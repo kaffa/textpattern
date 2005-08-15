@@ -1,7 +1,9 @@
 The structure of the repository is pretty simple. 
 
-current/  		Contains the most recent stable Textpattern version.
-developmental/ 		Contains developmental versions that may be broken in some features.
-releases/ 		Contains official release versions as source and archives.
+current/         Deprecated, will soon disappear.
+stable/          This contains all stable branchess of Textpattern
+                 (There is currently only one branch: /4.0 )
+development/     will be where future versions will be developed
+releases/ 		 Contains official release versions (tags)
 
-Dec 21, 2004
+Aug 15, 2005
