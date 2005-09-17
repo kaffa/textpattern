@@ -86,7 +86,7 @@ if (!empty($event) and $event == 'article') {
 			if ($publish_now==1) {
 				$when = 'now()';
 			} else {
-				$when = strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.":00")-tz_offset();
+				$when = "'".strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.":00")-tz_offset()."'";
 				$when = "from_unixtime($when)";
 			}
 
@@ -98,7 +98,7 @@ if (!empty($event) and $event == 'article') {
 				if (!has_privs('article.publish') && $Status>=4) $Status = 3;
 				if (empty($url_title)) $url_title = stripSpace($Title_plain, 1);  	
 
-				safe_insert(
+				$GLOBALS['ID'] = safe_insert(
 				   "textpattern",
 				   "Title           = '$Title',
 					Body            = '$Body',
@@ -133,8 +133,6 @@ if (!empty($event) and $event == 'article') {
 					uid				= '".md5(uniqid(rand(),true))."',
 					feed_time		= now()"
 				);
-				
-			$GLOBALS['ID'] = mysql_insert_id();
 				
 			if ($Status>=4) {
 	
@@ -216,7 +214,7 @@ if (!empty($event) and $event == 'article') {
 			$whenposted = "Posted=now()"; 
 		} else {
 			$when = strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.":00")-tz_offset();
-			$when = "from_unixtime($when)";
+			$when = "from_unixtime('$when')";
 			$whenposted = "Posted=$when";
 		}
 		
@@ -688,8 +686,9 @@ if (!empty($event) and $event == 'article') {
 		$dir = ($whichway == 'prev') ? '<' : '>'; 
 		$ord = ($whichway == 'prev') ? 'desc' : 'asc'; 
 
-		return safe_field("ID", "textpattern", 
-			"Posted $dir from_unixtime($sPosted) order by Posted $ord limit 1");
+		if ($sPosted)
+			return safe_field("ID", "textpattern", 
+				"Posted $dir from_unixtime('$sPosted') order by Posted $ord limit 1");
 	}
 
 //--------------------------------------------------------------

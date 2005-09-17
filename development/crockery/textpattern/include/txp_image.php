@@ -196,7 +196,7 @@ $LastChangedRevision$
 			$name .= $ext;
 			$name2db = doSlash($name);
 
-			$rs = safe_insert("txp_image",
+			$id = safe_insert("txp_image",
 				"w        = '$w',
 				 h        = '$h',
 				 category = '$category',
@@ -206,9 +206,7 @@ $LastChangedRevision$
 				 author   = '$txp_user'
 			");
 			
-			$id = mysql_insert_id();
-			
-			if(!$rs){
+			if(!$id){
 
 				image_list('there was a problem saving image data');
 

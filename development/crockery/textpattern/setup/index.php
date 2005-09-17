@@ -18,12 +18,14 @@ if (!defined('txpath'))
 	define("txpath", dirname(dirname(__FILE__)));
 	define("txpinterface", "admin");
 }
+
 error_reporting(E_ALL);
 @ini_set("display_errors","1");
 
 include_once txpath.'/lib/txplib_html.php';
 include_once txpath.'/lib/txplib_forms.php';
 include_once txpath.'/lib/txplib_misc.php';
+include_once txpath.'/lib/mdb.php';
 
 header("Content-type: text/html; charset=utf-8");
 
@@ -184,7 +186,7 @@ eod;
 				 characters must match one of <b>a-zA-Z0-9_</b>';
 
 		echo graf(gTxt("checking_database"));
-		if (!($mylink = mysql_connect($dhost,$duser,$dpass))){
+		if (!db_connect($dhost,$duser,$dpass,$ddb)){
 			exit(graf(gTxt('db_cant_connect')));
 		}
 
@@ -194,20 +196,19 @@ eod;
 			exit(graf(str_replace("{dbprefix}",strong($dprefix),gTxt("prefix_bad_characters"))));
 		}
 
-		if (!$mydb = mysql_select_db($ddb)) {
+		if (!db_selectdb($ddb)) {
 			exit(graf(str_replace("{dbname}",strong($ddb),gTxt("db_doesnt_exist"))));
 		}
 
 		// On 4.1 or greater use utf8-tables
-		$version = mysql_get_server_info();
-		if ( intval($version[0]) >= 5 || preg_match('#^4\.[1-9]#',$version)) 
-		{
-			if (mysql_query("SET NAMES utf8"))
-			{
-				$carry['dbcharset'] = "utf8";
-				$carry['dbcollate'] = "utf8_general_ci";
-			} else $carry['dbcharset'] = "latin1";
-		} else $carry['dbcharset'] = "latin1";
+		if (db_query("SET NAMES utf8")) {
+			$carry['dbcharset'] = "utf8";
+			$carry['dbcollate'] = "utf8_general_ci";
+		} 
+		else {
+			$carry['dbcharset'] = "latin1";
+			$carry['dbcollate'] = '';
+		}
 
 		echo graf(str_replace("{dbname}", strong($ddb), gTxt('using_db')).' ('. $carry['dbcharset'] .')' ),
 		
@@ -302,12 +303,12 @@ eod;
 
  		$nonce = md5( uniqid( rand(), true ) );
 
-		mysql_query("INSERT INTO `".PFX."txp_users` VALUES
+		db_query("INSERT INTO ".PFX."txp_users VALUES
 			(1,'$name',password(lower('$pass')),'$RealName','$email',1,now(),'$nonce')");
 
-		mysql_query("update `".PFX."txp_prefs` set val = '$siteurl' where `name`='siteurl'");
-		mysql_query("update `".PFX."txp_prefs` set val = '$lang' where `name`='language'");
-		mysql_query("update `".PFX."txp_prefs` set val = '".getlocale($lang)."' where `name`='locale'");
+		db_query("update ".PFX."txp_prefs set val = '$siteurl' where name='siteurl'");
+		db_query("update ".PFX."txp_prefs set val = '$lang' where name='language'");
+		db_query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");
 
  		echo fbCreate();
 	}

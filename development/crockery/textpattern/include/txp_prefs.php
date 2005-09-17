@@ -76,11 +76,11 @@ $LastChangedRevision$
 		tr(tdcs(sLink('prefs','advanced_prefs',gTxt('advanced_preferences'),'navlink').sp.
 			sLink('prefs','list_languages',gTxt('manage_languages'),'navlink'),'3'));
 		
-		$evt_list = safe_column('event','txp_prefs',"type='0' AND prefs_id='1' GROUP BY 'event' ORDER BY 'event' DESC");
+		$evt_list = safe_column('event','txp_prefs',"type='0' AND prefs_id='1' GROUP BY event ORDER BY event DESC");
 		
 		foreach ($evt_list as $event)
 		{			
-			$rs = safe_rows_start('*','txp_prefs',"type='0' AND prefs_id='1' AND event='$event' ORDER BY 'position'");
+			$rs = safe_rows_start('*','txp_prefs',"type='0' AND prefs_id='1' AND event='$event' ORDER BY position");
 			$cur_evt = '';
 			while ($a = nextRow($rs))
 			{			
@@ -239,7 +239,7 @@ $LastChangedRevision$
 //-------------------------------------------------------------
 	function languages($item,$var) 
 	{
-		$installed_langs = safe_column('lang','txp_lang',"1 GROUP BY 'lang'");
+		$installed_langs = safe_column('lang','txp_lang',"1=1 GROUP BY lang");
 		
 		$things = array();
 		
@@ -493,7 +493,7 @@ $LastChangedRevision$
 		}
 		# Get installed items from the database
 		# I'm affraid we need a value here for the language itself, not for each one of the rows
-		$rows = safe_rows('lang, UNIX_TIMESTAMP(MAX(lastmod)) as lastmod','txp_lang',"1 GROUP BY lang ORDER BY lastmod DESC");
+		$rows = safe_rows('lang, UNIX_TIMESTAMP(MAX(lastmod)) as lastmod','txp_lang',"1=1 GROUP BY lang ORDER BY lastmod DESC");
 		foreach ($rows as $language)
 		{
 			$available_lang[$language['lang']]['db_lastmod'] = $language['lastmod'];
@@ -605,7 +605,7 @@ $LastChangedRevision$
 			{
 				extract(gpsa(array('lang_code','updating')));
 				$exists = safe_field('name','txp_lang',"name='$value[name]' AND lang='$lang_code'");				
-				$q = "name='".doSlash($value['name'])."', event='".doSlash($value['event'])."', data='".doSlash($value['data'])."', lastmod='".strftime('%Y%m%d%H%M%S',$value['uLastmod'])."'";
+				$q = "name='".doSlash($value['name'])."', event='".doSlash($value['event'])."', data='".doSlash($value['data'])."', lastmod='".strftime('%Y-%m-%d %H:%M:%S',$value['uLastmod'])."'";
 
 				if ($exists)
 				{

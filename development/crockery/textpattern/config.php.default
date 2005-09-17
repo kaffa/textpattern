@@ -39,4 +39,10 @@
 
 		$txpcfg['dbcharset'] = 'latin1';
 
+	/**
+	 *  DB type = 'my' or 'pg'
+	 */
+
+		$txpcfg['dbtype'] = 'my';
+
 ?>

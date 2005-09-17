@@ -176,9 +176,11 @@ $LastChangedRevision$
 //-------------------------------------------------------------
 	function type_options($array)
 	{
-		foreach($array as $a=>$b) {
-			$out[] = t.'<option value="'.$a.'">'.gTxt($b).'</option>'.n;
-		}
+		$out = array();
+		if ($array)
+			foreach($array as $a=>$b) {
+				$out[] = t.'<option value="'.$a.'">'.gTxt($b).'</option>'.n;
+			}
 		return join('',$out);
 	}
 

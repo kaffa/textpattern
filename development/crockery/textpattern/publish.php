@@ -512,8 +512,8 @@ $LastChangedRevision$
 			include_once txpath.'/publish/search.php';
 			$s_filter = ($searchall ? filterSearch() : '');
 			$q = doSlash($q);
-			$match = ", match (Title,Body) against ('$q') as score";
-			$search = " and (Title rlike '$q' or Body rlike '$q') $s_filter";
+			$match = ", ".db_match('Title,Body', $q);
+			$search = " and (Title ".db_rlike()." '$q' or Body ".db_rlike()." '$q') $s_filter";
 
 			// searchall=0 can be used to show search results for the current section only
 			if ($searchall) $section = '';
@@ -566,7 +566,7 @@ $LastChangedRevision$
 			}
 			$keywords = " and (" . join(' or ',$keyparts) . ")"; 
 		}
-		$where = "1" . ($id ? " and Status >= '4'" : " and Status='".doSlash($status)."'"). $time.
+		$where = "1=1" . ($id ? " and Status >= '4'" : " and Status='".doSlash($status)."'"). $time.
 			$search . $id . $category . $section . $excerpted . $month . $author . $keywords . $custom . $frontpage;
 
 		//do not paginate if we are on a custom list
@@ -575,7 +575,7 @@ $LastChangedRevision$
 			$total = safe_count('textpattern',$where) - $offset;
 			$numPages = ceil($total/$limit);  
 			$pg = (!$pg) ? 1 : $pg;
-			$pgoffset = $offset + (($pg - 1) * $limit).', ';	
+			$pgoffset = $offset + (($pg - 1) * $limit);	
 			// send paging info to txp:newer and txp:older
 			$pageout['pg']       = $pg;
 			$pageout['numPages'] = $numPages;
@@ -587,11 +587,11 @@ $LastChangedRevision$
 			if ($pgonly)
 				return;
 		}else{
-			$pgoffset = $offset . ', ';
+			$pgoffset = $offset;
 		}
 
 		$rs = safe_rows_start("*, unix_timestamp(Posted) as uPosted".$match, 'textpattern', 
-		$where. ' order by ' . doslash($sortby) . ' ' . doSlash($sortdir) . ' limit ' . doSlash($pgoffset.$limit));
+		$where. ' order by ' . doslash($sortby) . ' ' . doSlash($sortdir) . ' ' . db_limit($limit,  $pgoffset));
 		// alternative form override for search or list
 		if ($q and !$iscustom and !$issticky)
 			$form = gAtt($atts, 'searchform', 'search_results');
@@ -751,17 +751,19 @@ $LastChangedRevision$
 	function getNeighbour($Posted, $s, $type) 
 	{
 		$type = ($type == '>') ? '>' : '<';
-		$q = array(
-			"select ID, Title, url_title, unix_timestamp(Posted) as uposted
-			from ".PFX."textpattern where Posted $type '".doSlash($Posted)."'",
-			($s!='' && $s!='default') ? "and Section = '".doSlash($s)."'" : filterFrontPage(),
-			'and Status=4 and Posted < now() order by Posted',
-			($type=='<') ? 'desc' : 'asc',
-			'limit 1'
-		);
+		if ($Posted) {
+			$q = array(
+				"select ID, Title, url_title, unix_timestamp(Posted) as uposted
+				from ".PFX."textpattern where Posted $type '".doSlash($Posted)."'",
+				($s!='' && $s!='default') ? "and Section = '".doSlash($s)."'" : filterFrontPage(),
+				'and Status=4 and Posted < now() order by Posted',
+				($type=='<') ? 'desc' : 'asc',
+				'limit 1'
+			);
 
-		$out = getRow(join(' ',$q));
-		return (is_array($out)) ? $out : '';
+			$out = getRow(join(' ',$q));
+			return (is_array($out)) ? $out : '';
+		}
 	}
 
 // -------------------------------------------------------------
@@ -829,7 +831,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function lastMod() 
 	{
-		$last = safe_field("unix_timestamp(val)", "txp_prefs", "`name`='lastmod' and prefs_id=1");
+		$last = safe_field("unix_timestamp(val)", "txp_prefs", "name='lastmod' and prefs_id=1");
 		return gmdate("D, d M Y H:i:s \G\M\T",$last);	
 	}
 
@@ -925,13 +927,14 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function ckEx($table,$val,$debug='') 
 	{
-		return safe_field("name",'txp_'.$table,"`name` like '".doSlash($val)."' limit 1",$debug);
+		return safe_field("name",'txp_'.$table,"name like '".doSlash($val)."' limit 1",$debug);
 	}
 
 // -------------------------------------------------------------
 	function ckExID($val,$debug='') 
 	{
-		return safe_row("ID,Section",'textpattern',"ID = ".doSlash($val)." limit 1",$debug);
+		if (is_numeric($val))
+			return safe_row("ID,Section",'textpattern',"ID = '".doSlash($val)."' limit 1",$debug);
 	}
 
 // -------------------------------------------------------------

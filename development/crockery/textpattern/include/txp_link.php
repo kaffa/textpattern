@@ -33,7 +33,7 @@ $LastChangedRevision$
 		extract(get_prefs());
 		
 		$page = gps('page');
-		$total = getCount('txp_link',"1");  
+		$total = getCount('txp_link',"1=1");  
 		$limit = $link_list_pageby;
 		$numPages = ceil($total/$limit);  
 		$page = (!$page) ? 1 : $page;

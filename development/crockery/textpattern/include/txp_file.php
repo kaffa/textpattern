@@ -255,17 +255,14 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function file_db_add($filename,$category,$permissions,$description)
 	{
-		$rs = safe_insert("txp_file",
+		$id = safe_insert("txp_file",
 			"filename = '$filename',
 			 category = '$category',
 			 permissions = '$permissions',
 			 description = '$description'
 		");
 		
-		if ($rs)
-			return mysql_insert_id();
-			
-		return false;
+		return $id;
 	}	
 	
 // -------------------------------------------------------------
@@ -418,7 +415,7 @@ $LastChangedRevision$
 			$permissions = implode(",",$permissions);
 		}
 
-		$perms = mysql_real_escape_string($permissions);
+		$perms = doSlash($permissions);
 		
 		$old_filename = fetch('filename','txp_file','id','$id');
 		

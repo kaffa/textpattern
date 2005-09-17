@@ -40,6 +40,7 @@ $LastChangedRevision$
 	error_reporting(E_ALL);
 	@ini_set("display_errors","1");
 
+	include txpath.'/lib/mdb.php';
 	include txpath.'/lib/txplib_db.php';
 	include txpath.'/lib/txplib_forms.php';
 	include txpath.'/lib/txplib_html.php';
@@ -48,7 +49,7 @@ $LastChangedRevision$
 
 	$microstart = getmicrotime();
 
-	 if ($connected && safe_query("describe `".PFX."textpattern`")) {
+	 if ($connected && db_table_exists(PFX.'textpattern')) {
 
 		$dbversion = safe_field('val','txp_prefs',"name = 'version'");
 

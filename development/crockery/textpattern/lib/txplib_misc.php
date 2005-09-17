@@ -55,11 +55,7 @@ else
 // -------------------------------------------------------------
 	function doSlash($in)
 	{ 
-		if(phpversion() >= "4.3.0") {
-			return doArray($in,'mysql_real_escape_string');
-		} else {
-			return doArray($in,'mysql_escape_string');
-		}
+		return doArray($in,'db_escape');
 	}
 
 // -------------------------------------------------------------
@@ -201,7 +197,7 @@ else
 		if (empty($user))
 			$user = $txp_user;
 
-		$privs = safe_field("privs", "txp_users", "`name`='".doSlash($user)."'");
+		$privs = safe_field("privs", "txp_users", "name='".doSlash($user)."'");
 		if (@$txp_permissions[$res])
 			$req = explode(',', $txp_permissions[$res]);
 		else

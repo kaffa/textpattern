@@ -287,7 +287,7 @@ if ($event == 'admin') {
 		.	td()
 		.	td()
 		);
-		$rs = safe_rows_start("*", "txp_users", "1");
+		$rs = safe_rows_start("*", "txp_users", "1=1");
 		if ($rs) {
 			while ($a = nextRow($rs)) {
 				extract($a);

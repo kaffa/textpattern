@@ -189,7 +189,7 @@ $LastChangedRevision$
 		$Form = fetch_form($form);
 		
 		$qparts = array(
-			($category) ? "category='$category'" : '1',
+			($category) ? "category='$category'" : '1=1',
 			"order by",
 			$sort,
 			($limit) ? "limit $limit" : ''
@@ -361,7 +361,7 @@ $LastChangedRevision$
 			if (!empty($Category2)) array_push($cat_condition, "(Category1='$Category2')","(Category2='$Category2')");
 			$cat_condition = (count($cat_condition)) ? join(' or ',$cat_condition) : '';
 
-			$q = array("select *, id as thisid, unix_timestamp(Posted) as posted from `".PFX."textpattern` where Status=4",
+			$q = array("select *, id as thisid, unix_timestamp(Posted) as posted from ".PFX."textpattern where Status=4",
 				($cat_condition) ? "and (". $cat_condition. ")" :'',
 				"and Posted <= now() order by Posted desc limit 0,$limit");
 
@@ -399,7 +399,7 @@ $LastChangedRevision$
 		$thetable = ($type=='s') ? 'section' : 'category';
 		$out ='<select name="'.$type.'" onchange="submit(this.form)">'.n.
 		t.'<option value=""></option>'.n;
-		$q[] = "select name,title from `".PFX."txp_".$thetable."` where name != 'default'";
+		$q[] = "select name,title from ".PFX."txp_".$thetable." where name != 'default'";
 		$q[] = ($thetable=='category') ? "and type='article'" : '';
 		$q[] = "order by name";
 
@@ -1273,7 +1273,7 @@ $LastChangedRevision$
 		$article = safe_row(
 			"*,ID as thisid, unix_timestamp(Posted) as posted",
 			"textpattern",
-			"ID=$ID");
+			"ID='".doSlash($ID)."'");
 		
 		return permlinkurl($article);
 	}
