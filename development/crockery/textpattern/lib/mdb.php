@@ -109,21 +109,26 @@ function db_table_list() {
 	return $rs;
 }
 
-function db_column_exists($tbl, $col, $res=0) {
+function db_column_list($tbl, $res=0) {
 	global $mdb_res;
 	$res = ($res ? $res : $mdb_res);
 
 	if (MDB_TYPE == 'pg') {
 		$cols = @pg_meta_data($mdb_res, $tbl);
-		return (!empty($cols[$col]));
+		return $cols ? $cols : array();
 	}
 	else {
 		$cols = array();
 		if ($rs = mysql_query('describe '.$tbl)) 
 			while ($row = mysql_fetch_assoc($rs))
 				$cols[$row['Field']] = $row;
-		return (!empty($cols[$col]));
+		return $cols;
 	}
+}
+
+function db_column_exists($tbl, $col, $res=0) {
+	$cols = db_column_list($tbl, $res);
+	return !empty($cols[$col]);
 }
 
 function db_last_insert_id($table, $res=0) {
