@@ -94,6 +94,16 @@ $DB = new DB;
 	}
 
 // -------------------------------------------------------------
+	function safe_upgrade_table($table, $cols, $debug='') 
+	{
+		$current = db_column_list(PFX.$table);
+		foreach ($cols as $name=>$type) {
+			if (empty($current[$name]))
+				safe_alter($table, 'add '.$name.' '.$type);
+		}
+	}
+
+// -------------------------------------------------------------
 	function safe_optimize($table, $debug='') 
 	{
 		$q = "optimize table ".PFX."$table";

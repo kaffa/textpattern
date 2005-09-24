@@ -19,11 +19,32 @@ $LastChangedRevision$
 		return $newest;
 	}
 
-	if ( $txp_using_svn && (newest_file() < $dbupdatetime) ) 
-		return;
+	function get_update_files() {
+		$files = array();
+		$dp = opendir(txpath.'/update/');
+		while (false !== ($file = readdir($dp))) 
+		{
+			if (strpos($file,"_to_") === 0)
+				$files[] = $file;
+		}
+		closedir($dp);
+		// sort so they're in the correct order to apply
+		sort($files);
+		return $files;
+	}
 
 	@ignore_user_abort(1);
 	@set_time_limit(0);
+
+	// Run any update file newer than the last dbupdatetime
+	if ($txp_using_svn) {
+		foreach (get_update_files() as $file) {
+			$f = txpath."/update/$file";
+			if (filemtime($f) > $dbupdatetime)
+				include($f);
+		}
+		return;
+	}
 
 	//Use "ENGINE" if version of MySQL > (4.0.18 or 4.1.2)
 	// On 4.1 or greater use utf8-tables, if that is configures in config.php
@@ -36,19 +57,16 @@ $LastChangedRevision$
 		$tabletype .= " CHARACTER SET = ". $txpcfg['dbcharset'] ." ";
 	}
 
-	// Update to 4.0
-	if (( $dbversion == '' ) ||  
-		( strpos($dbversion, 'g1'   ) === 0) ||  
-		( strpos($dbversion, '1.0rc') === 0) )  
-	{  
-		if ((include txpath.DS.'update'.DS.'_to_1.0.0.php') !== false)
-			$dbversion = '4.0';
-	}  
-
-	if ( $dbversion !== '4.0.2' )
-	{  
-		if ((include txpath.DS.'update'.DS.'_to_4.0.2.php') !== false)
-			$dbversion = '4.0.1';
+	// Run any update file newer than the last dbupdatetime
+	foreach (get_update_files() as $file) {
+		if (preg_match('@_to_(.*)\.php@', $file, $m)) {
+			$file_ver = $m[1];
+			$f = txpath."/update/$file";
+			if (version_compare($file_ver, $dbversion) > 0) {
+				include($f);
+				$dbversion = $file_ver;
+			}
+		}
 	}
 
 	// keep track of updates for svn users
