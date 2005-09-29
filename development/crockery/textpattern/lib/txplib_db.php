@@ -13,6 +13,8 @@ if (!defined('PFX')) {
 	} else define ("PFX",'');
 }
 
+set_magic_quotes_runtime(0);
+
 include_once('mdb.php');
 
 class DB {
@@ -248,6 +250,12 @@ $DB = new DB;
 		if ($row === false)
 			db_free($r);
 		return $row;
+	}
+
+//-------------------------------------------------------------
+	function numRows($r)
+	{
+		return mysql_num_rows($r);
 	}
 
 //-------------------------------------------------------------

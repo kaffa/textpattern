@@ -18,13 +18,15 @@ $LastChangedRevision$
 		extract(lAtts(array('separator' => ': '),$atts));
 		$s = $sitename;
 		$sep = $separator;
-		if ($id)       return $s.$sep.safe_field('Title','textpattern',"ID = $id");
-		if ($c)        return $s.$sep.fetch_category_title($c);
-		if ($q)        return $s.$sep.gTxt('search_results').$sep.' '.$q;
-		if ($pg)       return $s.$sep.gTxt('page').' '.$pg;
-		if ($parentid) return $s.$sep.gTxt('comments_on').' '.
+
+		$out = $sitename;
+		if ($id)       $out = $s.$sep.safe_field('Title','textpattern',"ID = $id");
+		if ($c)        $out = $s.$sep.fetch_category_title($c);
+		if ($q)        $out = $s.$sep.gTxt('search_results').$sep.' '.$q;
+		if ($pg)       $out = $s.$sep.gTxt('page').' '.$pg;
+		if ($parentid) $out = $s.$sep.gTxt('comments_on').' '.
 			safe_field('Title','textpattern',"ID = '$parentid'");
-		return $sitename;
+		return escape_title($out);
 	}
 
 // -------------------------------------------------------------
@@ -144,12 +146,13 @@ $LastChangedRevision$
 			'category' => '',
 			'section'  => '',
 			'limit'    => '',
-			'flavor'   => 'rss'
+			'flavor'   => 'rss',
+			'title'    => gTxt('xml_feed_title'),
 		),$atts));
 		
 		$url = pagelinkurl(array('category'=>$category, 'section'=>$section, 'limit'=>$limit ,$flavor=>'1'));
 
-		$out = '<a href="'.$url.'" title="XML feed">'.$label.'</a>';
+		$out = '<a href="'.$url.'" title="'.$title.'">'.$label.'</a>';
 		return ($wraptag) ? tag($out,$wraptag) : $out;
 	}
 
@@ -161,12 +164,13 @@ $LastChangedRevision$
 			'break'    => br,
 			'wraptag'  => '',
 			'category' => '',
-			'flavor'   => 'rss'
+			'flavor'   => 'rss',
+			'title'    => gTxt('xml_feed_title'),
 		),$atts));
 	
 		$url = pagelinkurl(array('c'=>$category, $flavor=>'1', 'area'=>'link'));
 
-		$out = '<a href="'.$url.'" title="XML feed">'.$label.'</a>';
+		$out = '<a href="'.$url.'" title="'.$title.'">'.$label.'</a>';
 		
 		return ($wraptag) ? tag($out,$wraptag) : $out;
 	}
@@ -301,7 +305,7 @@ $LastChangedRevision$
 			if ($label) $out[] = $label;
 			while ($a = nextRow($rs)) {
 				extract($a);
-				$out[] = href($Title,permlinkurl($a));
+				$out[] = href(escape_title($Title),permlinkurl($a));
 			}
 			if (is_array($out)) {
 				return doWrap($out, $wraptag, $break, $class);
@@ -328,7 +332,7 @@ $LastChangedRevision$
         	while ($a = nextRow($rs)) {
 				extract($a);
 				$Title = safe_field("Title",'textpattern',"ID=$parentid");
-				$out[] = href($name.' ('.$Title.')', permlinkurl_id($parentid).'#c'.$discussid);
+				$out[] = href($name.' ('.escape_title($Title).')', permlinkurl_id($parentid).'#c'.$discussid);
 			}
 			if (!empty($out)) {
 				return doWrap($out, $wraptag, $break, $class);
@@ -372,7 +376,7 @@ $LastChangedRevision$
 				foreach($rs as $a) {
 					extract($a);
 					if ($thisid == $id) continue;
-					$out[] = href($Title,permlinkurl($a));
+					$out[] = href(escape_title($Title),permlinkurl($a));
 				}
 				if (is_array($out)) {
 					return doWrap($out, $wraptag, $break, $class);
@@ -1661,6 +1665,37 @@ $LastChangedRevision$
 		), $atts));
 
 		return @htmlspecialchars($pretext[$type]);	
+	}
+
+// -------------------------------------------------------------
+	function if_different($atts, $thing) 
+	{
+		static $last;
+
+		$key = md5($thing);
+
+		$cond = EvalElse($thing, 1);
+
+		$out = parse($cond);
+		if (empty($last[$key]) or $out != $last[$key]) {
+			return $last[$key] = $out;
+		}
+		else
+			return parse(EvalElse($thing, 0));
+	}
+
+// -------------------------------------------------------------
+	function if_first_article($atts, $thing) 
+	{
+		global $thisarticle;
+		return parse(EvalElse($thing, !empty($thisarticle['is_first'])));
+	}
+
+// -------------------------------------------------------------
+	function if_last_article($atts, $thing) 
+	{
+		global $thisarticle;
+		return parse(EvalElse($thing, !empty($thisarticle['is_last'])));
 	}
 
 //--------------------------------------------------------------------------
