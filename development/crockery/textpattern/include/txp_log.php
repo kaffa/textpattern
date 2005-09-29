@@ -55,7 +55,7 @@ $LastChangedRevision$
 		$rs = safe_rows_start(
 			"*, unix_timestamp(time) as stamp", 
 			"txp_log", 
-			"1 order by time desc limit $offset, $limit"
+			"1=1 order by time desc ".db_limit($limit, $offset)
 		);
 
 		if ($rs) {
