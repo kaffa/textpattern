@@ -511,9 +511,14 @@ $LastChangedRevision$
 		if($q && !$iscustom && !$issticky) {
 			include_once txpath.'/publish/search.php';
 			$s_filter = ($searchall ? filterSearch() : '');
-			$q = doSlash($q);
-			$match = ", ".db_match('Title,Body', $q);
-			$search = " and (Title ".db_rlike()." '$q' or Body ".db_rlike()." '$q') $s_filter";
+			$match = ", ".db_match('Title,Body', doSlash($q));
+
+			$words = preg_split('/\s+/', $q);
+			foreach ($words as $w) {
+				$customsql = ($searchcustom ? buildCustomSearch($customFields, $w) : '');
+				$rlike[] = " and (Title ".db_rlike()." '".doSlash($w)."' or Body ".db_rlike()." '".doSlash($w)."'".$customsql.")";
+			}
+			$search = " and " . join(' and ', $rlike) . " $s_filter";
 
 			// searchall=0 can be used to show search results for the current section only
 			if ($searchall) $section = '';
