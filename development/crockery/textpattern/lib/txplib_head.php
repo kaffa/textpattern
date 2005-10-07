@@ -87,6 +87,56 @@ $LastChangedRevision$
 				}
 			}
 		}
+		
+		function poweredit(elm)
+		{
+			
+<?php
+			$sections = '';
+			$rs = safe_column("name", "txp_section", "name!='default'");
+			if ($rs) {	
+				$sections = str_replace("\n",'',stripslashes(selectInput("Section", $rs, '',1)));
+			}
+			
+			$statuses = str_replace("\n",'',stripslashes(selectInput('Status',array(
+					1 => gTxt('draft'),
+					2 => gTxt('hidden'),
+					3 => gTxt('pending'),
+					4 => gTxt('live'),
+					5 => gTxt('sticky'),
+			),'')));
+?>
+			something = elm.options[elm.selectedIndex].value;
+			// Add another chunk of HTML
+			pjs = document.getElementById('js');
+			if(pjs == null) {
+				br = document.createElement('br');
+				elm.parentNode.appendChild(br);
+				pjs = document.createElement('P');
+				pjs.setAttribute('id','js');
+				pjs.setAttribute('style','text-align:right; padding-right:30px; display: none;');
+				elm.parentNode.appendChild(pjs);
+			}
+			
+			if(pjs.style.display == 'none' || pjs.style.display == '') pjs.style.display = 'block';
+			
+			if(something!='' && something == 'changesection'){
+				sects = '<?php echo $sections; ?>';
+				pjs.innerHTML = '<span style="background-color: #ffc; padding: 10px;"><?php echo gTxt('section') ?>: '+sects+'</span>';
+			}else if(something!='' && something == 'changestatus'){
+				stats = '<?php echo $statuses; ?>';
+				pjs.innerHTML = '<span style="background-color: #ffc; padding: 10px;"><?php echo gTxt('status') ?>: '+stats+'</span>';
+			}else{
+				pjs.style.display = 'none';
+			}
+			
+			return false;
+		}
+		
+		window.onload = function(){
+			withsel = document.getElementById('withselected');
+			if(withsel.options[withsel.selectedIndex].value != '') return (withsel.selectedIndex = 0);
+		}
 	-->
 	</script>
 	</head>

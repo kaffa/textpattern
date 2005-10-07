@@ -30,6 +30,10 @@ $statuses = array(
 		5 => gTxt('sticky'),
 );
 
+if (!defined('LEAVE_TEXT_UNTOUCHED')) define('LEAVE_TEXT_UNTOUCHED', 0);
+if (!defined('USE_TEXTILE')) define('USE_TEXTILE', 1);
+if (!defined('CONVERT_LINEBREAKS')) define('CONVERT_LINEBREAKS', 2);
+
 if (!empty($event) and $event == 'article') {
 	require_privs('article');
 
@@ -59,105 +63,68 @@ if (!empty($event) and $event == 'article') {
 		extract(get_prefs());
 		$incoming = psa($vars);
 		$message='';
-		
-		include_once $txpcfg['txpath'].'/lib/classTextile.php';
-		$textile = new Textile();
-		
-		if ($use_textile==0 or !$incoming['textile_body']) {
-			$incoming['Body_html'] = trim($incoming['Body']);
-		} else if ($use_textile==1) {
-			$incoming['Body_html'] = nl2br(trim($incoming['Body']));
-		} else if ($use_textile==2 && $incoming['textile_body']) {
-			$incoming['Body_html'] = $textile->TextileThis($incoming['Body']);
-		}
-		
-		$incoming['Title_plain'] = $incoming['Title'];
 
-		$incoming['Title'] = $textile->TextileThis($incoming['Title'],'',1);
+		$incoming = textile_main_fields($incoming, $use_textile);
 
-		if ($incoming['textile_excerpt']) {
-			$incoming['Excerpt_html'] = $textile->TextileThis($incoming['Excerpt']);
-		}else{
-			$incoming['Excerpt_html'] = $textile->TextileThis($incoming['Excerpt'],1);
+		extract(doSlash($incoming));
+
+		if ($publish_now==1) {
+			$when = 'now()';
+		} else {
+			$when = strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.":00")-tz_offset();
+			$when = "from_unixtime($when)";
 		}
 
-			extract(doSlash($incoming));
-
-			if ($publish_now==1) {
-				$when = 'now()';
-			} else {
-				$when = "'".strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.":00")-tz_offset()."'";
-				$when = "from_unixtime($when)";
-			}
-
-			if ($Title or $Body or $Excerpt) {
-
-				$textile_body = (!$textile_body) ? 0 : 1;
-				$textile_excerpt = (!$textile_excerpt) ? 0 : 1;
-				
-				if (!has_privs('article.publish') && $Status>=4) $Status = 3;
-				if (empty($url_title)) $url_title = stripSpace($Title_plain, 1);  	
-
-				$GLOBALS['ID'] = safe_insert(
-				   "textpattern",
-				   "Title           = '$Title',
-					Body            = '$Body',
-					Body_html       = '$Body_html',
-					Excerpt         = '$Excerpt',
-					Excerpt_html    = '$Excerpt_html',
-					Image           = '$Image',
-					Keywords        = '$Keywords',
-					Status          = '$Status',
-					Posted          = $when,
-					LastMod         = now(),
-					AuthorID        = '$txp_user',
-					Section         = '$Section',
-					Category1       = '$Category1',
-					Category2       = '$Category2',
-					textile_body    =  $textile_body,
-					textile_excerpt =  $textile_excerpt,
-					Annotate        = '$Annotate',
-					override_form   = '$override_form',
-					url_title       = '$url_title',
-					AnnotateInvite  = '$AnnotateInvite',
-					custom_1        = '$custom_1',
-					custom_2        = '$custom_2',
-					custom_3        = '$custom_3',
-					custom_4        = '$custom_4',
-					custom_5        = '$custom_5',
-					custom_6        = '$custom_6',
-					custom_7        = '$custom_7',
-					custom_8        = '$custom_8',
-					custom_9        = '$custom_9',
-					custom_10       = '$custom_10',
-					uid				= '".md5(uniqid(rand(),true))."',
-					feed_time		= now()"
-				);
-				
-			if ($Status>=4) {
-	
-				safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
-				$message = gTxt('article_posted');
-	
-				include_once $txpcfg['txpath'].'/lib/IXRClass.php';
-				
-				if ($ping_textpattern_com) {
-					$tx_client = new IXR_Client('http://textpattern.com/xmlrpc/');
-					$tx_client->query('ping.Textpattern', $sitename, hu);
-				}
-	
-				if ($ping_weblogsdotcom==1) {
-					$wl_client = new IXR_Client('http://rpc.pingomatic.com/');
-					$wl_client->query('weblogUpdates.ping', $sitename, hu);
-				}		
+		if ($Title or $Body or $Excerpt) {
 			
-			} else { 	
-					 if ($Status==3) { $message = gTxt("article_saved_pending"); } 
-				else if ($Status==2) { $message = gTxt("article_saved_hidden");  } 
-				else if ($Status==1) { $message = gTxt("article_saved_draft");   }
+			if (!has_privs('article.publish') && $Status>=4) $Status = 3;
+			if (empty($url_title)) $url_title = stripSpace($Title_plain, 1);  	
+
+			safe_insert(
+			   "textpattern",
+			   "Title           = '$Title',
+				Body            = '$Body',
+				Body_html       = '$Body_html',
+				Excerpt         = '$Excerpt',
+				Excerpt_html    = '$Excerpt_html',
+				Image           = '$Image',
+				Keywords        = '$Keywords',
+				Status          = '$Status',
+				Posted          = $when,
+				LastMod         = now(),
+				AuthorID        = '$txp_user',
+				Section         = '$Section',
+				Category1       = '$Category1',
+				Category2       = '$Category2',
+				textile_body    =  $textile_body,
+				textile_excerpt =  $textile_excerpt,
+				Annotate        = '$Annotate',
+				override_form   = '$override_form',
+				url_title       = '$url_title',
+				AnnotateInvite  = '$AnnotateInvite',
+				custom_1        = '$custom_1',
+				custom_2        = '$custom_2',
+				custom_3        = '$custom_3',
+				custom_4        = '$custom_4',
+				custom_5        = '$custom_5',
+				custom_6        = '$custom_6',
+				custom_7        = '$custom_7',
+				custom_8        = '$custom_8',
+				custom_9        = '$custom_9',
+				custom_10       = '$custom_10',
+				uid				= '".md5(uniqid(rand(),true))."',
+				feed_time		= now()"
+			);
+			
+			if ($Status>=4) {
+				
+				do_pings();
+				
+				safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
 			}
-			$message .= check_url_title($url_title);
-			article_edit($message);
+			article_edit(
+				get_status_message($Status).check_url_title($url_title)
+			);
 		} else article_edit();
 	}
 
@@ -181,30 +148,7 @@ if (!empty($event) and $event == 'article') {
 			return;
 		}
 
-		include_once $txpcfg['txpath'].'/lib/classTextile.php';
-		$textile = new Textile();
-
-		$incoming['Title_plain'] = $incoming['Title'];
-
-		if ($use_textile==0 or !$incoming['textile_body']) {
-
-			$incoming['Body_html'] = trim($incoming['Body']);
-
-		} else if ($use_textile==1) {
-
-			$incoming['Body_html'] = nl2br(trim($incoming['Body']));
-
-		} else if ($use_textile==2 && $incoming['textile_body']) {
-
-			$incoming['Body_html'] = $textile->TextileThis($incoming['Body']);
-			$incoming['Title'] = $textile->TextileThis($incoming['Title'],'',1);
-		}
-		
-		if ($incoming['textile_excerpt']) {
-			$incoming['Excerpt_html'] = $textile->TextileThis($incoming['Excerpt']);
-		}else{
-			$incoming['Excerpt_html'] = $textile->TextileThis($incoming['Excerpt'],1);
-		}
+		$incoming = textile_main_fields($incoming, $use_textile);
 
 		extract(doSlash($incoming));
 
@@ -218,8 +162,6 @@ if (!empty($event) and $event == 'article') {
 			$whenposted = "Posted=$when";
 		}
 		
-		$textile_body = (!$textile_body) ? 0 : 1;
-		$textile_excerpt = (!$textile_excerpt) ? 0 : 1;
 		if (empty($url_title))
 		{
 			$url_title = stripSpace($Title_plain, 1);
@@ -265,27 +207,15 @@ if (!empty($event) and $event == 'article') {
 
 		if($Status >= 4) {
 			if ($oldArticle['Status'] < 4) {
-				include_once $txpcfg['txpath'].'/lib/IXRClass.php';
-				
-				if ($ping_textpattern_com) {
-					$tx_client = new IXR_Client('http://textpattern.com/xmlrpc/');
-					$tx_client->query('ping.Textpattern', $sitename, $siteurl);
-				}
-
-				if ($ping_weblogsdotcom==1) {
-					$wl_client = new IXR_Client('http://rpc.pingomatic.com/');
-					$wl_client->query('weblogUpdates.ping', $sitename, hu);
-				}		
+				do_pings();	
 			}
 			safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
-			$message = gTxt("article_saved");
-		} else { 
-			     if ($Status==3) { $message = gTxt("article_saved_pending"); } 
-			else if ($Status==2) { $message = gTxt("article_saved_hidden");	 } 
-			else if ($Status==1) { $message = gTxt("article_saved_draft");	 }	
 		}
-		$message .= check_url_title($url_title);
-		article_edit($message);
+		
+		article_edit(
+			get_status_message($Status).check_url_title($url_title)
+		);
+
 	}
 
 //--------------------------------------------------------------
@@ -356,8 +286,8 @@ if (!empty($event) and $event == 'article') {
 		$GLOBALS['step'] = $step;
 
 		if ($step=='create') {
-			$textile_body = 1;
-			$textile_excerpt = 1;
+			$textile_body = $use_textile;
+			$textile_excerpt = $use_textile;
 		}
 
 		if ($step!='create') {
@@ -406,7 +336,7 @@ if (!empty($event) and $event == 'article') {
 
 	//-- textile help --------------
 
-		($view=='text' && $use_textile==2) ?
+		($view=='text' && $textile_body == USE_TEXTILE) ?
 		
 		'<p><a href="#" onclick="toggleDisplay(\'textile_help\');return false;">'.gTxt('textile_help').'</a></p>
 		<div id="textile_help" style="display:none;">'.sidehelp().'</div>' : sp;
@@ -420,11 +350,11 @@ if (!empty($event) and $event == 'article') {
 				
 				// textile toggles
 			graf(gTxt('use_textile').br.
-				tag(checkbox2('textile_body',$textile_body).
-					gTxt('article'),'label').
+				tag(gTxt('article').br.pref_text('textile_body',$textile_body)
+					,'label').
 				br.
-				tag(checkbox2('textile_excerpt',$textile_excerpt).
-					gTxt('excerpt'),'label')),
+				tag(gTxt('excerpt').br.pref_text('textile_excerpt',$textile_excerpt)
+					,'label')),
 
 				// form override
 			($allow_form_override)
@@ -484,21 +414,21 @@ if (!empty($event) and $event == 'article') {
 
     	if ($view=="preview") { 
 
-			if ($use_textile==2) {
+			if ($textile_body == USE_TEXTILE) {
 				echo $textile->TextileThis($Body);
-			} else if ($use_textile==1) {
+			} else if ($textile_body == CONVERT_LINEBREAKS) {
 				echo nl2br($Body);
-			} else if ($use_textile==0) {
+			} else if ($textile_body == LEAVE_TEXT_UNTOUCHED) {
 				echo $Body;
 			}
 
     	} elseif($view=="html") {
 
-			if ($use_textile==2) {
+			if ($textile_body == USE_TEXTILE) {
 				$bod = $textile->TextileThis($Body);
-			} else if ($use_textile==1) {
+			} else if ($textile_body == CONVERT_LINEBREAKS) {
 				$bod = nl2br($Body);
-			} else if ($use_textile==0) {
+			} else if ($textile_body == LEAVE_TEXT_UNTOUCHED) {
 				$bod = $Body;
 			}
 
@@ -525,12 +455,12 @@ if (!empty($event) and $event == 'article') {
 	
 				echo '<hr width="50%" />';
 				
-				echo ($textile_excerpt)
+				echo ($textile_excerpt == USE_TEXTILE)
 				?	($view=='preview')
-					?	graf($textile->textileThis($Excerpt),1)
+					?	graf($textile->textileThis($Excerpt))
 					:	tag(str_replace(array(n,t),
 							array(br,sp.sp.sp.sp),htmlspecialchars(
-								$textile->TextileThis($Excerpt),1)),'code')
+								$textile->TextileThis($Excerpt))),'code')
 				:	graf($Excerpt);
 			}
 		}
@@ -552,7 +482,7 @@ if (!empty($event) and $event == 'article') {
 
   	//-- layer tabs -------------------
 
-		echo ($use_textile==2)
+		echo ($use_textile == USE_TEXTILE || $textile_body == USE_TEXTILE)
 		?	tab('text',$view).tab('html',$view).tab('preview',$view)
 		:	'&#160;';
 	echo '</td>';
@@ -712,10 +642,10 @@ if (!empty($event) and $event == 'article') {
 //--------------------------------------------------------------
 	function sidehelp()
 	{
-		global $use_textile;
+		global $use_textile, $textile_body;
 		$out='<p><small>';
 
-		if ($use_textile==2) {
+		if ($use_textile == USE_TEXTILE || $textile_body == USE_TEXTILE) {
 			$out .=
 			gTxt('header').': <strong>h<em>n</em>.</strong>'.
 				popHelpSubtle('header',400,400).br.
@@ -826,5 +756,72 @@ if (!empty($event) and $event == 'article') {
 		}
 		return '';
 	}
+// -------------------------------------------------------------
+	function get_status_message($Status)
+	{
+		switch ($Status){
+			case 3: return gTxt("article_saved_pending");
+			case 2: return gTxt("article_saved_hidden");
+			case 1: return gTxt("article_saved_draft");
+			default: return gTxt('article_posted');
+		}
+	}
+// -------------------------------------------------------------
+	function textile_main_fields($incoming, $use_textile)
+	{
+		global $txpcfg;
+		
+		include_once $txpcfg['txpath'].'/lib/classTextile.php';
+		$textile = new Textile();
+		
+		$incoming['Title_plain'] = $incoming['Title'];
+		
+		if ($incoming['textile_body'] == LEAVE_TEXT_UNTOUCHED) {
+		
+			$incoming['Body_html'] = trim($incoming['Body']);
+			
+		}elseif ($incoming['textile_body'] == USE_TEXTILE){
+		
+			$incoming['Body_html'] = $textile->TextileThis($incoming['Body']);
+			$incoming['Title'] = $textile->TextileThis($incoming['Title'],'',1);
+			
+		}elseif ($incoming['textile_body'] == CONVERT_LINEBREAKS){
+			
+			$incoming['Body_html'] = nl2br(trim($incoming['Body']));
+		}
 
+		if ($incoming['textile_excerpt'] == LEAVE_TEXT_UNTOUCHED) {
+		
+			$incoming['Excerpt_html'] = trim($incoming['Excerpt']);
+			
+		}elseif ($incoming['textile_excerpt'] == USE_TEXTILE){
+		
+			$incoming['Excerpt_html'] = $textile->TextileThis($incoming['Excerpt']);
+			
+		}elseif ($incoming['textile_excerpt'] == CONVERT_LINEBREAKS){
+			
+			$incoming['Excerpt_html'] = nl2br(trim($incoming['Excerpt']));
+		}
+		
+		return $incoming;
+	}
+// -------------------------------------------------------------
+	function do_pings()
+	{
+		global $txpcfg;
+		
+		$prefs = get_prefs();
+		
+		include_once $txpcfg['txpath'].'/lib/IXRClass.php';
+		
+		if ($prefs['ping_textpattern_com']) {
+			$tx_client = new IXR_Client('http://textpattern.com/xmlrpc/');
+			$tx_client->query('ping.Textpattern', $prefs['sitename'], hu);
+		}
+
+		if ($prefs['ping_weblogsdotcom']==1) {
+			$wl_client = new IXR_Client('http://rpc.pingomatic.com/');
+			$wl_client->query('weblogUpdates.ping', $prefs['sitename'], hu);
+		}
+	}
 ?>

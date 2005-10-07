@@ -824,8 +824,14 @@ else
 	{
 		$method = ps('method');
 		$methods = array('delete'=>gTxt('delete'));
+		if ($name == 'list') {
+			$methods['changesection'] = gTxt('changesection');
+			$methods['changestatus'] = gTxt('changestatus');
+		}
 		return
-			gTxt('with_selected').sp.selectInput('method',$methods,$method,1).
+			gTxt('with_selected').sp.selectInput('method',$methods,$method,1,(
+				($name == 'list')? ' onchange="poweredit(this);return false;" id="withselected"':'')
+			).
 			eInput($name).sInput($name.'_multi_edit').fInput('submit','',gTxt('go'),'smallerbox');
 	}
 
@@ -843,7 +849,25 @@ else
 					}
 				}
 				return join(', ',$ids);
-			} else return '';
+			}elseif ($method == 'changesection'){
+				$section = ps('Section');
+				foreach($things as $id) {
+					$id = intval($id);
+					if (safe_update($tablename,"Section='$section'","$idkeyname='$id'")) {
+						$ids[] = $id;
+					}
+				}
+				return join(', ',$ids);
+			}elseif ($method == 'changestatus'){
+				$status = ps('Status');
+				foreach($things as $id) {
+					$id = intval($id);
+					if (safe_update($tablename,"Status='$status'","$idkeyname='$id'")) {
+						$ids[] = $id;
+					}
+				}
+				return join(', ',$ids);
+			}else return '';
 		} else return '';
 	}
 
@@ -1163,9 +1187,9 @@ else
 		extract($prefs);
 
 		$im = (!empty($comments_disallow_images)) ? 1 : '';
-		$msg = trim(nl2br($textile->TextileThis(strip_tags(deEntBrackets(
+		$msg = trim($textile->blockLite($textile->TextileThis(strip_tags(deEntBrackets(
 			$msg
-		)),1,'',$im,'',(@$comment_nofollow ? 'nofollow' : ''))));
+		))),1,'',$im,'',(@$comment_nofollow ? 'nofollow' : '')));
 
 		return $msg;
 	}

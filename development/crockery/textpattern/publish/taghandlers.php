@@ -470,12 +470,15 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function section_list($atts) // output href list of site sections
 	{
+		global $sitename;
+		
 		extract(lAtts(array(
 			'label'   => '',
 			'break'   => br,
 			'wraptag' => '',
 			'class'    => __FUNCTION__,
 			'labeltag' => '',
+			'include_default' => '',
 		),$atts));
 		
 		$rs = safe_rows_start("name,title","txp_section","name != 'default' order by name");
@@ -487,6 +490,7 @@ $LastChangedRevision$
 				$out[] = tag($title, 'a', ' href="'.$url.'"');
 			}
 			if (is_array($out)) {
+				if ($include_default) $out = array_merge(array(tag($sitename,'a', ' href="'.hu.'"')),$out);
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}
 		}
@@ -1452,18 +1456,18 @@ $LastChangedRevision$
 		}
 		
 		$category = empty($c)? '': $c;
-		$category_title = (($title) && ($c != '')) ? fetch_category_title($category) : $category;
-		$category_title_html = escape_title($category_title);
 		$cattree = array();
 
 		while($category and $category != 'root' and $parent = safe_field('parent','txp_category',"name='$category'")) {
 			//Use new /category/category_name scheme here too?
-				$cattree[] = ($linked)? 
-					tag($category_title_html,'a',' href="'.pagelinkurl(array('c'=>$category)).'"')
-						:$category_title_html;
-				$category = $parent;
-				unset($parent);
-		}		
+			$category_title = (($title) && ($category != '')) ? fetch_category_title($category) : $category;
+			$category_title_html = escape_title($category_title);
+			$cattree[] = ($linked)? 
+				tag($category_title_html,'a',' href="'.pagelinkurl(array('c'=>$category)).'"')
+					:$category_title_html;
+			$category = $parent;
+			unset($parent);
+		}
 
 		if (!empty($cattree))
 		{
