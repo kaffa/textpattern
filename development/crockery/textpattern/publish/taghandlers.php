@@ -20,10 +20,10 @@ $LastChangedRevision$
 		$sep = $separator;
 
 		$out = $sitename;
-		if ($id)       $out = $s.$sep.safe_field('Title','textpattern',"ID = $id");
 		if ($c)        $out = $s.$sep.fetch_category_title($c);
 		if ($q)        $out = $s.$sep.gTxt('search_results').$sep.' '.$q;
 		if ($pg)       $out = $s.$sep.gTxt('page').' '.$pg;
+		if ($id)       $out = $s.$sep.safe_field('Title','textpattern',"ID = $id");
 		if ($parentid) $out = $s.$sep.gTxt('comments_on').' '.
 			safe_field('Title','textpattern',"ID = '$parentid'");
 		return escape_title($out);
@@ -411,7 +411,7 @@ $LastChangedRevision$
 			foreach ($rs as $a) {
 				extract($a);
 				if ($name=='root') continue;
-				$sel = ($gc==$name or $gs==$name) ? 'selected="selected"' : '';
+				$sel = ($gc==$name or $gs==$name) ? ' selected="selected"' : '';
 				$out .= t.t.'<option value="'.urlencode($name).'"'.$sel.'>'.
 				$title.'</option>'.n;
 				unset($selected);
@@ -954,7 +954,7 @@ $LastChangedRevision$
 	function title($atts) 
 	{
 		global $thisarticle;
-		return $thisarticle['title'];	
+		return escape_title($thisarticle['title']);
 	}
 
 // -------------------------------------------------------------
@@ -1513,7 +1513,7 @@ $LastChangedRevision$
 		),$atts));
 
 		if (trim($name)) {
-			return parse(EvalElse($thing, ($c == $name)));
+			return parse(EvalElse($thing, in_list($c, $name)));
 		}
 
 		return parse(EvalElse($thing, !empty($c)));
@@ -1553,7 +1553,7 @@ $LastChangedRevision$
 
 		$section = ($s == 'default' ? '' : $s);
 
-		return parse(EvalElse($thing, ($section == $name)));
+		return parse(EvalElse($thing, in_list($section, $name)));
 
 	}
 

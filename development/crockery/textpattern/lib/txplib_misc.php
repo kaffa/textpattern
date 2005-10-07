@@ -108,7 +108,7 @@ else
 		
 		$out = array();
 		
-		if ($rs && !empty($rs))
+		if ($rs && mysql_num_rows($rs) > 0)
 		{
 			while ($a = nextRow($rs))
 			{
@@ -132,7 +132,7 @@ else
 			}
 		}
 		
-		return ($out) ? $out : '';
+		return $out;
 	}
 
 // -------------------------------------------------------------
@@ -403,6 +403,21 @@ else
 		if (!($errno & error_reporting())) return;
 
 		echo "<pre>".gTxt('plugin_load_error').' '.strong($GLOBALS['txp_current_plugin'])." -> ".strong($error[$errno])
+				.": ".strong($errstr)."</pre>";
+	}
+
+// -------------------------------------------------------------
+	function tagErrorHandler($errno, $errstr, $errfile, $errline)
+	{
+		global $production_status;
+
+		$error = array( E_WARNING => "Warning", E_NOTICE => "Notice", E_USER_ERROR => "Textpattern Error", 
+						E_USER_WARNING => "Textpattern Warning", E_USER_NOTICE => "Textpattern Notice");
+
+		if (!($errno & error_reporting())) return;
+		if ($production_status == 'live') return;
+
+		echo "<pre>".gTxt('tag_error').' '.strong(htmlspecialchars($GLOBALS['txp_current_tag']))." -> ".strong($error[$errno])
 				.": ".strong($errstr)."</pre>";
 	}
 
@@ -1313,4 +1328,10 @@ eod;
 		}
 	}
 
+// -------------------------------------------------------------
+	function in_list($val, $list, $delim=',')
+	{
+		$args = explode($delim, $list);
+		return in_array($val, $args);
+	}
 ?>
