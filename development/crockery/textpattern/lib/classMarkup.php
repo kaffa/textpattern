@@ -4,6 +4,9 @@ include_once(txpath . '/lib/classTextile.php');
 
 // Abstract class for markup methods like nl2br, Textile, etc
 class txpMarkup {
+	function txpMarkup() {
+	}
+
 	function doMarkup($in) {
 	}
 }
@@ -12,7 +15,7 @@ function do_markup($type, $in) {
 	static $objs;
 
 	// default to nl2br if the requested class is unavailable
-	if (@get_parent_class($type) != 'txpmarkup')
+	if (@strtolower(get_parent_class($type)) != 'txpmarkup')
 		$type = 'txpNL2br';
 	$type = strtolower($type);
 
@@ -20,18 +23,20 @@ function do_markup($type, $in) {
 	if (empty($objs[$type]))
 		$objs[$type] = new $type();
 
-	return $type->doMarkup($in);
+	return $objs[$type]->doMarkup($in);
 }
 
 function get_markup_types() {
-	static $types;
+	static $types = array();
 
 	if (!empty($types))
 		return $types;
 
-	foreach (get_declared_classes() as $class)
-		if (@get_parent_class($class) == 'txpmarkup')
+	foreach (get_declared_classes() as $class) {
+		$class = strtolower($class);
+		if (@strtolower(get_parent_class($class)) == 'txpmarkup')
 			$types[$class] = gTxt($class);
+	}
 
 	return $types;
 }

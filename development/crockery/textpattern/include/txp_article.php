@@ -11,11 +11,13 @@ $LastChangedRevision$
 
 */
 
+include_once(txpath.'/lib/classMarkup.php');
+
 global $vars, $statuses;
 
 $vars = array(
-	'ID','Title','Title_html','Body','Body_html','Excerpt','textile_excerpt','Image',
-	'textile_body', 'Keywords','Status','Posted','Section','Category1','Category2',
+	'ID','Title','Title_html','Body','Body_html','Excerpt','markup_excerpt','Image',
+	'markup_body', 'Keywords','Status','Posted','Section','Category1','Category2',
 	'Annotate','AnnotateInvite','publish_now','reset_time','AuthorID','sPosted',
 	'LastModID','sLastMod','override_form','from_view','year','month','day','hour',
 	'minute','url_title','custom_1','custom_2','custom_3','custom_4','custom_5',
@@ -64,7 +66,7 @@ if (!empty($event) and $event == 'article') {
 		$incoming = psa($vars);
 		$message='';
 
-		$incoming = textile_main_fields($incoming, $use_textile);
+		$incoming = markup_main_fields($incoming);
 
 		extract(doSlash($incoming));
 
@@ -96,8 +98,8 @@ if (!empty($event) and $event == 'article') {
 				Section         = '$Section',
 				Category1       = '$Category1',
 				Category2       = '$Category2',
-				textile_body    =  $textile_body,
-				textile_excerpt =  $textile_excerpt,
+				markup_body     = '$markup_body',
+				markup_excerpt  = '$markup_excerpt',
 				Annotate        = '$Annotate',
 				override_form   = '$override_form',
 				url_title       = '$url_title',
@@ -148,7 +150,7 @@ if (!empty($event) and $event == 'article') {
 			return;
 		}
 
-		$incoming = textile_main_fields($incoming, $use_textile);
+		$incoming = markup_main_fields($incoming);
 
 		extract(doSlash($incoming));
 
@@ -186,8 +188,8 @@ if (!empty($event) and $event == 'article') {
 			Category1       = '$Category1',
 			Category2       = '$Category2',
 			Annotate        = '$Annotate',
-			textile_body    =  $textile_body,
-			textile_excerpt =  $textile_excerpt,
+			markup_body     = '$markup_body',
+			markup_excerpt  = '$markup_excerpt',
 			override_form   = '$override_form',
 			url_title       = '$url_title',
 			AnnotateInvite  = '$AnnotateInvite',
@@ -233,10 +235,6 @@ if (!empty($event) and $event == 'article') {
 			$ID = gps('ID');
 		}
 		
-
-		include_once $txpcfg['txpath'].'/lib/classTextile.php';
-		$textile = new Textile();
-
 		if (!$view) $view = "text";
 		if (!$step) $step = "create";
 
@@ -286,8 +284,8 @@ if (!empty($event) and $event == 'article') {
 		$GLOBALS['step'] = $step;
 
 		if ($step=='create') {
-			$textile_body = $use_textile;
-			$textile_excerpt = $use_textile;
+			$markup_body = @$markup_default;
+			$markup_excerpt = @$markup_default;
 		}
 
 		if ($step!='create') {
@@ -336,10 +334,10 @@ if (!empty($event) and $event == 'article') {
 
 	//-- textile help --------------
 
-		($view=='text' && $textile_body == USE_TEXTILE) ?
+		($view=='text' && $markup_body) ?
 		
 		'<p><a href="#" onclick="toggleDisplay(\'textile_help\');return false;">'.gTxt('textile_help').'</a></p>
-		<div id="textile_help" style="display:none;">'.sidehelp().'</div>' : sp;
+		<div id="textile_help" style="display:none;">'.sidehelp($markup_body).'</div>' : sp;
 
 		if ($view=='text') {
 		
@@ -348,12 +346,12 @@ if (!empty($event) and $event == 'article') {
 				gTxt('advanced_options').'</a></p>',
 			'<div id="advanced" style="display:none;">',
 				
-				// textile toggles
-			graf(gTxt('use_textile').br.
-				tag(gTxt('article').br.pref_text('textile_body',$textile_body)
+				// markup selection
+			graf(gTxt('markup_type').br.
+				tag(gTxt('article').br.markup_popup('markup_body', $markup_body)
 					,'label').
 				br.
-				tag(gTxt('excerpt').br.pref_text('textile_excerpt',$textile_excerpt)
+				tag(gTxt('excerpt').br.markup_popup('markup_excerpt', $markup_excerpt)
 					,'label')),
 
 				// form override
@@ -414,23 +412,11 @@ if (!empty($event) and $event == 'article') {
 
     	if ($view=="preview") { 
 
-			if ($textile_body == USE_TEXTILE) {
-				echo $textile->TextileThis($Body);
-			} else if ($textile_body == CONVERT_LINEBREAKS) {
-				echo nl2br($Body);
-			} else if ($textile_body == LEAVE_TEXT_UNTOUCHED) {
-				echo $Body;
-			}
+			echo do_markup($markup_body, $Body);
 
     	} elseif($view=="html") {
 
-			if ($textile_body == USE_TEXTILE) {
-				$bod = $textile->TextileThis($Body);
-			} else if ($textile_body == CONVERT_LINEBREAKS) {
-				$bod = nl2br($Body);
-			} else if ($textile_body == LEAVE_TEXT_UNTOUCHED) {
-				$bod = $Body;
-			}
+			$bod = do_markup($markup_body, $Body);
 
 			echo tag(str_replace(array(n,t),
 					array(br,sp.sp.sp.sp),htmlspecialchars($bod)),'code');
@@ -454,14 +440,12 @@ if (!empty($event) and $event == 'article') {
 			} else {
 	
 				echo '<hr width="50%" />';
-				
-				echo ($textile_excerpt == USE_TEXTILE)
-				?	($view=='preview')
-					?	graf($textile->textileThis($Excerpt))
+			
+				echo ($view=='preview')
+					?	graf(do_markup($markup_excerpt, $Excerpt))
 					:	tag(str_replace(array(n,t),
 							array(br,sp.sp.sp.sp),htmlspecialchars(
-								$textile->TextileThis($Excerpt))),'code')
-				:	graf($Excerpt);
+								do_markup($markup_excerpt, $Excerpt))),'code');
 			}
 		}
 
@@ -482,9 +466,7 @@ if (!empty($event) and $event == 'article') {
 
   	//-- layer tabs -------------------
 
-		echo ($use_textile == USE_TEXTILE || $textile_body == USE_TEXTILE)
-		?	tab('text',$view).tab('html',$view).tab('preview',$view)
-		:	'&#160;';
+		echo tab('text',$view).tab('html',$view).tab('preview',$view);
 	echo '</td>';
 ?>	
 <td width="200" valign="top" style="padding-left:10px" align="left" id="articleside">
@@ -640,8 +622,10 @@ if (!empty($event) and $event == 'article') {
 	}
 
 //--------------------------------------------------------------
-	function sidehelp()
+	function sidehelp($markup)
 	{
+		// FIXME: display help for each markup type
+		// perhaps this could be stored in the markup class
 		global $use_textile, $textile_body;
 		$out='<p><small>';
 
@@ -718,6 +702,13 @@ if (!empty($event) and $event == 'article') {
 	}
 
 //--------------------------------------------------------------
+	function markup_popup($name,$markup) 
+	{
+		$markup_types = get_markup_types();
+		return selectInput($name, $markup_types, $markup);
+	}
+
+//--------------------------------------------------------------
 	function tab($tabevent,$view) 
 	{
 		$state = ($view==$tabevent) ? 'up' : 'down';
@@ -767,41 +758,13 @@ if (!empty($event) and $event == 'article') {
 		}
 	}
 // -------------------------------------------------------------
-	function textile_main_fields($incoming, $use_textile)
+	function markup_main_fields($incoming)
 	{
 		global $txpcfg;
 		
-		include_once $txpcfg['txpath'].'/lib/classTextile.php';
-		$textile = new Textile();
-		
 		$incoming['Title_plain'] = $incoming['Title'];
-		
-		if ($incoming['textile_body'] == LEAVE_TEXT_UNTOUCHED) {
-		
-			$incoming['Body_html'] = trim($incoming['Body']);
-			
-		}elseif ($incoming['textile_body'] == USE_TEXTILE){
-		
-			$incoming['Body_html'] = $textile->TextileThis($incoming['Body']);
-			$incoming['Title'] = $textile->TextileThis($incoming['Title'],'',1);
-			
-		}elseif ($incoming['textile_body'] == CONVERT_LINEBREAKS){
-			
-			$incoming['Body_html'] = nl2br(trim($incoming['Body']));
-		}
-
-		if ($incoming['textile_excerpt'] == LEAVE_TEXT_UNTOUCHED) {
-		
-			$incoming['Excerpt_html'] = trim($incoming['Excerpt']);
-			
-		}elseif ($incoming['textile_excerpt'] == USE_TEXTILE){
-		
-			$incoming['Excerpt_html'] = $textile->TextileThis($incoming['Excerpt']);
-			
-		}elseif ($incoming['textile_excerpt'] == CONVERT_LINEBREAKS){
-			
-			$incoming['Excerpt_html'] = nl2br(trim($incoming['Excerpt']));
-		}
+		$incoming['Body_html'] = do_markup($incoming['markup_body'], $incoming['Body']);
+		$incoming['Excerpt_html'] = do_markup($incoming['markup_excerpt'], $incoming['Excerpt']);
 		
 		return $incoming;
 	}
