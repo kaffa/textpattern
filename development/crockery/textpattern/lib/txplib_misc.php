@@ -80,7 +80,7 @@ else
 // -------------------------------------------------------------
 	function escape_html($html)
 	{
-		return strtr($title,
+		return strtr($html,
 			array(
 				'<' => '&#60;',
 				'>' => '&#62;',
