@@ -1,8 +1,8 @@
 The structure of the repository is pretty simple. 
 
-current/         Deprecated, will soon disappear.
-stable/          Deprecated, will soon disappear.
-development/     this is where all active development happens
-releases/ 		 Contains official release versions (tags)
+development/          this is where all active development happens
+development/4.0       future 4.0.x releases will be made from this
+development/crockery  laying groundwork for the next major release
+releases/ 	          Contains official release versions (tags)
 
-Aug 22, 2005
+Oct 10, 2005
