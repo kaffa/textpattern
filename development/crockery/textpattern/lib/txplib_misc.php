@@ -355,7 +355,7 @@ else
 // -------------------------------------------------------------
 	function yes_no($status) 
 	{
-		return ($status==0) ? ucfirst(gTxt('no')) : ucfirst(gTxt('yes'));
+		return ($status==0) ? gTxt('no') : gTxt('yes');
 	}
 	
 // -------------------------------------------------------------
