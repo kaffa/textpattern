@@ -702,6 +702,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
+	// This whole function is a FIXME. Still need to rethink comments_invite for crockery
 	function comments_invite($atts) 
 	{
 		global $thisarticle,$is_article_list;
@@ -710,15 +711,25 @@ $LastChangedRevision$
 		extract($thisarticle);
 		global $comments_mode;
 
-		if (($annotate or $comments_count) && $is_article_list) {
+		extract(lAtts(array(
+			'class'		=> __FUNCTION__,
+			'showcount'	=> true,
+			'textonly'	=> false,
+			'displayalways'	=> false  //FIXME in crockery. This is only for BC.
+		), $atts));
 
-			$ccount = ($comments_count) ?  ' ['.$comments_count.']' : '';
-	
+		if (($annotate or $comments_count) && ($displayalways or $is_article_list) ) {
+
+			$ccount = ($comments_count && $showcount) ?  ' ['.$comments_count.']' : '';
+
+			if ($textonly)
+				return $comments_invite.$ccount;
+
 			if (!$comments_mode) {
 				return '<a href="'.permlinkurl($thisarticle).'#'.gTxt('comment').
-					'">'.$comments_invite.'</a>'. $ccount;
+					'"'.(($class) ? ' class="'.$class.'"' : '').'>'.$comments_invite.'</a>'. $ccount;
 			} else {
-				return "<a href=\"".hu."?parentid=$thisid\" onclick=\"window.open(this.href, 'popupwindow', 'width=500,height=500,scrollbars,resizable,status'); return false;\">".$comments_invite.'</a> '.$ccount;
+				return "<a href=\"".hu."?parentid=$thisid\" onclick=\"window.open(this.href, 'popupwindow', 'width=500,height=500,scrollbars,resizable,status'); return false;\"".(($class) ? ' class="'.$class.'"' : '').'>'.$comments_invite.'</a> '.$ccount;
 	
 			}
 		}
