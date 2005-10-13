@@ -86,6 +86,13 @@ $DB = new DB;
 	}
 
 // -------------------------------------------------------------
+	function safe_insert_rec($table,$rec,$debug='') 
+	{
+		global $DB;
+		return db_insert(PFX.$table, $set);
+	}
+
+// -------------------------------------------------------------
 // insert or update
 	function safe_upsert($table,$set,$where,$debug='') 
 	{
@@ -267,7 +274,7 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function numRows($r)
 	{
-		return mysql_num_rows($r);
+		return db_num_rows($r);
 	}
 
 //-------------------------------------------------------------
