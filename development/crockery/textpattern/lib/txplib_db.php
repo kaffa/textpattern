@@ -112,8 +112,8 @@ $DB = new DB;
 
 		// only include tables starting with PFX, and strip the prefix
 		foreach ($tables as $table)
-			if (($t = preg_replace('@^'.preg_quote(PFX).'@', '', $table)) != $table)
-				$out[] = $t;
+			if (preg_match('@^'.preg_quote(PFX).'@', $table))
+				$out[] = preg_replace('@^'.preg_quote(PFX).'@', '', $table);
 
 		return $out;
 	}
