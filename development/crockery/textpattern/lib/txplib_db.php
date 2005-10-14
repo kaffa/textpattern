@@ -333,6 +333,8 @@ $DB = new DB;
 			"name='$root' and type = '$type'"
 		));
 
+		if (empty($l) or empty($r))
+			return array();
 
 		$right = array(); 
 
