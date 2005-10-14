@@ -61,7 +61,7 @@ if (!empty($event) and $event == 'article') {
 //--------------------------------------------------------------
 	function article_post()
 	{
-		global $txp_user,$vars,$txpcfg;		
+		global $txp_user,$vars,$txpcfg, $ID;
 		extract(get_prefs());
 		$incoming = psa($vars);
 		$message='';
@@ -82,7 +82,7 @@ if (!empty($event) and $event == 'article') {
 			if (!has_privs('article.publish') && $Status>=4) $Status = 3;
 			if (empty($url_title)) $url_title = stripSpace($Title_plain, 1);  	
 
-			safe_insert(
+			$ID = safe_insert(
 			   "textpattern",
 			   "Title           = '$Title',
 				Body            = '$Body',
