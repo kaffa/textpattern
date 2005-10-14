@@ -89,7 +89,7 @@ $DB = new DB;
 	function safe_insert_rec($table,$rec,$debug='') 
 	{
 		global $DB;
-		return db_insert(PFX.$table, $set);
+		return db_insert_rec(PFX.$table, $rec, $debug);
 	}
 
 // -------------------------------------------------------------
@@ -102,6 +102,20 @@ $DB = new DB;
 			return $r;
 		else
 			return safe_insert($table, join(', ', array($where, $set)), $debug);
+	}
+
+// -------------------------------------------------------------
+	function safe_table_list($debug='') 
+	{
+		$out = array();
+		$tables = db_table_list();
+
+		// only include tables starting with PFX, and strip the prefix
+		foreach ($tables as $table)
+			if (($t = preg_replace('@^'.preg_quote(PFX).'@', '', $table)) != $table)
+				$out[] = $t;
+
+		return $out;
 	}
 
 // -------------------------------------------------------------

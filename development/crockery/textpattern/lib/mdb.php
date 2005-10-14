@@ -79,6 +79,27 @@ function db_insert($table, $set, $res=0) {
 	return ($last ? $last : true);
 }
 
+function db_insert_rec($table, $rec, $res=0) {
+	global $mdb_res;
+	$res = ($res ? $res : $mdb_res);
+
+	$cols = array();
+	$vals = array();
+	foreach (doSlash($rec) as $k=>$v) {
+		$cols[] = $k;
+		$vals[] = "'".$v."'";
+	}
+
+	$sql = '('.join(',', $cols).')'.
+		' VALUES ('.join(',', $vals).')';
+
+	if (!db_query('INSERT INTO '.$table.' '.$sql))
+		return false;
+
+	$last = db_last_insert_id($table);
+	return ($last ? $last : true);
+}
+
 function db_table_exists($tbl) {
 	global $mdb_res;
 	if (MDB_TYPE == 'pg')
