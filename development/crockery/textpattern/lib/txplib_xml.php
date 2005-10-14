@@ -154,7 +154,8 @@ class txpBackupParser extends txpXmlParser {
 		foreach (array_keys($data) as $table) {
 			if (in_array($table, $tables)) {
 				foreach ($data[$table] as $rec) {
-					safe_insert_rec($table, $rec);
+					// FIXME: this should ignore duplicate key errors only
+					@safe_insert_rec($table, $rec);
 				}
 			}
 		}
