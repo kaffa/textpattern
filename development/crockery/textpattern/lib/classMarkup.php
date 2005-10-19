@@ -81,7 +81,7 @@ class txpTextile extends TxpMarkup {
 class txpTextileLite extends TxpMarkup {
 	var $textile;
 
-	function txpTextile() {
+	function txpTextileLite() {
 		$this->txpMarkup();
 
 		$this->textile = new Textile();
