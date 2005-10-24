@@ -23,15 +23,6 @@ $LastChangedRevision$
 	}
 
 //-------------------------------------------------------------
-	function discuss_delete()
-	{
-		$discussid = ps('discussid');
-		safe_delete("txp_discuss","discussid = $discussid");
-		update_comments_count($discussid); 
-		discuss_list(messenger('message',$discussid,'deleted'));
-	}
-
-//-------------------------------------------------------------
 	function discuss_save()
 	{
 		extract(doSlash(gpsa(array('email','name','web','message','discussid','ip','visible','parentid'))));
