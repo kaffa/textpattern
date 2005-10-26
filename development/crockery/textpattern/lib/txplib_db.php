@@ -27,12 +27,13 @@ class DB {
 		$this->user = $txpcfg['user'];
 		$this->pass = $txpcfg['pass'];
 
-		$this->link = db_connect($this->host, $this->user, $this->pass, $this->db);
+		$this->link = @db_connect($this->host, $this->user, $this->pass, $this->db);
+		if (!$this->link) die(db_down());
 
 		if (!$this->link) {
 			$GLOBALS['connected'] = false;
 		} else $GLOBALS['connected'] = true;
-		db_selectdb($this->db) or die(db_down());
+		@db_selectdb($this->db) or die(db_down());
 
 		@db_query("SET NAMES ". $txpcfg['dbcharset']);
     }
@@ -442,6 +443,7 @@ $DB = new DB;
 	{
 		// 503 status might discourage search engines from indexing or caching the error message
 		header('Status: 503 Service Unavailable');
+		$error = db_lasterror();
 		return <<<eod
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -452,6 +454,7 @@ $DB = new DB;
 </head>
 <body>
 <p align="center" style="margin-top:4em">Database unavailable.</p>
+<!-- $error -->
 </body>
 </html>
 eod;
