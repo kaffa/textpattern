@@ -178,7 +178,7 @@ $LastChangedRevision$
 
 			//turn on compression if we aren't using it already
 			if (extension_loaded('zlib') && ini_get("zlib.output_compression") == 0 && ini_get('output_handler') != 'ob_gzhandler' && !headers_sent()) {
-				ob_start("ob_gzhandler");
+				@ob_start("ob_gzhandler");
 			}
 		  
 			$expires = gmdate('D, d M Y H:i:s \G\M\T', time()+(3600*1));
@@ -248,7 +248,6 @@ $LastChangedRevision$
 		
 			$out = array_merge($out, $articles);
 
-			ob_start();
 			header('Content-type: application/atom+xml; charset=utf-8');
 			return chr(60).'?xml version="1.0" encoding="UTF-8"?'.chr(62).n.
 			'<feed xml:lang="'.$language.'" xmlns="http://www.w3.org/2005/Atom">'.join(n,$out).'</feed>';
