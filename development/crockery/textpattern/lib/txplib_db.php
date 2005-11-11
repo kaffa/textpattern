@@ -98,11 +98,14 @@ $DB = new DB;
 	function safe_upsert($table,$set,$where,$debug='') 
 	{
 		// FIXME: lock the table so this is atomic?
-		$r = safe_update($table, $set, $where, $debug);
+		$wa = (is_array($where) ? join(' and ', $where) : $where);
+		$r = safe_update($table, $set, $wa, $debug);
 		if ($r and mysql_affected_rows())
 			return $r;
-		else
-			return safe_insert($table, join(', ', array($where, $set)), $debug);
+		else {
+			$wc = (is_array($where) ? join(', ', $where) : $where);
+			return safe_insert($table, join(', ', array($wc, $set)), $debug);
+		}
 	}
 
 // -------------------------------------------------------------
@@ -132,11 +135,27 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_upgrade_table($table, $cols, $debug='') 
 	{
-		$current = db_column_list(PFX.$table);
-		foreach ($cols as $name=>$type) {
-			if (empty($current[$name]))
-				safe_alter($table, 'add '.$name.' '.$type);
+		if (db_table_exists(PFX.$table)) {
+			$current = db_column_list(PFX.$table);
+			foreach ($cols as $name=>$type) {
+				if (empty($current[$name]))
+					safe_alter($table, 'add '.$name.' '.$type);
+			}
 		}
+		else {
+			$s = array();
+			foreach ($cols as $name=>$type)
+				$s[] = $name.' '.$type;
+			return safe_query('create table '.PFX.$table.' ('.join(",\n", $s).');');
+		}
+	}
+
+// -------------------------------------------------------------
+	function safe_upgrade_index($table, $idxname, $type, $def, $debug='') 
+	{
+		// $type would typically be '' or 'unique'
+		if (!db_index_exists(PFX.$table, PFX.$idxname))
+			return safe_query('create '.$type.' index '.PFX.$idxname.' on '.PFX.$table.' ('.$def.');');
 	}
 
 // -------------------------------------------------------------
@@ -426,19 +445,6 @@ $DB = new DB;
 	    );
     	return $right+1; 
  	} 
-
-//-------------------------------------------------------------
-	function get_prefs()
-	{
-		$r = safe_rows_start('name, val', 'txp_prefs', 'prefs_id=1');
-		if ($r) {
-			while ($a = nextRow($r)) {
-				$out[$a['name']] = $a['val']; 
-			}
-			return $out;
-		}
-		return false;
-	}
 
 // -------------------------------------------------------------
 	function db_down() 

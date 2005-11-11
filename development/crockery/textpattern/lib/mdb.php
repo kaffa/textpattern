@@ -21,6 +21,11 @@ $LastChangedRevision: 820 $
 global $txpcfg;
 define('MDB_TYPE', (empty($txpcfg['dbtype']) ? 'my' : $txpcfg['dbtype']));
 
+if (MDB_TYPE == 'pg')
+	define('DB_AUTOINC', 'SERIAL NOT NULL');
+else
+	define('DB_AUTOINC', 'BIGINT NOT NULL AUTO_INCREMENT');
+
 function get_caller($bt) {
 	$caller = $bt[count($bt)-1];
 	extract($caller);
@@ -128,6 +133,20 @@ function db_table_list() {
 	}
 
 	return $rs;
+}
+
+function db_index_exists($tbl, $idxname) {
+	global $mdb_res;
+
+	if (MDB_TYPE == 'pg')
+		# select c1.relname as name, c2.relname as table from pg_catalog.pg_class as c1  JOIN pg_catalog.pg_index i ON i.indexrelid = c1.oid join pg_catalog.pg_class c2 ON i.indrelid = c2.oid where c1.relkind='i';
+		return db_query("select c1.relname as name, c2.relname as table from pg_catalog.pg_class as c1 JOIN pg_catalog.pg_index i ON i.indexrelid = c1.oid join pg_catalog.pg_class c2 ON i.indrelid = c2.oid where c1.relkind='i' and table='".db_escape($tbl)."' and name='".db_escape($tbl)."';");
+	else {
+		if ($rs = mysql_query('show index from '.$tbl)) 
+			while ($row = mysql_fetch_assoc($rs))
+				if ($row['Key_name'] == $idxname)
+					return true;
+	}
 }
 
 function db_column_list($tbl, $res=0) {

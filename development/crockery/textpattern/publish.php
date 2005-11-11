@@ -26,6 +26,7 @@ $LastChangedRevision$
 
 
 	include_once txpath.'/lib/txplib_db.php';
+	include_once txpath.'/lib/txplib_prefs.php';
 	include_once txpath.'/lib/txplib_html.php';
 	include_once txpath.'/lib/txplib_forms.php';
 	include_once txpath.'/lib/txplib_misc.php';
