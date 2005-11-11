@@ -843,8 +843,7 @@ else
  	function event_change_pageby($name) 
 	{
 		$qty = gps('qty');
-		safe_update('txp_prefs',"val='".doSlash($qty)."'","name='".doSlash($name).'_list_pageby'."'");
-		return;
+		return update_user_pref($name.'_list_pageby', $qty);
 	}
 
 // -------------------------------------------------------------
