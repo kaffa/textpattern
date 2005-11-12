@@ -522,7 +522,7 @@ $LastChangedRevision$
 	function file_change_max_size() 
 	{
 		$qty = gps('qty');
-		safe_update('txp_prefs',"val=$qty","name='file_max_upload_size'");
+		update_pref('file_max_upload_size', $qty);
 		file_list();
 	}
 
