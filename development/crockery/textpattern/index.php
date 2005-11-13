@@ -46,6 +46,7 @@ $LastChangedRevision$
 	include txpath.'/lib/txplib_forms.php';
 	include txpath.'/lib/txplib_html.php';
 	include txpath.'/lib/txplib_misc.php';
+	include txpath.'/lib/txplib_element.php';
 	include txpath.'/lib/admin_config.php';
 
 	$microstart = getmicrotime();
@@ -83,6 +84,8 @@ $LastChangedRevision$
 			define('TXP_UPDATE', 1);
 			include txpath.'/update/_update.php';
 		}
+
+		load_elements($event, $step);
 
 		if (!empty($admin_side_plugins) and gps('event') != 'plugin')
 			load_plugins(1);
