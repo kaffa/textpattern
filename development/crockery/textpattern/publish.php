@@ -30,6 +30,7 @@ $LastChangedRevision$
 	include_once txpath.'/lib/txplib_html.php';
 	include_once txpath.'/lib/txplib_forms.php';
 	include_once txpath.'/lib/txplib_misc.php';
+	include_once txpath.'/lib/txplib_element.php';
 	include_once txpath.'/lib/admin_config.php';
 
 	include_once txpath.'/publish/taghandlers.php';
@@ -92,6 +93,10 @@ $LastChangedRevision$
 		//i18n: $textarray = load_lang('en-gb');
 	$textarray = load_lang(LANG);
 
+	// bootstrap any elements that need to load before preText()
+	// FIXME: it'll do for now, but we need a clearer plan for how and when pub_ events are triggered
+	load_elements('', '');
+
 		// here come the plugins
 	if ($use_plugins) load_plugins();
 
@@ -103,6 +108,29 @@ $LastChangedRevision$
 	$pretext = array_merge($pretext, pretext($s,$prefs));
 	extract($pretext);
 	
+	// FIXME: just a rough idea for now/
+	$step = '';
+	if (txpinterface == 'css')
+		$event = 'pub_css';
+	elseif (gps('rss') or gps('atom'))
+		$event = 'pub_feed';
+	elseif ($s == 'file_download')
+		$event = 'pub_file';
+	elseif (gps('parentid') && gps('submit')) {
+		$event = 'pub_comment';
+		$step = 'submit';
+	}
+	elseif (gps('parentid') and $comments_mode == 1) {
+		$event = 'pub_comment';
+		$step = 'popup';
+	}
+	else
+		$event = 'pub_page';
+
+	// FIXME: not sure if this is the best place
+	load_elements($event, $step);
+	callback_event($event, $step);
+
 	// Now that everything is initialized, we can crank down error reporting
 	set_error_level($production_status);
 	
@@ -112,64 +140,6 @@ $LastChangedRevision$
 		header("Content-type: text/html; charset=utf-8");
 		exit(popComments(gps('parentid')));
 	}
-
-	// we are dealing with a download
-	if (@$s == 'file_download') {
-		if (!isset($file_error)) {
-
-				$fullpath = build_file_path($file_base_path,$filename);
-
-				if (is_file($fullpath)) {
-
-					// discard any error php messages
-					ob_clean();
-					$filesize = filesize($fullpath); $sent = 0;
-					header('Content-Description: File Download');
-					header('Content-Type: application/octet-stream');
-					header('Content-Length: ' . $filesize);
-					header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
-					@ini_set("zlib.output_compression", "Off");
-					@set_time_limit(0);
-					@ignore_user_abort(true);
-					if ($file = fopen($fullpath, 'rb')) {
-						while(!feof($file) and (connection_status()==0)) {
-							echo fread($file, 1024*64); $sent+=(1024*64);
-							ob_flush();
-							flush();
-						}
-						fclose($file);
-						// record download
-						if ((connection_status()==0) and !connection_aborted() ) {
-							safe_update("txp_file", "downloads=downloads+1", "id='".intval($id)."'");
-						} else {
-							$pretext['request_uri'] .= "#aborted-at-".floor($sent*100/$filesize)."%";
-							logit();
-						}
-					}      				
-				} else {
-					$file_error = 404;
-				}
-		}
-
-		// deal with error
-		if (isset($file_error)) {
-			switch($file_error) {
-			case 403:
-				header('HTTP/1.0 403 Forbidden');
-				break;
-			case 404:
-				header('HTTP/1.0 404 File Not Found');
-				break;
-			default:
-				header('HTTP/1.0 500 Internal Server Error');
-				break;
-			}
-		}
-		
-		// download done
-		exit(0);
-	}
-	
 
 	if(!isset($nolog) && $status != '404') {
 		if($logging == 'refer') { 

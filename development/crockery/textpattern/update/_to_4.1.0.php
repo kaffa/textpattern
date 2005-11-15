@@ -39,5 +39,11 @@ safe_upsert('txp_element',
 	"event='element', required=1, status=1, created=now(), modified=now()", "name='txp_element'");
 safe_upsert('txp_element',
 	"event='', required=1, status=1, created=now(), modified=now()", "name='txp_tab'");
+safe_upsert('txp_element',
+	"event='file', required=0, status=1, created=now(), modified=now()", "name='txp_file'");
+safe_upsert('txp_element',
+	"event='pub_file', required=0, status=1, created=now(), modified=now()", "name='pub_file'");
+safe_upsert('txp_element',
+	"event='pub_page', required=0, status=1, created=now(), modified=now()", "name='tag_file'");
 
 ?>

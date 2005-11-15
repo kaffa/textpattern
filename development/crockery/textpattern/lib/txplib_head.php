@@ -215,7 +215,6 @@ $LastChangedRevision$
 			gTxt('tab_write')    => 'article',
 			gTxt('tab_list')    =>  'list',
 			gTxt('tab_image')    => 'image',
-			gTxt('tab_file')	 => 'file',			
 			gTxt('tab_link')     => 'link',
 			gTxt('tab_comments') => 'discuss'
 		);

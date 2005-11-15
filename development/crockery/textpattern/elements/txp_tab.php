@@ -10,6 +10,9 @@ $LastChangedRevision: $
 // here until there's a better solution.
 
 if (element_active('txp_element'))
-	register_tab('admin', 'element', gTxt('elements'));
+	register_tab('admin', 'element', gTxt('tab_element'));
+
+if (element_active('txp_file'))
+	register_tab('content', 'file', gTxt('tab_file'));
 
 ?>

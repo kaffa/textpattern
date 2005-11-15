@@ -19,12 +19,9 @@ $LastChangedRevision$
 
 */
 
-	$levels = array(
-		1 => gTxt('private'),
-		0 => gTxt('public')
-	);
+register_callback('file_event', 'file');
 
-	if ($event == 'file') {
+	function file_event($event, $step) {
 		require_privs('file');		
 
 		if(!$step or !in_array($step, array('file_change_max_size','file_change_pageby','file_db_add','file_delete','file_edit','file_insert','file_list','file_replace','file_save','file_reset_count','file_create'))){
@@ -169,7 +166,12 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function file_edit($message='',$id='') 
 	{
-		global $txpcfg,$file_base_path,$levels,$path_from_root;
+		global $txpcfg,$file_base_path,$path_from_root;
+
+		$levels = array(
+			1 => gTxt('private'),
+			0 => gTxt('public')
+		);
 
 		extract(doSlash(gpsa(array('name','category','permissions','description'))));
 		
