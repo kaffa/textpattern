@@ -55,9 +55,13 @@ $LastChangedRevision: $
 	{
 		global $elements, $prefs;
 
-		$rs = safe_rows_start('*', 'txp_element', "status = '1'");
-		while ($row = nextRow($rs))
-			$elements[$row['name']] = $row;
+		// only do this the first time load_elements() is called
+		if (!isset($elements)) {
+			$elements = array();
+			$rs = safe_rows_start('*', 'txp_element', "status = '1'");
+			while ($row = nextRow($rs))
+				$elements[$row['name']] = $row;
+		}
 
 		foreach ($elements as $e) {
 			// type == 0 means load at startup
