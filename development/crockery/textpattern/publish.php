@@ -494,8 +494,7 @@ $LastChangedRevision$
 
 			$words = preg_split('/\s+/', $q);
 			foreach ($words as $w) {
-				$customsql = ($searchcustom ? buildCustomSearch($customFields, $w) : '');
-				$rlike[] = " and (Title ".db_rlike()." '".doSlash($w)."' or Body ".db_rlike()." '".doSlash($w)."'".$customsql.")";
+				$rlike[] = " and (Title ".db_rlike()." '".doSlash(preg_quote($w))."' or Body ".db_rlike()." '".doSlash(preg_quote($w))."')";
 			}
 			$search = " and " . join(' and ', $rlike) . " $s_filter";
 
