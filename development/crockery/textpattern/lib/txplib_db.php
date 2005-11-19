@@ -223,7 +223,7 @@ $DB = new DB;
 		$tables = split(',', $table);
 		for ($i=0; $i < count($tables); $i++)
 			$tables[$i] = PFX.trim($tables[$i]);
-		$table = join(',', $tables;
+		$table = join(',', $tables);
 			
 		$q = "select $things from ".PFX."$table where $where";
 		$rs = getRow($q,$debug);
@@ -240,7 +240,7 @@ $DB = new DB;
 		$tables = split(',', $table);
 		for ($i=0; $i < count($tables); $i++)
 			$tables[$i] = PFX.trim($tables[$i]);
-		$table = join(',', $tables;
+		$table = join(',', $tables);
 
 		$q = "select $things from ".PFX."$table where $where";
 		$rs = getRows($q,$debug);
