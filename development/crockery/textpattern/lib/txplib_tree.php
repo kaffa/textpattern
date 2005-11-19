@@ -11,12 +11,13 @@ $LastChangedRevision: 1093 $
 		// this is a generalization of the old getTree() function
 
 		$root = doSlash($root);
-		$type = doSlash($type);
 
+		// don't apply $whwere here, since we assume the supplied root
+		// already meets that constraint
 	    extract(safe_row(
 	    	"lft as l, rgt as r", 
 	    	$table, 
-			"id='$root' and $where"
+			"id='$root'"
 		));
 
 		if (empty($l) or empty($r))
@@ -61,8 +62,8 @@ $LastChangedRevision: 1093 $
 
 	    $rs = safe_rows_start(
 	    	"*", 
-	    	"txp_category",
-				"lft <= $l and rgt >= $r and type = '".doSlash($type)."' order by lft asc"
+	    	$table,
+				"lft <= $l and rgt >= $r and $where order by lft asc"
 		); 
 
 		$out = array();
