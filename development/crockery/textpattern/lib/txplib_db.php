@@ -225,7 +225,7 @@ $DB = new DB;
 			$tables[$i] = PFX.trim($tables[$i]);
 		$table = join(',', $tables);
 			
-		$q = "select $things from ".PFX."$table where $where";
+		$q = "select $things from $table where $where";
 		$rs = getRow($q,$debug);
 		if ($rs) {
 			return $rs;
@@ -242,7 +242,7 @@ $DB = new DB;
 			$tables[$i] = PFX.trim($tables[$i]);
 		$table = join(',', $tables);
 
-		$q = "select $things from ".PFX."$table where $where";
+		$q = "select $things from $table where $where";
 		$rs = getRows($q,$debug);
 		if ($rs) {
 			return $rs;
