@@ -156,6 +156,13 @@ $DB = new DB;
 	}
 
 // -------------------------------------------------------------
+	function safe_column_exists($table, $colname, $debug='') 
+	{
+		$cols = db_column_list(PFX.$table);
+		return !empty($cols[$colname]);
+	}
+
+// -------------------------------------------------------------
 	function safe_index_exists($table, $idxname, $debug='') 
 	{
 		return db_index_exists(PFX.$table, PFX.$idxname);

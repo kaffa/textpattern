@@ -105,6 +105,20 @@ function db_insert_rec($table, $rec, $res=0) {
 	return ($last ? $last : true);
 }
 
+function db_update_rec($table, $rec, $where, $res=0) {
+	global $mdb_res;
+	$res = ($res ? $res : $mdb_res);
+
+	$set = array();
+	foreach (doSlash($rec) as $k=>$v) {
+		$set[] = $k."='".$v."'";
+	}
+
+	$sql = join(',', $set);
+
+	return db_query('UPDATE '.$table.' SET '.$sql.' WHERE '.$where, $res);
+}
+
 function db_table_exists($tbl) {
 	global $mdb_res;
 	if (MDB_TYPE == 'pg')
