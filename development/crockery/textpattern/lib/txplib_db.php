@@ -79,6 +79,11 @@ $DB = new DB;
 		return false;
 	}
 
+	function safe_update_rec($table, $rec, $where, $debug='')
+	{
+		return db_update_rec(PFX.$table, $rec, $where);
+	}
+
 // -------------------------------------------------------------
 	function safe_insert($table,$set,$debug='') 
 	{
@@ -151,10 +156,16 @@ $DB = new DB;
 	}
 
 // -------------------------------------------------------------
+	function safe_index_exists($table, $idxname, $debug='') 
+	{
+		return db_index_exists(PFX.$table, PFX.$idxname);
+	}
+
+// -------------------------------------------------------------
 	function safe_upgrade_index($table, $idxname, $type, $def, $debug='') 
 	{
 		// $type would typically be '' or 'unique'
-		if (!db_index_exists(PFX.$table, PFX.$idxname))
+		if (!safe_index_exists($table, $idxname))
 			return safe_query('create '.$type.' index '.PFX.$idxname.' on '.PFX.$table.' ('.$def.');');
 	}
 
@@ -209,6 +220,11 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_row($things, $table, $where, $debug='') 
 	{
+		$tables = split(',', $table);
+		for ($i=0; $i < count($tables); $i++)
+			$tables[$i] = PFX.trim($tables[$i]);
+		$table = join(',', $tables;
+			
 		$q = "select $things from ".PFX."$table where $where";
 		$rs = getRow($q,$debug);
 		if ($rs) {
@@ -221,6 +237,11 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_rows($things, $table, $where, $debug='') 
 	{
+		$tables = split(',', $table);
+		for ($i=0; $i < count($tables); $i++)
+			$tables[$i] = PFX.trim($tables[$i]);
+		$table = join(',', $tables;
+
 		$q = "select $things from ".PFX."$table where $where";
 		$rs = getRows($q,$debug);
 		if ($rs) {
