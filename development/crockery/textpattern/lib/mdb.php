@@ -21,10 +21,10 @@ $LastChangedRevision: 820 $
 global $txpcfg;
 define('MDB_TYPE', (empty($txpcfg['dbtype']) ? 'my' : $txpcfg['dbtype']));
 
-if (MDB_TYPE == 'pg')
-	define('DB_AUTOINC', 'SERIAL NOT NULL');
-else
-	define('DB_AUTOINC', 'BIGINT NOT NULL AUTO_INCREMENT');
+// get the driver specific functions
+require_once txpath.'/lib/mdb/'.MDB_TYPE.'.php';
+
+// The functions here are general purpose ones
 
 function get_caller($bt) {
 	$caller = $bt[count($bt)-1];
@@ -32,57 +32,6 @@ function get_caller($bt) {
 	return "$file:$line $function()";
 }
 
-function db_connect($host, $user, $pass, $dbname='') {
-	global $mdb_res;
-	if (MDB_TYPE == 'pg')
-		return $mdb_res = pg_connect(($host and $host != 'localhost' ? "host='".addslashes($host)."' " : '')."user='".addslashes($user)."' password='".addslashes($pass)."' dbname='".addslashes($dbname)."'");
-	else
-		return $mdb_res = mysql_connect($host, $user, $pass);
-}
-
-function db_selectdb($dbname) {
-	global $mdb_res;
-	if (MDB_TYPE == 'pg')
-		return (pg_connection_status($mdb_res) === PGSQL_CONNECTION_OK);
-	else
-		return mysql_select_db($dbname, $mdb_res);
-}
-
-function db_query($q, $res=0) {
-	global $mdb_res, $db_last_query;
-	$res = ($res ? $res : $mdb_res);
-	if (MDB_TYPE == 'pg') {
-		$r = pg_query($res, $q);
-	}
-	else
-		$r = mysql_query($q, $res);
-
-	if (!$r) {
-		trigger_error('failed query: '.$q.n);
-		trigger_error('error: '.db_lasterror());
-	}
-	$db_last_query[$r] = $q;
-
-	return $r;
-}
-
-function db_insert($table, $set, $res=0) {
-	global $mdb_res;
-	$res = ($res ? $res : $mdb_res);
-	if (MDB_TYPE == 'pg')
-		$set = my_insert_to_values($set);
-	else
-		$set = 'SET '.$set;
-
-	if (!db_query('INSERT INTO '.$table.' '.$set, $res)) {
-		echo 'failed insert: INSERT INTO '.$table.' '.$set.n;
-		echo db_lasterror().n;
-		return false;
-	}
-
-	$last = db_last_insert_id($table);
-	return ($last ? $last : true);
-}
 
 function db_insert_rec($table, $rec, $res=0) {
 	global $mdb_res;
@@ -119,183 +68,11 @@ function db_update_rec($table, $rec, $where, $res=0) {
 	return db_query('UPDATE '.$table.' SET '.$sql.' WHERE '.$where, $res);
 }
 
-function db_table_exists($tbl) {
-	global $mdb_res;
-	if (MDB_TYPE == 'pg')
-		return @pg_meta_data($mdb_res, $tbl) != false;
-	else
-		return mysql_query('describe '.$tbl) != false;
-}
-
-function db_table_list() {
-	global $mdb_res;
-	if (MDB_TYPE == 'pg') {
-		if ($rs = pg_query($mdb_res, 'select relname from pg_stat_user_tables order by relname'))
-			$out = pg_fetch_all($rs);
-	}
-	else {
-		$out = array();
-		if ($rs = mysql_query('show tables')) 
-			while ($row = mysql_fetch_assoc($rs))
-				$out[] = $row;
-	}
-
-	$rs = array();
-	if ($out) {
-		foreach ($out as $r)
-			$rs[] = array_shift($r);
-	}
-
-	return $rs;
-}
-
-function db_index_exists($tbl, $idxname) {
-	global $mdb_res;
-
-	if (MDB_TYPE == 'pg')
-		# select c1.relname as name, c2.relname as table from pg_catalog.pg_class as c1  JOIN pg_catalog.pg_index i ON i.indexrelid = c1.oid join pg_catalog.pg_class c2 ON i.indrelid = c2.oid where c1.relkind='i';
-		return db_query("select c1.relname as name, c2.relname as table from pg_catalog.pg_class as c1 JOIN pg_catalog.pg_index i ON i.indexrelid = c1.oid join pg_catalog.pg_class c2 ON i.indrelid = c2.oid where c1.relkind='i' and table='".db_escape($tbl)."' and name='".db_escape($tbl)."';");
-	else {
-		if ($rs = mysql_query('show index from '.$tbl)) 
-			while ($row = mysql_fetch_assoc($rs))
-				if ($row['Key_name'] == $idxname)
-					return true;
-	}
-}
-
-function db_column_list($tbl, $res=0) {
-	global $mdb_res;
-	$res = ($res ? $res : $mdb_res);
-
-	if (MDB_TYPE == 'pg') {
-		$cols = @pg_meta_data($mdb_res, $tbl);
-		return $cols ? $cols : array();
-	}
-	else {
-		$cols = array();
-		if ($rs = mysql_query('describe '.$tbl)) 
-			while ($row = mysql_fetch_assoc($rs))
-				$cols[$row['Field']] = $row;
-		return $cols;
-	}
-}
-
 function db_column_exists($tbl, $col, $res=0) {
 	$cols = db_column_list($tbl, $res);
 	return !empty($cols[$col]);
 }
 
-function db_last_insert_id($table, $res=0) {
-	global $mdb_res;
-	$res = ($res ? $res : $mdb_res);
-
-	if (MDB_TYPE == 'pg') {
-		# This assumes that the very first column in the table is a sequence
-		$cols = pg_meta_data($res, $table);
-		$colnames = array_keys($cols);
-		$col = $colnames[0];
-		if (strpos(@$cols[$col]['type'], 'int') === 0) {
-			$sql = "select currval('{$table}_{$col}_seq') as lastinsertid";
-			$rs = pg_query($res, $sql);
-			$last_id = pg_fetch_result($rs, 0);
-			return $last_id;
-		}
-	}
-	else
-		return mysql_insert_id($res);
-}
-
-function db_lasterror() {
-	global $mdb_res;
-	if (MDB_TYPE == 'pg')
-		return pg_last_error($mdb_res);
-	else
-		return mysql_error();
-}
-
-function db_free($rs) {
-
-	if (MDB_TYPE == 'pg')
-		return pg_free_result($rs);
-	else 
-		return mysql_free_result($rs);
-}
-
-function db_num_rows($rs) {
-	if (MDB_TYPE == 'pg')
-		return pg_num_rows($rs);
-	else 
-		return mysql_num_rows($rs);
-}
-
-function db_fetch_assoc($rs) {
-	global $db_last_query;
-
-	if (MDB_TYPE == 'pg') {
-		$table = '';
-		if (preg_match('@from\s+(\S+)@i', $db_last_query[$rs], $m)) {
-			$table = $m[1];
-		}
-		$row = pg_fetch_assoc($rs);
-		db_fixup_row($table, $row);
-	}
-	else {
-		$row = mysql_fetch_assoc($rs);
-	}
-
-	return $row;
-}
-
-function db_fetch_result($rs, $row) {
-	if (MDB_TYPE == 'pg')
-		return pg_fetch_result($rs, $row);
-	else 
-		return mysql_result($rs, $row);
-}
-
-function db_interval($interval) {
-	// INTERVAL is standard SQL, but MySQL's quoting is non-standard
-	// e.g. "where date > NOW() - ".db_interval('1 day')
-	if (MDB_TYPE == 'pg')
-		return "INTERVAL '$interval'";
-	else
-		return "INTERVAL $interval";
-}
-
-function db_escape($str) {
-	if (MDB_TYPE == 'pg')
-		return pg_escape_string($str);
-	else {
-		if (is_callable('mysql_real_escape_string'))
-			return mysql_real_escape_string($str);
-		else
-			return mysql_escape_string($str);
-	}
-}
-
-function db_limit($limit, $offset=0) {
-	$limit = (int)$limit;
-	$offset = (int)$offset;
-
-	if (MDB_TYPE == 'pg')
-		return "limit $limit offset $offset";
-	else
-		return "limit $offset, $limit";
-}
-
-function db_match($cols, $against) {
-	if (MDB_TYPE == 'pg')
-		return 'oid as score';
-	else
-		return "match ($cols) against ('$against') as score";
-}
-
-function db_rlike() {
-	if (MDB_TYPE == 'pg')
-		return '~*';
-	else
-		return 'rlike';
-}
 
 function array_key_rename(&$array, $old, $new) {
 	if (isset($array[$old])) {

@@ -136,7 +136,7 @@ else
 		
 		$out = array();
 		
-		if ($rs && mysql_num_rows($rs) > 0)
+		if ($rs && db_num_rows($rs) > 0)
 		{
 			while ($a = nextRow($rs))
 			{

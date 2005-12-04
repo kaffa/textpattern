@@ -28,14 +28,15 @@ class DB {
 		$this->pass = $txpcfg['pass'];
 
 		$this->link = @db_connect($this->host, $this->user, $this->pass, $this->db);
-		if (!$this->link) die(db_down());
+		// PDO returns an object. Do strict comparison
+		if ($this->link === false) die(db_down());
 
 		if (!$this->link) {
 			$GLOBALS['connected'] = false;
 		} else $GLOBALS['connected'] = true;
 		@db_selectdb($this->db) or die(db_down());
 
-		@db_query("SET NAMES ". $txpcfg['dbcharset']);
+		if ($txpcfg['dbtype']!='pdo_sqlite') @db_query("SET NAMES ". $txpcfg['dbcharset']);
     }
 }
 $DB = new DB;
@@ -79,6 +80,7 @@ $DB = new DB;
 		return false;
 	}
 
+// -------------------------------------------------------------
 	function safe_update_rec($table, $rec, $where, $debug='')
 	{
 		return db_update_rec(PFX.$table, $rec, $where);
@@ -105,7 +107,7 @@ $DB = new DB;
 		// FIXME: lock the table so this is atomic?
 		$wa = (is_array($where) ? join(' and ', $where) : $where);
 		$r = safe_update($table, $set, $wa, $debug);
-		if ($r and mysql_affected_rows())
+		if ($r and db_affected_rows())
 			return $r;
 		else {
 			$wc = (is_array($where) ? join(', ', $where) : $where);
@@ -144,7 +146,7 @@ $DB = new DB;
 			$current = db_column_list(PFX.$table);
 			foreach ($cols as $name=>$type) {
 				if (empty($current[$name]))
-					safe_alter($table, 'add '.$name.' '.$type);
+					safe_alter($table, 'add '.$name.' '.$type,1);
 			}
 		}
 		else {

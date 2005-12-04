@@ -25,7 +25,6 @@ error_reporting(E_ALL);
 include_once txpath.'/lib/txplib_html.php';
 include_once txpath.'/lib/txplib_forms.php';
 include_once txpath.'/lib/txplib_misc.php';
-include_once txpath.'/lib/mdb.php';
 
 header("Content-type: text/html; charset=utf-8");
 
@@ -122,6 +121,7 @@ eod;
 			fLabelCell(gTxt('table_prefix')).fInputCell('dprefix','',5).
 			tdcs(small(gTxt('prefix_warning')),2)
 		),
+		tr(fLabelCell(gTxt('database_engines')).td(availableDBDrivers()).tdcs('&nbsp;',2)),
 		tr(tdcs('&nbsp;',4)),
 		tr(
 			tdcs(
@@ -163,7 +163,7 @@ eod;
 // -------------------------------------------------------------
 	function printConfig()
 	{
-		$carry = enumPostItems('ddb','duser','dpass','dhost','dprefix','txprefix','txpath',
+		$carry = enumPostItems('ddb','duser','dpass','dhost','dprefix','dbtype','txprefix','txpath',
 			'siteurl','ftphost','ftplogin','ftpass','ftpath','lang');
 
 		@include txpath.'/config.php';
@@ -186,6 +186,16 @@ eod;
 				 characters must match one of <b>a-zA-Z0-9_</b>';
 
 		echo graf(gTxt("checking_database"));
+		
+		$GLOBALS['txpcfg']['dbtype'] = $dbtype;
+		# include here in order to load only the required driver
+		include_once txpath.'/lib/mdb.php';
+		
+		if ($dbtype == 'pdo_sqlite') {
+			$ddb = $txpath.DS.$ddb;
+			$carry['ddb'] = $ddb;
+		}
+		
 		if (!db_connect($dhost,$duser,$dpass,$ddb)){
 			exit(graf(gTxt('db_cant_connect')));
 		}
@@ -201,10 +211,12 @@ eod;
 		}
 
 		// On 4.1 or greater use utf8-tables
-		if (db_query("SET NAMES utf8")) {
+		if ($dbtype!='pdo_sqlite' && db_query("SET NAMES utf8")) {
 			$carry['dbcharset'] = "utf8";
 			$carry['dbcollate'] = "utf8_general_ci";
-		} 
+		}elseif ($dbtype == 'pdo_sqlite' && db_query('PRAGMA encoding="UTF-8"')){
+			$carry['dbcharset'] = "utf8";			
+		}
 		else {
 			$carry['dbcharset'] = "latin1";
 			$carry['dbcollate'] = '';
@@ -286,6 +298,8 @@ eod;
 		$dpass = $txpcfg['pass'];
 		$dhost = $txpcfg['host'];
 		$dprefix = $txpcfg['table_prefix'];
+		$GLOBALS['txpcfg']['dbtype'] = $txpcfg['dbtype'];
+		include_once txpath.'/lib/mdb.php';
 
 		$GLOBALS['textarray'] = setup_load_lang($lang);
 
@@ -299,7 +313,12 @@ eod;
  		include txpath.'/setup/txpsql.php';
 
 		// This has to come after txpsql.php, because otherwise we can't call mysql_real_escape_string
-		extract(sDoSlash(gpsa(array('name','pass','RealName','email'))));
+		if (MDB_TYPE=='pdo_sqlite') {
+			extract(gpsa(array('name','pass','RealName','email')));
+		}else{
+			extract(sDoSlash(gpsa(array('name','pass','RealName','email'))));
+		}
+		
 
  		$nonce = md5( uniqid( rand(), true ) );
 
@@ -343,6 +362,7 @@ eod;
 		.o.'table_prefix' .m.$dprefix.nl
 		.o.'txpath'		  .m.$txpath.nl
 		.o.'dbcharset'	  .m.$dbcharset.nl
+		.o.'dbtype'	  .m.$dbtype.nl
 		.$close;
 	}
 
@@ -431,12 +451,51 @@ eod;
 // -------------------------------------------------------------
 	function sDoSlash($in)
 	{ 
-		if(phpversion() >= "4.3.0") {
-			return doArray($in,'mysql_real_escape_string');
-		} else {
-			return doArray($in,'mysql_escape_string');
-		}
+		return doArray($in,'db_escape');
 	}
+// -------------------------------------------------------------
+	function availableDBDrivers()
+	{
+		# get available mdb files first reading /lib/mdb dir
+		$d = dir(txpath.'/lib/mdb');
+		$drivers = array();
+		while (false !== ($entry = $d->read())) {
+			if (strpos($entry,'.php')) {
+				$drv = explode('.php',$entry);
+				if ($drv[0] != 'driver.template'){
+					$drivers[] = $drv[0];
+				}
+			}
+		}
+		
+		$drivers_popup = array();
+		
+		# do not show the list of drivers without support on this php install
+		foreach ($drivers as $driver){
+			if ($driver == 'my') {
+				if (function_exists('mysql_connect') && is_callable('mysql_connect')) $drivers_popup[$driver] = gTxt($driver);
+			}elseif ($driver == 'pg'){
+				if (function_exists('pg_connect') && is_callable('pg_connect')) $drivers_popup[$driver] = gTxt($driver);
+			}elseif(strpos($driver,'pdo_')!== false){
+				# works nice for nix 5.0.5 and win 5.1.0?
+				# try dl if allowed here too
+				if (is_windows() && version_compare(phpversion(), '5.1.0','ge')) {
+					if (extension_loaded('pdo') && extension_loaded($driver)) $drivers_popup[$driver] = gTxt($driver);
+				}elseif (!is_windows() && version_compare(phpversion(),'5.0.5','ge')){
+					if (extension_loaded('pdo') && extension_loaded($driver)) $drivers_popup[$driver] = gTxt($driver);
+				}
+			}
+		}
+		
+		$out = '<select name="dbtype">';
 
+		foreach ($drivers_popup as $k=>$v) {
+			$out .= '<option value="'.$k.'">'.$v.'</option>'.n;
+		}		
+
+		$out .= '</select>';
+		return $out;
+		
+	}
 
 ?>

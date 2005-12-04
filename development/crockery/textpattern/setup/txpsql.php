@@ -31,7 +31,7 @@ if (MDB_TYPE == 'pg') {
 	$tabletype = '';
 	$incval = 'DEFAULT';
 }
-else {
+elseif(MDB_TYPE == 'my')  {
 	$version = mysql_get_server_info();
 	//Use "ENGINE" if version of MySQL > (4.0.18 or 4.1.2)
 	$tabletype = ( intval($version[0]) >= 5 || preg_match('#^4\.(0\.[2-9]|(1[89]))|(1\.[2-9])#',$version)) 
@@ -54,6 +54,20 @@ else {
 	$incval = 'NULL';
 	$mediumtext = 'mediumtext';
 	$tinytext = 'tinytext';
+}
+elseif (MDB_TYPE == 'pdo_sqlite') {
+	/*if (isset($dbcharset))
+		db_query('SET NAMES '.$dbcharset);*/
+
+	$zerodate = '1970-01-01';
+	$zerodatetime = $zerodate.' 00:00:00';
+	$datetime = 'datetime';
+	$autoinc = 'INTEGER';
+	$mediumtext = 'text';
+	$tinytext = 'text';
+	$tabletype = '';
+	$incval = 'NULL';
+	#asume sqlite will understand int and smallint as integers, due to INT afinity.
 }
 
 // Default to messy URLs if we know clean ones won't work
@@ -435,6 +449,8 @@ if (MDB_TYPE == 'pg') {
 	db_query("create function from_unixtime(integer) returns abstime as 'select abstime($1) as result' language 'sql';");
 	db_query("create function password(text) returns text as 'select md5($1) as result' language 'sql';");
 	db_query("create function old_password(text) returns text as 'select md5($1) as result' language 'sql';");
+}elseif (MDB_TYPE == 'pdo_sqlite'){
+
 }
 
 $GLOBALS['txp_install_successful'] = true;
@@ -478,11 +494,19 @@ if (!$client->query('tups.getLanguage',$prefs['blog_uid'],$lang))
 }else {
 	$response = $client->getResponse();
 	$lang_struct = unserialize($response);
-	foreach ($lang_struct as $item)
-	{
-		foreach ($item as $name => $value) 
-			$item[$name] = addslashes($value);
-		db_query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
+	if (MDB_TYPE == 'pdo_sqlite') {
+		
+		$stmt = db_prepare("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang', ?, ?, ?, ?)");
+		foreach ($lang_struct as $item){
+			$stmt->execute(array_values($item));
+		}
+	}else{
+		foreach ($lang_struct as $item)
+		{
+			foreach ($item as $name => $value) 
+				$item[$name] = addslashes($value);
+			db_query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
+		}
 	}		
 }
 
