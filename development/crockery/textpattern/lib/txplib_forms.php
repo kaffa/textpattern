@@ -164,7 +164,7 @@ $LastChangedRevision: 952 $
 	function text_area($name,$h,$w,$thing='')
 	{
 		return
-		'<textarea name="'.$name.'" cols="1" rows="1" style="height:'.$h.'px;width:'.$w.'px;margin-bottom:1em;">'.$thing.'</textarea>';
+		'<textarea name="'.$name.'" cols="1" rows="1" style="height:'.$h.'px;width:'.$w.'px;">'.$thing.'</textarea>';
 	}
 
 //-------------------------------------------------------------
