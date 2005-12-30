@@ -245,7 +245,6 @@ class Textile
 			}
 			$text = $this->code($text);
 			$text = $this->span($text);
-			$text = $this->superscript($text);
 			$text = $this->footnoteRef($text);
 			$text = $this->glyphs($text);
 			$text = $this->retrieve($text);
@@ -345,6 +344,13 @@ class Textile
     }
 
 // -------------------------------------------------------------
+    function hasRawText($text)
+    {
+        // checks whether the text has text not already enclosed by a block tag
+        return '' != trim(preg_replace('@<(p|blockquote|div|form|table|ul|ol|pre|code|h\d)[^>]*?>.*</\1>@s', '', $text));
+    }
+
+// -------------------------------------------------------------
     function fTable($matches)
     {
         $tatts = $this->pba($matches[1], 'table');
@@ -417,15 +423,25 @@ class Textile
     }
 
 // -------------------------------------------------------------
+    function doPBr($in)
+    {
+        return preg_replace_callback('@<(p)([^>]*?)>(.*)(</\1>)@s', array(&$this, 'doBr'), $in);
+    }
+
+// -------------------------------------------------------------
+    function doBr($m)
+    {
+        $content = preg_replace("@(.+)(?<!<br>|<br />)\n(?![#*\s|])@", '$1<br />', $m[3]);
+        return '<'.$m[1].$m[2].'>'.$content.$m[4];
+    }
+
+// -------------------------------------------------------------
     function block($text)
     {
         $pre = $php = $txp = false;
         $find = array('bq', 'h[1-6]', 'fn\d+', 'p');
 
-        $text = preg_replace("/(.+)\n(?![#*\s|])/",
-            "$1<br />", $text);
-
-        $text = explode("\n", $text);
+        $text = explode("\n\n", $text);
         array_push($text, " ");
 
         foreach($text as $line) {
@@ -439,17 +455,20 @@ class Textile
                 $txp = true;
             }
 
-
             foreach($find as $tag) {
                 $line = ($pre == false and $php == false and $txp == false)
-                ? preg_replace_callback("/^($tag)($this->a$this->c)\.(?::(\S+))? (.*)$/",
+                ? preg_replace_callback("/^($tag)($this->a$this->c)\.(?::(\S+))? (.*)$/s",
                     array(&$this, "fBlock"), $line)
                 : $line;
             }
 
-            $line = (!$php and !$txp) ? preg_replace('/^(?!\t|<\/?pre|<\/?code|$| )(.*)/', "\t<p>$1</p>", $line) : $line;
+            $hasraw = $this->hasRawText($line);
+            if (!$php and !$txp and $hasraw)
+                $line = preg_replace('/^(?!\t|<\/?pre|<\/?code|$| )(.*)/s', "\t<p>$1</p>", $line);
 
-            $line = ($pre or $php) ? str_replace("<br />", "\n", $line):$line;
+				$line = $this->doPBr($line);
+            $line = preg_replace('/<br>/', '<br />', $line);
+
             if (preg_match('/<\/pre>/i', $line)) {
                 $pre = false;
             }
@@ -493,18 +512,18 @@ class Textile
 // -------------------------------------------------------------
     function span($text)
     {
-        $qtags = array('\*\*','\*','\?\?','-','__','_','%','\+','~');
+        $qtags = array('\*\*','\*','\?\?','-','__','_','%','\+','~','\^');
 
         foreach($qtags as $f) {
             $text = preg_replace_callback("/
-                (?<=^|\s|[[:punct:]]|[{([])
+                (?<=^|\d|\s|[.,\"'?!;:>]|[{([])
                 ($f)
                 ($this->c)
                 (?::(\S+))?
-                ([\w<&].*)
-                ([[:punct:];]*)
+                ([^\s$f]+|\S[^$f]*[^\s$f])
+                ([.,\"'?!;:]*)
                 $f
-                (?=[])}]|[[:punct:]]+|\s|$)
+                (?=[])}]|[.,\"'?!;:<]+|\s|$)
             /xmU", array(&$this, "fSpan"), $text);
         }
         return $text;
@@ -522,7 +541,8 @@ class Textile
             '-'  => 'del',
             '%'  => 'span',
             '+'  => 'ins',
-            '~'  => 'sub'
+            '~'  => 'sub',
+            '^'  => 'sup',
         );
 
         list(, $tag, $atts, $cite, $content, $end) = $m;
@@ -549,10 +569,10 @@ class Textile
             \s?
             (?:\(([^)]+)\)(?="))?        # $title
             ":
-            (\S+\b)                      # $url
+            ([^:]\S*\b)                  # $url
             (\/)?                        # $slash
             ([^\w\/;]*)                  # $post
-            (?=\s|$)
+            (?=\s|$|[\]})])
         /Ux', array(&$this, "fLink"), $text);
     }
 
@@ -564,13 +584,11 @@ class Textile
         $url = $this->checkRefs($url);
 
         $atts = $this->pba($atts);
-        $atts .= ($title != '') ? 'title="' . $title . '"' : '';
+        $atts .= ($title != '') ? 'title="' . htmlspecialchars($title) . '"' : '';
 
         $atts = ($atts) ? $this->shelve($atts) : '';
 
-        $parts = parse_url($url);
-        if (empty($parts['host']) and preg_match('/^\w/', @$parts['path']))
-            $url = hu.$url;
+        $url = $this->relURL($url);
 
         $out = $pre . '<a href="' . $url . $slash . '"' . $atts . $this->rel . '>' . $text . '</a>' . $post;
 
@@ -601,11 +619,22 @@ function refs($m)
     }
 
 // -------------------------------------------------------------
+    function relURL($url)
+    {
+        $parts = parse_url($url);
+        if ((empty($parts['scheme']) or @$parts['scheme'] == 'http') and 
+             empty($parts['host']) and 
+             preg_match('/^\w/', @$parts['path']))
+            $url = hu.$url;
+        return $url;
+    }
+
+// -------------------------------------------------------------
     function image($text)
     {
         return preg_replace_callback("/
             \!                 # opening !
-            (\<|\=|\>)?        # optional alignment atts
+            (\<|\=|\>)??       # optional alignment atts
             ($this->c)         # optional style,class atts
             (?:\. )?           # optional dot-space
             ([^\s(!]+)         # presume this is the src
@@ -613,7 +642,7 @@ function refs($m)
             (?:\(([^\)]+)\))?  # optional title
             \!                 # closing
             (?::(\S+))?        # optional href
-            (?=\s|$)           # lookahead: space or end of string
+            (?=\s|$|[\]})])   # lookahead: space or end of string
         /Ux", array(&$this, "fImage"), $text);
     }
 
@@ -631,9 +660,7 @@ function refs($m)
         $href = (isset($m[5])) ? $this->checkRefs($m[5]) : '';
         $url = $this->checkRefs($url);
 
-        $parts = parse_url($url);
-        if (empty($parts['host']) and preg_match('/^\w/', @$parts['path']))
-            $url = hu.$url;
+        $url = $this->relURL($url);
 
         $out = array(
             ($href) ? '<a href="' . $href . '">' : '',
@@ -749,12 +776,6 @@ function refs($m)
         @list(, $before, $notextile, $after) = $m;
         $notextile = str_replace(array_keys($modifiers), array_values($modifiers), $notextile);
         return $before . '<notextile>' . $notextile . '</notextile>' . $after;
-    }
-
-// -------------------------------------------------------------
-    function superscript($text)
-    {
-        return preg_replace('/\^(.*)\^/mU', '<sup>$1</sup>', $text);
     }
 
 // -------------------------------------------------------------
