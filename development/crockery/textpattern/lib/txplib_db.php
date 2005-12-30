@@ -44,7 +44,7 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function safe_query($q='',$debug='')
 	{
-		global $DB,$txpcfg, $qcount, $production_status;
+		global $DB,$txpcfg, $qcount, $qtime, $production_status;
 		if (!$q) return false;
 		if ($debug or TXP_DEBUG === 1) { 
 			dmp($q);
@@ -54,6 +54,7 @@ $DB = new DB;
 		$start = getmicrotime();
 		$result = db_query($q,$DB->link);
 		$time = sprintf('%02.6f', getmicrotime() - $start);
+		@$qtime += $time;
 		@$qcount++;
 		if ($result === false and (@$production_status == 'debug' or @$production_status == 'test'))
 			trigger_error(db_lasterror() . n . $q, E_USER_ERROR);
@@ -381,14 +382,14 @@ $DB = new DB;
 		$root = doSlash($root);
 		$type = doSlash($type);
 
-	    extract(safe_row(
+	   $rs = safe_row(
 	    	"lft as l, rgt as r", 
 	    	"txp_category", 
 			"name='$root' and type = '$type'"
-		));
+		);
 
-		if (empty($l) or empty($r))
-			return array();
+		if (!$rs) return array();
+		extract($rs);
 
 		$out = array();
 		$right = array(); 
@@ -423,11 +424,13 @@ $DB = new DB;
  	function getTreePath($target, $type)
  	{ 
 
-	    extract(safe_row(
+	  	$rs = safe_row(
 	    	"lft as l, rgt as r", 
 	    	"txp_category", 
 			"name='".doSlash($target)."' and type = '".doSlash($type)."'"
-		));
+		);
+		if (!$rs) return array();
+		extract($rs);
 
 	    $rs = safe_rows_start(
 	    	"*", 
