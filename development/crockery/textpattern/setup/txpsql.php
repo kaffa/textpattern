@@ -50,7 +50,7 @@ elseif(MDB_TYPE == 'my')  {
 	$zerodate = '1970-01-01';
 	$zerodatetime = $zerodate.' 00:00:00';
 	$datetime = 'datetime';
-	$autoinc = 'BIGINT NOT NULL AUTO_INCREMENT';
+	$autoinc = 'INT NOT NULL AUTO_INCREMENT';
 	$incval = 'NULL';
 	$mediumtext = 'mediumtext';
 	$tinytext = 'tinytext';
