@@ -393,11 +393,12 @@ $LastChangedRevision$
 		if (!$html) 
 			txp_die(gTxt('unknown_section'), '404');
 
+		trace_add('['.gTxt('page').': '.$pretext['page'].']');
 		set_error_handler("tagErrorHandler");
 		$pretext['secondpass'] = false;
 		$html = parse($html);
 		$pretext['secondpass'] = true;
-		$txptrace[] = " secondpass \r\n";
+		trace_add('[ --- '.gTxt('secondpass').' --- ]');
 		$html = parse($html); // the function so nice, he ran it twice
 		restore_error_handler();
 		$html = ($prefs['allow_page_php_scripting']) ? evalString($html) : $html;
@@ -723,6 +724,7 @@ $LastChangedRevision$
 	{
 		extract($rs);
 
+		trace_add("[".gTxt('Article')." $ID]");
 		$out['thisid']          = $ID;
 		$out['posted']          = $uPosted;
 		$out['annotate']        = $Annotate;
@@ -852,7 +854,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function processTags($matches)
 	{
-		global $pretext, $production_status, $txptrace, $txp_current_tag;
+		global $pretext, $production_status, $txptrace, $txptracelevel, $txp_current_tag;
 
 		$tag = $matches[1];
 
@@ -861,14 +863,13 @@ $LastChangedRevision$
 
 		$old_tag = @$txp_current_tag;
 		$txp_current_tag = '<txp:'.$tag.
-			($atts ? ' '.$matches[2] : '').
-			($thing ? '>' : ' />');
+			($atts ? $matches[2] : '').
+			($thing ? '>' : '/>');
 
+		trace_add($txp_current_tag);
+		@++$txptracelevel;
 		if ($production_status == 'debug')
-		{
-			@$txptrace[] = trim($matches[0]);
 			maxMemUsage(trim($matches[0]));
-		}
 
 		$out = '';
 
@@ -881,6 +882,10 @@ $LastChangedRevision$
 			elseif (isset($pretext[$tag])) $out = $pretext[$tag];
 			else trigger_error(gTxt('unknown_tag'), E_USER_WARNING);
 		}
+
+		@--$txptracelevel;
+		if (isset($matches[4]))
+			trace_add('</txp:'.$tag.'>');
 
 		$txp_current_tag = $old_tag;
 		return $out;

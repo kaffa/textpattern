@@ -1132,6 +1132,8 @@ else
 			}
 		}
 
+		global $txp_current_tag;
+		trace_add("[$txp_current_tag: ".($condition ? gTxt('true') : gTxt('false'))."]");
 		return ($condition ? $parts[0] : $parts[1]);
 	}
 
@@ -1141,11 +1143,14 @@ else
 		static $forms = array();
 
 		if (isset($forms[$name]))
-			return $forms[$name];
+			$f = $forms[$name];
+		else {
+			$f = fetch('Form','txp_form','name',doSlash($name));
+			if (!$f) return graf('form '.strong($name).' does not exist');
+			$forms[$name] = $f;
+		}
 
-		$f = fetch('Form','txp_form','name',doSlash($name));
-		if (!$f) return graf('form '.strong($name).' does not exist');
-		$forms[$name] = $f;
+		trace_add('['.gTxt('form').': '.$name.']');
 		return $f;
 	}
 
@@ -1384,5 +1389,14 @@ eod;
 	{
 		$args = explode($delim, $list);
 		return in_array($val, $args);
+	}
+
+// -------------------------------------------------------------
+	function trace_add($msg)
+	{
+		global $production_status,$txptrace,$txptracelevel;
+
+		if (in_array($production_status, array('debug', 'test')))
+			 @$txptrace[] = str_repeat("\t", @$txptracelevel).$msg;
 	}
 ?>
