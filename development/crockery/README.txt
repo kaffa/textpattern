@@ -1,8 +1,16 @@
-Textpattern 4.0 - 14 Aug 2005
-
+Textpattern Crockery
 Released under the Gnu General Public License
 
-Installation
+== WARNING ==
+
+Textpattern Crockery is an experimental development branch that will
+eventually become the 4.1 release.  It is not intended for use on a 
+live site, or by anyone who doesn't already know what they're doing.
+
+Before me things create were none, save things
+Eternal, and eternal I endure.
+
+== Installation ==
 
 * Extract the files to your site (in the web root, or choose a 
   subdirectory). The top-level index.php should reside in this 
@@ -11,7 +19,7 @@ Installation
   load /textpattern/setup/ (or /subpath/textpattern/setup/ )
   in a browser, and follow the directions.
 
-Upgrading
+== Upgrading ==
 
 * Simply replace the two files in your main installation directory 
   (index.php and .htaccess) and everything in your /textpattern/ 
@@ -21,3 +29,14 @@ Upgrading
   run automatically. Please take a look into diagnostics to find out 
   whether there are any errors and whether the correct version number 
   is displayed.
+
+== Getting Started ==
+
+* FAQ is available at http://textpattern.com/faq
+* In-Depth Documentation and tag-index is available in the TextBook-Project
+  at http://textpattern.net
+* You can get support in our forums at http://forum.textpattern.com
+
+* IMPORTANT: Regularly check back at textpattern.com to see if updates are 
+  available. 4.0.x is in maintenance mode which means updates are as painless 
+  as possible, and often fix important bugs or security-related issues.

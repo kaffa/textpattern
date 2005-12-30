@@ -1,0 +1,10 @@
+Changes from the 4.0.x branch:
+
+* Postgresql and Sqlite support, via the MDB library
+* Plugins can now provide additional markup conversion types for articles
+* Developers: several new database query functions
+* "Elements", a dynamic module loader, for efficiency and more modular code
+* Per-user preferences table
+* Nested sections (partial)
+* Simple XML backup and export (partial)
+
