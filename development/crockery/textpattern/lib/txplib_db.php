@@ -42,6 +42,15 @@ class DB {
 $DB = new DB;
 
 //-------------------------------------------------------------
+	function safe_pfx($table)
+	{
+		$name = PFX.$table;
+		if (preg_match('@[^\w._$]@', $name))
+			return '`'.$name.'`';
+		return $name;
+	}
+
+//-------------------------------------------------------------
 	function safe_query($q='',$debug='')
 	{
 		global $DB,$txpcfg, $qcount, $qtime, $production_status;
@@ -68,7 +77,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_delete($table, $where, $debug='')
 	{
-		$q = "delete from ".PFX."$table where $where";
+		$q = "delete from ".safe_pfx($table)." where $where";
 		if ($r = safe_query($q,$debug)) {
 			return true;
 		}
@@ -78,7 +87,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_update($table, $set, $where, $debug='') 
 	{
-		$q = "update ".PFX."$table set $set where $where";
+		$q = "update ".safe_pfx($table)." set $set where $where";
 		if ($r = safe_query($q,$debug)) {
 			return true;
 		}
@@ -95,7 +104,7 @@ $DB = new DB;
 	function safe_insert($table,$set,$debug='') 
 	{
 		global $DB;
-		return db_insert(PFX.$table, $set);
+		return db_insert(safe_pfx($table), $set);
 	}
 
 // -------------------------------------------------------------
@@ -137,7 +146,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_alter($table, $alter, $debug='') 
 	{
-		$q = "alter table ".PFX."$table $alter";
+		$q = "alter table ".safe_pfx($table)." $alter";
 		if ($r = safe_query($q,$debug)) {
 			return true;
 		}
@@ -186,7 +195,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_optimize($table, $debug='') 
 	{
-		$q = "optimize table ".PFX."$table";
+		$q = "optimize table ".safe_pfx($table)."";
 		if ($r = safe_query($q,$debug)) {
 			return true;
 		}
@@ -196,7 +205,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_repair($table, $debug='') 
 	{
-		$q = "repair table ".PFX."$table";
+		$q = "repair table ".safe_pfx($table)."";
 		if ($r = safe_query($q,$debug)) {
 			return true;
 		}
@@ -206,7 +215,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_field($thing, $table, $where, $debug='') 
 	{
-		$q = "select $thing from ".PFX."$table where $where";
+		$q = "select $thing from ".safe_pfx($table)." where $where";
 		$r = safe_query($q,$debug);
 		if (@db_num_rows($r) > 0) {
 			$f = db_fetch_result($r,0);
@@ -219,7 +228,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_column($thing, $table, $where, $debug='') 
 	{
-		$q = "select $thing from ".PFX."$table where $where";
+		$q = "select $thing from ".safe_pfx($table)." where $where";
 		$rs = getRows($q,$debug);
 		if ($rs) {
 			foreach($rs as $a) {
@@ -236,7 +245,7 @@ $DB = new DB;
 	{
 		$tables = split(',', $table);
 		for ($i=0; $i < count($tables); $i++)
-			$tables[$i] = PFX.trim($tables[$i]);
+			$tables[$i] = safe_pfx(trim($tables[$i]));
 		$table = join(',', $tables);
 			
 		$q = "select $things from $table where $where";
@@ -253,7 +262,7 @@ $DB = new DB;
 	{
 		$tables = split(',', $table);
 		for ($i=0; $i < count($tables); $i++)
-			$tables[$i] = PFX.trim($tables[$i]);
+			$tables[$i] = safe_pfx(trim($tables[$i]));
 		$table = join(',', $tables);
 
 		$q = "select $things from $table where $where";
@@ -267,20 +276,20 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_rows_start($things, $table, $where, $debug='') 
 	{
-		$q = "select $things from ".PFX."$table where $where";
+		$q = "select $things from ".safe_pfx($table)." where $where";
 		return startRows($q,$debug);
 	}
 
 //-------------------------------------------------------------
 	function safe_count($table, $where, $debug='') 
 	{
-		return getThing("select count(*) from ".PFX."$table where $where",$debug);
+		return getThing("select count(*) from ".safe_pfx($table)." where $where",$debug);
 	}
 
 // -------------------------------------------------------------
 	function safe_show($thing, $table, $debug='') 
 	{
-		$q = "show $thing from ".PFX."$table";
+		$q = "show $thing from ".safe_pfx($table)."";
 		$rs = getRows($q,$debug);
 		if ($rs) {
 			return $rs;
@@ -372,7 +381,7 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function getCount($table,$where,$debug='') 
 	{
-		return getThing("select count(*) from ".PFX."$table where $where",$debug);
+		return getThing("select count(*) from ".safe_pfx($table)." where $where",$debug);
 	}
 
 // -------------------------------------------------------------
