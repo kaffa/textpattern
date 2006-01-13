@@ -147,6 +147,9 @@ $LastChangedRevision: $
 			}
 		}
 
+		if ($inside)
+			$out .= $inside;
+
 		foreach ($stack as $t)
 			trigger_error(gTxt('parse_tag_unclosed', array('tag', $t)));
 
