@@ -106,11 +106,14 @@ else
 	}
 
 //-------------------------------------------------------------
-	function gTxt($var)
+	function gTxt($var, $reps=array())
 	{
 		global $textarray;
 		if(isset($textarray[strtolower($var)])) {
-			return $textarray[strtolower($var)];
+			$out = $textarray[strtolower($var)];
+			if ($reps)
+				$out = str_replace(array_keys($reps), array_values($reps), $out);
+			return $out;
 		}
 		return $var;
 	}
