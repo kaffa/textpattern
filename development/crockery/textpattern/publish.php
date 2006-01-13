@@ -31,6 +31,7 @@ $LastChangedRevision$
 	include_once txpath.'/lib/txplib_forms.php';
 	include_once txpath.'/lib/txplib_misc.php';
 	include_once txpath.'/lib/txplib_element.php';
+	include_once txpath.'/lib/txplib_parse.php';
 	include_once txpath.'/lib/admin_config.php';
 
 	include_once txpath.'/publish/taghandlers.php';
@@ -845,53 +846,6 @@ $LastChangedRevision$
 	{
 		$last = safe_field("unix_timestamp(val)", "txp_prefs", "name='lastmod' and prefs_id=1");
 		return gmdate("D, d M Y H:i:s \G\M\T",$last);	
-	}
-
-// -------------------------------------------------------------
-	function parse($text)
-	{
-		$f = '/<txp:(\S+)\b(.*)(?:(?<!br )(\/))?'.chr(62).'(?(3)|(.+)<\/txp:\1>)/sU';
-		return preg_replace_callback($f, 'processTags', $text);
-	}
-
-// -------------------------------------------------------------
-	function processTags($matches)
-	{
-		global $pretext, $production_status, $txptrace, $txptracelevel, $txp_current_tag;
-
-		$tag = $matches[1];
-
-		$atts = (isset($matches[2])) ? splat($matches[2]) : '';
-		$thing = (isset($matches[4])) ? $matches[4] : '';
-
-		$old_tag = @$txp_current_tag;
-		$txp_current_tag = '<txp:'.$tag.
-			($atts ? $matches[2] : '').
-			($thing ? '>' : '/>');
-
-		trace_add($txp_current_tag);
-		@++$txptracelevel;
-		if ($production_status == 'debug')
-			maxMemUsage(trim($matches[0]));
-
-		$out = '';
-
-		if ($thing) {
-			if (function_exists($tag)) $out = $tag($atts,$thing,$matches[0]);
-			elseif (isset($pretext[$tag])) $out = $pretext[$tag];
-			else trigger_error(gTxt('unknown_tag'), E_USER_WARNING);
-		} else {
-			if (function_exists($tag)) $out = $tag($atts,null,$matches[0]);
-			elseif (isset($pretext[$tag])) $out = $pretext[$tag];
-			else trigger_error(gTxt('unknown_tag'), E_USER_WARNING);
-		}
-
-		@--$txptracelevel;
-		if (isset($matches[4]))
-			trace_add('</txp:'.$tag.'>');
-
-		$txp_current_tag = $old_tag;
-		return $out;
 	}
 
 // -------------------------------------------------------------
