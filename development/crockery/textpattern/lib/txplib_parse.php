@@ -91,4 +91,66 @@ $LastChangedRevision: $
 		return $out;
 	}
 
+// --------------------------------------------------------------
+	function parse2($thing) 
+	{
+		$f = '@(</?txp:\S+\b.*(?:(?<!br )/)?'.chr(62).')@sU';
+
+		$parsed = preg_split($f, $thing, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+		$tagpat = '@^<(/?)txp:(\w+)\b(.*?)(/?)>$@';
+
+		$out = '';
+		$stack = array();
+		$inside = '';
+		$tag = array();
+		foreach ($parsed as $chunk) {
+			if (preg_match($tagpat, $chunk, $m)) {
+				if ($m[1] == '' and $m[4] == '') {
+					// opening tag
+
+					if (empty($stack))
+						$tag = $m;
+					else
+						$inside .= $chunk;	
+
+					array_push($stack, $m[2]);
+				}
+				elseif ($m[1] == '/' and $m[4] == '') {
+					// closing tag
+					if (@array_pop($stack) != $m[2])
+						trigger_error(gTxt('parse_tag_mismatch', array('code', $chunk)));
+					
+					if (empty($stack)) {
+						$out .= processTags(array('blah', $m[2], $m[3], '', $inside));
+						$inside = '';
+					}
+					else
+						$inside .= $chunk;
+				}
+				elseif ($m[1] == '' and $m[4] == '/') {
+					// self closing
+						if (empty($stack))
+							$out .= processTags(array('blah', $m[2], $m[3], '', ''));
+						else
+							$inside .= $chunk;
+				}
+				else {
+					trigger_error(gTxt('parse_error'.':'.$chunk, array('code', $chunk)));
+				}
+			}
+			else {
+				if (empty($stack))
+					$out .= $chunk;
+				else
+					$inside .= $chunk;
+			}
+		}
+
+		foreach ($stack as $t)
+			trigger_error(gTxt('parse_tag_unclosed', array('tag', $t)));
+
+		return $out;
+	}
+
 ?>
