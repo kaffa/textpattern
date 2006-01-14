@@ -1,8 +1,8 @@
 <?php
 
 /*
-$HeadURL: http://svn.textpattern.com/development/crockery/textpattern/lib/txplib_update.php $
-$LastChangedRevision: 1089 $
+$HeadURL$
+$LastChangedRevision$
 */
 
 //-------------------------------------------------------------
@@ -38,14 +38,14 @@ function install_language_from_file($lang)
 						foreach ($data as $name => $value)
 						{
 							$value = addslashes($value);
-							$exists = mysql_query('SELECT name, lastmod FROM '.PFX."txp_lang WHERE lang='".$lang."' AND name='$name' AND event='$event'");
+							$exists = mysql_query('SELECT name, lastmod FROM `'.PFX."txp_lang` WHERE `lang`='".$lang."' AND `name`='$name' AND `event`='$event'");
 							if ($exists) $exists = mysql_fetch_row($exists);
 							if ($exists[1])
 							{
-								mysql_query("UPDATE ".PFX."txp_lang SET lastmod='$lastmod', data='$value' WHERE lang='".$lang."' AND name='$name' AND event='$event'");
+								mysql_query("UPDATE `".PFX."txp_lang` SET `lastmod`='$lastmod', `data`='$value' WHERE `lang`='".$lang."' AND `name`='$name' AND `event`='$event'");
 								echo mysql_error();
 							} else
-								mysql_query("INSERT DELAYED INTO ".PFX."txp_lang  SET	lang='".$lang."', name='$name', lastmod='$lastmod', event='$event', data='$value'");
+								mysql_query("INSERT DELAYED INTO `".PFX."txp_lang`  SET	`lang`='".$lang."', `name`='$name', `lastmod`='$lastmod', `event`='$event', `data`='$value'");
 								echo mysql_error();
 						}
 					}
@@ -63,14 +63,14 @@ function install_language_from_file($lang)
 			if (!empty($data)){
 				foreach ($data as $name => $value)
 				{
-					 mysql_query("INSERT DELAYED INTO ".PFX."txp_lang  SET lang='".$lang."', name='$name', lastmod='$lastmod', event='$event', data='$value'");
+					 mysql_query("INSERT DELAYED INTO `".PFX."txp_lang`  SET `lang`='".$lang."', `name`='$name', `lastmod`='$lastmod', `event`='$event', `data`='$value'");
 				}
 			}
-			mysql_query("DELETE FROM ".PFX."txp_lang  WHERE lang='".$lang."' AND lastmod>$lastmod");
+			mysql_query("DELETE FROM `".PFX."txp_lang`  WHERE `lang`='".$lang."' AND `lastmod`>$lastmod");
 			@fclose($filename);
 			#delete empty fields if any
-			mysql_query("DELETE FROM ".PFX."txp_lang WHERE data=''");
-			mysql_query("FLUSH TABLE ".PFX."txp_lang");
+			mysql_query("DELETE FROM `".PFX."txp_lang` WHERE `data`=''");
+			mysql_query("FLUSH TABLE `".PFX."txp_lang`");
 
 			return true;
 		}
@@ -145,6 +145,7 @@ function checkUpdates()
 			'fr-fr' => array('fr_FR.UTF-8', 'fr_FR', 'fra', 'fre', 'fr', 'french', 'fr_FR.ISO_8859-1'),
 			'fi-fi' => array('fi_FI.UTF-8', 'fi_FI', 'fin', 'fi', 'finnish', 'fi_FI.ISO_8859-1'),
 			'it-it' => array('it_IT.UTF-8', 'it_IT', 'it', 'ita', 'italian', 'it_IT.ISO_8859-1'),
+			'id-id' => array('id_ID.UTF-8', 'id_ID', 'id', 'ind', 'indonesian','id_ID.ISO_8859-1'),
 			'ja-jp' => array('ja_JP.UTF-8', 'ja_JP', 'ja', 'jpn', 'japanese', 'ja_JP.ISO_8859-1'),
 			'no-no' => array('no_NO.UTF-8', 'no_NO', 'no', 'nor', 'norwegian', 'no_NO.ISO_8859-1'),
 			'nl-nl' => array('nl_NL.UTF-8', 'nl_NL', 'dut', 'nla', 'nl', 'nld', 'dutch', 'nl_NL.ISO_8859-1'),
