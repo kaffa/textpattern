@@ -5,11 +5,6 @@ $HeadURL: http://svn.textpattern.com/development/crockery/textpattern/lib/txplib
 $LastChangedRevision: 1127 $
 */
 
-if (defined('DIRECTORY_SEPARATOR'))
-	define('DS', DIRECTORY_SEPARATOR);
-else
-	define ('DS', (is_windows() ? '\\' : '/'));
-
 // -------------------------------------------------------------
 	function doArray($in,$function)
 	{
