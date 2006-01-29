@@ -154,7 +154,7 @@ $DB = new DB;
 	}
 
 // -------------------------------------------------------------
-	function safe_upgrade_table($table, $cols, $debug='') 
+	function safe_upgrade_table($table, $cols, $primary_key='', $debug='') 
 	{
 		if (db_table_exists(PFX.$table)) {
 			$current = db_column_list(PFX.$table);
@@ -167,6 +167,8 @@ $DB = new DB;
 			$s = array();
 			foreach ($cols as $name=>$type)
 				$s[] = $name.' '.$type;
+			if ($primary_key)
+				$s[] = 'primary key('.$primary_key.')';
 			return safe_query('create table '.PFX.$table.' ('.join(",\n", $s).');');
 		}
 	}
