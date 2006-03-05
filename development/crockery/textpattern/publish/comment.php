@@ -129,8 +129,10 @@ $LastChangedRevision$
 		if (defined('PARTLY_MESSY') and (PARTLY_MESSY)) 
 			$url = hu.'?id='.intval($parentid);
 
-		$out = '<form method="post" action="'.$url.'#cpreview" id="txpCommentInputForm">';
-
+		$out = '<form method="post" action="'.$url.'#cpreview" id="txpCommentInputForm">'.
+		# Juts to prevent XHTML Strict validation gotchas 
+		'<div class="comments-wrapper">'; 
+		
 		$Form = fetch('Form','txp_form','name',$form);
 		$msgstyle = ($msgstyle ? ' style="'.$msgstyle.'"' : '');
 		$msgrows = ($msgrows and is_numeric($msgrows)) ? ' rows="'.intval($msgrows).'"' : '';
@@ -171,12 +173,8 @@ $LastChangedRevision$
 		$out .= (!$preview)
 		?	fInput('hidden','backpage',serverset("REQUEST_URI"))
 		:	fInput('hidden','backpage',$backpage);
-		$out = substr_replace( $out,
-				callback_event('comment.form'),
-				strpos($out, '<!-- plugin-place-holder -->'), 
-				strlen('<!-- plugin-place-holder -->')
-		);
-		$out .= '</form>'; 
+		$out = str_replace( '<!-- plugin-place-holder -->', callback_event('comment.form'), $out); 
+		$out .= '</div></form>'; 
 	  return $out;
 	}
 
