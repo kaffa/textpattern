@@ -4,9 +4,6 @@
 $HeadURL: http://svn.textpattern.com/development/crockery/textpattern/lib/txplib_db.php $
 $LastChangedRevision: 1127 $
 */
-
-define('TXP_DEBUG', 0);
-
 if (!defined('PFX')) {
 	if (!empty($txpcfg['table_prefix'])) {
 		define ("PFX",$txpcfg['table_prefix']);
@@ -66,7 +63,7 @@ $DB = new DB;
 		@$qtime += $time;
 		@$qcount++;
 		if ($result === false and (@$production_status == 'debug' or @$production_status == 'test'))
-			trigger_error(db_lasterror() . n . $q, E_USER_ERROR);
+			trigger_error(mysql_error() . n . $q, E_USER_WARNING); 
 
 		trace_add("[SQL ($time): $q]");
 

@@ -32,10 +32,6 @@ $statuses = array(
 		5 => gTxt('sticky'),
 );
 
-if (!defined('LEAVE_TEXT_UNTOUCHED')) define('LEAVE_TEXT_UNTOUCHED', 0);
-if (!defined('USE_TEXTILE')) define('USE_TEXTILE', 1);
-if (!defined('CONVERT_LINEBREAKS')) define('CONVERT_LINEBREAKS', 2);
-
 if (!empty($event) and $event == 'article') {
 	require_privs('article');
 
@@ -81,6 +77,7 @@ if (!empty($event) and $event == 'article') {
 			
 			if (!has_privs('article.publish') && $Status>=4) $Status = 3;
 			if (empty($url_title)) $url_title = stripSpace($Title_plain, 1);  	
+			if (!$Annotate) $Annotate = 0; 
 
 			$ID = safe_insert(
 			   "textpattern",
@@ -175,6 +172,7 @@ if (!empty($event) and $event == 'article') {
 		{
 			$url_title = stripSpace($Title_plain, 1);
 		}
+		if (!$Annotate) $Annotate = 0; 
 
 		safe_update("textpattern", 
 		   "Title           = '$Title',
@@ -630,10 +628,9 @@ if (!empty($event) and $event == 'article') {
 		// FIXME: display help for each markup type
 		// perhaps this could be stored in the markup class
 		global $use_textile, $textile_body;
-		$out='<p><small>';
 
 		if ($use_textile == USE_TEXTILE || $textile_body == USE_TEXTILE) {
-			$out .=
+			return '<p><small>'.
 			gTxt('header').': <strong>h<em>n</em>.</strong>'.
 				popHelpSubtle('header',400,400).br.
 			gTxt('blockquote').': <strong>bq.</strong>'.
@@ -670,7 +667,7 @@ if (!empty($event) and $event == 'article') {
 			'<a href="http://textism.com/tools/textile/" target="_blank">'.gTxt('More').'</a>';
 		}			
 	
-	   return $out;
+	   return '';
 	}
 
 //--------------------------------------------------------------

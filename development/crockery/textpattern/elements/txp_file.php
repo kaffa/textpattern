@@ -149,7 +149,7 @@ register_callback('file_event', 'file');
 				tr(
 					tdcs(
 						graf(join('',$nav))
-					,4)
+					,8)
 				);
 		}
 		echo endTable();

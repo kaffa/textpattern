@@ -302,11 +302,12 @@ $LastChangedRevision$
 		);
 		
 		if ($rs) {
+			$out = array();
 			while ($a = nextRow($rs)) {
 				extract($a);
 				$out[] = href(escape_title($Title),permlinkurl($a));
 			}
-			if (is_array($out)) {
+			if (count($out)) {
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}
 		}
@@ -325,7 +326,7 @@ $LastChangedRevision$
 			'labeltag' => ''
 		),$atts));
 
-		$rs = safe_rows_start("*",'txp_discuss',"visible=1 order by posted desc limit 0,$limit");
+		$rs = safe_rows_start("*",'txp_discuss',"visible=".VISIBLE." order by posted desc limit 0,$limit");
 
 		if ($rs) {
         	while ($a = nextRow($rs)) {
@@ -373,12 +374,13 @@ $LastChangedRevision$
 			$rs = getRows(join(' ',$q));
 	
 			if ($rs) {
+				$out = array();
 				foreach($rs as $a) {
 					extract($a);
 					if ($thisid == $id) continue;
 					$out[] = href(escape_title($Title),permlinkurl($a));
 				}
-				if (is_array($out)) {
+				if (count($out)) {
 					return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 				}
 			}
@@ -456,12 +458,13 @@ $LastChangedRevision$
 		}
 
 		if ($rs) {
+			$out = array();
 			while ($a = nextRow($rs)) {
 				extract($a);
 				if ($name=='root') continue;
 				if($name) $out[] = tag(str_replace("& ","&#38; ", $title),'a',' href="'.pagelinkurl(array('c'=>$name)).'"');
 			}
-			if (is_array($out)) {
+			if (count($out)) {
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}			
 		}
@@ -485,12 +488,13 @@ $LastChangedRevision$
 		$rs = safe_rows_start("name,title","txp_section","name != 'default' order by name");
 		
 		if ($rs) {
+			$out = array();
 			while ($a = nextRow($rs)) {
 				extract($a);
 				$url = pagelinkurl(array('s'=>$name));
 				$out[] = tag($title, 'a', ' href="'.$url.'"');
 			}
-			if (is_array($out)) {
+			if (count($out)) {
 				if ($include_default) $out = array_merge(array(tag($sitename,'a', ' href="'.hu.'"')),$out);
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}
@@ -583,63 +587,92 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function link_to_home($atts, $thing) 
+	function link_to_home($atts, $thing = false) 
 	{
 		extract(lAtts(array(
-			'class' => ''
-		),$atts));
-		$cl = ($class) ? ' class="'.$class.'"' : '';
-		if (!empty($thing)) {
-			return '<a href="'.hu.'"'.$cl.'>'.parse($thing).'</a>';
+			'class' => false
+		), $atts));
+
+		if ($thing)
+		{
+			$class = ($class) ? ' class="'.$class.'"' : '';
+			return '<a href="'.hu.'"'.$class.'>'.parse($thing).'</a>';
 		}
+
+		return hu;
 	}
 
 // -------------------------------------------------------------
-	function newer($atts, $thing, $match='') 
+	function newer($atts, $thing = false, $match='')  
 	{
-		global $thispage,$permlink_mode, $pretext;
+		global $thispage, $permlink_mode, $pretext;
 		extract($pretext);
 				
-		if (is_array($atts)) extract($atts);
-		if (is_array($thispage))
-			extract($thispage);
+		if (is_array($atts))
+		{
+			extract($atts);
+		}
 
-		if ($numPages > 1 && $pg > 1) {
+ 		if (is_array($thispage))
+		{
+ 			extract($thispage);
+		}
+
+		if ($numPages > 1 && $pg > 1)
+		{
 			$nextpg = ($pg - 1 == 1) ? 0 : ($pg - 1);
-			$url = pagelinkurl(array('pg' => $nextpg, 's' => @$pretext['s'], 'c' => @$pretext['c'], 'q' => @$pretext['q'], 'a' => @$pretext['a']));
-			$out = array(
-				'<a href="'.$url.'"',
-				(empty($title)) ? '' : ' title="'.$title.'"',
-				'>',
-				$thing,
-				'</a>');
-			return join('',$out);
-		} else return;
-	}
+			$url = pagelinkurl(array(
+				'pg' => $nextpg, 
+				's' => @$pretext['s'], 
+				'c' => @$pretext['c'], 
+				'q' => @$pretext['q'], 
+				'a' => @$pretext['a']
+			));
+
+			if ($thing)
+			{
+				return '<a href="'.$url.'"'.
+				(empty($title) ? '' : ' title="'.$title.'"').
+				'>'.$thing.'</a>';
+			}
+
+			return $url;
+		}
+
+		return;
+}
 
 // -------------------------------------------------------------
-	function older($atts, $thing, $match='') 
+	function older($atts, $thing = false, $match = '')  
 	{
-		global $thispage,$permlink_mode, $pretext;
+		global $thispage, $permlink_mode, $pretext;
 		extract($pretext);
 
-		if (is_array($atts)) extract($atts);
-		if (is_array($thispage))
-			extract($thispage); 
+		if (is_array($atts))
+		{
+			extract($atts);
+		}
+
+ 		if (is_array($thispage))
+		{
+			extract($thispage);
+		}
 		
 		if ($numPages > 1 && $pg != $numPages) {
 			$nextpg = $pg + 1;
 			$url = pagelinkurl(array('pg' => $nextpg, 's' => @$pretext['s'], 'c' => @$pretext['c'], 'q' => @$pretext['q'], 'a' => @$pretext['a']));
-			$out = array(
-				'<a href="'.$url.'"',
-				(empty($title)) ? '' : ' title="'.$title.'"',
-				'>',
-				$thing,
-				'</a>');
-			return join('',$out);
-		} else return;
-	}
 
+			if ($thing)
+			{
+				return '<a href="'.$url.'"'.
+				(empty($title) ? '' : ' title="'.$title.'"').
+				'>'.$thing.'</a>';
+			}
+			return $url;
+		}
+
+		return;
+	}
 
 // -------------------------------------------------------------
 	function text($atts) 
@@ -767,9 +800,9 @@ $LastChangedRevision$
 		if ($id) {
 			if (!checkCommentsAllowed($id)) {
 				$out = graf(gTxt("comments_closed"));
-			} elseif (gps('commented')) {
+			} elseif (gps('commented')!=='') {
 				$out = gTxt("comment_posted");
-				if (@$GLOBALS['prefs']['comments_moderate'])
+				if (gps('commented')==='0')
 					$out .= " ". gTxt("comment_moderated");
 				$out = graf($out, ' id="txpCommentInputForm"');
 			} else {
@@ -781,7 +814,27 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	# DEPRECATED - provided only for backwards compatibility
+	function comments_error($atts)
+	{
+		extract(lAtts(array(
+			'class'		=> __FUNCTION__,
+			'break'		=> 'br',
+			'wraptag'	=> 'div'
+		),$atts));
+
+		$evaluator =& get_comment_evaluator();
+		return doWrap($evaluator -> get_result_message(), $wraptag, $break, $class);
+	}
+
+// -------------------------------------------------------------
+	function if_comments_error($atts, $thing)
+	{
+		$evaluator =& get_comment_evaluator();
+		return parse(EvalElse($thing,(count($evaluator -> get_result_message()) > 0)));
+	}
+
+// -------------------------------------------------------------
+# DEPRECATED - provided only for backwards compatibility
 	# this functionality will be merged into comments_invite
 	# no point in having two tags for one functionality
 	function comments_annotateinvite($atts,$thing=NULL)
@@ -846,7 +899,7 @@ $LastChangedRevision$
 		}
 		else {
 			$rs = safe_rows_start("*, unix_timestamp(posted) as time", "txp_discuss",
-				"parentid='$id' and visible='1' order by posted asc");
+				"parentid='$id' and visible=".VISIBLE." order by posted asc");
 							
 			$out = '';
 
@@ -978,11 +1031,17 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function comment_time($atts) 
 	{
-		global $thiscomment,$comments_dateformat;
-		if($comments_dateformat == "since") { 
+		global $thiscomment, $comments_dateformat;
+
+		extract(lAtts(array(
+			'format' => $comments_dateformat,
+		), $atts));
+
+		if ($format == 'since')
+		{ 
 			$comment_time = since($thiscomment['time'] + tz_offset()); 
 		} else {
-			$comment_time = safe_strftime($comments_dateformat,$thiscomment['time']); 
+			$comment_time = safe_strftime($format, $thiscomment['time']);  
 		}
 		return $comment_time;
 	}
@@ -1244,6 +1303,7 @@ $LastChangedRevision$
 		$rs = safe_rows_start("*", "txp_image","category='$c' and thumbnail=1 order by name");
 
 		if ($rs) {
+			$out = array();
 			while ($a = nextRow($rs)) {
 				extract($a);
 				$impath = $img_dir.'/'.$id.'t'.$ext;
@@ -1254,7 +1314,7 @@ $LastChangedRevision$
                '<img src="'.hu.$impath.'"'.$dims.' alt="'.$alt.'" />'.'</a>';
 
 			}
-			if (is_array($out)) {
+			if (count($out)) {
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}	
 		}
@@ -1481,7 +1541,7 @@ $LastChangedRevision$
 	{
 		global $comments_mode;
 
-		$dc = safe_count('txp_discuss',"parentid='$ID' and visible=1");
+		$dc = safe_count('txp_discuss',"parentid='$ID' and visible=".VISIBLE);
 
 		$ccount = ($dc) ?  '['.$dc.']' : '';
 		if (!$comments_mode) {

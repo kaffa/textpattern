@@ -516,13 +516,15 @@ $LastChangedRevision: 1127 $
 		if (!is_array($plugin_callback))
 			return;
 
+		$return_value = '';
 		foreach ($plugin_callback as $c) {
 			if ($c['event'] == $event and (empty($c['step']) or $c['step'] == $step) and $c['pre'] == $pre) {
 				if (is_callable($c['function'])) {
-					call_user_func($c['function'], $event, $step);
+					$return_value .= call_user_func($c['function'], $event, $step);
 				}
 			}
 		}
+		return $return_value;
 	}
 
 // -------------------------------------------------------------
@@ -1148,7 +1150,7 @@ $LastChangedRevision: 1127 $
 // -------------------------------------------------------------
 	function update_comments_count($id) 
 	{
-		$thecount = safe_field('count(*)','txp_discuss','parentid='.doSlash($id).' and visible=1');
+		$thecount = safe_field('count(*)','txp_discuss','parentid='.doSlash($id).' and visible='.VISIBLE);
 		$updated = safe_update("textpattern","comments_count='".doSlash($thecount)."'","ID='".doSlash($id)."'");
 		return ($updated) ? true : false;
 	}
@@ -1156,7 +1158,7 @@ $LastChangedRevision: 1127 $
 // -------------------------------------------------------------
 	function clean_comment_counts($parentids) 
 	{
-		$rs = safe_rows_start('parentid, count(*) as thecount','txp_discuss','parentid IN ('.implode(',',$parentids).') AND visible=1 group by parentid');
+		$rs = safe_rows_start('parentid, count(*) as thecount','txp_discuss','parentid IN ('.implode(',',$parentids).') AND visible='.VISIBLE.' group by parentid');
 		if (!$rs) return;
 
 		$updated = array();

@@ -19,6 +19,7 @@ $LastChangedRevision: $
 			'label'    => '',
 			'break'    => br,
 			'limit'    => '10',
+			'offset'   => '0',
 			'wraptag'  => '',
 			'category' => '',
 			'class'    => __FUNCTION__,
@@ -29,7 +30,7 @@ $LastChangedRevision: $
 			($category) ? "category='$category'" : '1',
 			"order by",
 			$sort,
-			($limit) ? "limit $limit" : ''
+			($limit) ? "limit $offset, $limit" : ''
 		);
 		
 		$rs = safe_rows_start("*","txp_file",join(' ',$qparts));

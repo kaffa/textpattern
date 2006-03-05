@@ -20,7 +20,7 @@ $LastChangedRevision$
 	define("txpath", dirname(__FILE__));
 	define("txpinterface", "admin");
 
-	$thisversion = '4.0.1';
+	$thisversion = '4.1.0';
 	$txp_using_svn = true; // set false for releases
 
 	ob_start(NULL, 2048);
@@ -40,6 +40,7 @@ $LastChangedRevision$
 	error_reporting(E_ALL);
 	@ini_set("display_errors","1");
 
+	include_once txpath.'/lib/constants.php';
 	include txpath.'/lib/mdb.php';
 	include txpath.'/lib/txplib_db.php';
 	include txpath.'/lib/txplib_prefs.php';
