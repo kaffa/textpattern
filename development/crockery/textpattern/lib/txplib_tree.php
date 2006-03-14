@@ -6,7 +6,7 @@ $LastChangedRevision: 1093 $
 */
 
 // -------------------------------------------------------------
- 	function tree_get($table, $root, $where='1=1')
+ 	function tree_get($table, $root=NULL, $where='1=1')
  	{ 
 		// this is a generalization of the old getTree() function
 
@@ -14,23 +14,29 @@ $LastChangedRevision: 1093 $
 
 		// don't apply $whwere here, since we assume the supplied root
 		// already meets that constraint
-	    extract(safe_row(
-	    	"lft as l, rgt as r", 
-	    	$table, 
-			"id='$root'"
-		));
 
-		if (empty($l) or empty($r))
-			return array();
+		if ($root !== NULL) {
+			 extract(safe_row(
+				"lft as l, rgt as r", 
+				$table, 
+				"id='$root'"
+			));
 
-		$out = array();
-		$right = array(); 
+			if (empty($l) or empty($r))
+				return array();
 
-	    $rs = safe_rows_start(
-	    	"*", 
-	    	$table,
-	    	"lft between $l and $r and $where order by lft asc"
-		); 
+			$out = array();
+			$right = array(); 
+
+			 $rs = safe_rows_start(
+				"*", 
+				$table,
+				"lft >= $l and lft <= $r and $where order by lft asc"
+			); 
+		}
+		else {
+			$rs = safe_rows_start('*', $table, $where.' order by lft asc');
+		}
 
 	    while ($rs and $row = nextRow($rs)) {
 	   		extract($row);
