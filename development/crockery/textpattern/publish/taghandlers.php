@@ -1080,6 +1080,44 @@ $LastChangedRevision$
 	}
 	
 // -------------------------------------------------------------
+
+	function if_author($atts, $thing)
+	{
+		global $author;		
+
+		extract(lAtts(array(
+			'name' => ''
+		), $atts));
+
+		if ($name)
+		{
+			return parse(EvalElse($thing, in_list($author, $name)));
+		}
+
+		return parse(EvalElse($thing, !empty($author)));
+	}
+
+// -------------------------------------------------------------
+
+	function if_article_author($atts, $thing)
+	{
+		global $thisarticle;
+
+		extract(lAtts(array(
+			'name' => ''
+		), $atts));
+
+		$author = $thisarticle['authorid'];
+
+		if ($name)
+		{
+			return parse(EvalElse($thing, in_list($author, $name)));
+		}
+
+		return parse(EvalElse($thing, !empty($author)));
+	}
+// -------------------------------------------------------------	
+
 	function body($atts) 
 	{
 		global $thisarticle;
@@ -1589,8 +1627,7 @@ $LastChangedRevision$
 			'linkclass' => 'noline',
 		),$atts));
 		$linked = ($link == 'y')? true: false; 		
-		if ($linked) $label = '<a href="'.hu.'" class="'.$linkclass.'">'.$sitename.'</a>';
-		if ($linked) $label = doTag($sitename,'a',$linkclass,' href="'.hu.'"');
+		if ($linked) $label = doTag($label,'a',$linkclass,' href="'.hu.'"');
 		
 		$content = array();
 		extract($pretext);
