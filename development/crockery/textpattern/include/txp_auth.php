@@ -14,6 +14,8 @@ $LastChangedRevision$
 
 */
 
+if (!defined('txpinterface')) die('txpinterface is undefined.');
+
 function doAuth() {
 	global $txp_user;
 			
