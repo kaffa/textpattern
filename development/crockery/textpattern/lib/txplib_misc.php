@@ -434,9 +434,11 @@ $LastChangedRevision: 1127 $
 
 		if (!($errno & error_reporting())) return;
 
-		global $txp_current_plugin;
+		global $txp_current_plugin, $production_status;
 		printf ("<pre>".gTxt('plugin_load_error').' <b>%s</b> -> <b>%s: %s on line %s</b></pre>',
 				$txp_current_plugin, $error[$errno], $errstr, $errline);
+		if ($production_status == 'debug')
+			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".join("\n", get_caller(10))."</code></pre>";
 	}
 
 // -------------------------------------------------------------
@@ -454,6 +456,8 @@ $LastChangedRevision: 1127 $
 		$errline = ($errstr === 'unknown_tag') ? '' : " on line $errline";
 		printf ("<pre>".gTxt('tag_error').' <b>%s</b> -> <b> %s: %s %s</b></pre>',
 				htmlspecialchars($txp_current_tag), $error[$errno], $errstr, $errline );
+		if ($production_status == 'debug')
+			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".join("\n", get_caller(10))."</code></pre>";
 	}
 
 // -------------------------------------------------------------
@@ -1379,4 +1383,49 @@ eod;
 		if (in_array($production_status, array('debug', 'test')))
 			 @$txptrace[] = str_repeat("\t", @$txptracelevel).$msg;
 	}
+
+
+// -------------------------------------------------------------
+	function relative_path($path, $pfx=txpath)
+	{
+		return preg_replace('@^'.preg_quote($pfx, '@').'@', '', $path);
+	}
+
+// -------------------------------------------------------------
+	function get_caller($num=1)
+	{
+		$out = array();
+		if (!is_callable('debug_backtrace'))
+			return $out;
+
+		$bt = debug_backtrace();
+		for ($i=2; $i< $num+2; $i++) {
+			if (!empty($bt[$i])) {
+				$t = '';
+				if (!empty($bt[$i]['file']))
+					$t .= relative_path($bt[$i]['file']);
+				if (!empty($bt[$i]['line']))
+					$t .= ':'.$bt[$i]['line'];
+				if ($t)
+					$t .= ' ';
+				if (!empty($bt[$i]['class']))
+					$t .= $bt[$i]['class'];
+				if (!empty($bt[$i]['type']))
+					$t .= $bt[$i]['type'];
+				if (!empty($bt[$i]['function'])) {
+					$t .= $bt[$i]['function'];
+
+					if (!empty($bt[$i]['args']))
+						$t .= '('.@join(', ', $bt[$i]['args']).')';
+					else 
+						$t .= '()';
+				}
+				
+
+				$out[] = $t;
+			}
+		}
+		return $out;
+	}
+
 ?>
