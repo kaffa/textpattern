@@ -39,12 +39,25 @@ class DB {
 $DB = new DB;
 
 //-------------------------------------------------------------
-	function safe_pfx($table)
-	{
+	function safe_pfx($table) {
 		$name = PFX.$table;
 		if (preg_match('@[^\w._$]@', $name))
 			return '`'.$name.'`';
 		return $name;
+	}
+
+//-------------------------------------------------------------
+	function safe_pfx_j($table)
+	{
+		$ts = array();
+		foreach (explode(',', $table) as $t) {
+			$name = PFX.trim($t);
+			if (preg_match('@[^\w._$]@', $name))
+				$ts[] = "`$name`".(PFX ? " as `$t`" : '');
+			else
+				$ts[] = "$name".(PFX ? " as $t" : '');
+		}
+		return join(', ', $ts);
 	}
 
 //-------------------------------------------------------------
@@ -216,7 +229,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_field($thing, $table, $where, $debug='') 
 	{
-		$q = "select $thing from ".safe_pfx($table)." where $where";
+		$q = "select $thing from ".safe_pfx_j($table)." where $where";
 		$r = safe_query($q,$debug);
 		if (@db_num_rows($r) > 0) {
 			$f = db_fetch_result($r,0);
@@ -229,7 +242,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_column($thing, $table, $where, $debug='') 
 	{
-		$q = "select $thing from ".safe_pfx($table)." where $where";
+		$q = "select $thing from ".safe_pfx_j($table)." where $where";
 		$rs = getRows($q,$debug);
 		if ($rs) {
 			foreach($rs as $a) {
@@ -244,12 +257,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_row($things, $table, $where, $debug='') 
 	{
-		$tables = split(',', $table);
-		for ($i=0; $i < count($tables); $i++)
-			$tables[$i] = safe_pfx(trim($tables[$i]));
-		$table = join(',', $tables);
-			
-		$q = "select $things from $table where $where";
+		$q = "select $things from ".safe_pfx_j($table)." where $where";
 		$rs = getRow($q,$debug);
 		if ($rs) {
 			return $rs;
@@ -261,12 +269,7 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_rows($things, $table, $where, $debug='') 
 	{
-		$tables = split(',', $table);
-		for ($i=0; $i < count($tables); $i++)
-			$tables[$i] = safe_pfx(trim($tables[$i]));
-		$table = join(',', $tables);
-
-		$q = "select $things from $table where $where";
+		$q = "select $things from ".safe_pfx_j($table)." where $where";
 		$rs = getRows($q,$debug);
 		if ($rs) {
 			return $rs;
@@ -277,14 +280,14 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_rows_start($things, $table, $where, $debug='') 
 	{
-		$q = "select $things from ".safe_pfx($table)." where $where";
+		$q = "select $things from ".safe_pfx_j($table)." where $where";
 		return startRows($q,$debug);
 	}
 
 //-------------------------------------------------------------
 	function safe_count($table, $where, $debug='') 
 	{
-		return getThing("select count(*) from ".safe_pfx($table)." where $where",$debug);
+		return getThing("select count(*) from ".safe_pfx_j($table)." where $where",$debug);
 	}
 
 // -------------------------------------------------------------
@@ -302,7 +305,7 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function fetch($col,$table,$key,$val,$debug='') 
 	{
-		$q = "select $col from ".PFX."$table where $key = '$val' limit 1";
+		$q = "select $col from ".safe_pfx($table)." where $key = '$val' limit 1";
 		if ($r = safe_query($q,$debug)) {
 			$thing = (db_num_rows($r) > 0) ? db_fetch_result($r,0) : '';
 			db_free($r);
@@ -382,7 +385,7 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function getCount($table,$where,$debug='') 
 	{
-		return getThing("select count(*) from ".safe_pfx($table)." where $where",$debug);
+		return getThing("select count(*) from ".safe_pfx_j($table)." where $where",$debug);
 	}
 
 // -------------------------------------------------------------

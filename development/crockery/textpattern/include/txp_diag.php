@@ -214,13 +214,50 @@ $LastChangedRevision$
 			foreach ($lines as $line) {
 				if (preg_match('/^\$LastChangedRevision: (\w+) \$/', $line, $match)) {
 					$file_revs[$f] = $match[1];
-					if ($match[1] > $rev)
-						$rev = $match[1];
+					if (intval($match[1]) > $rev)
+						$rev = intval($match[1]);
 				}
 			}
 		}
 	}
 
+	# Check revs & md5 against stable release, if possible
+	$dev_files = $old_files = $modified_files = array();
+	if ($cs = @file(txpath.'/checksums.txt')) {
+		foreach ($cs as $c) {
+			if (preg_match('@^(\S+): r?(\S+) \((.*)\)$@', trim($c), $m)) {
+				list(,$file,$r,$md5) = $m;
+				if (!empty($file_revs[$file]) and $r and $file_revs[$file] < $r) {
+					$old_files[] = $file;
+				}
+				elseif (!empty($file_revs[$file]) and $r and $file_revs[$file] > $r) {
+					$dev_files[] = $file;
+				}
+				elseif (@is_readable(txpath . $file) and ($sum=md5_file(txpath . $file)) != $md5) {
+					$modified_files[] = $file;
+				}
+			}
+		}
+	}
+
+	# files that haven't been updated
+	if ($old_files)
+		$fail['old_files'] = gTxt('old_files').cs.join(', '.n.t, $old_files);
+
+	# files that don't match their checksums
+	if ($modified_files)
+		$fail['modified_files'] = gTxt('modified_files').cs.join(', '.n.t, $modified_files);
+
+	# running development code in live mode is not recommended
+	if ($dev_files and $production_status == 'live')
+		$fail['dev_version_live'] = gTxt('dev_version_live').cs.join(', '.n.t, $dev_files);
+
+	# anything might break if arbitrary functions are disabled
+	if (ini_get('disable_functions'))
+		$fail['some_php_functions_disabled'] = gTxt('some_php_functions_disabled').cs.ini_get('disable_functions');
+
+	if (strncmp(php_sapi_name(), 'cgi', 3) == 0 and ini_get('cgi.rfc2616_headers'))
+		$fail['cgi_header_config'] = gTxt('cgi_header_config');
 
 	echo 
 	pagetop(gTxt('tab_diagnostics'),''),
@@ -281,6 +318,8 @@ $LastChangedRevision$
 		(is_callable('apache_get_version')) ? gTxt('apache_version').cs.apache_get_version().n : '',
 
 		gTxt('php_sapi_mode').cs.php_sapi_name().n,
+
+		gTxt('rfc2616_headers').cs.ini_get('cgi.rfc2616_headers').n,
 
 		gTxt('os_version').cs.php_uname('s').' '.php_uname('r').n,
 
