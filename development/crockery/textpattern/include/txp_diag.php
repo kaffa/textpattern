@@ -83,6 +83,27 @@ $LastChangedRevision$
 		}
 	}
 
+	function list_txp_tables() {
+		$table_names = array(PFX.'textpattern');
+		$rows = getRows("SHOW TABLES LIKE '".PFX."txp\_%'");
+		foreach ($rows as $row)
+			$table_names[] = array_shift($row);
+		return $table_names;
+	}
+
+	function check_tables($tables, $type='FAST QUICK') {
+		$msgs = array();
+		foreach ($tables as $table) {
+			$rs = getRows("CHECK TABLE $table $type");
+			if ($rs) {
+				foreach ($rs as $r)
+					if ($r['Msg_type'] != 'status')
+						$msgs[] = $table.cs.$r['Msg_type'].cs.$r['Msg_text'];
+			}
+		}
+		return $msgs;
+	}
+
 	function doDiagnostics()
 	{
 		global $files, $txpcfg, $step;
@@ -101,6 +122,11 @@ $LastChangedRevision$
 	$is_register_globals = ( (strcasecmp(ini_get('register_globals'),'on')===0) or (ini_get('register_globals')==='1'));
 	
 	$fail = array(
+
+		'php_version_4_3_0_required' =>
+		(!is_callable('version_compare') or version_compare(PHP_VERSION, '4.3.0', '<'))
+		? gTxt('php_version_4_3_0_required')
+		: '',
 
 		'path_to_site_missing' =>
 		(!isset($path_to_site))
@@ -256,8 +282,29 @@ $LastChangedRevision$
 	if (ini_get('disable_functions'))
 		$fail['some_php_functions_disabled'] = gTxt('some_php_functions_disabled').cs.ini_get('disable_functions');
 
-	if (strncmp(php_sapi_name(), 'cgi', 3) == 0 and ini_get('cgi.rfc2616_headers'))
-		$fail['cgi_header_config'] = gTxt('cgi_header_config');
+	# not sure about this one
+	#if (strncmp(php_sapi_name(), 'cgi', 3) == 0 and ini_get('cgi.rfc2616_headers'))
+	#	$fail['cgi_header_config'] = gTxt('cgi_header_config');
+
+	$guess_site_url = $_SERVER['HTTP_HOST'] . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/');
+	if ($siteurl and $siteurl != $guess_site_url)
+		$fail['site_url_mismatch'] = gTxt('site_url_mismatch').cs.$guess_site_url;
+
+	if ($tables = list_txp_tables()) {
+		$table_errors = check_tables($tables);
+		if ($table_errors)
+			$fail['mysql_table_errors'] = gTxt('mysql_table_errors').cs.join(', '.n.t, $table_errors);
+	}
+
+	$active_plugins = array();
+	if ($rows = safe_rows('name, version, code_md5, md5(code) as md5', 'txp_plugin', 'status > 0')) {
+		foreach ($rows as $row) {
+			$n = $row['name'].'-'.$row['version'];
+			if (strtolower($row['md5']) != strtolower($row['code_md5']))
+				$n .= 'm';
+			$active_plugins[] = $n;
+		}
+	}
 
 	echo 
 	pagetop(gTxt('tab_diagnostics'),''),
@@ -322,6 +369,8 @@ $LastChangedRevision$
 		gTxt('rfc2616_headers').cs.ini_get('cgi.rfc2616_headers').n,
 
 		gTxt('os_version').cs.php_uname('s').' '.php_uname('r').n,
+
+		($active_plugins ? gTxt('active_plugins').cs.join(', ', $active_plugins).n : ''),
 
 		$fail
 		? n.gTxt('preflight_check').cs.n.ln.join("\n", $fail).n.ln

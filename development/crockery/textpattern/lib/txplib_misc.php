@@ -378,6 +378,9 @@ $LastChangedRevision: 1127 $
 		
 		if (!empty($prefs['plugin_cache_dir'])) {
 			$dir = rtrim($prefs['plugin_cache_dir'], '/') . '/';
+			# in case it's a relative path
+			if (!is_dir($dir))
+				$dir = rtrim(realpath(txpath.'/'.$dir), '/') . '/';
 			if (is_file($dir . $name . '.php')) {
 				$plugins[] = $name;
 				set_error_handler("pluginErrorHandler");
@@ -462,6 +465,9 @@ $LastChangedRevision: 1127 $
 		
 		if (!empty($prefs['plugin_cache_dir'])) {
 			$dir = rtrim($prefs['plugin_cache_dir'], '/') . '/';
+			# allow a relative path
+			if (!is_dir($dir))
+				$dir = rtrim(realpath(txpath.'/'.$dir), '/') . '/';
 			$dh = @opendir($dir);
 			while ($dh and false !== ($f = @readdir($dh))) {
 				if ($f{0} != '.')
@@ -947,7 +953,7 @@ $LastChangedRevision: 1127 $
 
 		# we could add some other formats here
 		if ($format == 'iso8601' or $format == 'w3cdtf') {
-			$format = '%Y-%m-%dT%TZ';
+			$format = '%Y-%m-%dT%H:%M:%SZ';
 			$gmt = 1;
 		}
 		elseif ($format == 'rfc822') {
@@ -1534,6 +1540,23 @@ eod;
          trigger_error(gTxt('error_comment_context'));
 	}
 
+//-------------------------------------------------------------
+	function replace_relative_urls($html, $permalink='') {
 
+		global $siteurl;
+
+		# urls like "/foo/bar" - relative to the domain
+		if (serverSet('HTTP_HOST')) {
+			$html = preg_replace('@(<a[^>]+href=")/@','$1http://'.serverSet('HTTP_HOST').'/',$html);
+			$html = preg_replace('@(<img[^>]+src=")/@','$1http://'.serverSet('HTTP_HOST').'/',$html);
+		}
+		# "foo/bar" - relative to the textpattern root
+		$html = preg_replace('@(<a[^>]+href=")(?!http://)@','$1http://'.$siteurl.'/$2',$html);
+		$html = preg_replace('@(<img[^>]+src=")(?!http://)@','$1http://'.$siteurl.'/$2',$html);
+
+		if ($permalink)
+			$html = preg_replace("/href=\\\"#(.*)\"/","href=\"".$permalink."#\\1\"",$html);
+		return ($html);
+	}
 
 ?>
