@@ -361,10 +361,9 @@ $LastChangedRevision$
 			'labeltag' => '',
 		),$atts));
 		
-		global $id,$thisid,$thisarticle;
+		global $id,$thisarticle;
+		assert_article();
 		
-		$id = ($thisid) ? $thisid : $id;
-
 		$cats = doSlash(safe_row("Category1,Category2","textpattern", "ID='$id' limit 1"));
 
 		if (!empty($cats['Category1']) or !empty($cats['Category2'])) {
@@ -692,6 +691,8 @@ $LastChangedRevision$
 	function article_id() 
 	{
 		global $thisarticle;
+		assert_article();
+
 		return $thisarticle['thisid'];
 	}
 
@@ -701,6 +702,8 @@ $LastChangedRevision$
 		global $dateformat,$archive_dateformat,
 				$pg,$c,$thisarticle,$id,$txpcfg;
 
+		assert_article();
+		
 		$date_offset = $thisarticle['posted'];
 
 		extract(lAtts(array(
@@ -732,6 +735,8 @@ $LastChangedRevision$
 	{
 		global $thisarticle;
 
+		assert_article();
+		
 		$com_count = $thisarticle['comments_count'];
 		return ($com_count > 0) ? $com_count : '';
 	}
@@ -741,7 +746,8 @@ $LastChangedRevision$
 	function comments_invite($atts) 
 	{
 		global $thisarticle,$is_article_list;
-		if (empty($thisarticle)) return;
+
+		assert_article();
 		
 		extract($thisarticle);
 		global $comments_mode;
@@ -794,6 +800,8 @@ $LastChangedRevision$
 		if (ps('preview') and empty($comment_preview) and !$preview)
 			return '';
 
+		assert_article();
+		
 		if (is_array($thisarticle)) extract($thisarticle);
 
 		if (@$thisid) $id = $thisid;
@@ -848,6 +856,8 @@ $LastChangedRevision$
 			'wraptag'	=> 'h3',
 		),$atts));
 
+		assert_article();
+		
 		if (is_array($thisarticle)) extract($thisarticle);
 
 		if (@$thisid) $id = $thisid;
@@ -882,6 +892,8 @@ $LastChangedRevision$
 			'breakclass'=> '',
 		),$atts));	
 
+		assert_article();
+		
 		if (is_array($thisarticle)) extract($thisarticle);
 
 		if (@$thisid) $id = $thisid;
@@ -948,6 +960,8 @@ $LastChangedRevision$
 		}
 		$GLOBALS['pretext']['comments_preview_shown'] = true;
 
+		assert_article();
+		
 		if (is_array($thisarticle)) extract($thisarticle);
 
 		if (@$thisid) $id = $thisid;
@@ -977,6 +991,9 @@ $LastChangedRevision$
 	function comment_permlink($atts,$thing) 
 	{
 		global $thisarticle, $thiscomment;
+
+		assert_article();
+		
 		extract($thiscomment);
 		extract(lAtts(array(
 			'anchor' => empty($thiscomment['has_anchor_tag']),
@@ -995,6 +1012,9 @@ $LastChangedRevision$
 	function comment_id($atts) 
 	{
 		global $thiscomment;
+
+		assert_comment();
+		
 		return $thiscomment['discussid'];
 	}
 
@@ -1002,6 +1022,9 @@ $LastChangedRevision$
 	function comment_name($atts) 
 	{
 		global $thiscomment, $prefs;
+
+		assert_comment();
+		
 		extract($prefs);
 		extract($thiscomment);
 		$web = str_replace("http://", "", $web);
@@ -1019,6 +1042,9 @@ $LastChangedRevision$
 	function comment_email($atts) 
 	{
 		global $thiscomment;
+
+		assert_comment();
+		
 		return $thiscomment['email'];
 	}
 
@@ -1026,6 +1052,8 @@ $LastChangedRevision$
 	function comment_web($atts) 
 	{
 		global $thiscomment;
+		assert_comment();
+		
 		return $thiscomment['web'];
 	}
 
@@ -1040,6 +1068,8 @@ $LastChangedRevision$
 			'lang'   => '',
 		), $atts));
 
+		assert_comment();
+		
 		$comment_time = safe_strftime($format, $thiscomment['time'], $gmt, $lang);
 		return $comment_time;
 	}
@@ -1048,6 +1078,8 @@ $LastChangedRevision$
 	function comment_message($atts) 
 	{
 		global $thiscomment;
+		assert_comment();
+		
 		return $thiscomment['message'];
 	}
 
@@ -1055,6 +1087,9 @@ $LastChangedRevision$
 	function comment_anchor($atts) 
 	{
 		global $thiscomment;
+
+		assert_comment();
+		
 		$thiscomment['has_anchor_tag'] = 1;
 		return '<a id="c'.$thiscomment['discussid'].'"></a>';
 	}
@@ -1070,6 +1105,9 @@ $LastChangedRevision$
 	function author($atts) 
 	{
 		global $thisarticle;		
+
+		assert_article();
+		
 		extract(lAtts(array('link' => ''),$atts));
 		$author_name = get_author_name($thisarticle['authorid']);
 		return (empty($link))
@@ -1119,6 +1157,9 @@ $LastChangedRevision$
 	function body($atts) 
 	{
 		global $thisarticle;
+
+		assert_article();
+		
 		return $thisarticle['body'];
 	}	
 	
@@ -1126,6 +1167,8 @@ $LastChangedRevision$
 	function title($atts) 
 	{
 		global $thisarticle;
+		assert_article();
+		
 		return escape_title($thisarticle['title']);
 	}
 
@@ -1133,6 +1176,8 @@ $LastChangedRevision$
 	function excerpt($atts) 
 	{
 		global $thisarticle;
+		assert_article();
+
 		return $thisarticle['excerpt'];	
 	}
 
@@ -1140,6 +1185,8 @@ $LastChangedRevision$
 	function category1($atts) 
 	{
 		global $thisarticle;
+		assert_article();
+
 		extract(lAtts(array(
 			'link' => 0,
 			'title' => 0,
@@ -1157,6 +1204,8 @@ $LastChangedRevision$
 	function category2($atts) 
 	{
 		global $thisarticle;
+		assert_article();
+
 		extract(lAtts(array(
 			'link' => 0,
 			'title' => 0,
@@ -1228,6 +1277,8 @@ $LastChangedRevision$
 	function keywords($atts) 
 	{
 		global $thisarticle;
+		assert_article();
+
 		return ($thisarticle['keywords']) ? $thisarticle['keywords'] : '';
 	}
 
@@ -1235,6 +1286,8 @@ $LastChangedRevision$
 	function article_image($atts)
 	{
 		global $thisarticle, $img_dir;
+
+		assert_article();
 
 		assert_article();
 
@@ -1308,9 +1361,8 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'hilight'     => 'strong',
 		),$atts));
-		
-		if (empty($thisarticle)) return;
-		
+	
+		assert_article();	
 		extract($thisarticle);
 		
 		$result = preg_replace("/>\s*</","> <",$body);
@@ -1328,6 +1380,7 @@ $LastChangedRevision$
 	function search_result_url($atts) 
 	{
 		global $thisarticle;
+		assert_article();
 		
 		$l = permlinkurl($thisarticle);
 		return permlink($atts, $l);
@@ -1336,6 +1389,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function search_result_date($atts) 
 	{
+		assert_article();
 		return posted($atts);
 	}
 
@@ -1408,6 +1462,8 @@ $LastChangedRevision$
 	function if_comments($atts, $thing)	
 	{
 		global $thisarticle;
+		assert_article();
+
 		return parse(EvalElse($thing, ($thisarticle['comments_count'] > 0)));
 	}
 
@@ -1516,7 +1572,8 @@ $LastChangedRevision$
 	function permlink($atts,$thing=NULL)
 	{
 		global $thisarticle;
-		if (empty($thisarticle)) return;
+		assert_article();
+
 		extract(lAtts(array(
 			'style' => '',
 			'class' => ''
@@ -1692,6 +1749,7 @@ $LastChangedRevision$
 	function if_excerpt($atts, $thing)
 	{
 	        global $thisarticle;
+           assert_article();
 	        # eval condition here. example for article excerpt
 	        $excerpt = trim($thisarticle['excerpt']);
 	        $condition = (!empty($excerpt))? true : false;
@@ -1729,6 +1787,7 @@ $LastChangedRevision$
 	function if_article_category($atts, $thing)
 	{
 		global $thisarticle;
+		assert_article();
 
 		extract(lAtts(array(
 			'name' => '',
@@ -1767,6 +1826,7 @@ $LastChangedRevision$
 	function if_article_section($atts, $thing)
 	{
 		global $thisarticle;
+		assert_article();
 
 		extract(lAtts(array(
 			'name' => '',
@@ -1799,6 +1859,7 @@ $LastChangedRevision$
 	function custom_field($atts)
 	{
 		global $thisarticle, $prefs;
+		assert_article();
 		
 		extract(lAtts(array(
 			'name' => @$prefs['custom_1_set'],
@@ -1812,6 +1873,7 @@ $LastChangedRevision$
 	function if_custom_field($atts, $thing)
 	{
 		global $thisarticle, $prefs;
+		assert_article();
 		
 		extract(lAtts(array(
 			'name' => @$prefs['custom_1_set'],
@@ -1907,6 +1969,7 @@ $LastChangedRevision$
 	function if_first_article($atts, $thing) 
 	{
 		global $thisarticle;
+		assert_article();
 		return parse(EvalElse($thing, !empty($thisarticle['is_first'])));
 	}
 
@@ -1914,7 +1977,20 @@ $LastChangedRevision$
 	function if_last_article($atts, $thing) 
 	{
 		global $thisarticle;
+		assert_article();
 		return parse(EvalElse($thing, !empty($thisarticle['is_last'])));
+	}
+
+// -------------------------------------------------------------
+	function if_plugin($atts, $thing) 
+	{
+		global $plugins, $plugins_ver;
+		extract(lAtts(array(
+			'name'    => '',
+			'ver'     => '',
+		),$atts));	
+
+		return parse(EvalElse($thing, @in_array($name, $plugins) and (!$ver or version_compare($plugins_ver[$name], $ver) >= 0)));
 	}
 
 ?>

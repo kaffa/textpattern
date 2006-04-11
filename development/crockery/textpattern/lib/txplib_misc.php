@@ -119,7 +119,7 @@ $LastChangedRevision: 1127 $
 		$a = func_get_args();
 		echo "<pre>".n;
 		foreach ($a as $thing)
-			echo (is_scalar($thing) ? strval($thing) : var_export($thing, true)), n;
+			echo htmlspecialchars(is_scalar($thing) ? strval($thing) : var_export($thing, true)), n;
 		echo "</pre>".n;
     }
 
@@ -383,7 +383,7 @@ $LastChangedRevision: 1127 $
 // -------------------------------------------------------------
 	function load_plugin($name)
 	{
-		global $plugins, $prefs, $txp_current_plugin;
+		global $plugins, $plugins_ver, $prefs, $txp_current_plugin;
 
 		if (is_array($plugins) and in_array($name,$plugins)) {
 			return true;
@@ -396,14 +396,16 @@ $LastChangedRevision: 1127 $
 				set_error_handler("pluginErrorHandler");
 				$txp_current_plugin = $name;
 				include($dir . $name . '.php');
+				$plugins_ver[$name] = @$plugin['version'];
 				restore_error_handler();
 				return true;
 			}
 		}
 							
-		$rs = safe_row("name,code","txp_plugin","status='1' AND name='".doSlash($name)."'");
+		$rs = safe_row("name,code,version","txp_plugin","status='1' AND name='".doSlash($name)."'");
 		if ($rs) {
 			$plugins[] = $rs['name'];
+			$plugins_ver[$rs['name']] = $rs['version'];
 			
 			set_error_handler("pluginErrorHandler");
 			$txp_current_plugin = $rs['name'];
@@ -467,7 +469,7 @@ $LastChangedRevision: 1127 $
 // -------------------------------------------------------------
    function load_plugins($type=NULL)
    {
-		global $prefs,$plugins;
+		global $prefs,$plugins, $plugins_ver;
 		
 		if (!is_array($plugins)) $plugins = array();
 		
@@ -484,12 +486,13 @@ $LastChangedRevision: 1127 $
 		if ($type !== NULL)
 			$where .= (" and type='".doSlash($type)."'");
 
-		$rs = safe_rows("name, code", "txp_plugin", $where);
+		$rs = safe_rows("name, code, version", "txp_plugin", $where);
 		if ($rs) {
 			$old_error_handler = set_error_handler("pluginErrorHandler");
 			foreach($rs as $a) {
 				if (!in_array($a['name'],$plugins)) {
 					$plugins[] = $a['name'];
+					$plugins_ver[$a['name']] = $a['version'];
 					$GLOBALS['txp_current_plugin'] = $a['name'];
 					$eval_ok = eval($a['code']);
 					if ($eval_ok === FALSE) 
@@ -1274,7 +1277,7 @@ $LastChangedRevision: 1127 $
 // -------------------------------------------------------------
 	function txp_status_header($status='200 OK')
 	{
-		if (substr(php_sapi_name(), 0, 3) == 'cgi')
+		if (substr(php_sapi_name(), 0, 3) == 'cgi' and empty($_SERVER['FCGI_ROLE']) and empty($_ENV['FCGI_ROLE']))
 			header("Status: $status");
 		else
 			header("HTTP/1.1 $status");
@@ -1526,5 +1529,21 @@ eod;
 
 		return $locale;
 	}
+
+//-------------------------------------------------------------
+	function assert_article() {
+		global $thisarticle;
+		if (empty($thisarticle))
+         trigger_error(gTxt('error_article_context'));
+	}
+
+//-------------------------------------------------------------
+	function assert_comment() {
+		global $thiscomment;
+		if (empty($thiscomment))
+         trigger_error(gTxt('error_comment_context'));
+	}
+
+
 
 ?>
