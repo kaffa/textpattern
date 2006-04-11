@@ -109,7 +109,7 @@ class txpBackupParser extends txpXmlParser {
 			$out .= '<record table="'.$table.'">'.n;
 			foreach ($row as $k=>$v)
 				if ($v !== NULL)
-					$out .= '<field name="'.$k.'">'.escape_html($v).'</field>'.n;
+					$out .= '<field name="'.$k.'">'.escape_output($v).'</field>'.n;
 			$out .= '</record>'.n;
 		}
 

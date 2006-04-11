@@ -1116,7 +1116,6 @@ $LastChangedRevision$
 	}
 	
 // -------------------------------------------------------------
-
 	function if_author($atts, $thing)
 	{
 		global $author;		
@@ -1152,9 +1151,10 @@ $LastChangedRevision$
 
 		return parse(EvalElse($thing, !empty($author)));
 	}
-// -------------------------------------------------------------	
+	
+// -------------------------------------------------------------
 
-	function body($atts) 
+function body($atts) 
 	{
 		global $thisarticle;
 
@@ -1357,18 +1357,23 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function search_result_excerpt($atts) 
 	{
-		global $thisarticle, $q;
+		global $thisarticle, $pretext;
 		extract(lAtts(array(
 			'hilight'     => 'strong',
+			'limit'       => 5,
 		),$atts));
 	
 		assert_article();	
+		extract($pretext);
 		extract($thisarticle);
 		
 		$result = preg_replace("/>\s*</","> <",$body);
 		preg_match_all("/\s.{1,50}".preg_quote($q).".{1,50}\s/iu",$result,$concat);
 
-		$concat = join(" ... ",$concat[0]);
+		$r = array();
+		for ($i=0; $i < min($limit, count($concat[0])); $i++)
+			$r[] = trim($concat[0][$i]);
+		$concat = join(" ...\n", $r);
 
 		$concat = strip_tags($concat);
 		$concat = preg_replace('/^[^>]+>/U',"",$concat);
@@ -1863,10 +1868,16 @@ $LastChangedRevision$
 		
 		extract(lAtts(array(
 			'name' => @$prefs['custom_1_set'],
+			'escape' => '',
+			'default' => '',
 		),$atts));
 
-		if (isset($thisarticle[$name]))
-			return $thisarticle[$name];
+		if (!empty($thisarticle[$name]))
+			$out = $thisarticle[$name];
+		else
+			$out = $default;
+
+		return ($escape == 'html' ? escape_output($out) : $out);
 	}	
 	
 //--------------------------------------------------------------------------
