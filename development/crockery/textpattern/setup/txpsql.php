@@ -257,7 +257,6 @@ $create_sql[] = "CREATE TABLE ".PFX."txp_lang (
 
 $create_sql[] = 'CREATE UNIQUE INDEX '.PFX.'lang ON '.PFX.'txp_lang (lang,name)';
 $create_sql[] = 'CREATE INDEX '.PFX.'lang_2 ON '.PFX.'txp_lang (lang,event)';
-$create_sql[] = "INSERT INTO `".PFX."txp_image` VALUES (1, 'divider.gif', 'site-design', '.gif', 400, 1, '', '', '2005-07-22 16:37:11', '$name', 0)";
 
 $create_sql[] = "CREATE TABLE ".PFX."txp_link (
   id $autoinc,

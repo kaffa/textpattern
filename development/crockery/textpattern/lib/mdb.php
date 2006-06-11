@@ -26,12 +26,6 @@ require_once txpath.'/lib/mdb/'.MDB_TYPE.'.php';
 
 // The functions here are general purpose ones
 
-function get_caller($bt) {
-	$caller = $bt[count($bt)-1];
-	extract($caller);
-	return "$file:$line $function()";
-}
-
 
 function db_insert_rec($table, $rec, $res=0) {
 	global $mdb_res;

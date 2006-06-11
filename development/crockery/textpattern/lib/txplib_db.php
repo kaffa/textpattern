@@ -75,8 +75,8 @@ $DB = new DB;
 		$time = sprintf('%02.6f', getmicrotime() - $start);
 		@$qtime += $time;
 		@$qcount++;
-		if ($result === false and (@$production_status == 'debug' or @$production_status == 'test')) {
-			$caller = ($production_status == 'test') ? n . join("\n", get_caller()) : '';
+		if ($result === false and (@$production_status == 'debug' or @$production_status == 'testing')) {
+			$caller = ($production_status == 'testing') ? n . join("\n", get_caller()) : '';
 			trigger_error(mysql_error() . n . $q . $caller, E_USER_WARNING);
 		}
 
@@ -172,7 +172,7 @@ $DB = new DB;
 			$current = db_column_list(PFX.$table);
 			foreach ($cols as $name=>$type) {
 				if (empty($current[$name]))
-					safe_alter($table, 'add '.$name.' '.$type,1);
+					safe_alter($table, 'add '.$name.' '.$type);
 			}
 		}
 		else {
