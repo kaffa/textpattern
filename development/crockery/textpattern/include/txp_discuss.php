@@ -276,8 +276,8 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function discuss_multi_edit() 
 	{
-+		//FIXME, this method needs some refactoring
-+		
+		//FIXME, this method needs some refactoring
+		
 		$selected = ps('selected');
 		$method = ps('method');
 		$done = array();
