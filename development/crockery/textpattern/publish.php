@@ -507,7 +507,7 @@ $LastChangedRevision$
 
 			$words = preg_split('/\s+/', $q);
 			foreach ($words as $w) {
-				$rlike[] = " and (Title ".db_rlike()." '".doSlash(preg_quote($w))."' or Body ".db_rlike()." '".doSlash(preg_quote($w))."')";
+				$rlike[] = "(Title ".db_rlike()." '".doSlash(preg_quote($w))."' or Body ".db_rlike()." '".doSlash(preg_quote($w))."')";
 			}
 			$search = " and " . join(' and ', $rlike) . " $s_filter";
 
