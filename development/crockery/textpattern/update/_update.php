@@ -7,18 +7,6 @@ $LastChangedRevision$
 		exit("Nothing here. You can't access this file directly.");
 	global $txpcfg, $thisversion, $dbversion, $txp_using_svn, $dbupdatetime;
 
-	function newest_file() {
-		$newest = 0;
-		$dp = opendir(txpath.'/update/');
-		while (false !== ($file = readdir($dp))) 
-		{
-			if (strpos($file,"_") === 0)
-				$newest = max($newest, filemtime(txpath."/update/$file"));
-		}
-		closedir($dp);
-		return $newest;
-	}
-
 	function get_update_files() {
 		$files = array();
 		$dp = opendir(txpath.'/update/');
@@ -40,31 +28,32 @@ $LastChangedRevision$
 	if ($txp_using_svn) {
 		foreach (get_update_files() as $file) {
 			$f = txpath."/update/$file";
-			if (filemtime($f) > $dbupdatetime)
+			if (filemtime($f) > $dbupdatetime) {
 				include($f);
+			}
 		}
-		return;
 	}
+	else {
+		//Use "ENGINE" if version of MySQL > (4.0.18 or 4.1.2)
+		// On 4.1 or greater use utf8-tables, if that is configures in config.php
+		$mysqlversion = mysql_get_server_info();
+		$tabletype = ( intval($mysqlversion[0]) >= 5 || preg_match('#^4\.(0\.[2-9]|(1[89]))|(1\.[2-9])#',$mysqlversion)) 
+						? " ENGINE=MyISAM "
+						: " TYPE=MyISAM ";
+		if ( isset($txpcfg['dbcharset']) && (intval($mysqlversion[0]) >= 5 || preg_match('#^4\.[1-9]#',$mysqlversion))) 
+		{
+			$tabletype .= " CHARACTER SET = ". $txpcfg['dbcharset'] ." ";
+		}
 
-	//Use "ENGINE" if version of MySQL > (4.0.18 or 4.1.2)
-	// On 4.1 or greater use utf8-tables, if that is configures in config.php
-	$mysqlversion = mysql_get_server_info();
-	$tabletype = ( intval($mysqlversion[0]) >= 5 || preg_match('#^4\.(0\.[2-9]|(1[89]))|(1\.[2-9])#',$mysqlversion)) 
-					? " ENGINE=MyISAM "
-					: " TYPE=MyISAM ";
-	if ( isset($txpcfg['dbcharset']) && (intval($mysqlversion[0]) >= 5 || preg_match('#^4\.[1-9]#',$mysqlversion))) 
-	{
-		$tabletype .= " CHARACTER SET = ". $txpcfg['dbcharset'] ." ";
-	}
-
-	// Run any update file newer than the last dbupdatetime
-	foreach (get_update_files() as $file) {
-		if (preg_match('@_to_(.*)\.php@', $file, $m)) {
-			$file_ver = $m[1];
-			$f = txpath."/update/$file";
-			if (version_compare($file_ver, $dbversion) > 0) {
-				include($f);
-				$dbversion = $file_ver;
+		// Run any update file newer than the last dbupdatetime
+		foreach (get_update_files() as $file) {
+			if (preg_match('@_to_(.*)\.php@', $file, $m)) {
+				$file_ver = $m[1];
+				$f = txpath."/update/$file";
+				if (version_compare($file_ver, $dbversion) > 0) {
+					include($f);
+					$dbversion = $file_ver;
+				}
 			}
 		}
 	}
