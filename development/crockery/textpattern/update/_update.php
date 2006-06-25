@@ -21,20 +21,20 @@ $LastChangedRevision$
 		return $files;
 	}
 
-	if ( $txp_using_svn && (newest_file() < $dbupdatetime) ) 
-		return;
-
 	@ignore_user_abort(1);
 	@set_time_limit(0);
 
 	// Run any update file newer than the last dbupdatetime
 	if ($txp_using_svn) {
+		$updated = false;
 		foreach (get_update_files() as $file) {
 			$f = txpath."/update/$file";
 			if (filemtime($f) > $dbupdatetime) {
 				include($f);
+				$updated = true;		
 			}
 		}
+		if (!$updated) return;
 	}
 	else {
 		//Use "ENGINE" if version of MySQL > (4.0.18 or 4.1.2)
