@@ -75,9 +75,9 @@ $DB = new DB;
 		$time = sprintf('%02.6f', getmicrotime() - $start);
 		@$qtime += $time;
 		@$qcount++;
-		if ($result === false and (@$production_status == 'debug' or @$production_status == 'testing')) {
-			$caller = ($production_status == 'testing') ? n . join("\n", get_caller()) : '';
-			trigger_error(mysql_error() . n . $q . $caller, E_USER_WARNING);
+		if ($result == false and (@$production_status == 'debug' or @$production_status == 'testing')) {
+			$caller = join("\n", get_caller());
+			trigger_error(db_lasterror() . n . $q . $caller);
 		}
 
 		trace_add("[SQL ($time): $q]");
@@ -131,13 +131,13 @@ $DB = new DB;
 	function safe_upsert($table,$set,$where,$debug='') 
 	{
 		// FIXME: lock the table so this is atomic?
-		$wa = (is_array($where) ? join(' and ', $where) : $where);
-		$r = safe_update($table, $set, $wa, $debug);
-		if ($r and db_affected_rows())
+		$wc = (is_array($where) ? join(', ', $where) : $where);
+		$r = @safe_insert($table, join(', ', array($wc, $set)), $debug);
+		if ($r)
 			return $r;
 		else {
-			$wc = (is_array($where) ? join(', ', $where) : $where);
-			return safe_insert($table, join(', ', array($wc, $set)), $debug);
+			$wa = (is_array($where) ? join(' and ', $where) : $where);
+			return safe_update($table, $set, $wa, $debug);
 		}
 	}
 
