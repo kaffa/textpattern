@@ -137,16 +137,17 @@ $LastChangedRevision: 1008 $
 	}
 
 // -------------------------------------------------------------
-	function PrevNextLink($event,$topage,$label,$type,$sort='',$dir='')
+
+	function PrevNextLink($event, $page, $label, $type, $sort = '', $dir = '', $crit = '', $method = '')
 	{
-		return join('',array(
-			'<a href="?event='.$event.a.'step=list'.a.'page='.$topage,
-			($sort) ? a.'sort='.$sort : '',
-			($dir) ? a.'dir='.$dir : '',
-			'" class="navlink">',
-			($type=="prev") ? '&#8249;'.sp.$label : $label.sp.'&#8250;',
-			'</a>'
-		));
+		return '<a href="?event='.$event.a.'step=list'.a.'page='.$page.
+			($sort ? a.'sort='.$sort : '').
+			($dir ? a.'dir='.$dir : '').
+			($crit ? a.'crit='.$crit : '').
+			($method ? a.'method='.$method : '').
+			'" class="navlink">'.
+			($type == 'prev' ? '&#8249;'.sp.$label : $label.sp.'&#8250;').
+			'</a>';
 	}
 
 // -------------------------------------------------------------
@@ -307,62 +308,69 @@ $LastChangedRevision: 1008 $
 	}
 
 // -------------------------------------------------------------
-	function popHelp($helpvar,$winW='',$winH='') 
+
+	function popHelp($help_var, $width = '', $height = '') 
 	{
-		$the_lang = (LANG == 'cs-cz' || LANG == 'el-gr' || LANG == 'ja-jp') ? substr(LANG,3,2): substr(LANG,0,2);
-		return join('',array(
-			' <a target="_blank" href="http://rpc.textpattern.com/help/?item='.$helpvar.'&#38;lang='.$the_lang.'"',
-			' onclick="',
-			"window.open(this.href, 'popupwindow', 'width=",
-			($winW) ? $winW : 400,
-			',height=',
-			($winH) ? $winH : 400,
-			',scrollbars,resizable\'); return false;" class="pophelp">?</a>'
-		));
+		$lang = (LANG == 'cs-cz' || LANG == 'el-gr' || LANG == 'ja-jp') ? 
+			substr(LANG, 3, 2): substr(LANG, 0, 2);
+
+		return '<a target="_blank"'.
+			' href="http://rpc.textpattern.com/help/?item='.$help_var.a.'lang='.$lang.'"'.
+			' onclick="popWin(this.href'.
+			($width ? ', '.$width : '').
+			($height ? ', '.$height : '').
+			'); return false;" class="pophelp">?</a>';
 	}
 
 // -------------------------------------------------------------
-	function popHelpSubtle($helpvar,$winW='',$winH='') 
+
+	function popHelpSubtle($help_var, $width = '', $height = '') 
 	{
-		$the_lang = (LANG == 'cs-cz' || LANG == 'el-gr' || LANG == 'ja-jp') ? substr(LANG,3,2): substr(LANG,0,2);
-		return join('',array(
-			' <a target="_blank" href="http://rpc.textpattern.com/help/?item='.$helpvar.'&lang='.$the_lang.'"',
-			' onclick="',
-			"window.open(this.href, 'popupwindow', 'width=",
-			($winW) ? $winW : 400,
-			',height=',
-			($winH) ? $winH : 400,
-			',scrollbars,resizable\'); return false;">?</a>'
-		));
+		$lang = (LANG == 'cs-cz' || LANG == 'el-gr' || LANG == 'ja-jp') ? 
+			substr(LANG, 3, 2): substr(LANG, 0, 2);
+
+		return '<a target="_blank"'.
+			' href="http://rpc.textpattern.com/help/?item='.$help_var.a.'lang='.$lang.'"'.
+			' onclick="popWin(this.href'.
+			($width ? ', '.$width : '').
+			($height ? ', '.$height : '').
+			'); return false;">?</a>';
 	}
 
-
 // -------------------------------------------------------------
-	function popTag($var,$text,$winW='',$winH='') 
+
+	function popTag($var, $text, $width = '', $height = '') 
 	{
-		return join('',array(
-			' <a target="_blank" href="?event=tag'.a.'name='.$var.'"',
-			' onclick="',
-			"window.open(this.href, 'popupwindow', 'width=",
-			($winW) ? $winW : 400,
-			',height=',
-			($winH) ? $winH : 400,
-			',scrollbars,resizable\'); return false;">',
-			$text,'</a>'
-		));
+		return '<a target="_blank"'.
+			' href="?event=tag'.a.'name='.$var.'"'.
+			' onclick="popWin(this.href'.
+			($width ? ', '.$width : '').
+			($height ? ', '.$height : '').
+			'); return false;">'.$text.'</a>';
 	}
 	
 // -------------------------------------------------------------
+
 	function popTagLinks($type) 
 	{
 		global $txpcfg;
-		include $txpcfg['txpath'].'/lib/taglib.php';
+		include txpath.'/lib/taglib.php';
+
 		$arname = $type.'_tags';
 		asort($$arname);
-		foreach($$arname as $a) {
-			$out[] = popTag($a,gTxt('tag_'.$a));
+
+		$out = array();
+
+		$out[] = n.'<ul class="tag-links">';
+
+		foreach ($$arname as $a)
+		{
+			$out[] = n.t.tag(popTag($a,gTxt('tag_'.$a)), 'li');
 		}
-		return join(br,$out);
+
+		$out[] = n.'</ul>';
+
+		return join('', $out);
 	}
 
 //-------------------------------------------------------------
@@ -383,21 +391,27 @@ $LastChangedRevision: 1008 $
 		,' align="center"'));
 	}
 // -------------------------------------------------------------
+
 	function upload_form($label, $pophelp, $step, $event, $id='', $max_file_size = '1000000')
 	{
-		return
-			'<form enctype="multipart/form-data" action="index.php" method="post">'.
-			((!empty($max_file_size))? hInput('MAX_FILE_SIZE',$max_file_size): '').
-			graf($label.': '.
-			fInput('file','thefile','','edit').
-			popHelp($pophelp).
-			fInput('submit','',gTxt('upload'),'smallerbox')).
-			eInput($event).
-			sInput($step).
-			hInput('id',$id).
-			'</form>';
+		return n.n.'<form class="upload-form" method="post" enctype="multipart/form-data" action="index.php">'.
+			n.'<div>'.
+
+			(!empty($max_file_size)? n.hInput('MAX_FILE_SIZE', $max_file_size): '').
+			n.eInput($event).
+			n.sInput($step).
+			n.hInput('id', $id).
+
+			n.graf(
+				'<label for="'.$event.'-upload">'.$label.'</label>'.sp.popHelp($pophelp).sp.
+					fInput('file', 'thefile', '', 'edit', '', '', '', '', $event.'-upload').
+					fInput('submit', '', gTxt('upload'), 'smallerbox')
+			).
+
+			n.'</div>'.
+			n.'</form>';
 	}
-	
+
 //-------------------------------------------------------------
 	function pref_text($item,$var)
 	{
