@@ -42,7 +42,7 @@ register_callback('file_event', 'file');
 		$page = gps('page');
 
 		$total = getCount('txp_file',"1=1");  
-		$limit = max(@$file_list_pageby, 25);
+		$limit = max(@$file_list_pageby, 15);
 		$numPages = ceil($total/$limit);  
 		$page = (!$page) ? 1 : $page;
 		$offset = ($page - 1) * $limit;
@@ -77,7 +77,7 @@ register_callback('file_event', 'file');
 				)
 			):''),
 		tr(
-			column_head('Id','id','file',1,$dir).
+			column_head('ID','id','file',1,$dir).
 			column_head('file_name','filename','file',1,$dir).
 			td(gTxt('status')).
 			td(gTxt('tags')).

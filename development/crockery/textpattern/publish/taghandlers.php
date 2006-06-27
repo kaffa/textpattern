@@ -1187,43 +1187,61 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function category1($atts) 
+
+	function category1($atts)
 	{
-		global $thisarticle;
+		global $thisarticle, $permlink_mode;
+
 		assert_article();
 
 		extract(lAtts(array(
-			'link' => 0,
+			'link'	=> 0,
 			'title' => 0,
-		),$atts));
-		if ($thisarticle['category1']) {
-			$cat_title = ($title ? fetch_category_title($thisarticle['category1']) : $thisarticle['category1']);
-			if (!empty($link)) 
-				return '<a href="'.pagelinkurl(array('c'=>$thisarticle['category1'])).'">'.
-					$cat_title.'</a>';
+		), $atts));
+
+		if ($thisarticle['category1'])
+		{
+			$cat_title = ($title) ? fetch_category_title($thisarticle['category1']) : $thisarticle['category1'];
+
+			if (!empty($link))
+			{
+				return '<a'.
+					($permlink_mode != 'messy' ? ' rel="tag"' : '').
+					' href="'.pagelinkurl(array('c' => $thisarticle['category1'])).'">'.$cat_title.'</a>';
+			}
+
 			return $cat_title;
 		}
 	}
-	
+
 // -------------------------------------------------------------
-	function category2($atts) 
+
+	function category2($atts)
 	{
-		global $thisarticle;
+		global $thisarticle, $permlink_mode;
+
 		assert_article();
 
 		extract(lAtts(array(
-			'link' => 0,
+			'link'	=> 0,
 			'title' => 0,
-		),$atts));
-		if ($thisarticle['category2']) {
-			$cat_title = ($title ? fetch_category_title($thisarticle['category2']) : $thisarticle['category2']);
-			if (!empty($link)) 
-				return '<a href="'.pagelinkurl(array('c'=>$thisarticle['category2'])).'">'.
-					$cat_title.'</a>';
+		), $atts));
+
+		if ($thisarticle['category2'])
+		{
+			$cat_title = ($title) ? fetch_category_title($thisarticle['category2']) : $thisarticle['category2'];
+
+			if (!empty($link))
+			{
+				return '<a'.
+					($permlink_mode != 'messy' ? ' rel="tag"' : '').
+					' href="'.pagelinkurl(array('c' => $thisarticle['category2'])).'">'.$cat_title.'</a>';
+			}
+
 			return $cat_title;
 		}
 	}
-	
+
 // -------------------------------------------------------------
 	function category($atts) 
 	{
@@ -1579,25 +1597,29 @@ function body($atts)
 	}
 	
 // -------------------------------------------------------------
-	function permlink($atts,$thing=NULL)
+
+	function permlink($atts, $thing = NULL)
 	{
 		global $thisarticle;
+
 		assert_article();
 
 		extract(lAtts(array(
-			'style' => '',
-			'class' => ''
-		),$atts));
-		
+			'class' => '',
+			'style' => ''
+		), $atts));
+
 		$url = permlinkurl($thisarticle);
 
 		if ($thing === NULL)
+		{
 			return $url;
-		
-		return tag(parse($thing),'a',' href="'.$url.'" title="'.gTxt('permanent_link').'"'. 
-							(($style) ? ' style="'.$style.'"' : '').
-							(($class) ? ' class="'.$class.'"' : '')
- 			 );
+		}
+
+		return tag(parse($thing), 'a', ' rel="bookmark" href="'.$url.'" title="'.gTxt('permanent_link').'"'.
+			($style ? ' style="'.$style.'"' : '').
+			($class ? ' class="'.$class.'"' : '')
+		);
 	}
 
 // -------------------------------------------------------------
