@@ -289,6 +289,27 @@ $LastChangedRevision$
 	$guess_site_url = $_SERVER['HTTP_HOST'] . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/');
 	if ($siteurl and $siteurl != $guess_site_url)
 		$fail['site_url_mismatch'] = gTxt('site_url_mismatch').cs.$guess_site_url;
+		
+	# test clean URL server vars
+	if (hu) {
+		if (ini_get('allow_url_fopen')) {
+			$s = md5(uniqid(rand(), true));
+			$pretext_data = @file(hu.$s.'/?txpcleantest=1');
+			if ($pretext_data) {
+				$pretext_req = trim(@$pretext_data[0]);
+				if ($pretext_req != '/'.$s.'/?txpcleantest=1')
+					$fail['clean_url_data_failed'] = gTxt('clean_url_data_failed').cs.htmlspecialchars($pretext_req);
+			}
+			else
+				$fail['clean_url_test_failed'] = gTxt('clean_url_test_failed');
+		}
+		else {
+			# unable to confirm whether or not clean URLs are working
+			if ($permlink_mode != 'messy')
+				$fail['clean_url_untested'] = gTxt('clean_url_untested');
+		}
+
+	}
 
 	if ($tables = list_txp_tables()) {
 		$table_errors = check_tables($tables);
@@ -376,8 +397,8 @@ $LastChangedRevision$
 		? n.gTxt('preflight_check').cs.n.ln.join("\n", $fail).n.ln
 		: '',
 
-		(is_readable($path_to_site.'/.htaccess')) 
-		?	n.gTxt('htaccess_contents').cs.n.ln.join('',file($path_to_site.'/.htaccess')).n.ln 
+		(is_readable($path_to_site.'/.htaccess'))
+		?	n.gTxt('htaccess_contents').cs.n.ln.join('',file($path_to_site.'/.htaccess')).n.ln
 		:	''
 	);
 
@@ -402,7 +423,7 @@ $LastChangedRevision$
 		foreach ($table_names as $table)
 		{
 			$ctr = safe_query("SHOW CREATE TABLE ". $table."");
-			if (!$ctr) 
+			if (!$ctr)
 			{
 				unset($table_names[$table]);
 				continue;
@@ -411,10 +432,10 @@ $LastChangedRevision$
 			if (isset($conn_char) && !stristr($ctcharset,'CREATE') && ($conn_char != $ctcharset))
 				$table_msg[] = "$table is $ctcharset";
 			$ctr = safe_query("CHECK TABLE ". $table);
-			if (in_array(mysql_result($ctr,0,'Msg_type'), array('error','warning')) ) 
+			if (in_array(mysql_result($ctr,0,'Msg_type'), array('error','warning')) )
 				$table_msg[] = $table .cs. mysql_result($ctr,0,'Msg_Text');
 		}
-		if ($table_msg == array()) 
+		if ($table_msg == array())
 			$table_msg = (count($table_names) < 18) ?  array('-') : array('OK');
 		$out[] = count($table_names).' Tables'.cs. implode(', ',$table_msg).n;
 
@@ -427,6 +448,10 @@ $LastChangedRevision$
 
 		if (is_callable('apache_get_modules'))
 			$out[] = n.gTxt('apache_modules').cs.join(', ', apache_get_modules()).n.n;
+			
+		if (@is_array($pretext_data)) {
+			$out[] = n.gTxt('pretext_data').cs.htmlspecialchars(join('', array_slice($pretext_data, 1, 20))).n.n;
+		}
 
 		foreach ($files as $f) {
 			$rev = '';

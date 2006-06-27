@@ -204,8 +204,13 @@ $LastChangedRevision$
 		$is_404 = 0;
 
 			// if messy vars exist, bypass url parsing
-		if (!$out['id'] && !$out['s'] && !(txpinterface=='css')) 
-		{
+		if (!$out['id'] && !$out['s'] && !(txpinterface=='css')) {
+			
+			// return clean URL test results for diagnostics
+			if (gps('txpcleantest') and serverSet('SERVER_ADDR') == serverSet('REMOTE_ADDR')) {
+				exit(show_clean_test($out));
+			}
+
 			extract(chopUrl($req));
 	
 				//first we sniff out some of the preset url schemes
@@ -361,14 +366,14 @@ $LastChangedRevision$
 // 		$out['css']  = @$rs['css'];
 
 		if(is_numeric($id)) {
-			$idrs = safe_row("Posted, AuthorID, Keywords","textpattern","ID=".doSlash($id));
-			extract($idrs);
+			$a = safe_row('*, unix_timestamp(Posted) as uPosted', 'textpattern', "ID='".doSlash($id)."' and Status in (4,5)");
+			$Posted             = @$a['Posted'];
+			$out['id_keywords'] = @$a['Keywords'];
+			$out['id_author']   = @$a['AuthorID'];
+			populateArticleData($a);
 
 			if ($np = getNextPrev($id, $Posted, $s))
 				$out = array_merge($out, $np);
-
-			$out['id_keywords'] = $Keywords; 
-			$out['id_author']   = get_author_name($AuthorID); 
 		}
 
 		$out['path_from_root'] = $path_from_root; // these are deprecated as of 1.0
@@ -442,7 +447,12 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 	function article($atts)
-	{		
+	{
+		global $is_article_body;
+		if ($is_article_body) {
+			trigger_error(gTxt('article_tag_illegal_body'));
+			return '';
+		}
 		return parseArticles($atts);
 	}
 
@@ -633,7 +643,7 @@ $LastChangedRevision$
 				unset($GLOBALS['thisarticle']);
 				unset($GLOBALS['theseatts']);//Required?				
 			}
-			
+
 			return join('',$articles);
 		}
 	}
@@ -659,7 +669,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function doArticle($atts) 
 	{
-		global $pretext,$prefs;
+		global $pretext,$prefs, $thisarticle;
 		extract($prefs);
 		extract($pretext);
 
@@ -671,18 +681,23 @@ $LastChangedRevision$
 			'status' => '',
 		),$atts));		
 
-		if ($status and !is_numeric($status))
-			$status = getStatusNum($status);
+		if ($status or empty($thisarticle) or $thisarticle['thisid'] != $id) {
+			if ($status and !is_numeric($status))
+				$status = getStatusNum($status);
 
-		$q_status = ($status ? "and Status='".doSlash($status)."'" : 'and Status in (4,5)');
+			$q_status = ($status ? "and Status='".doSlash($status)."'" : 'and Status in (4,5)');
 
-		$rs = safe_row("*, unix_timestamp(Posted) as uPosted", 
-				"textpattern", "ID='".intval($id)."' $q_status limit 1");
+			$rs = safe_row("*, unix_timestamp(Posted) as uPosted", 
+					"textpattern", "ID='".intval($id)."' $q_status limit 1");
 
-		if ($rs) {
-			extract($rs);
-			populateArticleData($rs);
-			global $thisarticle;
+			if ($rs) {
+				extract($rs);
+				populateArticleData($rs);
+			}
+		}
+
+		if (!empty($thisarticle)) {
+			extract($thisarticle);
 			$thisarticle['is_first'] = 1;
 			$thisarticle['is_last'] = 1;
 
@@ -719,7 +734,9 @@ $LastChangedRevision$
 		global $pretext, $is_article_list;
 		$old_ial = $is_article_list;
 		$is_article_list = ($pretext['id'] && !$iscustom)? false : true;
+		article_push();
 		$r = ($is_article_list)? doArticles($atts, $iscustom) : doArticle($atts);
+		article_pop();
 		$is_article_list = $old_ial;
 
 		return $r;
@@ -747,6 +764,8 @@ $LastChangedRevision$
 		$out['keywords']        = $Keywords;
 		$out['article_image']   = $Image;
 		$out['comments_count']  = $comments_count;
+		$out['body']            = $Body_html;
+		$out['excerpt']         = $Excerpt_html;
 
 
 		$custom = getCustomFields();
@@ -754,14 +773,9 @@ $LastChangedRevision$
 			foreach ($custom as $i => $name)
 				$out[$name] = $rs['custom_' . $i];
 		}
-			
-		global $thisarticle, $is_article_body;
-		$thisarticle = $out;
-		$is_article_body = 1;		
-		$thisarticle['body'] = parse($Body_html);
-		$thisarticle['excerpt'] = parse($Excerpt_html);
-		$is_article_body = 0;
-
+		
+		global $thisarticle;
+		$thisarticle = $out;	
 	}
 
 // -------------------------------------------------------------
@@ -841,12 +855,17 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function evalString($html) 
+	function evalString($html)
 	{
+		global $prefs;
 		if (strpos($html, chr(60).'?php') !== false) {
-			$html = eval(' ?'.chr(62).$html.chr(60).'?php ');
+			trigger_error(gTxt('raw_php_deprecated'), E_USER_WARNING);
+			if (!empty($prefs['allow_raw_php_scripting']))
+				$html = eval(' ?'.chr(62).$html.chr(60).'?php ');
+			else
+				trigger_error(gTxt('raw_php_disabled'), E_USER_WARNING);
 		}
-		return $html;	
+		return $html;
 	}
 
 // -------------------------------------------------------------

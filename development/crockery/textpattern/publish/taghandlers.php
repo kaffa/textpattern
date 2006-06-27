@@ -1156,11 +1156,13 @@ $LastChangedRevision$
 
 function body($atts) 
 	{
-		global $thisarticle;
-
+		global $thisarticle, $is_article_body;
 		assert_article();
 		
-		return $thisarticle['body'];
+		$is_article_body = 1;		
+		$out = parse($thisarticle['body']);
+		$is_article_body = 0;
+		return $out;
 	}	
 	
 // -------------------------------------------------------------
@@ -1175,10 +1177,13 @@ function body($atts)
 // -------------------------------------------------------------
 	function excerpt($atts) 
 	{
-		global $thisarticle;
+		global $thisarticle, $is_article_body;
 		assert_article();
-
-		return $thisarticle['excerpt'];	
+		
+		$is_article_body = 1;		
+		$out = parse($thisarticle['excerpt']);
+		$is_article_body = 0;
+		return $out;
 	}
 
 // -------------------------------------------------------------
@@ -1851,11 +1856,18 @@ function body($atts)
 		if (empty($is_article_body)) {
 			if (!empty($prefs['allow_page_php_scripting']))
 				eval($thing);
+			else
+				trigger_error(gTxt('php_code_disabled_page'));
 		}
 		else {
-			if (!empty($prefs['allow_article_php_scripting'])
-				and has_privs('article.php', $thisarticle['authorid']))
-				eval($thing);
+			if (!empty($prefs['allow_article_php_scripting'])) {
+				if (has_privs('article.php', $thisarticle['authorid']))
+					eval($thing);
+				else
+					trigger_error(gTxt('php_code_forbidden_user'));
+			}
+			else
+				trigger_error(gTxt('php_code_disabled_article'));
 		}
 		return ob_get_clean();
 	}
