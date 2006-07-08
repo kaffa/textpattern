@@ -108,6 +108,8 @@ $LastChangedRevision: 1098 $
 					4 => gTxt('live'),
 					5 => gTxt('sticky'),
 			),'')));
+
+			$comments_annotate = onoffRadio('Annotate', safe_field('val', 'txp_prefs', "name = 'comments_on_default'"));
 ?>
 			something = elm.options[elm.selectedIndex].value;
 			// Add another chunk of HTML
@@ -128,6 +130,9 @@ $LastChangedRevision: 1098 $
 			}else if(something!='' && something == 'changestatus'){
 				stats = '<?php echo $statuses; ?>';
 				pjs.innerHTML = '<span><?php echo gTxt('status') ?>: '+stats+'</span>';
+			}else if(something!='' && something == 'changecomments'){
+				stats = '<?php echo $comments_annotate; ?>';
+				pjs.innerHTML = '<span><?php echo gTxt('comments'); ?>: '+stats+'</span>';
 			}else{
 				pjs.style.display = 'none';
 			}
