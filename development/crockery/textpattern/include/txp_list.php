@@ -149,6 +149,24 @@ $LastChangedRevision$
 
 		if ($rs)
 		{
+			$total_comments = array();
+
+			// fetch true comment count, not the public comment count
+			// maybe we should have another row in the db?
+			$rs2 = safe_rows_start('parentid, count(*) as num', 'txp_discuss',
+				"$criteria group by parentid order by $sort_sql limit $offset, $limit");
+
+			if ($rs2)
+			{
+				while ($a = nextRow($rs2))
+				{
+					$pid = $a['parentid'];
+					$num = $a['num'];
+	
+					$total_comments[$pid] = $num;
+				}
+			}
+
 			echo n.n.'<form name="longform" method="post" action="index.php" onsubmit="return verify(\''.gTxt('are_you_sure').'\')">'.
 
 				n.startTable('list').
@@ -186,10 +204,10 @@ $LastChangedRevision$
 
 				$comments = gTxt('none');
 
-				if ($comments_count > 0)
+				if (isset($total_comments[$ID]) and $total_comments[$ID] > 0)
 				{
 					$comments = href(gTxt('manage'), 'index.php?event=discuss'.a.'step=list'.a.'method=parent'.a.'crit='.$ID).
-						' ('.$comments_count.')';
+						' ('.$total_comments[$ID].')';
 				}
 
 				$comments = n.'<ul>'.

@@ -452,77 +452,120 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function category_list($atts) // output href list of site categories
-	{
-		extract(lAtts(array(
-			'label'    => '',
-			'break'    => br,
-			'wraptag'  => '',
-			'parent'   => '',
-			'type'    => 'article',
-			'class'    => __FUNCTION__,
-			'labeltag' => '',
-		),$atts));
+// output href list of site categories
 
-		if ($parent) {
-			$qs = safe_row("lft,rgt",'txp_category',"name='$parent'");
-			if($qs) {
+	function category_list($atts)
+	{
+		global $c;
+
+		extract(lAtts(array(
+			'active_class' => '',
+			'break'        => br,
+			'class'        => __FUNCTION__,
+			'label'        => '',
+			'labeltag'     => '',
+			'parent'       => '',
+			'type'         => 'article',
+			'wraptag'      => ''
+		), $atts));
+
+		if ($parent)
+		{
+			$qs = safe_row('lft, rgt', 'txp_category', "name = '$parent'");
+
+			if ($qs)
+			{
 				extract($qs);
-				$rs = safe_rows_start(
-				  "name,title", 
-				  "txp_category","name != 'default' and type='$type' and (lft between $lft and $rgt) order by lft asc"
-				);
+
+				$rs = safe_rows_start('name, title', 'txp_category', 
+					"name != 'default' and type = '$type' and (lft between $lft and $rgt) order by lft asc");
 			}
-		} else {
-			$rs = safe_rows_start(
-			  "name,title", 
-			  "txp_category",
-			  "name != 'default' and type='$type' order by name"
-			);
 		}
 
-		if ($rs) {
+		else
+		{
+			$rs = safe_rows_start('name, title', 'txp_category', 
+				"name not in('default','root') and type = '$type' order by name");
+		}
+
+		if ($rs)
+		{
 			$out = array();
-			while ($a = nextRow($rs)) {
+
+			while ($a = nextRow($rs))
+			{
 				extract($a);
-				if ($name=='root') continue;
-				if($name) $out[] = tag(str_replace("& ","&#38; ", $title),'a',' href="'.pagelinkurl(array('c'=>$name)).'"');
+
+				if ($name)
+				{
+					$out[] = tag(str_replace('& ', '&#38; ', $title), 'a', 
+						( ($active_class and ($c == $name)) ? ' class="'.$active_class.'"' : '' ).
+						' href="'.pagelinkurl(array('c' => $name)).'"'
+					);
+				}
 			}
-			if (count($out)) {
+
+			if ($out)
+			{
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}			
 		}
+
 		return '';
 	}
 
 // -------------------------------------------------------------
-	function section_list($atts) // output href list of site sections
+// output href list of site sections
+
+	function section_list($atts) 
 	{
-		global $sitename;
-		
+		global $sitename, $s;
+
 		extract(lAtts(array(
-			'label'   => '',
-			'break'   => br,
-			'wraptag' => '',
-			'class'    => __FUNCTION__,
-			'labeltag' => '',
+			'active_class'    => '',
+			'break'           => br,
+			'class'           => __FUNCTION__,
+			'default_title'   => $sitename,
 			'include_default' => '',
-		),$atts));
-		
-		$rs = safe_rows_start("name,title","txp_section","name != 'default' order by name");
-		
-		if ($rs) {
+			'label'           => '',
+			'labeltag'        => '',
+			'wraptag'         => ''
+		), $atts));
+
+		$rs = safe_rows_start('name, title', 'txp_section', "name != 'default' order by name");
+
+		if ($rs)
+		{
 			$out = array();
-			while ($a = nextRow($rs)) {
+
+			while ($a = nextRow($rs))
+			{
 				extract($a);
-				$url = pagelinkurl(array('s'=>$name));
-				$out[] = tag($title, 'a', ' href="'.$url.'"');
+
+				$url = pagelinkurl(array('s' => $name));
+
+				$out[] = tag($title, 'a', 
+					( ($active_class and ($s == $name)) ? ' class="'.$active_class.'"' : '' ).
+					' href="'.$url.'"'
+				);
 			}
-			if (count($out)) {
-				if ($include_default) $out = array_merge(array(tag($sitename,'a', ' href="'.hu.'"')),$out);
+
+			if ($out)
+			{
+				if ($include_default)
+				{
+					$out = array_merge(array(
+						tag($default_title,'a', 
+							( ($active_class and ($s == 'default')) ? ' class="'.$active_class.'"' : '' ).
+							' href="'.hu.'"'
+						)
+					), $out);
+				}
+
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}
 		}
+
 		return '';
 	}
 
@@ -780,14 +823,14 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
+
 	function comments_count($atts) 
 	{
 		global $thisarticle;
 
 		assert_article();
-		
-		$com_count = $thisarticle['comments_count'];
-		return ($com_count > 0) ? $com_count : '';
+
+		return $thisarticle['comments_count'];
 	}
 
 // -------------------------------------------------------------
@@ -1237,111 +1280,201 @@ function body($atts)
 
 // -------------------------------------------------------------
 
-	function category1($atts)
+	function category1($atts, $thing = '')
 	{
 		global $thisarticle, $permlink_mode;
 
 		assert_article();
 
 		extract(lAtts(array(
-			'link'	=> 0,
-			'title' => 0,
+			'class'   => '',
+			'link'		=> 0,
+			'title'		=> 0,
+			'wraptag' => ''
 		), $atts));
 
 		if ($thisarticle['category1'])
 		{
-			$cat_title = ($title) ? fetch_category_title($thisarticle['category1']) : $thisarticle['category1'];
+			$cat = $thisarticle['category1'];
 
-			if (!empty($link))
+			$label = ($title) ? fetch_category_title($cat) : $cat;
+
+			if ($thing)
 			{
-				return '<a'.
+				$out = '<a'.
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
-					' href="'.pagelinkurl(array('c' => $thisarticle['category1'])).'">'.$cat_title.'</a>';
+					' href="'.pagelinkurl(array('c' => $cat)).'"'.
+					($title ? ' title="'.$label.'"' : '').
+					'>'.$thing.'</a>';
 			}
 
-			return $cat_title;
+			elseif ($link)
+			{
+				$out = '<a'.
+					($permlink_mode != 'messy' ? ' rel="tag"' : '').
+					' href="'.pagelinkurl(array('c' => $cat)).'">'.$label.'</a>';
+			}
+
+			else
+			{
+				$out = $label;
+			}
+
+			return doTag($out, $wraptag, $class);
 		}
 	}
 
 // -------------------------------------------------------------
 
-	function category2($atts)
+	function category2($atts, $thing = '')
 	{
 		global $thisarticle, $permlink_mode;
 
 		assert_article();
 
 		extract(lAtts(array(
-			'link'	=> 0,
-			'title' => 0,
+			'class'   => '',
+			'link'		=> 0,
+			'title'		=> 0,
+			'wraptag' => ''
 		), $atts));
 
 		if ($thisarticle['category2'])
 		{
-			$cat_title = ($title) ? fetch_category_title($thisarticle['category2']) : $thisarticle['category2'];
+			$cat = $thisarticle['category2'];
 
-			if (!empty($link))
+			$label = ($title) ? fetch_category_title($cat) : $cat;
+
+			if ($thing)
 			{
-				return '<a'.
+				$out = '<a'.
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
-					' href="'.pagelinkurl(array('c' => $thisarticle['category2'])).'">'.$cat_title.'</a>';
+					' href="'.pagelinkurl(array('c' => $cat)).'"'.
+					($title ? ' title="'.$label.'"' : '').
+					'>'.$thing.'</a>';
 			}
 
-			return $cat_title;
+			elseif ($link)
+			{
+				$out = '<a'.
+					($permlink_mode != 'messy' ? ' rel="tag"' : '').
+					' href="'.pagelinkurl(array('c' => $cat)).'">'.$label.'</a>';
+			}
+
+			else
+			{
+				$out = $label;
+			}
+
+			return doTag($out, $wraptag, $class);
 		}
 	}
 
 // -------------------------------------------------------------
-	function category($atts) 
+
+	function category($atts, $thing = '')
 	{
-		global $pretext;
+		global $s, $c;
+
 		extract(lAtts(array(
-			'link' => 0,
-			'title' => 0,
-			'name' => '',
+			'class'   => '',
+			'link'		=> 0,
+			'name'		=> '',
+			'section' => $s,
+			'title'		=> 0,
 			'wraptag' => '',
-			'section' => @$pretext['s'],
-		),$atts));
+		), $atts));
 
-		if ($name) $cat = $name;
-		else $cat = @$pretext['c'];
+		if ($name)
+		{
+			$cat = $name;
+		}
 
-		if ($cat) {
-			$cat_title = ($title ? fetch_category_title($cat) : $cat);
-			if ($link) 
-				$out = '<a href="'.pagelinkurl(array('c'=>$cat, 's'=>$section)).'">'.
-					$cat_title.'</a>';
+		else
+		{
+			$cat = $c;
+		}
+
+		if ($cat)
+		{
+			$label = ($title) ? fetch_category_title($cat) : $cat;
+
+			if ($thing)
+			{
+				$out = '<a href="'.pagelinkurl(array('c' => $cat, 's' => $section)).'"'.
+					($title ? ' title="'.$label.'"' : '').
+					'>'.$thing.'</a>';
+			}
+
+			elseif ($link)
+			{
+				$out = href($label,
+					pagelinkurl(array('c' => $cat, 's' => $section))
+				);
+			}
+
 			else
-				$out = $cat_title;
+			{
+				$out = $label;
+			}
 
-			return doTag($out, $wraptag);
+			return doTag($out, $wraptag, $class);
 		}
 	}
 
 // -------------------------------------------------------------
-	function section($atts) 
+
+	function section($atts, $thing = '')
 	{
-		global $thisarticle, $pretext;
+		global $thisarticle, $s;
+
 		extract(lAtts(array(
-			'link' => 0,
-			'title' => 0,
-			'name' => '',
+			'class'   => '',
+			'link'		=> 0,
+			'name'		=> '',
+			'title'		=> 0,
 			'wraptag' => '',
-		),$atts));
+		), $atts));
 
-		if ($name) $sec = $name;
-		elseif (!empty($thisarticle['section'])) $sec = $thisarticle['section'];
-		else $sec = @$pretext['s'];
+		if ($name)
+		{
+			$sec = $name;
+		}
 
-		if ($sec) {
-			$sec_title = ($title ? fetch_section_title($sec) : $sec);
-			if (!empty($link)) 
-				$out = '<a href="'.pagelinkurl(array('s'=>$sec)).'">'.
-					$sec_title.'</a>';
+		elseif (!empty($thisarticle['section']))
+		{
+			$sec = $thisarticle['section'];
+		}
+
+		else
+		{
+			$sec = $s;
+		}
+
+		if ($sec)
+		{
+			$label = ($title) ? fetch_section_title($sec) : $sec;
+
+			if ($thing)
+			{
+				$out = '<a href="'.pagelinkurl(array('s' => $sec)).'"'.
+					($title ? ' title="'.$label.'"' : '').
+					'>'.$thing.'</a>';
+			}
+
+			elseif ($link)
+			{
+				$out = href($label,
+					pagelinkurl(array('s' => $sec))
+				);
+			}
+
 			else
-				$out = $sec_title;
+			{
+				$out = $label;
+			}
 
-			return doTag($out, $wraptag);
+			return doTag($out, $wraptag, $class);
 		}
 	}
 
