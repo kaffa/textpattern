@@ -146,15 +146,16 @@ $create_sql[] = "CREATE TABLE ".PFX."txp_category (
   PRIMARY KEY  (id)
 ) $tabletype";
 
-$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'root', 'file', '', 1, 2, 'root')";
-$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'root', 'image', '', 1, 4, 'root')";
-$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'root', 'link', '', 1, 4, 'root')";
-$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'textpattern', 'link', 'root', 2, 3, 'textpattern')";
-$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'reciprocal-affection', 'article', 'root', 6, 7, 'reciprocal affection')";
-$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'hope-for-the-future', 'article', 'root', 2, 3, 'hope for the future')";
-$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'meaningful-labor', 'article', 'root', 4, 5, 'meaningful labor')";
-$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'site-design', 'image', 'root', 2, 3, 'site design')";
 $create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'root', 'article', '', 1, 8, 'root')";
+$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'root', 'link', '', 1, 4, 'root')";
+$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'root', 'image', '', 1, 4, 'root')";
+$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'root', 'file', '', 1, 2, 'root')";
+$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'reciprocal-affection', 'article', 'root', 6, 7, 'Reciprocal Affection')";
+$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'hope-for-the-future', 'article', 'root', 2, 3, 'Hope for the Future')";
+$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'meaningful-labor', 'article', 'root', 4, 5, 'Meaningful Labor')";
+$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'textpattern', 'link', 'root', 2, 3, 'Textpattern')";
+$create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'site-design', 'image', 'root', 2, 3, 'Site Design')";
+
 
 $create_sql[] = "CREATE TABLE ".PFX."txp_css (
   name varchar(255) default NULL,
@@ -269,7 +270,7 @@ $create_sql[] = "CREATE TABLE ".PFX."txp_link (
 
 $create_sql[] = "INSERT INTO ".PFX."txp_link VALUES (1, '2005-07-20 12:54:26', 'textpattern', 'http://textpattern.com/', 'Textpattern', 'Textpattern', '')";
 $create_sql[] = "INSERT INTO ".PFX."txp_link VALUES (2, '2005-07-20 12:54:41', 'textpattern', 'http://textpattern.net/', 'TextBook', 'TextBook', '')";
-$create_sql[] = "INSERT INTO ".PFX."txp_link VALUES (3, '2005-07-20 12:55:04', 'textpattern', 'http://textpattern.org/', 'Txp Resources', 'Txp Recources', '')";
+$create_sql[] = "INSERT INTO ".PFX."txp_link VALUES (3, '2005-07-20 12:55:04', 'textpattern', 'http://textpattern.org/', 'Txp Resources', 'Txp Resources', '')";
 
 $create_sql[] = "CREATE TABLE ".PFX."txp_log (
   id $autoinc,
