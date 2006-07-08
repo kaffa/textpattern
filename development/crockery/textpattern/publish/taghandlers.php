@@ -799,12 +799,14 @@ $LastChangedRevision$
 		{
 			$nextpg = ($pg - 1 == 1) ? 0 : ($pg - 1);
 			$url = pagelinkurl(array(
-				'pg' => $nextpg, 
-				's' => @$pretext['s'], 
-				'c' => @$pretext['c'], 
-				'q' => @$pretext['q'], 
+				'pg'     => $nextpg, 
+				's'      => @$pretext['s'], 
+				'c'      => @$pretext['c'], 
+				'q'      => @$pretext['q'], 
 				'author' => @$pretext['author']
 			));
+
+			$url = urldecode($url);
 
 			if ($thing)
 			{
@@ -839,12 +841,14 @@ $LastChangedRevision$
 			$nextpg = $pg + 1;
 
 			$url = pagelinkurl(array(
-				'pg' => $nextpg, 
-				's' => @$pretext['s'], 
-				'c' => @$pretext['c'], 
-				'q' => @$pretext['q'], 
+				'pg'     => $nextpg, 
+				's'      => @$pretext['s'], 
+				'c'      => @$pretext['c'], 
+				'q'      => @$pretext['q'], 
 				'author' => @$pretext['author']
 			));
+
+			$url = urldecode($url);
 
 			if ($thing)
 			{

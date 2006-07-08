@@ -511,6 +511,7 @@ $LastChangedRevision$
 			
 		//give control to search, if necesary
 		if($q && !$iscustom && !$issticky) {
+			$q = urldecode($q);
 			include_once txpath.'/publish/search.php';
 			$s_filter = ($searchall ? filterSearch() : '');
 			$match = ", ".db_match('Title,Body', doSlash($q));
