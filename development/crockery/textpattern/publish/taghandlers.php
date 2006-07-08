@@ -157,7 +157,7 @@ $LastChangedRevision$
 
 		elseif (!empty($id))
 		{
-			$rs = safe_row('*', 'txp_image', "id = '$id' limit 1", 1);
+			$rs = safe_row('*', 'txp_image', "id = '$id' limit 1");
 		}
 
 		else
@@ -625,7 +625,7 @@ $LastChangedRevision$
 
 				if ($name)
 				{
-					$section = ($this_section) ? $s : $section;
+					$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
 
 					$out[] = tag(str_replace('& ', '&#38; ', $title), 'a', 
 						( ($active_class and ($c == $name)) ? ' class="'.$active_class.'"' : '' ).
@@ -737,10 +737,9 @@ $LastChangedRevision$
 	{
 		global $thisarticle, $id;
 		global $next_id, $next_title, $next_utitle, $next_posted;
-		global $prev_id, $prev_title, $prev_utitle, $prev_posted;
 
 		extract(lAtts(array(
-			'showalways'   => 0,
+			'showalways' => 0,
 		), $atts));
 
 		if (!is_numeric(@$id))
@@ -752,9 +751,21 @@ $LastChangedRevision$
 			), @$GLOBALS['s']));
 		}
 
-		return ($next_id) ? 
-			tag(parse($thing), 'a', ' rel="next" href="'.permlinkurl_id($next_id).'"') : 
-			($showalways ? parse($thing) : '');
+		if ($thing)
+		{
+			return ($next_id) ? 
+				tag(
+					parse($thing), 'a', 
+						' rel="next" href="'.permlinkurl_id($next_id).'"'.
+						( ($next_title and $next_title != $thing) ? ' title="'.$next_title.'"' : '' )
+				) : 
+				($showalways ? parse($thing) : '');
+		}
+
+		else
+		{
+			return ($next_id) ? permlinkurl_id($next_id) : '';
+		}
 	}
 		
 // -------------------------------------------------------------
@@ -763,11 +774,10 @@ $LastChangedRevision$
 	function link_to_prev($atts, $thing) 
 	{
 		global $thisarticle, $id;
-		global $next_id, $next_title, $next_utitle, $next_posted;
 		global $prev_id, $prev_title, $prev_utitle, $prev_posted;
 
 		extract(lAtts(array(
-			'showalways'   => 0,
+			'showalways' => 0,
 		), $atts));
 
 		if (!is_numeric(@$id))
@@ -779,9 +789,21 @@ $LastChangedRevision$
 			), @$GLOBALS['s']));
 		}
 
-		return ($prev_id) ? 
-			tag(parse($thing), 'a', ' rel="prev" href="'.permlinkurl_id($prev_id).'"') : 
-			($showalways ? parse($thing) : '');
+		if ($thing)
+		{
+			return ($prev_id) ? 
+				tag(
+					parse($thing), 'a', 
+						' rel="prev" href="'.permlinkurl_id($prev_id).'"'.
+						( ($prev_title and $prev_title != $thing) ? ' title="'.$prev_title.'"' : '' )
+				) : 
+				($showalways ? parse($thing) : '');
+		}
+
+		else
+		{
+			return ($prev_id) ? permlinkurl_id($prev_id) : '';
+		}
 	}
 
 // -------------------------------------------------------------
@@ -913,12 +935,32 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function article_id() 
+
+	function article_id()
 	{
 		global $thisarticle;
+
 		assert_article();
 
 		return $thisarticle['thisid'];
+	}
+
+// -------------------------------------------------------------
+
+	function if_article_id($atts, $thing)
+	{
+		global $thisarticle;
+
+		assert_article();
+
+		extract(lAtts(array(
+			'id' => ''
+		), $atts));
+
+		if ($id)
+		{
+			return parse(EvalElse($thing, in_list($thisarticle['thisid'], $id)));
+		}
 	}
 
 // -------------------------------------------------------------
@@ -1244,21 +1286,35 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function comment_name($atts) 
+
+	function comment_name($atts)
 	{
 		global $thiscomment, $prefs;
 
 		assert_comment();
-		
+
 		extract($prefs);
 		extract($thiscomment);
-		$web = str_replace("http://", "", $web);
 
-		if ($email && !$web && !$never_display_email)
-			$name = '<a href="'.eE('mailto:'.$email).'"'.(@$comment_nofollow ? ' rel="nofollow"' : '').'>'.$name.'</a>';
+		extract(lAtts(array(
+			'link' => 1,
+		), $atts));
 
-		if ($web)
-			$name = '<a href="http://'.$web.'" title="'.$web.'"'.(@$comment_nofollow ? ' rel="nofollow"' : '').'>'.$name.'</a>';
+		if ($link)
+		{
+			$web = str_replace('http://', '', $web);
+			$nofollow = (@$comment_nofollow ? ' rel="nofollow"' : '');
+
+			if ($web)
+			{
+				return '<a href="http://'.$web.'"'.$nofollow.'>'.$name.'</a>';
+			}
+
+			if ($email && !$never_display_email)
+			{
+				return '<a href="'.eE('mailto:'.$email).'"'.$nofollow.'>'.$name.'</a>';
+			}
+		}
 
 		return $name;
 	}
@@ -1327,19 +1383,28 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function author($atts) 
+
+	function author($atts)
 	{
-		global $thisarticle;		
+		global $thisarticle, $s;
 
 		assert_article();
-		
-		extract(lAtts(array('link' => ''),$atts));
+
+		extract(lAtts(array(
+			'link'				 => '',
+			'section'			 => '',
+			'this_section' => 0
+		), $atts));
+
 		$author_name = get_author_name($thisarticle['authorid']);
-		return (empty($link))
-			? $author_name 
-			: tag($author_name, 'a', ' href="'.pagelinkurl(array('author'=>$author_name)).'"');
+
+		$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
+
+		return ($link) ?
+			href($author_name, pagelinkurl(array('s' => $section, 'author' => $author_name))) :
+			$author_name;
 	}
-	
+
 // -------------------------------------------------------------
 	function if_author($atts, $thing)
 	{
@@ -1430,7 +1495,7 @@ function body($atts)
 
 		if ($thisarticle['category1'])
 		{
-			$section = ($this_section) ? $s : $section;
+			$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
 			$cat = $thisarticle['category1'];
 
 			$label = ($title) ? fetch_category_title($cat) : $cat;
@@ -1479,7 +1544,7 @@ function body($atts)
 
 		if ($thisarticle['category2'])
 		{
-			$section = ($this_section) ? $s : $section;
+			$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
 			$cat = $thisarticle['category2'];
 
 			$label = ($title) ? fetch_category_title($cat) : $cat;
@@ -1521,6 +1586,7 @@ function body($atts)
 			'name'		=> '',
 			'section' => $s,
 			'title'		=> 0,
+			'type'    => 'article',
 			'wraptag' => '',
 		), $atts));
 
@@ -1536,7 +1602,7 @@ function body($atts)
 
 		if ($cat)
 		{
-			$label = ($title) ? fetch_category_title($cat) : $cat;
+			$label = ($title) ? fetch_category_title($cat, $type) : $cat;
 
 			if ($thing)
 			{
@@ -1927,24 +1993,38 @@ function body($atts)
 	{
 		global $thisarticle;
 
-		assert_article();
-
 		extract(lAtts(array(
 			'class' => '',
-			'style' => ''
+			'id'		=> '',
+			'style' => '',
+			'title' => ''
 		), $atts));
 
-		$url = permlinkurl($thisarticle);
-
-		if ($thing === NULL)
+		if (!$id)
 		{
-			return $url;
+			assert_article();
 		}
 
-		return tag(parse($thing), 'a', ' rel="bookmark" href="'.$url.'" title="'.gTxt('permanent_link').'"'.
-			($style ? ' style="'.$style.'"' : '').
-			($class ? ' class="'.$class.'"' : '')
-		);
+		$url = ($id) ? permlinkurl_id($id) : permlinkurl($thisarticle);
+
+		if ($url)
+		{
+			if ($thing === NULL)
+			{
+				return $url;
+			}
+
+			if ($title == false and ($id == false or $id == $thisarticle['thisid']))
+			{
+				$title = gTxt('permanent_link');
+			}
+
+			return tag(parse($thing), 'a', ' rel="bookmark" href="'.$url.'"'.
+				($title ? ' title="'.$title.'"' : '').
+				($style ? ' style="'.$style.'"' : '').
+				($class ? ' class="'.$class.'"' : '')
+			);
+		}
 	}
 
 // -------------------------------------------------------------
