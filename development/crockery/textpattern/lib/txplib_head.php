@@ -31,6 +31,7 @@ $LastChangedRevision: 1098 $
 	<meta name="robots" content="noindex, nofollow" />
 	<title>Txp &#8250; <?php echo $sitename ?> &#8250; <?php echo $pagetitle?></title>
 	<link href="textpattern.css" rel="Stylesheet" type="text/css" />
+	<script type="text/javascript" src="textpattern.js"></script>
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		function verify(msg) { return confirm(msg); }
