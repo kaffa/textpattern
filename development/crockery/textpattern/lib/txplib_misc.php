@@ -1083,6 +1083,13 @@ $LastChangedRevision: 1127 $
 	}
 
 // -------------------------------------------------------------
+// Convert a time string from the Textpattern time zone to GMT
+	function safe_strtotime($time_str)
+	{
+		return strtotime($time_str, time()+tz_offset()) - tz_offset();
+	}
+
+// -------------------------------------------------------------
 	function myErrorHandler($errno, $errstr, $errfile, $errline) 
 	{
 		# error_reporting() returns 0 when the '@' suppression
