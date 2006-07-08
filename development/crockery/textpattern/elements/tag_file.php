@@ -5,250 +5,383 @@ $HeadURL: $
 $LastChangedRevision: $
 
 */
-//--------------------------------------------------------------------------
-//File tags functions. 
-//--------------------------------------------------------------------------
 
 	function file_download_list($atts)
 	{
 		global $thisfile;
-		
+
 		extract(lAtts(array(
-			'form'     => 'files',
-			'sort'     => 'filename',
-			'label'    => '',
-			'break'    => br,
-			'limit'    => '10',
-			'offset'   => '0',
-			'wraptag'  => '',
+			'break'		 => br,
 			'category' => '',
-			'class'    => __FUNCTION__,
+			'class'		 => __FUNCTION__,
+			'form'		 => 'files',
+			'label'		 => '',
 			'labeltag' => '',
-		),$atts));	
-		
+			'limit'		 => '10',
+			'offset'	 => '0',
+			'sort'		 => 'filename',
+			'wraptag'	 => '',
+		), $atts));
+
 		$qparts = array(
-			($category) ? "category='$category'" : '1',
-			"order by",
-			$sort,
+			($category) ? "category = '".doSlash($category)."'" : '1',
+			"order by $sort",
 			($limit) ? "limit $offset, $limit" : ''
 		);
-		
-		$rs = safe_rows_start("*","txp_file",join(' ',$qparts));
-	
-		if ($rs) {
-		
-			while ($a = nextRow($rs)) {				
-				$thisfile = fileDownloadFetchInfo("id='$a[id]'");
-				$outlist[] = file_download(
-					array('id'=>$a['id'],'filename'=>$a['filename'],'form'=>$form)
-				);
+
+		$rs = safe_rows_start('id, filename, category, description, downloads', 'txp_file', join(' ', $qparts));
+
+		if ($rs)
+		{
+			$form = fetch_form($form);
+
+			$out = array();
+
+			while ($a = nextRow($rs))
+			{
+				$thisfile = file_download_format_info($a);
+
+				$out[] = parse($form);
+
+				unset($thisfile);
 			}
-			
-			if (!empty($outlist)) {
-				if ($wraptag == 'ul' or $wraptag == 'ol') {
-					return doLabel($label, $labeltag).doWrap($outlist, $wraptag, $break, $class);
-				}	
-				
-				return ($wraptag) ? tag(join($break,$outlist),$wraptag) : join(n,$outlist);
+
+			if ($out)
+			{
+				if ($wraptag == 'ul' or $wraptag == 'ol')
+				{
+					return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
+				}
+
+				return ($wraptag) ? tag(join($break, $out), $wraptag) : join(n, $out);
 			}
-		}				
+		}
 		return '';
 	}
 
 //--------------------------------------------------------------------------
+
 	function file_download($atts)
 	{
 		global $thisfile;
-		
-		extract(lAtts(array(
-			'form'=>'files',
-			'id'=>'',
-			'filename'=>'',
-		),$atts));
-		
-		$where = (!empty($id) && $id != 0)? "id='$id'" : ((!empty($filename))? "filename='$filename'" : '');
-		
-		if (!empty($id) || !empty($filename)) {
-			$thisfile = fileDownloadFetchInfo($where);
-		}				
-		
-		$thing = fetch_form($form);
 
-		return parse($thing);		
-	}
-	
-//--------------------------------------------------------------------------
-	function file_download_link($atts,$thing)
-	{
-		global $permlink_mode, $thisfile;
 		extract(lAtts(array(
-			'id'=>'',
-			'filename'=>'',
-		),$atts));
-		
-		$where = (!empty($id) && $id != 0)? "id='$id'" : ((!empty($filename))? "filename='$filename'" : '');
-		
-		if (!empty($id) || !empty($filename)) {
-			$thisfile = fileDownloadFetchInfo($where);
+			'filename' => '',
+			'form'		 => 'files',
+			'id'			 => '',
+		), $atts));
+
+		if (empty($thisfile))
+		{
+			if ($id)
+			{
+				$thisfile = fileDownloadFetchInfo('id = '.intval($id));
+			}
+
+			elseif ($filename)
+			{
+				$thisfile = fileDownloadFetchInfo("filename = '".doSlash($filename)."'");
+			}
 		}
-		
-		$out = ($permlink_mode == 'messy') ?
-					'<a href="'.hu.'index.php?s=file_download&amp;id='.$thisfile['id'].'">'.parse($thing).'</a>':
-					'<a href="'.hu.gTxt('file_download').'/'.$thisfile['id'].'">'.parse($thing).'</a>';								
-		return $out;
-	}	
+
+		if ($thisfile)
+		{
+			$form = fetch_form($form);
+
+			$out = parse($form);
+
+			unset($thisfile);
+
+			return $out;
+		}
+	}
+
 //--------------------------------------------------------------------------
+
+	function file_download_link($atts, $thing)
+	{
+		global $thisfile, $permlink_mode;
+
+		extract(lAtts(array(
+			'filename' => '',
+			'id'			 => '',
+		), $atts));
+
+		$from_form = true;
+
+		if (empty($thisfile))
+		{
+			$from_form = false;
+
+			if ($id)
+			{
+				$thisfile = fileDownloadFetchInfo('id = '.intval($id));
+			}
+
+			elseif ($filename)
+			{
+				$thisfile = fileDownloadFetchInfo("filename = '".doSlash($filename)."'");
+			}
+		}
+
+		if ($thisfile)
+		{
+			$url = ($permlink_mode == 'messy') ?
+				hu.'index.php?s=file_download'.a.'id='.$thisfile['id'] :
+				hu.gTxt('file_download').'/'.$thisfile['id'];
+
+			$out = ($thing) ? href(parse($thing), $url) : $url;
+
+			// cleanup: this wasn't called from a form,
+			// so we don't want this value remaining
+			if ($from_form == false)
+			{
+				unset($thisfile);
+			}
+
+			return $out;
+		}
+	}
+
+//--------------------------------------------------------------------------
+
 	function fileDownloadFetchInfo($where)
 	{
-		global $file_base_path;		
+		$rs = safe_row('id, filename, category, description, downloads', 'txp_file', $where);
 
-		$result = array(
-				'id' => 0,
-				'filename' => '',
-				'category' => '',
-				'description' => '',
-				'downloads' => 0,
-				'size' => 0,
-				'created' => 0,
-				'modified' => 0
-			);
+		if ($rs)
+		{
+			return file_download_format_info($rs);
+		}
 
-		$rs = safe_row('*','txp_file',$where);
+		return false;
+	}
 
-		if ($rs) {
-			extract($rs);
+//--------------------------------------------------------------------------
 
-			$result['id'] = $id;
-			$result['filename'] = $filename;
-			$result['category'] = $category;
-			$result['description'] = $description;
-			$result['downloads'] = $downloads;
+	function file_download_format_info($file)
+	{
+		global $file_base_path;
 
-			// get filesystem info
-			$filepath = build_file_path($file_base_path , $filename);
+		// get filesystem info
+		$filepath = build_file_path($file_base_path, $file['filename']);
 
-			if (file_exists($filepath)) {
-				$filesize = filesize($filepath);
-				if ($filesize !== false)
-					$result['size'] = $filesize;
+		if (file_exists($filepath))
+		{
+			$filesize = filesize($filepath);
 
-				$created = filectime($filepath);
-				if ($created !== false)
-					$result['created'] = $created;
+			if ($filesize !== false)
+			{
+				$file['size'] = $filesize;
+			}
 
-				$modified = filemtime($filepath);
-				if ($modified !== false)
-					$result['modified'] = $modified;
+			$created = filectime($filepath);
+
+			if ($created !== false)
+			{
+				$file['created'] = $created;
+			}
+
+			$modified = filemtime($filepath);
+
+			if ($modified !== false)
+			{
+				$file['modified'] = $modified;
 			}
 		}
 
-		return $result;
-	}	
+		return $file;
+	}
+
 //--------------------------------------------------------------------------
+
 	function file_download_size($atts)
 	{
-		global $thisfile;		
-		
+		global $thisfile;
+
 		extract(lAtts(array(
 			'decimals' => 2,
-			'format' => ''			
+			'format'	 => ''
 		), $atts));
-		
-		if (empty($decimals) || $decimals < 0) $decimals = 2;
-		if (is_numeric($decimals)) {
-			$decimals = intval($decimals);			
-		} else {
+
+		if (is_numeric($decimals) and $decimals >= 0)
+		{
+			$decimals = intval($decimals);
+		}
+
+		else
+		{
 			$decimals = 2;
 		}
-		$t = $thisfile['size'];
-		if (!empty($thisfile['size']) && !empty($format)) {
-			switch(strtoupper(trim($format))) {
-				default:
-					$divs = 0;
-					while ($t > 1024) {
-						$t /= 1024;
-						$divs++;
-					}
-					if ($divs==0) $format = ' b';
-					elseif ($divs==1) $format = 'kb';
-					elseif ($divs==2) $format = 'mb';
-					elseif ($divs==3) $format = 'gb';
-					elseif ($divs==4) $format = 'pb';
+
+		if ($thisfile['size'])
+		{
+			$size = $thisfile['size'];
+
+			if (!in_array($format, array('B','KB','MB','GB','PB')))
+			{
+				$divs = 0;
+
+				while ($size > 1024)
+				{
+					$size /= 1024;
+					$divs++;
+				}
+
+				switch ($divs)
+				{
+					case 1:
+						$format = 'KB';
 					break;
-				case 'B':
-					// do nothing
+
+					case 2:
+						$format = 'MB';
 					break;
+
+					case 3:
+						$format = 'GB';
+					break;
+
+					case 4:
+						$format = 'PB';
+					break;
+
+					case 0:
+					default:
+						$format = 'B';
+					break;
+				}
+			}
+
+			$size = $thisfile['size'];
+
+			switch ($format)
+			{
 				case 'KB':
-					$t /= 1024;
-					break;
+					$size /= 1024;
+				break;
+
 				case 'MB':
-					$t /= (1024*1024);
-					break;
+					$size /= (1024*1024);
+				break;
+
 				case 'GB':
-					$t /= (1024*1024*1024);
-					break;
+					$size /= (1024*1024*1024);
+				break;
+
 				case 'PB':
-					$t /= (1024*1024*1024);
+					$size /= (1024*1024*1024*1024);
+				break;
+
+				case 'B':
+				default:
+					// do nothing
 				break;
 			}
-			return number_format($t,$decimals) . $format;
+
+			return number_format($size, $decimals).$format;
 		}
-		
-		return (!empty($thisfile['size']))? $thisfile['size'] : '';
+
+		else
+		{
+			return '';
+		}
 	}
 
 //--------------------------------------------------------------------------
+
 	function file_download_created($atts)
 	{
-		global $thisfile;		
-		extract(lAtts(array('format'=>''),$atts));		
-		return fileDownloadFormatTime(array('ftime'=>$thisfile['created'], 'format' => $format));
+		global $thisfile;
+
+		extract(lAtts(array(
+			'format' => ''
+		), $atts));
+
+		return fileDownloadFormatTime(array(
+			'ftime'	 => $thisfile['created'],
+			'format' => $format
+		));
 	}
+
 //--------------------------------------------------------------------------
+
 	function file_download_modified($atts)
 	{
-		global $thisfile;		
-		extract(lAtts(array('format'=>''),$atts));		
-		return fileDownloadFormatTime(array('ftime'=>$thisfile['modified'], 'format' => $format));
+		global $thisfile;
+
+		extract(lAtts(array(
+			'format' => ''
+		), $atts));
+
+		return fileDownloadFormatTime(array(
+			'ftime'	 => $thisfile['modified'],
+			'format' => $format
+		));
 	}
+
 //-------------------------------------------------------------------------
-	//All the time related file_download tags in one
-	//One Rule to rule them all ... now using safe formats
+// All the time related file_download tags in one
+// One Rule to rule them all... now using safe formats
+
 	function fileDownloadFormatTime($params)
 	{
 		global $prefs;
+
 		extract($params);
-		if (!empty($ftime)) {
-			return  (!empty($format))? safe_strftime($format,$ftime) : safe_strftime($prefs['archive_dateformat'],$ftime);
+
+		if (!empty($ftime))
+		{
+			return !empty($format) ?
+				safe_strftime($format, $ftime) : safe_strftime($prefs['archive_dateformat'], $ftime);
 		}
 		return '';
 	}
 
+//--------------------------------------------------------------------------
+
 	function file_download_id($atts)
 	{
-		global $thisfile;		
+		global $thisfile;
 		return $thisfile['id'];
 	}
+
+//--------------------------------------------------------------------------
+
 	function file_download_name($atts)
 	{
-		global $thisfile;		
+		global $thisfile;
 		return $thisfile['filename'];
-	} 
+	}
+
+//--------------------------------------------------------------------------
+
 	function file_download_category($atts)
 	{
-		global $thisfile;		
+		global $thisfile;
 		return $thisfile['category'];
 	}
+
+//--------------------------------------------------------------------------
+
 	function file_download_downloads($atts)
 	{
-		global $thisfile;		
+		global $thisfile;
 		return $thisfile['downloads'];
 	}
+
+//--------------------------------------------------------------------------
+
 	function file_download_description($atts)
 	{
-		global $thisfile;		
-		return $thisfile['description'];
-	}	
+		global $thisfile;
 
+		extract(lAtts(array(
+			'escape' => '',
+		), $atts));
+
+		return ($escape == 'html') ?
+			escape_output($thisfile['description']) : $thisfile['description'];
+	}
 
 ?>
