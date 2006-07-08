@@ -99,12 +99,12 @@ $LastChangedRevision$
 			$crit_escaped = doSlash($crit);
 
 			$critsql = array(
-				'id'         => "ID = '$crit_escaped'",
-				'title_body' => "Title rlike '$crit_escaped' or Body rlike '$crit_escaped'",
-				'section'		 => "Section rlike '$crit_escaped'",
-				'categories' => "Category1 rlike '$crit_escaped' or Category2 rlike '$crit_escaped'",
-				'status'		 => "Status = '".(@$sesutats[$crit_escaped])."'",
-				'author'		 => "AuthorID rlike '$crit_escaped'",
+				'id'         => "`ID` = '$crit_escaped'",
+				'title_body' => "`Title` rlike '$crit_escaped' or `Body` rlike '$crit_escaped'",
+				'section'		 => "`Section` rlike '$crit_escaped'",
+				'categories' => "`Category1` rlike '$crit_escaped' or `Category2` rlike '$crit_escaped'",
+				'status'		 => "`Status` = '".(@$sesutats[$crit_escaped])."'",
+				'author'		 => "`AuthorID` rlike '$crit_escaped'",
 			);
 
 			if (array_key_exists($method, $critsql))
@@ -125,7 +125,7 @@ $LastChangedRevision$
 		{
 			if ($criteria != 1)
 			{
-				echo n.list_searching_form($crit, $method).
+				echo n.list_search_form($crit, $method).
 					n.graf(gTxt('no_results_found'), ' style="text-align: center;"');
 			}
 
@@ -141,7 +141,7 @@ $LastChangedRevision$
 
 		list($page, $offset, $numPages) = pager($total, $limit, $page);
 
-		echo n.list_searching_form($crit, $method);
+		echo n.list_search_form($crit, $method);
 
 		$rs = safe_rows_start('*, unix_timestamp(Posted) as uPosted', 'textpattern',
 			"$criteria order by $sort_sql limit $offset, $limit"
@@ -174,6 +174,9 @@ $LastChangedRevision$
 
 				$Title = empty($Title) ? '<em>'.gTxt('untitled').'</em>' : $Title;
 
+				$Category1 = ($Category1) ? '<span title="'.fetch_category_title($Category1).'">'.$Category1.'</span>' : '';
+				$Category2 = ($Category2) ? '<span title="'.fetch_category_title($Category2).'">'.$Category2.'</span>' : '';
+
 				$manage = n.'<ul>'.
 						n.'<li>'.eLink('article', 'edit', 'ID', $ID, gTxt('edit')).'</li>'.
 						( ($Status == 4 or $Status == 5) ? n.'<li><a href="'.permlinkurl($a).'">'.gTxt('view').'</a></li>' : '' ).
@@ -198,12 +201,22 @@ $LastChangedRevision$
 						safe_strftime('%d %b %Y %I:%M %p', $uPosted)
 					, 75).
 
-					td($Title, 175).
-					td($Section, 75).
+					td(
+						eLink('article', 'edit', 'ID', $ID, $Title)
+					, 175).
+
+					td(
+						'<span title="'.fetch_section_title($Section).'">'.$Section.'</span>'
+					, 75).
+
 					td($Category1, 100).
 					td($Category2, 100).
 					td($Status, 50).
-					td($AuthorID, 75).
+
+					td(
+						'<span title="'.get_author_name($AuthorID).'">'.$AuthorID.'</span>'
+					, 75).
+
 					td($comments).
 
 					td(
@@ -225,8 +238,6 @@ $LastChangedRevision$
 			n.list_nav_form($page, $numPages, $sort, $dir, $crit, $method).
 
 			n.pageby_form('list', $article_list_pageby);
-
-			unset($sort);
 		}
 	}
 
@@ -239,7 +250,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function list_searching_form($crit, $method)
+	function list_search_form($crit, $method)
 	{
 		$methods =	array(
 			'id'         => gTxt('ID'),

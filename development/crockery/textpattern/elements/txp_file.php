@@ -523,6 +523,13 @@ register_callback('file_event', 'file');
 		event_change_pageby('file');
 		file_list();
 	}
+	
+// -------------------------------------------------------------
+	function file_change_max_size() 
+	{
+		// DEPRECATED function; removed old code
+		file_list();
+	}
 
 // -------------------------------------------------------------
 	function make_download_link($id, $filename, $text)

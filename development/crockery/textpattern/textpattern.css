@@ -46,7 +46,7 @@ p {
 line-height: 1.4em;
 }
 
-ul {
+table#list ul {
 list-style-type: none;
 }
 
@@ -289,9 +289,29 @@ vertical-align: bottom;
 /* other element overrides
 ----------------------------------------------- */
 
+.ok {
+color: #008000;
+}
+
+.not-ok {
+color: #C40000;
+}
+
+p#js {
+margin-top: 10px;
+padding-right: 30px;
+display: none;
+}
+
+p#js span {
+padding: 10px;
+background-color: #ffc;
+}
+
 ul.tag-links {
 margin-bottom: 10px;
 font-size: 0.9em;
+list-style-type: none;
 }
 
 #warning {
