@@ -804,7 +804,7 @@ if (!empty($event) and $event == 'article') {
 		
 		$prefs = get_prefs();
 		
-		include_once $txpcfg['txpath'].'/lib/IXRClass.php';
+		include_once txpath.'/lib/IXRClass.php';
 		
 		if ($prefs['ping_textpattern_com']) {
 			$tx_client = new IXR_Client('http://textpattern.com/xmlrpc/');
