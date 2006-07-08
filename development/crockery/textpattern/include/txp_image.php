@@ -52,7 +52,7 @@ $LastChangedRevision$
 
 		else
 		{
-			echo upload_form(gTxt('upload_image'), gTxt('upload'), 'image_insert', 'image', '', $file_max_upload_size);
+			echo upload_form(gTxt('upload_image'), 'upload', 'image_insert', 'image', '', $file_max_upload_size);
 		}
 
 		$dir = ($dir == 'desc') ? 'desc' : 'asc';
@@ -128,7 +128,7 @@ $LastChangedRevision$
 
 			else
 			{
-				echo n.graf(gTxt('no_images'), ' style="text-align: center;"');
+				echo n.graf(gTxt('no_images_recorded'), ' style="text-align: center;"');
 			}
 
 			return;
@@ -230,12 +230,16 @@ $LastChangedRevision$
 
 	function image_search_form($crit, $method)
 	{
+		$default_method = 'name';
+
 		$methods =	array(
 			'id'       => gTxt('ID'),
 			'name'     => gTxt('name'),
 			'category' => gTxt('image_category'),
 			'author'	 => gTxt('author')
 		);
+
+		$method = ($method) ? $method : $default_method;
 
 		return n.n.form(
 			graf(
