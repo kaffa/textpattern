@@ -12,11 +12,11 @@ color: #000;
 background-color: #fff;
 }
 
-code {
-font-family: Monaco, "Courier New", Courier, monospace;
+code, .code {
+font: 1.1em Monaco, "Courier New", monospace;
 }
 
-small {
+small, .small {
 font-size: 0.9em;
 }
 
@@ -53,32 +53,6 @@ list-style-type: circle;
 li {
 margin: 0 0 5px 35px;
 padding: 0;
-}
-
-fieldset {
-padding: 1em;
-border: none;
-}
-
-input {
-font-size: 0.9em;
-}
-
-textarea {
-padding: 3px;
-line-height: 1.4em;
-color: inherit;
-background-color: #eee;
-}
-
-select {
-font-size: 0.9em;
-color: inherit;
-background-color: #eee;
-}
-
-table, tr, th, td {
-vertical-align: top;
 }
 
 /* links
@@ -131,7 +105,6 @@ border-bottom: 1px solid #ddd;
 }
 
 a.plain {
-font-size: 0.9em;
 color: #000;
 background-color: transparent;
 }
@@ -143,8 +116,30 @@ color: #00f;
 background-color: #eee;
 }
 
-/* form element overrides
+/* form elements
 ----------------------------------------------- */
+
+fieldset {
+padding: 1em;
+border: none;
+}
+
+input {
+font-size: 0.9em;
+}
+
+textarea {
+padding: 3px;
+line-height: 1.4em;
+color: inherit;
+background-color: #eee;
+}
+
+select {
+font-size: 0.9em;
+color: inherit;
+background-color: #eee;
+}
 
 form.upload-form {
 text-align: center;
@@ -178,7 +173,7 @@ border-color: #999 #fff #fff #999;
 input.edit {
 margin-top: 5px;
 padding: 1px;
-font-size: 1.1em;
+font-size: 1em;
 color: inherit;
 background-color: #eee;
 }
@@ -239,8 +234,12 @@ color: inherit;
 background-color: #ddd;
 }
 
-/* table element overrides
+/* table elements
 ----------------------------------------------- */
+
+table, tr, th, td {
+vertical-align: top;
+}
 
 table.edit-table {
 margin-top: 2em;
@@ -322,26 +321,18 @@ padding: 10px;
 background-color: #ffc;
 }
 
-ul.textile-help, 
-ul.tag-links {
+ul.plain-list {
 list-style-type: none;
 }
 
-ul.textile-help li, 
-ul.tag-links li {
+ul.plain-list li {
 margin: 0 0 2px 0;
-}
-
-.textile-help, 
-ul.tag-links {
-font-size: 0.9em;
 }
 
 #warning {
 margin: 0 auto 15px auto;
 padding: 10px;
 width: 30em;
-font-size: 1.1em;
 text-align: center;
 color: inherit;
 background-color: #fff4f4;
@@ -466,7 +457,7 @@ tr.spam a, tr.moderate a {
 font-weight: bold;
 }
 
-/* pages, forms and style
+/* pages, forms, style, plugins
 ----------------------------------------------- */
 
 input.css {
@@ -477,10 +468,6 @@ background-color: #eee;
 border-width: 1px;
 border-style: solid;
 border-color: #999 #fff #fff #999;
-}
-
-textarea#html, textarea#form, textarea#css {
-font-family: Monaco, "Courier New", Courier, monospace;
 }
 
 textarea#html {
@@ -494,11 +481,13 @@ width: 500px;
 height: 515px;
 }
 
-/* plugins
------------------------------------------------ */
-
 div#preview-plugin {
 margin: 0 auto;
 height: 300px;
 overflow: auto;
+}
+
+textarea#plugin-install {
+width: 400px;
+height: 30px;
 }

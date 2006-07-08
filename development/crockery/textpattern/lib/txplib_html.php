@@ -32,7 +32,7 @@ $LastChangedRevision: 1008 $
 
 	function column_head($value, $sort = '', $event = '', $is_link = '', $dir = '', $crit = '', $method = '')
 	{
-		$o = '<th class="small">';
+		$o = '<th>';
 
 		if ($is_link)
 		{
@@ -366,7 +366,7 @@ $LastChangedRevision: 1008 $
 
 		$out = array();
 
-		$out[] = n.'<ul class="tag-links">';
+		$out[] = n.'<ul class="plain-list small">';
 
 		foreach ($$arname as $a)
 		{
