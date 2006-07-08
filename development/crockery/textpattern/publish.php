@@ -766,7 +766,7 @@ $LastChangedRevision$
 		$out['comments_count']  = $comments_count;
 		$out['body']            = $Body_html;
 		$out['excerpt']         = $Excerpt_html;
-
+		$out['override_form']		= $override_form;
 
 		$custom = getCustomFields();
 		if ($custom) {
