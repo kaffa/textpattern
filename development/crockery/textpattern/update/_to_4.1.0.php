@@ -73,4 +73,6 @@ $root_id = safe_field('id', 'txp_section', "name='default'");
 safe_update('txp_section', "parent='".$root_id."'", "parent IS NULL");
 include_once(txpath.'/lib/txplib_tree.php');
 tree_rebuild('txp_section', $root_id, 1);
+
+safe_insert('txp_prefs', "prefs_id = 1, event='publish', name = 'markup_default', val = 'txptextile', type = '0', html='text_input'");
 ?>
