@@ -20,13 +20,13 @@ $LastChangedRevision: $
 //-------------------------------------------------------------
 	function get_default_prefs()
 	{
-		return parse_ini_file(txpath.DS.prefs_dir.DS.'prefs.default.ini', 0);
+		return parse_ini_file(txpath.DS.prefs_dir.DS.'prefs.default.ini.php', 0);
 	}
 
 //-------------------------------------------------------------
 	function get_local_prefs()
 	{
-		$lp = txpath.DS.prefs_dir.DS.'prefs.local.ini';
+		$lp = txpath.DS.prefs_dir.DS.'prefs.local.ini.php';
 		if (is_file($lp) and $p = parse_ini_file($lp, 0))
 			return $p;
 		return array();

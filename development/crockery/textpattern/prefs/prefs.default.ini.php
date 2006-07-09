@@ -1,7 +1,7 @@
-;<?php die(); ?>
+;<?php die(); /*
 ;
 ; DO NOT be tempted to edit this file, it doesn't do what you think.
-; create a new file named prefs.local.ini and put your custom settings there
+; create a new file named prefs.local.ini.php and put your custom settings there
 
 ; main prefs
 archive_dateformat               = "%b %d, %I:%M %p"
@@ -71,3 +71,4 @@ use_dns                          = "1"
 use_mail_on_feeds_id             = "0"
 use_plugins                      = "1"
 
+; */ ?>
