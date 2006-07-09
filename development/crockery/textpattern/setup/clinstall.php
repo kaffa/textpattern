@@ -49,7 +49,7 @@ $nonce = md5( uniqid( rand(), true ) );
 
 $name = $argv[1];
 $email = $argv[1];
-$pass = $argv[1];
+$pass = strtolower($argv[1]);
 
 db_query("INSERT INTO ".PFX."txp_users VALUES
 	(1,'$name',password(lower('$pass')),'$name','$email',1,now(),'$nonce')");
