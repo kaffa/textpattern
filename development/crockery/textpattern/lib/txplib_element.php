@@ -5,6 +5,8 @@ $HeadURL: $
 $LastChangedRevision: $
 */
 
+define('elements_dir', 'elements');
+
 // -------------------------------------------------------------
 	function load_element($name)
 	{
@@ -18,9 +20,14 @@ $LastChangedRevision: $
 
 		extract($elements[$name]);
 
-		$file = txpath.'/elements/'.$name.'.php';
+		$dir = realpath(txpath.DS.elements_dir);
+		$file = $dir.DS.$name.'.php';
+
 		if (!is_file($file) or !is_readable($file))
 			trigger_error("$file is inaccessible", E_USER_ERROR);
+
+		if (strncmp($dir, realpath($file), strlen($dir)) !== 0)
+			trigger_error("$file directory is invalid ($dir)", E_USER_ERROR);
 
 		if (!empty($hash) and $hash != ($md5 = md5_file($file)))
 			trigger_error("$file hash check failed: $hash != $md5", E_USER_ERROR);
@@ -51,9 +58,9 @@ $LastChangedRevision: $
 	}
 
 // -------------------------------------------------------------
-	function load_elements($event, $step)
+	function build_element_list()
 	{
-		global $elements, $prefs;
+		global $elements;
 
 		// only do this the first time load_elements() is called
 		if (!isset($elements)) {
@@ -62,6 +69,14 @@ $LastChangedRevision: $
 			while ($row = nextRow($rs))
 				$elements[$row['name']] = $row;
 		}
+	}
+
+// -------------------------------------------------------------
+	function load_elements($event, $step)
+	{
+		global $elements, $prefs;
+
+		build_element_list();
 
 		foreach ($elements as $e) {
 			// type == 0 means load at startup
@@ -72,6 +87,41 @@ $LastChangedRevision: $
 				load_element($e['name']);
 			}
 		}
+	}
+
+// -------------------------------------------------------------
+	function update_elements($ver, $ts, $dir='')
+	{
+		// recursively find and run element update files
+		if (!$dir)
+			$dir = realpath(txpath.DS.elements_dir);
+
+		$dh = @opendir($dir);
+		$dirs = array();
+		$files = array();
+		while ($dh and false !== ($f = @readdir($dh))) {
+			if ($f{0} == '.')
+				continue;
+			if (is_dir($dir.DS.$f))
+				$dirs[] = $dir.DS.$f;
+			elseif (is_file($dir.DS.$f))
+				$files[] = $f;
+		}
+		closedir($dh);
+
+		foreach ($files as $f)
+			$file = $dir.DS.$f;
+			if (preg_match('@_to_(.*)\.php@', $f, $m)) {
+				$file_ver = $m[1];
+				if (is_file($file) and is_readable($file)
+						and (version_compare($file_ver, $ver) > 0 or filemtime($file) > $ts)) {
+					include($file);
+				}
+			}
+
+		foreach ($dirs as $d)
+			update_elements($ver, $ts, $d);
+
 	}
 
 
