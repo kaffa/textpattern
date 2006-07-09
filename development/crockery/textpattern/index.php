@@ -48,6 +48,7 @@ $LastChangedRevision$
 	include txpath.'/lib/txplib_html.php';
 	include txpath.'/lib/txplib_misc.php';
 	include txpath.'/lib/txplib_element.php';
+	include txpath.'/lib/txplib_class.php';
 	include txpath.'/lib/admin_config.php';
 
 	$microstart = getmicrotime();
