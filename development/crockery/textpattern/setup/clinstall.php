@@ -32,8 +32,10 @@ define('txpath', $txpcfg['txpath']);
 include_once(txpath."/lib/mdb.php");
 if (!db_connect($dhost,$duser,$dpass, $ddb))
 	die('error connecting: '.db_lasterror());
-if (!db_selectdb($ddb))
-	die('error selecting db: '.db_lasterror());
+if (!db_selectdb($ddb)) {
+	if (!db_query('create database '.$ddb))
+		die('error selecting db: '.db_lasterror());
+}
 
 include(txpath."/lib/txplib_misc.php");
 include(txpath."/lib/txplib_html.php");
