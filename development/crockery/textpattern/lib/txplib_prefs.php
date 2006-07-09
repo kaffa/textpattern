@@ -10,6 +10,31 @@ $LastChangedRevision: $
 //-------------------------------------------------------------
 	function get_prefs()
 	{
+		return array_merge(
+			get_default_prefs(),
+			get_db_prefs(),
+			get_local_prefs()
+		);
+	}
+
+//-------------------------------------------------------------
+	function get_default_prefs()
+	{
+		return parse_ini_file(txpath.DS.prefs_dir.DS.'prefs.default.ini', 0);
+	}
+
+//-------------------------------------------------------------
+	function get_local_prefs()
+	{
+		$lp = txpath.DS.prefs_dir.DS.'prefs.local.ini';
+		if (is_file($lp) and $p = parse_ini_file($lp, 0))
+			return $p;
+		return array();
+	}
+
+//-------------------------------------------------------------
+	function get_db_prefs()
+	{
 		$r = safe_rows_start('name, val', 'txp_prefs', 'prefs_id=1');
 		if ($r) {
 			while ($a = nextRow($r)) {
@@ -20,7 +45,7 @@ $LastChangedRevision: $
 				$out = array_merge($user_prefs, $out);
 			return $out;
 		}
-		return false;
+		return array();
 	}
 
 //-------------------------------------------------------------
@@ -37,7 +62,7 @@ $LastChangedRevision: $
 			}
 			return $out;
 		}
-		return false;
+		return array();
 	}
 
 //-------------------------------------------------------------

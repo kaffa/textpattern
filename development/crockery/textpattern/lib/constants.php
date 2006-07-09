@@ -24,6 +24,7 @@ if (defined('DIRECTORY_SEPARATOR'))
 else
 	define ('DS', (is_windows() ? '\\' : '/'));
 
+define('prefs_dir', 'prefs');
 
 error_reporting($old_level);unset($old_level);
 ?>
