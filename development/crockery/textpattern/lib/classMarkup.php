@@ -15,18 +15,14 @@ class txpMarkup {
 }
 
 function do_markup($type, $in) {
-	static $objs;
 
-	// default to nl2br if the requested class is unavailable
-	if (@strtolower(get_parent_class($type)) != 'txpmarkup')
-		$type = 'txpNL2br';
-	$type = strtolower($type);
+	$markup_types = get_classes('txpmarkup');
+	if (isset($markup_types[$type]))
+		$obj = get_singleton($type);
+	else
+		$obj = get_singleton('txpnl2br');
+	return $obj->doMarkup($in);
 
-	// Cache singleton objects
-	if (empty($objs[$type]))
-		$objs[$type] = new $type();
-
-	return $objs[$type]->doMarkup($in);
 }
 
 function get_markup_types() {
@@ -35,11 +31,12 @@ function get_markup_types() {
 	if (!empty($types))
 		return $types;
 
-	foreach (get_declared_classes() as $class) {
-		$class = strtolower($class);
-		if (@strtolower(get_parent_class($class)) == 'txpmarkup')
-			$types[$class] = gTxt($class);
-	}
+	$classes = get_classes('txpmarkup');
+
+	foreach ($classes as $type)
+		# ignore the txpMarkup parent class
+		if ($type != 'txpmarkup')
+			$types[$type] = gTxt($type);
 
 	return $types;
 }
