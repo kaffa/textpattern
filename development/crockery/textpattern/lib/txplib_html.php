@@ -468,14 +468,14 @@ $LastChangedRevision: 1008 $
 	}
 
 //-------------------------------------------------------------
-	function pref_text($item,$var)
-	{
-		$things = array(
-			"2" => gTxt('convert_linebreaks'),
-			"1" => gTxt('use_textile'),
-			"0" => gTxt('leave_text_untouched'));
-		return selectInput($item, $things, $var);
-	}
 
+	function pref_markup($name, $markup, $id) 
+	{
+		include_once(txpath.'/lib/classMarkup.php');
+
+		$markup_types = get_markup_types();
+
+		return selectInput($name, $markup_types, $markup, '', '', $id);
+	}
 
 ?>

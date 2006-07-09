@@ -10,7 +10,7 @@ class txpMarkup {
 	function doMarkup($in) {
 	}
 
-	function sidehelp() {
+	function sidehelp($where = '') {
 	}
 }
 
@@ -76,6 +76,56 @@ class txpTextile extends TxpMarkup {
 	function doMarkup($in) {
 		return $this->textile->TextileThis($in);
 	}
+
+	function sidehelp($where = '')
+	{
+		$where = ($where) ? br.' ('.$where.')' : '';
+
+		return n.hed('<a href="#" onclick="toggleDisplay(\'textile_help\'); return false;">'.gTxt('textile_help').$where.'</a>', 3).
+
+			n.'<div id="textile_help" style="display: none;">'.
+
+			n.'<ul class="plain-list small">'.
+				n.t.'<li>'.gTxt('header').': <strong>h<em>n</em>.</strong>'.sp.
+					popHelpSubtle('header', 400, 400).'</li>'.
+				n.t.'<li>'.gTxt('blockquote').': <strong>bq.</strong>'.sp.
+					popHelpSubtle('blockquote',400,400).'</li>'.
+				n.t.'<li>'.gTxt('numeric_list').': <strong>#</strong>'.sp.
+					popHelpSubtle('numeric', 400, 400).'</li>'.
+				n.t.'<li>'.gTxt('bulleted_list').': <strong>*</strong>'.sp.
+					popHelpSubtle('bulleted', 400, 400).'</li>'.
+			n.'</ul>'.
+
+			n.'<ul class="plain-list small">'.
+				n.t.'<li>'.'_<em>'.gTxt('emphasis').'</em>_'.sp.
+					popHelpSubtle('italic', 400, 400).'</li>'.
+				n.t.'<li>'.'*<strong>'.gTxt('strong').'</strong>*'.sp.
+					popHelpSubtle('bold', 400, 400).'</li>'.
+				n.t.'<li>'.'??<cite>'.gTxt('citation').'</cite>??'.sp.
+					popHelpSubtle('cite', 500, 300).'</li>'.
+				n.t.'<li>'.'-'.gTxt('deleted_text').'-'.sp.
+					popHelpSubtle('delete', 400, 300).'</li>'.
+				n.t.'<li>'.'+'.gTxt('inserted_text').'+'.sp.
+					popHelpSubtle('insert', 400, 300).'</li>'.
+				n.t.'<li>'.'^'.gTxt('superscript').'^'.sp.
+					popHelpSubtle('super', 400, 300).'</li>'.
+				n.t.'<li>'.'~'.gTxt('subscript').'~'.sp.
+					popHelpSubtle('subscript', 400, 400).'</li>'.
+			n.'</ul>'.
+
+			n.graf(
+				'"'.gTxt('linktext').'":url'.sp.popHelpSubtle('link', 400, 500)
+			, ' class="small"').
+
+			n.graf(
+				'!'.gTxt('imageurl').'!'.sp.popHelpSubtle('image', 500, 500)
+			, ' class="small"').
+
+			n.graf(
+				'<a href="http://textism.com/tools/textile/" target="_blank">'.gTxt('More').'</a>').
+
+		n.'</div>';
+	}
 }
 
 class txpTextileLite extends TxpMarkup {
@@ -90,7 +140,45 @@ class txpTextileLite extends TxpMarkup {
 	function doMarkup($in) {
 		return $this->textile->TextileThis($in, 1);
 	}
-}
 
+	function sidehelp($where = '')
+	{
+		$where = ($where) ? br.' ('.$where.')' : '';
+
+		return n.hed('<a href="#" onclick="toggleDisplay(\'textile_lite_help\'); return false;">'.gTxt('textile_lite_help').$where.'</a>', 3).
+
+			n.'<div id="textile_lite_help" style="display: none;">'.
+
+			n.'<ul class="plain-list small">'.
+				n.t.'<li>'.'_<em>'.gTxt('emphasis').'</em>_'.sp.
+					popHelpSubtle('italic', 400, 400).'</li>'.
+				n.t.'<li>'.'*<strong>'.gTxt('strong').'</strong>*'.sp.
+					popHelpSubtle('bold', 400, 400).'</li>'.
+				n.t.'<li>'.'??<cite>'.gTxt('citation').'</cite>??'.sp.
+					popHelpSubtle('cite', 500, 300).'</li>'.
+				n.t.'<li>'.'-'.gTxt('deleted_text').'-'.sp.
+					popHelpSubtle('delete', 400, 300).'</li>'.
+				n.t.'<li>'.'+'.gTxt('inserted_text').'+'.sp.
+					popHelpSubtle('insert', 400, 300).'</li>'.
+				n.t.'<li>'.'^'.gTxt('superscript').'^'.sp.
+					popHelpSubtle('super', 400, 300).'</li>'.
+				n.t.'<li>'.'~'.gTxt('subscript').'~'.sp.
+					popHelpSubtle('subscript', 400, 400).'</li>'.
+			n.'</ul>'.
+
+			n.graf(
+				'"'.gTxt('linktext').'":url'.sp.popHelpSubtle('link', 400, 500)
+			, ' class="small"').
+
+			n.graf(
+				'!'.gTxt('imageurl').'!'.sp.popHelpSubtle('image', 500, 500)
+			, ' class="small"').
+
+			n.graf(
+				'<a href="http://textism.com/tools/textile/" target="_blank">'.gTxt('More').'</a>').
+
+			n.'</div>';
+	}
+}
 
 ?>
