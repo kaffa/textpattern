@@ -9,6 +9,9 @@ class txpMarkup {
 
 	function doMarkup($in) {
 	}
+
+	function sidehelp() {
+	}
 }
 
 function do_markup($type, $in) {
