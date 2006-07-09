@@ -50,8 +50,8 @@ if ($GLOBALS['txp_install_successful'] === false)
 $nonce = md5( uniqid( rand(), true ) );
 
 $name = $argv[1];
-$email = $argv[1];
-$pass = strtolower($argv[1]);
+$email = $argv[2];
+$pass = strtolower($argv[3]);
 
 db_query("INSERT INTO ".PFX."txp_users VALUES
 	(1,'$name',password(lower('$pass')),'$name','$email',1,now(),'$nonce')");
