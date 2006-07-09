@@ -3,6 +3,8 @@
 // Textpattern string functions
 
 /*
+Copyright 2006 Alex Shiels http://thresholdstate.com/
+
 $HeadURL: $
 $LastChangedRevision: $
 */
