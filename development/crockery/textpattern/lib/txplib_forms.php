@@ -90,7 +90,7 @@ $LastChangedRevision: 952 $
 
 			if ($name == $value)
 			{
-				$selected = ' selected="selected"';
+				$sel = ' selected="selected"';
 				$selected = true;
 			}
 
