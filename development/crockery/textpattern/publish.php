@@ -471,8 +471,9 @@ $LastChangedRevision$
 			'section'   => '',
 			'excerpted' => '',
 			'author'    => '',
+			'sort'      => '',
 			'sortby'    => '',
-			'sortdir'   => 'desc',
+			'sortdir'   => '',
 			'month'     => '',
 			'keywords'  => '',
 			'frontpage' => '',
@@ -524,11 +525,28 @@ $LastChangedRevision$
 
 			// searchall=0 can be used to show search results for the current section only
 			if ($searchall) $section = '';
-			if (!$sortby) $sortby='score';
+			if (!$sort) $sort='score';
 		}
 		else {
 			$match = $search = '';
-			if (!$sortby) $sortby='Posted';
+			if (!$sort) $sort='Posted';
+		}
+
+		// for backwards compatibility
+		// sortby and sortdir are deprecated
+		if ($sortby)
+		{
+			if (!$sortdir)
+			{
+				$sortdir = 'desc';
+			}
+
+			$sort = "$sortby $sortdir";
+		}
+
+		elseif ($sortdir)
+		{
+			$sort = "Posted $sortdir";
 		}
 
 		//Building query parts
@@ -609,7 +627,7 @@ $LastChangedRevision$
 		}
 
 		$rs = safe_rows_start("*, unix_timestamp(Posted) as uPosted".$match, 'textpattern', 
-		$where. ' order by ' . doslash($sortby) . ' ' . doSlash($sortdir) . ' ' . db_limit($limit,  $pgoffset));
+		$where. ' order by '.doslash($sort).' '.db_limit($limit,  $pgoffset));
 		// alternative form override for search or list
 		if ($q and !$iscustom and !$issticky)
 			$form = gAtt($atts, 'searchform', 'search_results');

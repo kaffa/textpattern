@@ -19,7 +19,7 @@ $LastChangedRevision: $
 			'labeltag' => '',
 			'limit'		 => '10',
 			'offset'	 => '0',
-			'sort'		 => 'filename',
+			'sort'		 => 'filename asc',
 			'wraptag'	 => '',
 		), $atts));
 
