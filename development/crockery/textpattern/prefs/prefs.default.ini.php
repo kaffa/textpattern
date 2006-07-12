@@ -22,7 +22,7 @@ markup_default                   = "txptextile"
 permlink_mode                    = "messy"
 production_status                = "testing"
 sitename                         = "my_site"
-siteurl                          = "comment.local"
+siteurl                          = ""
 site_slogan                      = "my_slogan"
 use_comments                     = "1"
 
