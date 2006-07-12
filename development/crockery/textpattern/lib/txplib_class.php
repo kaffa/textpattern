@@ -77,15 +77,19 @@ function find_class_method($parent, $method) {
 	static $methods = array();
 
 	$method = strtolower($method);
-	if (!empty($methods[$parent][$method]))
-		return $methods[$parent][$method];
+	if (isset($methods[$parent]))
+		return @$methods[$parent][$method];
 
 	$classes = get_classes($parent);
-	foreach ($classes as $class)
-		if (is_callable(array($class, $method)))
-			return $methods[$parent][$method] = $class;
+	$methods[$parent] = array();
+	foreach ($classes as $class) {
+		$class_methods = get_class_methods($class);
+		$methods[$parent] = array_merge(
+			array_combine($class_methods, array_fill(0, count($class_methods), $class)),
+			$methods[$parent]);
+	}
 
-	return '';
+	return @$methods[$parent][$method];
 }
 
 ?>
