@@ -15,9 +15,9 @@ include_once(txpath.'/lib/classMarkup.php');
 
 if (!defined('txpinterface')) die('txpinterface is undefined.');
 
-global $vars, $statuses;
+global $article_vars, $statuses;
 
-$vars = array(
+$article_vars = array(
 	'ID','Title','Title_html','Body','Body_html','Excerpt','markup_excerpt','Image',
 	'markup_body', 'Keywords','Status','Posted','Section','Category1','Category2',
 	'Annotate','AnnotateInvite','publish_now','reset_time','AuthorID','sPosted',
@@ -59,9 +59,9 @@ if (!empty($event) and $event == 'article') {
 //--------------------------------------------------------------
 	function article_post()
 	{
-		global $txp_user,$vars,$txpcfg, $ID;
+		global $txp_user,$article_vars,$txpcfg, $ID;
 		extract(get_prefs());
-		$incoming = psa($vars);
+		$incoming = psa($article_vars);
 		$message='';
 
 		$incoming = markup_main_fields($incoming);
@@ -132,9 +132,9 @@ if (!empty($event) and $event == 'article') {
 //--------------------------------------------------------------
 	function article_save()
 	{
-		global $txp_user,$vars,$txpcfg;
+		global $txp_user,$article_vars,$txpcfg;
 		extract(get_prefs());
-		$incoming = psa($vars);
+		$incoming = psa($article_vars);
 
 		$oldArticle = safe_row('Status, url_title, Title','textpattern','ID = '.(int)$incoming['ID']);
 
@@ -226,7 +226,7 @@ if (!empty($event) and $event == 'article') {
 //--------------------------------------------------------------
 	function article_edit($message="")
 	{
-		global $txpcfg,$txp_user,$vars;
+		global $txpcfg,$txp_user,$article_vars;
 
 		extract(get_prefs());
 		extract(gpsa(array('view','from_view','step')));
@@ -268,7 +268,7 @@ if (!empty($event) and $event == 'article') {
 			$pull = false;         //-- assume they came from post
 		
 			if (!$from_view or $from_view=='text') {
-				extract(gpsa($vars));
+				extract(gpsa($article_vars));
 			} elseif($from_view=='preview' or $from_view=='html') {
 					// coming from either html or preview
 				if (isset($_POST['store'])) {
@@ -277,7 +277,7 @@ if (!empty($event) and $event == 'article') {
 				}
 			}
 			
-			foreach($vars as $var){
+			foreach($article_vars as $var){
 				if(isset($$var)){
 					$store_out[$var] = $$var;		
 				}
@@ -422,7 +422,7 @@ if (!empty($event) and $event == 'article') {
 			{
 				include_once txpath.'/publish/taghandlers.php';
 
-				$article_array = ($pull) ? $rs : gpsa($vars);
+				$article_array = ($pull) ? $rs : gpsa($article_vars);
 
 				echo sp.sp.'<a href="'.permlinkurl($article_array).'">'.gTxt('view').'</a>';
 			}
