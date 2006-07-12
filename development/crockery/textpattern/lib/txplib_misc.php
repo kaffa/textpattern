@@ -1719,10 +1719,11 @@ eod;
 
 //-------------------------------------------------------------
 	function export_ini($array) {
-		$out = ";<?php die(); ?>\n";
+		$out = ";<?php die(); /*\n";
 		foreach ($array as $k=>$v) {
 			$out .= str_pad($k, 32). " = \"$v\"\n";
 		}
+		$out .= "; */ ?>\n";
 		return $out;
 	}
 ?>
