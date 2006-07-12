@@ -270,7 +270,7 @@ EOD;
 		$length = strlen($xml);
 		header('Connection: close');
 		header('Content-Length: '.$length);
-		header("Content-Type: text/xml charset=$enc");
+		header("Content-Type: text/xml; charset=$enc");
 		header('Date: '.date('r'));        
 		echo $xml;
 		exit;
