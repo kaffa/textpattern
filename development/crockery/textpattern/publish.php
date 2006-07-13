@@ -400,7 +400,7 @@ $LastChangedRevision$
 		if ($pretext['status'] == '404')
 			txp_die(gTxt('404_not_found'), '404');
 
-		$html = safe_field('user_html','txp_page',"name='".doSlash($pretext['page'])."'");
+		$html = fetch_page_template($pretext['page']);
 		if (!$html) 
 			txp_die(gTxt('unknown_section'), '404');
 

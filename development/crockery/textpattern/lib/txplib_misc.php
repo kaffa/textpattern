@@ -1242,9 +1242,13 @@ $LastChangedRevision: 1127 $
 	}
 
 // --------------------------------------------------------------
-	function fetch_form($name) 
+	function fetch_form($name, $pfx=NULL) 
 	{
 		static $forms = array();
+		global $txp_theme;
+		if ($pfx === NULL)
+			$pfx = @$txp_theme;
+		$name = $pfx.$name;
 
 		if (isset($forms[$name]))
 			$f = $forms[$name];
@@ -1260,6 +1264,31 @@ $LastChangedRevision: 1127 $
 
 		trace_add('['.gTxt('form').': '.$name.']');
 		return $f;
+	}
+
+// --------------------------------------------------------------
+	function fetch_page_template($name, $pfx=NULL) 
+	{
+		static $pages = array();
+		global $txp_theme;
+		if ($pfx === NULL)
+			$pfx = @$txp_theme;
+		$name = $pfx.$name;
+
+		if (isset($pages[$name]))
+			$f = $pages[$name];
+		else {
+			$row = safe_row('user_html', 'txp_page',"name='".doSlash($name)."'");
+			if (!$row) {
+				trigger_error(gTxt('page_template_not_found').': '.$name);
+				return;
+			}
+			$p = $row['user_html'];
+			$pages[$name] = $p;
+		}
+
+		trace_add('['.gTxt('page').': '.$name.']');
+		return $p;
 	}
 
 // --------------------------------------------------------------
@@ -1403,9 +1432,9 @@ $LastChangedRevision: 1127 $
 		}
 
 		if ($GLOBALS['connected']) {
-			$out = safe_field('user_html','txp_page',"name='error_".doSlash($code)."'");
+			$out = fetch_page_template('error_'.$code);
 			if (empty($out))
-				$out = safe_field('user_html','txp_page',"name='error_default'");
+				$out = fetch_page_template('error_default');
 		}
 
 		if (empty($out))
