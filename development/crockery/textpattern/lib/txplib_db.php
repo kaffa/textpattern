@@ -131,13 +131,14 @@ $DB = new DB;
 	function safe_upsert($table,$set,$where,$debug='') 
 	{
 		// FIXME: lock the table so this is atomic?
-		$wc = (is_array($where) ? join(', ', $where) : $where);
-		$r = @safe_insert($table, join(', ', array($wc, $set)), $debug);
-		if ($r)
+		$wa = (is_array($where) ? join(' and ', $where) : $where);
+		$r = safe_update($table, $set, $wa, $debug);
+		if ($r and db_affected_rows())
 			return $r;
 		else {
-			$wa = (is_array($where) ? join(' and ', $where) : $where);
-			return safe_update($table, $set, $wa, $debug);
+			$wc = (is_array($where) ? join(', ', $where) : $where);
+			@safe_insert($table, join(', ', array($wc, $set)), $debug);
+			return true;
 		}
 	}
 

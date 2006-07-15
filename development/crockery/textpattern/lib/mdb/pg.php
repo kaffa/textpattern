@@ -21,10 +21,6 @@ function db_query($q, $res=0) {
 	$res = ($res ? $res : $mdb_res);
 	$r = pg_query($res, $q);
 
-	if (!$r) {
-		trigger_error('failed query: '.$q.n);
-		trigger_error('error: '.db_lasterror());
-	}
 	$db_last_query[$r] = $q;
 
 	return $r;
@@ -36,8 +32,6 @@ function db_insert($table, $set, $res=0) {
 	$set = my_insert_to_values($set);
 
 	if (!db_query('INSERT INTO '.$table.' '.$set, $res)) {
-		echo 'failed insert: INSERT INTO '.$table.' '.$set.n;
-		echo db_lasterror().n;
 		return false;
 	}
 
