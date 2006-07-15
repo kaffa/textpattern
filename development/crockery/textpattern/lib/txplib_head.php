@@ -158,21 +158,14 @@ $LastChangedRevision: 1098 $
  		<?php
  		if (!$bm) {
 			echo '<table cellpadding="0" cellspacing="0" align="center"><tr>
-  <td valign="middle" style="width:368px">&nbsp;'.$message.'</td>',
-  			
-			has_privs('tab.content')
-			? areatab(gTxt('tab_content'), 'content', 'article', $area)
-			: '',
-			has_privs('tab.presentation')
-			?	areatab(gTxt('tab_presentation'), 'presentation', 'page', $area)
-			:	'',
-			has_privs('tab.admin')
-			?	areatab(gTxt('tab_admin'), 'admin', 'prefs', $area)
-			:	'',
-			(has_privs('tab.extensions') and !empty($areas['extensions']))
-			?	areatab(gTxt('tab_extensions'), 'extensions', array_shift($areas['extensions']), $area)
-			:	'',
+  <td valign="middle" style="width:368px">&nbsp;'.$message.'</td>';
 
+  			foreach (areas() as $a => $tabs) {
+				if (has_privs("tab.{$a}"))
+					echo areatab(gTxt("tab_{$a}"), $a, array_shift($tabs), $area);
+			}
+
+			echo
 			'<td class="tabdown"><a href="'.hu.'" class="plain" target="blank">'.gTxt('tab_view_site').'</a></td>',
 		 '</tr></table>',
 		
@@ -195,7 +188,7 @@ $LastChangedRevision: 1098 $
 
 // -------------------------------------------------------------
 	function tabber($label,$tabevent,$event) 
-	{		
+	{
 		$tc = ($event==$tabevent) ? 'tabup' : 'tabdown2';
 		$out = '<td class="'.$tc.'" onclick="window.location.href=\'?event='.$tabevent.'\'" ><a href="?event='.$tabevent.'" class="plain">'.$label.'</a></td>';
       	return $out;
