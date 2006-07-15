@@ -206,7 +206,7 @@ $LastChangedRevision: 1098 $
 	{
 		$areas = areas();
 		foreach($areas[$area] as $a=>$b) {
-			$out[] = tabber($a,$b,$event,2);
+			$out[] = tabber(gTxt($a),$b,$event,2);
 		}
 		return join('',$out);
 	}
@@ -217,28 +217,28 @@ $LastChangedRevision: 1098 $
 		global $privs, $plugin_areas;
 		
 		$areas['content'] = array(
-			gTxt('tab_organise') => 'category',
-			gTxt('tab_write')    => 'article',
-			gTxt('tab_list')    =>  'list',
-			gTxt('tab_image')    => 'image',
-			gTxt('tab_link')     => 'link',
-			gTxt('tab_comments') => 'discuss'
+			'tab_organise' => 'category',
+			'tab_write'    => 'article',
+			'tab_list'    =>  'list',
+			'tab_image'    => 'image',
+			'tab_link'     => 'link',
+			'tab_comments' => 'discuss'
 		);
-		
+
 		$areas['presentation'] = array(
-			gTxt('tab_sections') => 'section',
-			gTxt('tab_pages')    => 'page',
-			gTxt('tab_forms')    => 'form',
-			gTxt('tab_style')    => 'css'
+			'tab_sections' => 'section',
+			'tab_pages'    => 'page',
+			'tab_forms'    => 'form',
+			'tab_style'    => 'css'
 		);
 
 		$areas['admin'] = array(
-			gTxt('tab_diagnostics') => 'diag',
-			gTxt('tab_preferences') => 'prefs',
-			gTxt('tab_site_admin')  => 'admin',
-			gTxt('tab_logs')        => 'log',
-			gTxt('tab_plugins')     => 'plugin',
-			gTxt('tab_import')      => 'import'
+			'tab_diagnostics' => 'diag',
+			'tab_preferences' => 'prefs',
+			'tab_site_admin'  => 'admin',
+			'tab_logs'        => 'log',
+			'tab_plugins'     => 'plugin',
+			'tab_import'      => 'import'
 		);	
 
 		$areas['extensions'] = array(
