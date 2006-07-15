@@ -1255,7 +1255,7 @@ $LastChangedRevision: 1127 $
 		else {
 			$row = safe_row('Form', 'txp_form',"name='".doSlash($name)."'");
 			if (!$row) {
-				trigger_error(gTxt('form_not_found').': '.$name);
+				trigger_error(gTxt('form_not_found', array('{name}' => $name)));
 				return;
 			}
 			$f = $row['Form'];
@@ -1276,11 +1276,11 @@ $LastChangedRevision: 1127 $
 		$name = $pfx.$name;
 
 		if (isset($pages[$name]))
-			$f = $pages[$name];
+			$p = $pages[$name];
 		else {
 			$row = safe_row('user_html', 'txp_page',"name='".doSlash($name)."'");
 			if (!$row) {
-				trigger_error(gTxt('page_template_not_found').': '.$name);
+				trigger_error(gTxt('page_template_not_found', array('{name}' => $name)));
 				return;
 			}
 			$p = $row['user_html'];
