@@ -210,24 +210,24 @@ $LastChangedRevision: 1098 $
 		global $privs, $plugin_areas;
 		
 		$areas['content'] = array(
-			'tab_organise' => 'category',
 			'tab_write'    => 'article',
 			'tab_list'    =>  'list',
+			'tab_organise' => 'category',
 			'tab_image'    => 'image',
 			'tab_link'     => 'link',
 			'tab_comments' => 'discuss'
 		);
 
 		$areas['presentation'] = array(
-			'tab_sections' => 'section',
 			'tab_pages'    => 'page',
 			'tab_forms'    => 'form',
+			'tab_sections' => 'section',
 			'tab_style'    => 'css'
 		);
 
 		$areas['admin'] = array(
-			'tab_diagnostics' => 'diag',
 			'tab_preferences' => 'prefs',
+			'tab_diagnostics' => 'diag',
 			'tab_site_admin'  => 'admin',
 			'tab_logs'        => 'log',
 			'tab_plugins'     => 'plugin',
