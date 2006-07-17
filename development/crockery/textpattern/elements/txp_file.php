@@ -73,28 +73,28 @@ register_callback('file_event', 'file');
 		switch ($sort)
 		{
 			case 'id':
-				$sort_sql = '`id` '.$dir;
+				$sort_sql = 'id '.$dir;
 			break;
 
 			case 'filename':
-				$sort_sql = '`filename` '.$dir;
+				$sort_sql = 'filename '.$dir;
 			break;
 
 			case 'description':
-				$sort_sql = '`description` '.$dir.', `filename` desc';
+				$sort_sql = 'description '.$dir.', filename desc';
 			break;
 
 			case 'category':
-				$sort_sql = '`category` '.$dir.', `filename` desc';
+				$sort_sql = 'category '.$dir.', filename desc';
 			break;
 
 			case 'downloads':
-				$sort_sql = '`downloads` '.$dir.', `filename` desc';
+				$sort_sql = 'downloads '.$dir.', filename desc';
 			break;
 
 			default:
 				$dir = 'desc';
-				$sort_sql = '`filename` '.$dir;
+				$sort_sql = 'filename '.$dir;
 			break;
 		}
 
@@ -107,10 +107,10 @@ register_callback('file_event', 'file');
 			$crit_escaped = doSlash($crit);
 
 			$critsql = array(
-				'id'			    => "`id` = '$crit_escaped'",
-				'filename'    => "`filename` like '%$crit_escaped%'",
-				'description' => "`description` like '%$crit_escaped%'",
-				'category'    => "`category` like '%$crit_escaped%'"
+				'id'			    => "id = '$crit_escaped'",
+				'filename'    => "filename like '%$crit_escaped%'",
+				'description' => "description like '%$crit_escaped%'",
+				'category'    => "category like '%$crit_escaped%'"
 			);
 
 			if (array_key_exists($search_method, $critsql))
@@ -177,7 +177,7 @@ register_callback('file_event', 'file');
 
 				$file_exists = file_exists(build_file_path($file_base_path, $filename));
 
-				$download_link = ($file_exists) ? '<li>'.make_download_link($id).'</li>' : $id;
+				$download_link = ($file_exists) ? '<li>'.make_download_link($id).'</li>' : '';
 
 				$category = ($category) ? '<span title="'.fetch_category_title($category, 'file').'">'.$category.'</span>' : '';
 
