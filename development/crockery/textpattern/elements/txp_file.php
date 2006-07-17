@@ -181,7 +181,7 @@ register_callback('file_event', 'file');
 
 				$category = ($category) ? '<span title="'.fetch_category_title($category, 'file').'">'.$category.'</span>' : '';
 
-				$tag_url = '?event=tag'.a.'name=file'.a.'id='.$id.a.'description='.urlencode($description).
+				$tag_url = '?event=tag'.a.'tag_name=file_download_link'.a.'id='.$id.a.'description='.urlencode($description).
 					a.'filename='.urlencode($filename);
 
 				$status = '<span class="';

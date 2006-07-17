@@ -81,7 +81,7 @@ class txpTextile extends TxpMarkup {
 	{
 		$where = ($where) ? br.' ('.$where.')' : '';
 
-		return n.hed('<a href="#" onclick="toggleDisplay(\'textile_help\'); return false;">'.gTxt('textile_help').$where.'</a>', 3).
+		return n.'<h3 class="plain"><a href="#" onclick="toggleDisplay(\'textile_help\'); return false;">'.gTxt('textile_help').$where.'</a></h3>'.
 
 			n.'<div id="textile_help" style="display: none;">'.
 
@@ -145,7 +145,7 @@ class txpTextileLite extends TxpMarkup {
 	{
 		$where = ($where) ? br.' ('.$where.')' : '';
 
-		return n.hed('<a href="#" onclick="toggleDisplay(\'textile_lite_help\'); return false;">'.gTxt('textile_lite_help').$where.'</a>', 3).
+		return n.'<h3 class="plain"><a href="#" onclick="toggleDisplay(\'textile_lite_help\'); return false;">'.gTxt('textile_lite_help').$where.'</a></h3>'.
 
 			n.'<div id="textile_lite_help" style="display: none;">'.
 
