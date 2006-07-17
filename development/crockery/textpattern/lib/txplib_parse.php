@@ -8,7 +8,7 @@ $LastChangedRevision: $
 */
 
 // --------------------------------------------------------------
-	function EvalElse($thing, $condition) 
+	function EvalElse($thing, $condition)
 	{
 		$f = '@(</?txp:\S+\b.*(?:(?<!br )/)?'.chr(62).')@sU';
 
@@ -44,13 +44,6 @@ $LastChangedRevision: $
 		global $txp_current_tag;
 		trace_add("[$txp_current_tag: ".($condition ? gTxt('true') : gTxt('false'))."]");
 		return ($condition ? $parts[0] : $parts[1]);
-	}
-
-// -------------------------------------------------------------
-	function parse($text)
-	{
-		$f = '/<txp:(\S+)\b(.*)(?:(?<!br )(\/))?'.chr(62).'(?(3)|(.+)<\/txp:\1>)/sU';
-		return preg_replace_callback($f, 'processTags', $text);
 	}
 
 // -------------------------------------------------------------
@@ -117,7 +110,7 @@ $LastChangedRevision: $
 	}
 
 // --------------------------------------------------------------
-	function parse2($thing) 
+	function parse($thing)
 	{
 		$f = '@(</?txp:\S+\b.*(?:(?<!br )/)?'.chr(62).')@sU';
 
@@ -137,7 +130,7 @@ $LastChangedRevision: $
 					if (empty($stack))
 						$tag = $m;
 					else
-						$inside .= $chunk;	
+						$inside .= $chunk;
 
 					array_push($stack, $m[2]);
 				}
@@ -180,5 +173,6 @@ $LastChangedRevision: $
 
 		return $out;
 	}
+
 
 ?>
