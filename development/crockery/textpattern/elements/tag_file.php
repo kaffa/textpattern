@@ -6,6 +6,9 @@ $LastChangedRevision: $
 
 */
 
+
+//--------------------------------------------------------------------------
+
 	function file_download_list($atts)
 	{
 		global $thisfile;
@@ -359,7 +362,20 @@ $LastChangedRevision: $
 	function file_download_category($atts)
 	{
 		global $thisfile;
-		return $thisfile['category'];
+
+		extract(lAtts(array(
+			'class'   => '',
+			'escape'  => '',
+			'wraptag' => ''
+		), $atts));
+
+		if ($thisfile['category'])
+		{
+			$category = ($escape == 'html') ? 
+				escape_output($thisfile['category']) : $thisfile['category'];
+
+			return ($wraptag) ? doTag($category, $wraptag, $class) : $category;
+		}
 	}
 
 //--------------------------------------------------------------------------
@@ -377,11 +393,18 @@ $LastChangedRevision: $
 		global $thisfile;
 
 		extract(lAtts(array(
-			'escape' => '',
+			'class'   => '',
+			'escape'  => '',
+			'wraptag' => ''
 		), $atts));
 
-		return ($escape == 'html') ?
-			escape_output($thisfile['description']) : $thisfile['description'];
+		if ($thisfile['description'])
+		{
+			$description = ($escape == 'html') ?
+				escape_output($thisfile['description']) : $thisfile['description'];
+
+			return ($wraptag) ? doTag($description, $wraptag, $class) : $description;
+		}
 	}
 
 ?>
