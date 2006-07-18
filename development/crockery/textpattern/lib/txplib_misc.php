@@ -375,12 +375,9 @@ $LastChangedRevision: 1127 $
 		if (is_array($plugins) and in_array($name,$plugins)) {
 			return true;
 		}
-		
+
 		if (!empty($prefs['plugin_cache_dir'])) {
-			$dir = rtrim($prefs['plugin_cache_dir'], '/') . '/';
-			# in case it's a relative path
-			if (!is_dir($dir))
-				$dir = rtrim(realpath(txpath.'/'.$dir), '/') . '/';
+			$dir = rtrim(abspath($prefs['plugin_cache_dir']), '/') . '/';
 			if (is_file($dir . $name . '.php')) {
 				$plugins[] = $name;
 				set_error_handler("pluginErrorHandler");
@@ -391,20 +388,20 @@ $LastChangedRevision: 1127 $
 				return true;
 			}
 		}
-							
+
 		$rs = safe_row("name,code,version","txp_plugin","status='1' AND name='".doSlash($name)."'");
 		if ($rs) {
 			$plugins[] = $rs['name'];
 			$plugins_ver[$rs['name']] = $rs['version'];
-			
+
 			set_error_handler("pluginErrorHandler");
 			$txp_current_plugin = $rs['name'];
 			eval($rs['code']);
 			restore_error_handler();
-			
-			return true;	
+
+			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -414,7 +411,7 @@ $LastChangedRevision: 1127 $
 		if (!load_plugin($name))
 			trigger_error("Unable to include required plugin \"{$name}\"",E_USER_ERROR);
 	}
-	
+
 // -------------------------------------------------------------
 	function include_plugin($name)
 	{
@@ -460,14 +457,11 @@ $LastChangedRevision: 1127 $
    function load_plugins($type=NULL)
    {
 		global $prefs,$plugins, $plugins_ver;
-		
+
 		if (!is_array($plugins)) $plugins = array();
-		
+
 		if (!empty($prefs['plugin_cache_dir'])) {
-			$dir = rtrim($prefs['plugin_cache_dir'], '/') . '/';
-			# allow a relative path
-			if (!is_dir($dir))
-				$dir = rtrim(realpath(txpath.'/'.$dir), '/') . '/';
+			$dir = rtrim(abspath($prefs['plugin_cache_dir']), '/') . '/';
 			$dh = @opendir($dir);
 			while ($dh and false !== ($f = @readdir($dh))) {
 				if ($f{0} != '.')
@@ -488,7 +482,7 @@ $LastChangedRevision: 1127 $
 					$plugins_ver[$a['name']] = $a['version'];
 					$GLOBALS['txp_current_plugin'] = $a['name'];
 					$eval_ok = eval($a['code']);
-					if ($eval_ok === FALSE) 
+					if ($eval_ok === FALSE)
 						echo gTxt('plugin_load_error_above').strong($a['name']).n.br;
 					unset($GLOBALS['txp_current_plugin']);
 				}
