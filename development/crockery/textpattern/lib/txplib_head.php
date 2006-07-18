@@ -161,7 +161,7 @@ $LastChangedRevision: 1098 $
   <td valign="middle" style="width:368px">&nbsp;'.$message.'</td>';
 
   			foreach (areas() as $a => $tabs) {
-				if (has_privs("tab.{$a}"))
+				if ($tabs and has_privs("tab.{$a}"))
 					echo areatab(gTxt("tab_{$a}"), $a, array_shift($tabs), $area);
 			}
 
