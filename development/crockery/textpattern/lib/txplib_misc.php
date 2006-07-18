@@ -1601,8 +1601,22 @@ eod;
 		global $thisarticle, $stack_article;
 		$thisarticle = array_pop($stack_article);
 	}
-// -------------------------------------------------------------
 
+// -------------------------------------------------------------
+	function abspath($path, $pfx = txpath) {
+		// safely resolve a path like '/foo/bar/baz' or 'bar/baz' or '../foo'
+		// nb, the file or directory must exist if it's relative
+		$path = trim($path);
+		$pfx = realpath($pfx);
+		if (!$path)
+			return $pfx;
+		elseif ($path{0} == DS)
+			return realpath($path);
+		else
+			return realpath(rtrim($pfx, DS).DS.ltrim($path, DS));
+	}
+
+// -------------------------------------------------------------
 	function relative_path($path, $pfx=NULL)
 	{
 		if ($pfx === NULL)
