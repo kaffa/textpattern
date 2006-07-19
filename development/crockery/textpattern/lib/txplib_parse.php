@@ -10,11 +10,11 @@ $LastChangedRevision: $
 // --------------------------------------------------------------
 	function EvalElse($thing, $condition)
 	{
-		$f = '@(</?txp:\S+\b.*(?:(?<!br )/)?'.chr(62).')@sU';
+		$f = '@(</?txp:\S+\b.*(?:/)?(?<!\\\\)>)@sU';
 
 		$parsed = preg_split($f, $thing, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
-		$tagpat = '@^<(/?)txp:(\w+).*?(/?)>$@';
+		$tagpat = '@^<(/?)txp:(\w+).*?(/?)(?<!\\\\)>$@';
 
 		$parts = array(0 => '', 1 => '');
 		$in = 0;
