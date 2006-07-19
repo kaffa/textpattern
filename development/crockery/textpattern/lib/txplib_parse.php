@@ -140,7 +140,7 @@ $LastChangedRevision: $
 						trigger_error(gTxt('parse_tag_mismatch', array('code', $chunk)));
 					
 					if (empty($stack)) {
-						$out .= processTags(array('blah', $m[2], $m[3], '', $inside));
+						$out .= processTags(array('blah', $tag[2], $tag[3], '', $inside));
 						$inside = '';
 					}
 					else
