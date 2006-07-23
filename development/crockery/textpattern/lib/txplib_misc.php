@@ -252,13 +252,13 @@ $LastChangedRevision: 1127 $
 	function gps($thing) // checks GET and POST for a named variable, or creates it blank
 	{
 		if (isset($_GET[$thing])) {
-			if (get_magic_quotes_gpc()) {
+			if (MAGIC_QUOTES_GPC) {
 				return doStrip($_GET[$thing]);
 			} else {
 				return $_GET[$thing];
 			}
 		} elseif (isset($_POST[$thing])) {
-			if (get_magic_quotes_gpc()) {
+			if (MAGIC_QUOTES_GPC) {
 				return doStrip($_POST[$thing]);
 			} else {
 				return $_POST[$thing];
@@ -283,7 +283,7 @@ $LastChangedRevision: 1127 $
 	function ps($thing) // checks POST for a named variable, or creates it blank
 	{
 		if (isset($_POST[$thing])) {
-			if (get_magic_quotes_gpc()==1) {
+			if (MAGIC_QUOTES_GPC) {
 				return doStrip($_POST[$thing]);
 			} else {
 				return $_POST[$thing];
@@ -314,7 +314,7 @@ $LastChangedRevision: 1127 $
 	function stripPost() 
 	{
 		if (isset($_POST)) {
-			if (get_magic_quotes_gpc()==1) {
+			if (MAGIC_QUOTES_GPC) {
 				return doStrip($_POST);
 			} else {
 				return $_POST;
@@ -333,11 +333,11 @@ $LastChangedRevision: 1127 $
  	function pcs($thing) //	Get a var from POST or COOKIE; if not, create it 
 	{
 		if (isset($_COOKIE["txp_".$thing])) {
-			if (get_magic_quotes_gpc()) {
+			if (MAGIC_QUOTES_GPC) {
 				return doStrip($_COOKIE["txp_".$thing]);
 			} else return $_COOKIE["txp_".$thing];
 		} elseif (isset($_POST[$thing])) {
-			if (get_magic_quotes_gpc()) {
+			if (MAGIC_QUOTES_GPC) {
 				return doStrip($_POST[$thing]);
 			} else return $_POST[$thing];
 		} 
@@ -348,7 +348,7 @@ $LastChangedRevision: 1127 $
  	function cs($thing) //	Get a var from COOKIE; if not, create it 
 	{
 		if (isset($_COOKIE[$thing])) {
-			if (get_magic_quotes_gpc()) {
+			if (MAGIC_QUOTES_GPC) {
 				return doStrip($_COOKIE[$thing]);
 			} else return $_COOKIE[$thing];
 		}

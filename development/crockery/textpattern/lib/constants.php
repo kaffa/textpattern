@@ -24,7 +24,10 @@ if (defined('DIRECTORY_SEPARATOR'))
 else
 	define ('DS', (is_windows() ? '\\' : '/'));
 
+define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
+
 define('prefs_dir', 'prefs');
 
 error_reporting($old_level);unset($old_level);
+
 ?>
