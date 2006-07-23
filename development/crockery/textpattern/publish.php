@@ -393,7 +393,9 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function textpattern() 
 	{
-		global $pretext,$microstart,$prefs,$qcount,$qtime,$production_status,$txptrace,$siteurl;
+		global $pretext,$microstart,$prefs,$qcount,$qtime,$production_status,$txptrace,$siteurl,$has_article_tag;
+
+		$has_article_tag = false;
 
 		callback_event('textpattern');
 
@@ -413,6 +415,10 @@ $LastChangedRevision$
 		$html = parse($html); // the function so nice, he ran it twice
 		restore_error_handler();
 		$html = ($prefs['allow_page_php_scripting']) ? evalString($html) : $html;
+
+		// make sure the page has an article tag if necessary
+		if (!$has_article_tag and (!empty($pretext['id']) or !empty($pretext['c']) or !empty($pretext['q']) or !empty($pretext['pg'])))
+			trigger_error(gTxt('missing_article_tag', array('{page}' => $pretext['page'])));
 
 		header("Content-type: text/html; charset=utf-8");
 		echo $html;
@@ -450,11 +456,12 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function article($atts)
 	{
-		global $is_article_body;
+		global $is_article_body, $has_article_tag;
 		if ($is_article_body) {
 			trigger_error(gTxt('article_tag_illegal_body'));
 			return '';
 		}
+		$has_article_tag = true;
 		return parseArticles($atts);
 	}
 
@@ -620,8 +627,9 @@ $LastChangedRevision$
 			$pageout['grand_total'] = $grand_total;
 			$pageout['total']    = $total;
 
-			global $thispage;	
-			$thispage = $pageout;
+			global $thispage;
+			if (empty($thispage))
+				$thispage = $pageout;
 			if ($pgonly)
 				return;
 		}else{
