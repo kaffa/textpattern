@@ -34,120 +34,127 @@ $LastChangedRevision: 1098 $
 	<script type="text/javascript" src="js/textpattern.js"></script>
 	<script language="JavaScript" type="text/javascript">
 	<!--
-		function verify(msg) { return confirm(msg); }
 
-		var date = new Date();
-		date.setTime(date.getTime()+(60*1000));
-		var expires = "; expires="+date.toGMTString();
-		document.cookie="testcookie=enabled"+expires+"; path=/";
-		cookieEnabled=(document.cookie.length>2)? true : false
-		date.setTime(date.getTime()-(60*1000));
-		var expires = "; expires="+date.toGMTString();
-		document.cookie="testcookie"+expires+"; path=/"; //erase dummy value
-		if(!cookieEnabled){
-			confirm(<?php echo "'".trim(gTxt('cookies_must_be_enabled'))."'"; ?>)
-		}
+		var cookieEnabled = checkCookies();
 
-		function toggleDisplay(obj_id) {
-			if (document.getElementById){
-				var obj = document.getElementById(obj_id);
-				if (obj.style.display == '' || obj.style.display == 'none'){
-					var state = 'block';
-				} else {
-					var state = 'none';
-				}
-				obj.style.display = state;
-			}
-		}
-
-		function selectall() {
-			var cnt = 0;
-			var elem = window.document.longform.elements;
-			cnt = elem.length;
-			for (var i=0; i < cnt; i++) elem[i].checked = true;
-		}
-		
-		function deselectall() {
-			var cnt = 0;
-			var elem = window.document.longform.elements;
-			cnt = elem.length;
-			for (var i=0; i < cnt; i++) elem[i].checked = false;
-		}
-		
-		function selectrange() {
-			var inrange = false;
-			var cnt = 0;
-			var elem = window.document.longform.elements;
-			cnt = elem.length;
-			for (var i=0; i < cnt; i++) {
-				if (elem[i].type == 'checkbox') {
-					if (elem[i].checked == true) {
-						if (!inrange) inrange = true;
-						else inrange = false;
-					}
-					if (inrange) elem[i].checked = true;
-				}
-			}
-		}
+		if (!cookieEnabled)
+		{
+			confirm('<?php echo trim(gTxt('cookies_must_be_enabled')); ?>');
+		}	
 <?php
-	if ($event == 'list') {
-?>		
+
+	if ($event == 'list')
+	{
+		$sections = '';
+
+		$rs = safe_column('name', 'txp_section', "name != 'default'");
+
+		if ($rs)
+		{
+			$sections = str_replace("\n", '', stripslashes(selectInput('Section', $rs, '', true)));
+		}
+
+		$category1 = '';
+		$category2 = '';
+
+		$rs = getTree('root', 'article');
+
+		if ($rs)
+		{
+			$category1 = str_replace("\n", '', treeSelectInput('Category1', $rs, ''));
+			$category2 = str_replace("\n", '', treeSelectInput('Category2', $rs, ''));
+		}
+
+		$statuses = str_replace("\n", '', stripslashes(selectInput('Status', array(
+			1 => gTxt('draft'),
+			2 => gTxt('hidden'),
+			3 => gTxt('pending'),
+			4 => gTxt('live'),
+			5 => gTxt('sticky'),
+		), '', true)));
+
+		$comments_annotate = onoffRadio('Annotate', safe_field('val', 'txp_prefs', "name = 'comments_on_default'"));
+
+		$authors = '';
+
+		$rs = safe_column('name', 'txp_users', "privs not in(0,6)");
+
+		if ($rs)
+		{
+			$authors = str_replace("\n", '', stripslashes(selectInput('AuthorID', $rs, '', true)));
+		}
+
+		// output JavaScript
+?>
 		function poweredit(elm)
 		{
-			
-<?php
-			$sections = '';
-			$rs = safe_column("name", "txp_section", "name!='default'");
-			if ($rs) {	
-				$sections = str_replace("\n",'',stripslashes(selectInput("Section", $rs, '',1)));
-			}
-			
-			$statuses = str_replace("\n",'',stripslashes(selectInput('Status',array(
-					1 => gTxt('draft'),
-					2 => gTxt('hidden'),
-					3 => gTxt('pending'),
-					4 => gTxt('live'),
-					5 => gTxt('sticky'),
-			),'')));
+			var something = elm.options[elm.selectedIndex].value;
 
-			$comments_annotate = onoffRadio('Annotate', safe_field('val', 'txp_prefs', "name = 'comments_on_default'"));
-?>
-			something = elm.options[elm.selectedIndex].value;
 			// Add another chunk of HTML
-			pjs = document.getElementById('js');
-			if(pjs == null) {
-				br = document.createElement('br');
+			var pjs = document.getElementById('js');
+
+			if (pjs == null)
+			{
+				var br = document.createElement('br');
 				elm.parentNode.appendChild(br);
+
 				pjs = document.createElement('P');
 				pjs.setAttribute('id','js');
 				elm.parentNode.appendChild(pjs);
 			}
-			
-			if(pjs.style.display == 'none' || pjs.style.display == '') pjs.style.display = 'block';
-			
-			if(something!='' && something == 'changesection'){
-				sects = '<?php echo $sections; ?>';
-				pjs.innerHTML = '<span><?php echo gTxt('section') ?>: '+sects+'</span>';
-			}else if(something!='' && something == 'changestatus'){
-				stats = '<?php echo $statuses; ?>';
-				pjs.innerHTML = '<span><?php echo gTxt('status') ?>: '+stats+'</span>';
-			}else if(something!='' && something == 'changecomments'){
-				stats = '<?php echo $comments_annotate; ?>';
-				pjs.innerHTML = '<span><?php echo gTxt('comments'); ?>: '+stats+'</span>';
-			}else{
-				pjs.style.display = 'none';
+
+			if (pjs.style.display == 'none' || pjs.style.display == '')
+			{
+				pjs.style.display = 'block';
 			}
-			
+
+			if (something != '')
+			{
+				switch (something)
+				{
+					case 'changesection':
+						var sections = '<?php echo $sections; ?>';
+						pjs.innerHTML = '<span><?php echo gTxt('section') ?>: '+sections+'</span>';
+					break;
+
+					case 'changecategory1':
+						var categories = '<?php echo $category1; ?>';
+						pjs.innerHTML = '<span><?php echo gTxt('category1') ?>: '+categories+'</span>';
+					break;
+
+					case 'changecategory2':
+						var categories = '<?php echo $category2; ?>';
+						pjs.innerHTML = '<span><?php echo gTxt('category2') ?>: '+categories+'</span>';
+					break;
+
+					case 'changestatus':
+						var statuses = '<?php echo $statuses; ?>';
+						pjs.innerHTML = '<span><?php echo gTxt('status') ?>: '+statuses+'</span>';
+					break;
+
+					case 'changecomments':
+						var comments = '<?php echo $comments_annotate; ?>';
+						pjs.innerHTML = '<span><?php echo gTxt('comments'); ?>: '+comments+'</span>';
+					break;
+
+					case 'changeauthor':
+						var authors = '<?php echo $authors; ?>';
+						pjs.innerHTML = '<span><?php echo gTxt('author'); ?>: '+authors+'</span>';
+					break;
+
+					default:
+						pjs.style.display = 'none';
+					break;
+				}
+			}
+
 			return false;
 		}
-		
-		window.onload = function(){
-			withsel = document.getElementById('withselected');
-			if(withsel.options[withsel.selectedIndex].value != '') return (withsel.selectedIndex = 0);
-		}
+
+		addEvent(window, 'load', cleanSelects);
 <?php
 	}
-?>		
+?>
 	-->
 	</script>
 	</head>
