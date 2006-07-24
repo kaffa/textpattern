@@ -19,7 +19,6 @@ $LastChangedRevision$
 	global $extensions;
 	$extensions = array(0,'.gif','.jpg','.png','.swf');
 	define("IMPATH",$path_to_site.'/'.$img_dir.'/');
-	#include txpath.'/lib/class.thumb.php';
 	include txpath.'/lib/txplib_image.php';
 
 	if ($event == 'image') {
