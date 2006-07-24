@@ -19,7 +19,7 @@ $LastChangedRevision$
 	global $extensions;
 	$extensions = array(0,'.gif','.jpg','.png','.swf');
 	define("IMPATH",$path_to_site.'/'.$img_dir.'/');
-	include txpath.'/lib/txplib_image.php';
+	include_once(txpath.'/lib/txplib_image.php');
 
 	if ($event == 'image') {
 		require_privs('image');		
