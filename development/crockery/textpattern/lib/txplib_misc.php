@@ -1614,7 +1614,6 @@ eod;
 	function secpath($path, $pfx = txpath) {
 		// similar to abspath, but the result must reside within $pfx
 		$abs = abspath($path, $pfx);
-		dmp($abs, $path, $pfx);
 		if (substr($abs, 0, strlen($pfx)) == realpath($pfx))
 			return $abs;
 		return false;
