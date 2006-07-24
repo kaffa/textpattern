@@ -12,7 +12,7 @@ function img_newsize($old_w, $old_h, $max_w, $max_h, $crop=0) {
 
 	if (!$max_w) $max_w = $max_h;
 	if (!$max_h) $max_h = $max_w;
-	
+
 	if (!$max_w or !$max_h)
 		return false;
 
@@ -34,14 +34,7 @@ function img_newsize($old_w, $old_h, $max_w, $max_h, $crop=0) {
 		$crop_w = $old_w;
 		$crop_h = $old_h;
 
-		$ratio = min($max_w / $old_w, $max_h / $old_h);
-
-		# never scale up
-		if ($ratio > 1.0)
-			$ratio = 1.0;
-
-		$new_w = floor($old_w * $ratio);
-		$new_h = floor($old_h * $ratio);
+		list($new_w, $new_h) = img_fit($old_w, $old_h, $max_w, $max_h);
 	}
 
 	# int dst_x, int dst_y, int src_x, int src_y, int dst_w, int dst_h, int src_w, int src_h
@@ -92,6 +85,14 @@ function img_downsize($old_fn, $new_fn, $max_w, $max_h, $crop=0, $q=75, $interla
 		return false;
 	}
 
+}
+
+// fit an image into a bounding box
+function img_fit($old_w, $old_h, $max_w, $max_h) {
+
+	$ratio = min(1.0, $max_w / $old_w, $max_h / $old_h);
+
+	return array(floor($old_w * $ratio), floor($old_h * $ratio));
 }
 
 function img_makethumb($id, $w, $h, $crop) {
