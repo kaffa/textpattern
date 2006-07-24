@@ -19,9 +19,10 @@ $LastChangedRevision$
 	global $extensions;
 	$extensions = array(0,'.gif','.jpg','.png','.swf');
 	define("IMPATH",$path_to_site.'/'.$img_dir.'/');
-	include txpath.'/lib/class.thumb.php';
+	#include txpath.'/lib/class.thumb.php';
+	include txpath.'/lib/txplib_image.php';
 
-	if ($event == 'image') {	
+	if ($event == 'image') {
 		require_privs('image');		
 
 		if(!$step or !in_array($step, array('image_list','image_edit','image_insert','image_delete','image_replace','image_save','thumbnail_insert','image_change_pageby','thumbnail_create'
@@ -472,16 +473,10 @@ $LastChangedRevision$
 			image_edit(messenger('invalid_width_or_height',"($width)/($height)", ''),$id);
 			return;
 		}
-		
+
 		$crop = gps('crop');
-		
-		$t = new txp_thumb( $id );
-		$t->crop = ($crop == '1');
-		$t->hint = '0';
-		if ( is_numeric ($width)) $t->width = $width;
-		if ( is_numeric ($height)) $t->height = $height;
-		
-		if ($t->write()) {
+
+		if (img_makethumb($id, $width, $height, $crop)) {
 			global $prefs;
 			$prefs['thumb_w'] = $width;
 			$prefs['thumb_h'] = $height;
@@ -557,12 +552,7 @@ $LastChangedRevision$
 					chmod($newpath,0755);
 					// Auto-generate a thumbnail using the last settings
 					if (isset($prefs['thumb_w'], $prefs['thumb_h'], $prefs['thumb_crop'])) {
-						$t = new txp_thumb( $id );
-						$t->crop = ($prefs['thumb_crop'] == '1');
-						$t->hint = '0';
-						if ( is_numeric ($prefs['thumb_w'])) $t->width = $prefs['thumb_w'];
-						if ( is_numeric ($prefs['thumb_h'])) $t->height = $prefs['thumb_h'];
-						$t->write();
+						img_makethumb($id, $prefs['thumb_w'], $prefs['thumb_h'], $prefs['thumb_crop']);
 					}
 					return array(messenger('image',$name,'uploaded'),$id);
 				}
