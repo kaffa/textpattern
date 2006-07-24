@@ -57,21 +57,25 @@ define('elements_dir', 'elements');
 	}
 
 // -------------------------------------------------------------
-	function build_element_list($ini_file='elements.ini.php')
+	function build_element_list($ini_file)
 	{
 		global $elements;
 
-		$e = @parse_ini_file(secpath($ini_file, txpath.DS.elements_dir), true);
-		if ($e) {
-			foreach ($e as $name => $row) {
-				$er = array_merge(array(
-					'name' => $name,
-					'event' => 'null',
-					'status' => '1',
-				), $row);
+		$ini_file = secpath($ini_file, txpath.DS.elements_dir);
 
-				if (!empty($er['status']))
-					$elements[$name] = $er;
+		if (file_exists($ini_file)) {
+			$e = parse_ini_file($ini_file, true);
+			if ($e) {
+				foreach ($e as $name => $row) {
+					$er = array_merge(array(
+						'name' => $name,
+						'event' => 'null',
+						'status' => '1',
+					), $row);
+
+					if (!empty($er['status']))
+						$elements[$name] = $er;
+				}
 			}
 		}
 
@@ -81,8 +85,6 @@ define('elements_dir', 'elements');
 	function load_elements($event)
 	{
 		global $elements;
-
-		build_element_list();
 
 		if (is_array($elements)) {
 			foreach ($elements as $e) {

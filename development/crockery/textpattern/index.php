@@ -77,12 +77,15 @@ $LastChangedRevision$
 	
 		include txpath.'/include/txp_auth.php';
 		doAuth();
-		
+
+		build_element_list($elements_main);
+		if ($elements_aux)
+			build_element_list($elements_aux);
 		load_elements('init');
 
 		$event = (gps('event') ? gps('event') : 'article');
 		$step = gps('step');
-		
+
 		if (!$dbversion or ($dbversion != $thisversion) or $txp_using_svn)
 		{
 			define('TXP_UPDATE', 1);
@@ -99,7 +102,7 @@ $LastChangedRevision$
 		// ugly hack, for the people that don't update their admin_config.php
 		// Get rid of this when we completely remove admin_config and move privs to db
 		if ($event == 'list') 		
-			require_privs('article'); 
+			require_privs('article');
 		else 
 			require_privs($event);
 
