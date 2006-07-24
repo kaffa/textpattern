@@ -126,5 +126,20 @@ define('elements_dir', 'elements');
 
 	}
 
+// -------------------------------------------------------------
+	function add_element($name, $event, $type = 0, $required=1)
+	{
+		// type == 0 means load at startup
+		// type == 1 means load only when included or required
+
+		return safe_upsert('txp_element',
+		   "event='".doSLash($event)."',
+			required='".doSlash($required)."',
+			type='".doSlash($type)."',
+			status='1',
+			created=now(),
+			modified=now()",
+			"name='".doSlash($name)."'");
+	}
 
 ?>
