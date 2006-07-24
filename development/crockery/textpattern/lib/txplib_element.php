@@ -22,17 +22,14 @@ define('elements_dir', 'elements');
 
 		extract($elements[$name]);
 
-		$dir = realpath(txpath.DS.elements_dir);
-		$file = $dir.DS.$name.'.php';
+		$dir = abspath(elements_dir);
+		$file = secpath($name.'.php', $dir);
+		
+		if ($file == false)
+			trigger_error("$file path is invalid ($dir)", E_USER_ERROR);
 
 		if (!is_file($file) or !is_readable($file))
 			trigger_error("$file is inaccessible", E_USER_ERROR);
-
-		if (strncmp($dir, realpath($file), strlen($dir)) !== 0)
-			trigger_error("$file directory is invalid ($dir)", E_USER_ERROR);
-
-		if (!empty($hash) and $hash != ($md5 = md5_file($file)))
-			trigger_error("$file hash check failed: $hash != $md5", E_USER_ERROR);
 
 		$elements[$name]['loaded'] = 1;
 		return include_once($file);
@@ -60,33 +57,38 @@ define('elements_dir', 'elements');
 	}
 
 // -------------------------------------------------------------
-	function build_element_list()
+	function build_element_list($ini_file='elements.ini.php')
 	{
 		global $elements;
 
-		// only do this the first time load_elements() is called
-		if (!isset($elements)) {
-			$elements = array();
-			$rs = safe_rows_start('*', 'txp_element', "status = '1'");
-			while ($row = nextRow($rs))
-				$elements[$row['name']] = $row;
+		$e = @parse_ini_file(secpath($ini_file, txpath.DS.elements_dir), true);
+		if ($e) {
+			foreach ($e as $name => $row) {
+				$er = array_merge(array(
+					'name' => $name,
+					'event' => 'null',
+					'status' => '1',
+				), $row);
+
+				if (!empty($er['status']))
+					$elements[$name] = $er;
+			}
 		}
+
 	}
 
 // -------------------------------------------------------------
-	function load_elements($event, $step)
+	function load_elements($event)
 	{
-		global $elements, $prefs;
+		global $elements;
 
 		build_element_list();
 
-		foreach ($elements as $e) {
-			// type == 0 means load at startup
-			// type == 1 means load only when included or required
-			if ($e['type'] == 0 and
-				($e['event'] == '' or $e['event'] == $event) and
-				($e['step'] == '' or $e['step'] == $step)) {
-				load_element($e['name']);
+		if (is_array($elements)) {
+			foreach ($elements as $e) {
+				if ($e['event'] == $event) {
+					load_element($e['name']);
+				}
 			}
 		}
 	}
@@ -126,20 +128,5 @@ define('elements_dir', 'elements');
 
 	}
 
-// -------------------------------------------------------------
-	function add_element($name, $event, $type = 0, $required=1)
-	{
-		// type == 0 means load at startup
-		// type == 1 means load only when included or required
-
-		return safe_upsert('txp_element',
-		   "event='".doSLash($event)."',
-			required='".doSlash($required)."',
-			type='".doSlash($type)."',
-			status='1',
-			created=now(),
-			modified=now()",
-			"name='".doSlash($name)."'");
-	}
 
 ?>

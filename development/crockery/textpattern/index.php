@@ -77,6 +77,8 @@ $LastChangedRevision$
 	
 		include txpath.'/include/txp_auth.php';
 		doAuth();
+		
+		load_elements('init');
 
 		$event = (gps('event') ? gps('event') : 'article');
 		$step = gps('step');
@@ -87,7 +89,7 @@ $LastChangedRevision$
 			include txpath.'/update/_update.php';
 		}
 
-		load_elements($event, $step);
+		load_elements($event);
 
 		if (!empty($admin_side_plugins) and gps('event') != 'plugin')
 			load_plugins(1);
