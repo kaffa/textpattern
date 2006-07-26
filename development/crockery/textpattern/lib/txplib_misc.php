@@ -249,7 +249,7 @@ $LastChangedRevision: 1127 $
 	}
 
 // -------------------------------------------------------------
-	function gps($thing) // checks GET and POST for a named variable, or creates it blank
+	function gps($thing, $default='') // checks GET and POST for a named variable, or creates it blank
 	{
 		if (isset($_GET[$thing])) {
 			if (MAGIC_QUOTES_GPC) {
@@ -264,7 +264,7 @@ $LastChangedRevision: 1127 $
 				return $_POST[$thing];
 			}
 		}
-		return '';
+		return $default;
 	}
 
 // -------------------------------------------------------------
@@ -280,7 +280,7 @@ $LastChangedRevision: 1127 $
 	}
 
 // -------------------------------------------------------------
-	function ps($thing) // checks POST for a named variable, or creates it blank
+	function ps($thing, $default='') // checks POST for a named variable, or creates it blank
 	{
 		if (isset($_POST[$thing])) {
 			if (MAGIC_QUOTES_GPC) {
@@ -289,7 +289,7 @@ $LastChangedRevision: 1127 $
 				return $_POST[$thing];
 			}
 		}
-		return '';
+		return $default;
 	}
 
 // -------------------------------------------------------------
@@ -330,7 +330,7 @@ $LastChangedRevision: 1127 $
 	}
 
 // -------------------------------------------------------------
- 	function pcs($thing) //	Get a var from POST or COOKIE; if not, create it 
+ 	function pcs($thing, $default='') //	Get a var from POST or COOKIE; if not, create it
 	{
 		if (isset($_COOKIE["txp_".$thing])) {
 			if (MAGIC_QUOTES_GPC) {
@@ -341,18 +341,18 @@ $LastChangedRevision: 1127 $
 				return doStrip($_POST[$thing]);
 			} else return $_POST[$thing];
 		} 
-		return '';
+		return $default;
 	}
 
 // -------------------------------------------------------------
- 	function cs($thing) //	Get a var from COOKIE; if not, create it 
+ 	function cs($thing, $default='') //	Get a var from COOKIE; if not, create it
 	{
 		if (isset($_COOKIE[$thing])) {
 			if (MAGIC_QUOTES_GPC) {
 				return doStrip($_COOKIE[$thing]);
 			} else return $_COOKIE[$thing];
 		}
-		return '';
+		return $default;
 	}
 
 // -------------------------------------------------------------
@@ -526,7 +526,7 @@ $LastChangedRevision: 1127 $
 	}
 
 // -------------------------------------------------------------
-	function register_tab($area, $event, $title) 
+	function register_tab($area, $event, $title)
 	{
 		global $plugin_areas;
 		
