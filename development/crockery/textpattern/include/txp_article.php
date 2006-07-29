@@ -303,7 +303,7 @@ if (!empty($event) and $event == 'article') {
 
 		pagetop($Title, $message);
 
-		echo n.n.'<form name="article" method="post" action="index.php">';
+		echo n.n.'<form name="article" method="post" action="index.php" enctype="multipart/form-data">';
 
 		if (!empty($store_out))
 		{
