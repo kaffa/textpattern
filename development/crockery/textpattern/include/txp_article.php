@@ -727,14 +727,7 @@ if (!empty($event) and $event == 'article') {
 
 	function category_popup($name, $val, $id)
 	{
-		$rs = getTree('root', 'article');
-
-		if ($rs)
-		{
-			return treeSelectInput($name,$rs,$val, $id);
-		}
-
-		return false;
+		return categorySelectInput('article', $name, $val, $id);
 	}
 
 //--------------------------------------------------------------
