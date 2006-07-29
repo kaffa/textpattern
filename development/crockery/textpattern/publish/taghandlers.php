@@ -1008,75 +1008,81 @@ $LastChangedRevision$
 
 	function link_to_next($atts, $thing)
 	{
-		global $thisarticle, $id;
-		global $next_id, $next_title, $next_utitle, $next_posted;
+		global $id, $next_id, $next_title;
 
 		extract(lAtts(array(
 			'showalways' => 0,
 		), $atts));
 
-		if (!is_numeric(@$id))
+		if (intval($id) == 0)
 		{
+			global $thisarticle, $s;
+
 			extract(getNextPrev(
-				@$thisarticle['thisid'], 
-				@strftime('%Y-%m-%d %H:%M:%S', 
-				$thisarticle['posted']
-			), @$GLOBALS['s']));
+				@$thisarticle['thisid'],
+				@strftime('%Y-%m-%d %H:%M:%S', $thisarticle['posted']),
+				@$s
+			));
 		}
 
-		if ($thing)
+		if ($next_id)
 		{
-			return ($next_id) ? 
-				tag(
-					parse($thing), 'a', 
-						' rel="next" href="'.permlinkurl_id($next_id).'"'.
-						( ($next_title and $next_title != $thing) ? ' title="'.$next_title.'"' : '' )
-				) : 
-				($showalways ? parse($thing) : '');
+			$url = permlinkurl_id($next_id);
+
+			if ($thing)
+			{
+				$thing = parse($thing);
+
+				return '<a rel="next" href="'.$url.'"'.
+					($next_title != $thing ? ' title="'.$next_title.'"' : '').
+					'>'.parse($thing).'</a>';
+			}
+
+			return $url;
 		}
 
-		else
-		{
-			return ($next_id) ? permlinkurl_id($next_id) : '';
-		}
+		return ($showalways) ? parse($thing) : '';
 	}
-		
+
 // -------------------------------------------------------------
 // link to next article, if it exists
 
 	function link_to_prev($atts, $thing) 
 	{
-		global $thisarticle, $id;
-		global $prev_id, $prev_title, $prev_utitle, $prev_posted;
+		global $id, $prev_id, $prev_title;
 
 		extract(lAtts(array(
 			'showalways' => 0,
 		), $atts));
 
-		if (!is_numeric(@$id))
+		if (intval($id) == 0)
 		{
+			global $thisarticle, $s;
+
 			extract(getNextPrev(
-				$thisarticle['thisid'], 
-				@strftime('%Y-%m-%d %H:%M:%S', 
-				$thisarticle['posted']
-			), @$GLOBALS['s']));
+				$thisarticle['thisid'],
+				@strftime('%Y-%m-%d %H:%M:%S', $thisarticle['posted']), 
+				@$s
+			));
 		}
 
-		if ($thing)
+		if ($prev_id)
 		{
-			return ($prev_id) ? 
-				tag(
-					parse($thing), 'a', 
-						' rel="prev" href="'.permlinkurl_id($prev_id).'"'.
-						( ($prev_title and $prev_title != $thing) ? ' title="'.$prev_title.'"' : '' )
-				) : 
-				($showalways ? parse($thing) : '');
+			$url = permlinkurl_id($prev_id);
+
+			if ($thing)
+			{
+				$thing = parse($thing);
+
+				return '<a rel="prev" href="'.$url.'"'.
+					($prev_title != $thing ? ' title="'.$prev_title.'"' : '').
+					'>'.$thing.'</a>';
+			}
+
+			return $url;
 		}
 
-		else
-		{
-			return ($prev_id) ? permlinkurl_id($prev_id) : '';
-		}
+		return ($showalways) ? parse($thing) : '';
 	}
 
 // -------------------------------------------------------------
@@ -1118,86 +1124,79 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function newer($atts, $thing = false, $match='')  
+
+	function newer($atts, $thing = false, $match = '')
 	{
-		global $thispage, $permlink_mode, $pretext;
-		extract($pretext);
-				
-		if (is_array($atts))
-		{
-			extract($atts);
-		}
+		global $thispage, $pretext, $permlink_mode;
 
- 		if (is_array($thispage))
-		{
- 			extract($thispage);
-		}
+		extract(lAtts(array(
+			'showalways' => 0,
+		), $atts));
 
-		if ($numPages > 1 && $pg > 1)
+		$numPages = $thispage['numPages'];
+		$pg				= $thispage['pg'];
+
+		if ($numPages > 1 and $pg > 1)
 		{
 			$nextpg = ($pg - 1 == 1) ? 0 : ($pg - 1);
-			$url = pagelinkurl(array(
-				'pg'     => $nextpg, 
-				's'      => @$pretext['s'], 
-				'c'      => @$pretext['c'], 
-				'q'      => @$pretext['q'], 
-				'author' => @$pretext['author']
-			));
 
-			$url = urldecode($url);
+			$url = urldecode(pagelinkurl(array(
+				'pg'		 => $nextpg,
+				's'			 => @$pretext['s'],
+				'c'			 => @$pretext['c'],
+				'q'			 => @$pretext['q'],
+				'author' => @$pretext['author']
+			)));
 
 			if ($thing)
 			{
 				return '<a href="'.$url.'"'.
-				(empty($title) ? '' : ' title="'.$title.'"').
-				'>'.$thing.'</a>';
+					(empty($title) ? '' : ' title="'.$title.'"').
+					'>'.parse($thing).'</a>';
 			}
 
 			return $url;
 		}
 
-		return;
-}
+		return ($showalways) ? parse($thing) : '';
+	}
 
 // -------------------------------------------------------------
-	function older($atts, $thing = false, $match = '')  
+
+	function older($atts, $thing = false, $match = '')
 	{
-		global $thispage, $permlink_mode, $pretext;
-		extract($pretext);
+		global $thispage, $pretext, $permlink_mode;
 
-		if (is_array($atts))
-		{
-			extract($atts);
-		}
+		extract(lAtts(array(
+			'showalways' => 0,
+		), $atts));
 
- 		if (is_array($thispage))
+		$numPages = $thispage['numPages'];
+		$pg				= $thispage['pg'];
+
+		if ($numPages > 1 and $pg != $numPages)
 		{
-			extract($thispage);
-		}
-		
-		if ($numPages > 1 && $pg != $numPages) {
 			$nextpg = $pg + 1;
 
-			$url = pagelinkurl(array(
-				'pg'     => $nextpg, 
-				's'      => @$pretext['s'], 
-				'c'      => @$pretext['c'], 
-				'q'      => @$pretext['q'], 
+			$url = urldecode(pagelinkurl(array(
+				'pg'		 => $nextpg,
+				's'			 => @$pretext['s'],
+				'c'			 => @$pretext['c'],
+				'q'			 => @$pretext['q'],
 				'author' => @$pretext['author']
-			));
-
-			$url = urldecode($url);
+			)));
 
 			if ($thing)
 			{
 				return '<a href="'.$url.'"'.
-				(empty($title) ? '' : ' title="'.$title.'"').
-				'>'.$thing.'</a>';
+					(empty($title) ? '' : ' title="'.$title.'"').
+					'>'.parse($thing).'</a>';
 			}
+
 			return $url;
 		}
 
-		return;
+		return ($showalways) ? parse($thing) : '';
 	}
 
 // -------------------------------------------------------------
@@ -1758,26 +1757,26 @@ function body($atts)
 		assert_article();
 
 		extract(lAtts(array(
-			'class'        => '',
-			'link'		     => 0,
-			'title'		     => 0,
-			'section'      => '',
+			'class'				 => '',
+			'link'				 => 0,
+			'title'				 => 0,
+			'section'			 => '',
 			'this_section' => 0,
-			'wraptag'      => ''
+			'wraptag'			 => ''
 		), $atts));
 
 		if ($thisarticle['category1'])
 		{
 			$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
-			$cat = $thisarticle['category1'];
+			$category = $thisarticle['category1'];
 
-			$label = ($title) ? fetch_category_title($cat) : $cat;
+			$label = ($title) ? fetch_category_title($category) : $category;
 
 			if ($thing)
 			{
 				$out = '<a'.
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
-					' href="'.pagelinkurl(array('s' => $section, 'c' => $cat)).'"'.
+					' href="'.pagelinkurl(array('s' => $section, 'c' => $category)).'"'.
 					($title ? ' title="'.$label.'"' : '').
 					'>'.$thing.'</a>';
 			}
@@ -1786,7 +1785,7 @@ function body($atts)
 			{
 				$out = '<a'.
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
-					' href="'.pagelinkurl(array('s' => $section, 'c' => $cat)).'">'.$label.'</a>';
+					' href="'.pagelinkurl(array('s' => $section, 'c' => $category)).'">'.$label.'</a>';
 			}
 
 			else
@@ -1807,26 +1806,26 @@ function body($atts)
 		assert_article();
 
 		extract(lAtts(array(
-			'class'        => '',
-			'link'		     => 0,
-			'title'		     => 0,
-			'section'      => '',
+			'class'				 => '',
+			'link'				 => 0,
+			'title'				 => 0,
+			'section'			 => '',
 			'this_section' => 0,
-			'wraptag'      => ''
+			'wraptag'			 => ''
 		), $atts));
 
 		if ($thisarticle['category2'])
 		{
 			$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
-			$cat = $thisarticle['category2'];
+			$category = $thisarticle['category2'];
 
-			$label = ($title) ? fetch_category_title($cat) : $cat;
+			$label = ($title) ? fetch_category_title($category) : $category;
 
 			if ($thing)
 			{
 				$out = '<a'.
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
-					' href="'.pagelinkurl(array('s' => $section, 'c' => $cat)).'"'.
+					' href="'.pagelinkurl(array('s' => $section, 'c' => $category)).'"'.
 					($title ? ' title="'.$label.'"' : '').
 					'>'.$thing.'</a>';
 			}
@@ -1835,7 +1834,7 @@ function body($atts)
 			{
 				$out = '<a'.
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
-					' href="'.pagelinkurl(array('s' => $section, 'c' => $cat)).'">'.$label.'</a>';
+					' href="'.pagelinkurl(array('s' => $section, 'c' => $category)).'">'.$label.'</a>';
 			}
 
 			else
@@ -1854,32 +1853,26 @@ function body($atts)
 		global $s, $c;
 
 		extract(lAtts(array(
-			'class'   => '',
-			'link'		=> 0,
-			'name'		=> '',
-			'section' => $s,
-			'title'		=> 0,
-			'type'    => 'article',
-			'wraptag' => '',
+			'class'				 => '',
+			'link'				 => 0,
+			'name'				 => '',
+			'section'			 => $s, // fixme in crockery
+			'this_section' => 0,
+			'title'				 => 0,
+			'type'				 => 'article',
+			'wraptag'			 => '',
 		), $atts));
 
-		if ($name)
-		{
-			$cat = $name;
-		}
+		$category = ($name) ? $name : $c;
 
-		else
+		if ($category)
 		{
-			$cat = $c;
-		}
-
-		if ($cat)
-		{
-			$label = ($title) ? fetch_category_title($cat, $type) : $cat;
+			$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
+			$label = ($title) ? fetch_category_title($category, $type) : $category;
 
 			if ($thing)
 			{
-				$out = '<a href="'.pagelinkurl(array('c' => $cat, 's' => $section)).'"'.
+				$out = '<a href="'.pagelinkurl(array('s' => $section, 'c' => $category,)).'"'.
 					($title ? ' title="'.$label.'"' : '').
 					'>'.$thing.'</a>';
 			}
@@ -1887,7 +1880,7 @@ function body($atts)
 			elseif ($link)
 			{
 				$out = href($label,
-					pagelinkurl(array('c' => $cat, 's' => $section))
+					pagelinkurl(array('s' => $section, 'c' => $category))
 				);
 			}
 
@@ -2528,7 +2521,10 @@ function body($atts)
 
 		$section = ($s == 'default' ? '' : $s);
 
-		return parse(EvalElse($thing, in_list($section, $name)));
+		if ($section)
+			return parse(EvalElse($thing, in_list($section, $name)));
+		else
+			return parse(EvalElse($thing, in_list('', $name) or in_list('default', $name)));
 
 	}
 
