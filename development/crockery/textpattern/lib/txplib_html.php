@@ -518,7 +518,7 @@ n.innerHTML = '{$c}'
 e.appendChild(n)
 EOF;
 
-		return script_js($js, $content, $noscript);
+		return script_js($js, $noscript);
 	}
 
 //-------------------------------------------------------------
