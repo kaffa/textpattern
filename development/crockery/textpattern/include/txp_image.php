@@ -60,32 +60,32 @@ $LastChangedRevision$
 		switch ($sort)
 		{
 			case 'id':
-				$sort_sql = '`id` '.$dir;
+				$sort_sql = 'id '.$dir;
 			break;
 
 			case 'name':
-				$sort_sql = '`name` '.$dir;
+				$sort_sql = 'name '.$dir;
 			break;
 
 			case 'thumbnail':
-				$sort_sql = '`thumbnail` '.$dir.', `id` asc';
+				$sort_sql = 'thumbnail '.$dir.', id asc';
 			break;
 
 			case 'category':
-				$sort_sql = '`category` '.$dir.', `id` asc';
+				$sort_sql = 'category '.$dir.', id asc';
 			break;
 
 			case 'date':
-				$sort_sql = '`date` '.$dir.', `id` asc';
+				$sort_sql = 'date '.$dir.', id asc';
 			break;
 
 			case 'author':
-				$sort_sql = '`author` '.$dir.', `id` asc';
+				$sort_sql = 'author '.$dir.', id asc';
 			break;
 
 			default:
 				$dir = 'desc';
-				$sort_sql = '`id` '.$dir;
+				$sort_sql = 'id '.$dir;
 			break;
 		}
 
@@ -99,9 +99,9 @@ $LastChangedRevision$
 
 			$critsql = array(
 				'id'			 => "id = '$crit_escaped'",
-				'name'		 => "`name` like '%$crit_escaped%'",
-				'category' => "`category` like '%$crit_escaped%'",
-				'author'	 => "`author` like '%$crit_escaped%'"
+				'name'		 => "name like '%$crit_escaped%'",
+				'category' => "category like '%$crit_escaped%'",
+				'author'	 => "author like '%$crit_escaped%'"
 			);
 
 			if (array_key_exists($search_method, $critsql))
@@ -140,7 +140,7 @@ $LastChangedRevision$
 
 		echo image_search_form($crit, $search_method);
 
-		$rs = safe_rows_start('*, unix_timestamp(`date`) as uDate', 'txp_image',
+		$rs = safe_rows_start('*, unix_timestamp(date) as uDate', 'txp_image',
 			"$criteria order by $sort_sql limit $offset, $limit
 		");
 
@@ -172,8 +172,8 @@ $LastChangedRevision$
 					'<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" />' :
 					gTxt('no');
 
-				$tag_url = '?event=tag'.a.'tag_name=image'.a.'id='.$id.a.'ext='.$ext.a.
-					'alt='.$alt.a.'h='.$h.a.'w='.$w;
+				$tag_url = '?event=tag'.a.'tag_name=image'.a.'id='.$id.a.'ext='.$ext.
+					a.'w='.$w.a.'h='.$h.a.'alt='.urlencode($alt).a.'caption='.urlencode($caption);
 
 				$category = ($category) ? '<span title="'.fetch_category_title($category, 'image').'">'.$category.'</span>' : '';
 
