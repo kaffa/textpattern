@@ -77,7 +77,7 @@ $LastChangedRevision: 952 $
 
 //-------------------------------------------------------------
 
-	function treeSelectInput($select_name = '', $array = '', $value = '', $select_id = '')
+	function treeSelectInput($select_name = '', $array = '', $value = '', $select_id = '', $onchange = 0)
 	{
 		$out = array();
 
@@ -108,19 +108,21 @@ $LastChangedRevision: 952 $
 			$out[] = n.t.'<option value="'.htmlspecialchars($name).'"'.$sel.'>'.$sp.$title.'</option>';
 		}
 
-		return n.'<select'.( $select_id ? ' id="'.$select_id.'" ' : '' ).' name="'.$select_name.'" class="list">'.
+		return n.'<select'.( $select_id ? ' id="'.$select_id.'" ' : '' ).' name="'.$select_name.'" class="list"'.
+			($onchange == 1 ? ' onchange="submit(this.form);"' : $onchange).
+			'>'.
 			n.t.'<option value=""'.($selected == false ? ' selected="selected"' : '').'></option>'.
 			( $out ? join('', $out) : '').
 			n.'</select>';
 	}
 
 //-------------------------------------------------------------
-	function categorySelectInput($type, $name, $val, $id, $parent='root')
+	function categorySelectInput($type, $name, $val, $id, $onchange=0, $parent='root')
 	{
 		$rs = getTree($parent, $type);
 
 		if ($rs) {
-			return treeSelectInput($name,$rs,$val, $id);
+			return treeSelectInput($name,$rs,$val, $id, $onchange);
 		}
 
 		return false;
