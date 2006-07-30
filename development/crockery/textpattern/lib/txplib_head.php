@@ -272,8 +272,34 @@ $LastChangedRevision: 1098 $
 	}
 
 // -------------------------------------------------------------
-	function button($label,$link) 
+	function button($label,$link)
 	{
 		return '<span style="margin-right:2em"><a href="?event='.$link.'" class="plain">'.$label.'</a></span>';
 	}
+
+// -------------------------------------------------------------
+	function user_message($msg, $type='message')
+	{
+		global $_user_messages;
+		@$_user_messages[] = array($msg, $type);
+	}
+
+// -------------------------------------------------------------
+	function show_user_messages($id='user_messages')
+	{
+		global $_user_messages;
+		$out = array();
+
+		if (is_array($_user_messages)) {
+			foreach ($_user_messages as $m) {
+				list($msg, $type) = $m;
+				$out[] = '<div class="'.$type.'">'.escape_output($msg).'</div>';
+			}
+		}
+
+		if ($out)
+			return '<div id="'.$id.'">'.n.join(n, $out).n.'</div>'.n;
+		return '';
+	}
+
 ?>
