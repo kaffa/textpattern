@@ -115,7 +115,8 @@ define('elements_dir', 'elements');
 		}
 		closedir($dh);
 
-		foreach ($files as $f)
+
+		foreach ($files as $f) {
 			$file = $dir.DS.$f;
 			if (preg_match('@_to_(.*)\.php@', $f, $m)) {
 				$file_ver = $m[1];
@@ -124,6 +125,7 @@ define('elements_dir', 'elements');
 					include($file);
 				}
 			}
+		}
 
 		foreach ($dirs as $d)
 			update_elements($ver, $ts, $d);
