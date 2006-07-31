@@ -1547,7 +1547,8 @@ eod;
 	function secpath($path, $pfx = txpath) {
 		// similar to abspath, but the result must reside within $pfx
 		$abs = abspath($path, $pfx);
-		if (substr($abs, 0, strlen($pfx)) == realpath($pfx))
+		$p = realpath($pfx);
+		if (substr($abs, 0, strlen($p)) == $p)
 			return $abs;
 		return false;
 	}
