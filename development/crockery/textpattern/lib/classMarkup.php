@@ -1,6 +1,7 @@
 <?php
 
 include_once(txpath . '/lib/classTextile.php');
+include_once(txpath . '/lib/txplib_class.php');
 
 // Abstract class for markup methods like nl2br, Textile, etc
 class txpMarkup {
