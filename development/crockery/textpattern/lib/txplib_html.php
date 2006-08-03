@@ -507,15 +507,16 @@ $LastChangedRevision: 1008 $
 	}
 
 //-------------------------------------------------------------
-	function dom_attach($id, $content, $noscript='', $wraptag='div')
+	function dom_attach($id, $content, $noscript='', $wraptag='div', $wraptagid='')
 	{
 
 		$c = addcslashes($content, "\r\n\"\'");
 		$js = <<<EOF
 var e = document.getElementById('{$id}');
-var n = document.createElement('{$wraptag}')
-n.innerHTML = '{$c}'
-e.appendChild(n)
+var n = document.createElement('{$wraptag}');
+n.innerHTML = '{$c}';
+n.setAttribute('id','{$wraptagid}');
+e.appendChild(n);
 EOF;
 
 		return script_js($js, $noscript);
