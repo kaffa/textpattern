@@ -214,11 +214,11 @@ register_callback('article_event', 'article', '', 1);
 
 		if($Status >= 4) {
 			if ($oldArticle['Status'] < 4) {
-				do_pings();	
+				do_pings();
 			}
 			safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
 		}
-		
+
 		article_edit(
 			get_status_message($Status).check_url_title($url_title)
 		);
@@ -232,73 +232,69 @@ register_callback('article_event', 'article', '', 1);
 
 		extract(get_prefs());
 		extract(gpsa(array('view','from_view','step')));
-		
+
 		if(!empty($GLOBALS['ID'])) { // newly-saved article
 			$ID = intval($GLOBALS['ID']);
 			$step = 'edit';
-		} else {  
+		} else {
 			$ID = gps('ID');
 		}
-		
+
 		if (!$view) $view = "text";
 		if (!$step) $step = "create";
 
-		if ($step == "edit" 
-			&& $view=="text" 
-			&& !empty($ID) 
-			&& $from_view != "preview" 
+		$article = getFreshArticle();
+
+		if ($step == "edit"
+			&& $view=="text"
+			&& !empty($ID)
+			&& $from_view != "preview"
 			&& $from_view != 'html') {
 
-			$pull = true;          //-- it's an existing article - off we go to the db
-
-			$rs = safe_row(
+			$article = safe_row(
 				"*, unix_timestamp(Posted) as sPosted,
 				unix_timestamp(LastMod) as sLastMod",
-				"textpattern", 
+				"textpattern",
 				"ID=$ID"
 			);
 
-			extract($rs);
-						
 		} else {
-		
-			$pull = false;         //-- assume they came from post
-		
+
 			if (!$from_view or $from_view=='text') {
-				extract(gpsa($article_vars));
+				if ($step != 'create') {
+					$article = gpsa($article_vars);
+				}
 			} elseif($from_view=='preview' or $from_view=='html') {
 					// coming from either html or preview
 				if (isset($_POST['store'])) {
-					$store = unserialize(base64_decode($_POST['store']));					
-					extract($store);
+					$article = unserialize(base64_decode($_POST['store']));
 				}
 			}
 			
-			foreach($article_vars as $var){
-				if(isset($$var)){
-					$store_out[$var] = $$var;		
-				}
-			}
+			$store_out = $article;
 		}
 
 		$GLOBALS['step'] = $step;
 
-		if ($step == 'create' or empty($markup_body) or empty($markup_excerpt))
-		{
-			$markup_body = $markup_default;
-			$markup_excerpt = $markup_default;
-		}
+		pagetop($article['Title'], $message);
+
+		article_edit_form($step, $view, $from_view, $article);
+	}
+
+function article_edit_form($step, $view, $from_view, $article) {
+		global $txpcfg,$txp_user,$article_vars;
+
+		extract(get_prefs());
+		extract($article);
 
 		if ($step!='create') {
 
-			// Previous record?				
+			// Previous record?
 			$prev_id = checkIfNeighbour('prev',$sPosted);
-			
+
 			// Next record?
 			$next_id = checkIfNeighbour('next',$sPosted);
 		}
-
-		pagetop($Title, $message);
 
 		echo n.n.'<form name="article" method="post" action="index.php" enctype="multipart/form-data">';
 
@@ -419,9 +415,7 @@ register_callback('article_event', 'article', '', 1);
 			{
 				include_once txpath.'/publish/taghandlers.php';
 
-				$article_array = ($pull) ? $rs : gpsa($article_vars);
-
-				echo sp.sp.'<a href="'.permlinkurl($article_array).'">'.gTxt('view').'</a>';
+				echo sp.sp.'<a href="'.permlinkurl($article).'">'.gTxt('view').'</a>';
 			}
 
 			echo '</p>';
@@ -533,8 +527,6 @@ register_callback('article_event', 'article', '', 1);
 					n.category_popup('Category2', $Category2, 'category-2'));
 
 		//-- section select --------------
-
-			if(!$from_view && !$pull) $Section = getDefaultSection();
 
 			echo n.graf('<label for="section">'.gTxt('section').'</label> '.
 				'<span class="small">['.eLink('section', '', '', '', gTxt('edit')).']</span>'.br.
@@ -758,8 +750,28 @@ register_callback('article_event', 'article', '', 1);
 		return safe_field("name", "txp_section","is_default=1");
 	}
 
-// -------------------------------------------------------------
+//--------------------------------------------------------------
+// return an empty article with default values
+	function getFreshArticle()
+	{
+		global $article_vars;
+		$prefs = get_prefs();
+		$a = array();
+		foreach ($article_vars as $v)
+			$a[$v] = '';
 
+		$a['Status'] = 0; # use this to identify an unsaved article
+		$a['Section'] = getDefaultSection();
+		$a['Annotate'] = $prefs['comments_on_default'];
+		$a['AnnotateInvite'] = $prefs['comments_default_invite'];
+		$a['markup_body'] = $prefs['markup_default'];
+		$a['markup_excerpt'] = $prefs['markup_default'];
+		$a['sPosted'] = time();
+
+		return $a;
+	}
+
+// -------------------------------------------------------------
 	function form_pop($form, $id)
 	{
 		$arr = array(' ');
