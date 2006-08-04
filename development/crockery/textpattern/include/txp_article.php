@@ -281,7 +281,9 @@ register_callback('article_event', 'article', '', 1);
 		article_edit_form($step, $view, $from_view, $article);
 	}
 
-function article_edit_form($step, $view, $from_view, $article) {
+//--------------------------------------------------------------
+	function article_edit_form($step, $view, $from_view, $article)
+	{
 		global $txpcfg,$txp_user,$article_vars;
 
 		extract(get_prefs());
@@ -298,9 +300,9 @@ function article_edit_form($step, $view, $from_view, $article) {
 
 		echo n.n.'<form name="article" method="post" action="index.php" enctype="multipart/form-data">';
 
-		if (!empty($store_out))
+		if ($view != 'text')
 		{
-			echo hInput('store', base64_encode(serialize($store_out)));
+			echo hInput('store', base64_encode(serialize($article)));
 		}
 
 		echo hInput('ID', $ID).
