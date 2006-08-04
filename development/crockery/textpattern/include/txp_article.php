@@ -1,10 +1,10 @@
 <?php
 /*
 	This is Textpattern
-	Copyright 2005 by Dean Allen 
+	Copyright 2005 by Dean Allen
  	All rights reserved.
 
-	Use of this software indicates acceptance of the Textpattern license agreement 
+	Use of this software indicates acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -34,7 +34,7 @@ $statuses = array(
 		5 => gTxt('sticky'),
 );
 
-if (!empty($event) and $event == 'article') {
+function article_event($event, $step) {
 	require_privs('article');
 
 
@@ -55,6 +55,8 @@ if (!empty($event) and $event == 'article') {
 		case "delete":   article_delete();
 	}
 }
+
+register_callback('article_event', 'article', '', 1);
 
 //--------------------------------------------------------------
 	function article_post()
@@ -258,11 +260,6 @@ if (!empty($event) and $event == 'article') {
 
 			extract($rs);
 						
-			if ($AnnotateInvite!= $comments_default_invite) {
-				$AnnotateInvite = $AnnotateInvite;
-			} else {
-				$AnnotateInvite = $comments_default_invite;
-			}
 		} else {
 		
 			$pull = false;         //-- assume they came from post

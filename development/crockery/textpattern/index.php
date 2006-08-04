@@ -106,12 +106,12 @@ $LastChangedRevision$
 		else 
 			require_privs($event);
 
-		callback_event($event, $step, 1);
-
 		$inc = txpath . '/include/txp_'.$event.'.php';
 		if (is_readable($inc))
 			include($inc);
-	
+
+		callback_event($event, $step, 1);
+
 		callback_event($event, $step, 0);
 
 		$microdiff = (getmicrotime() - $microstart);
