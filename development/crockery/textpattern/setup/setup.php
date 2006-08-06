@@ -229,10 +229,20 @@
 	}
 
 // -------------------------------------------------------------
+
 	function createTxp() 
 	{
+		$email = isPost('email');
+
+		if (!is_valid_email($email))
+		{
+			exit(graf(gTxt('email_required')));
+		}
+	
 		$carry = isPost('carry');
+
 		extract(postDecode($carry));
+
 		require txpath.'/config.php';
 		$dbb = $txpcfg['db'];
 		$duser = $txpcfg['user'];
