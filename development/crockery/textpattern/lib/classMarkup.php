@@ -17,13 +17,19 @@ class txpMarkup {
 
 function do_markup($type, $in) {
 
+	$obj =& get_markup($type);
+	return $obj->doMarkup($in);
+}
+
+// fetch a markup singleton object of the specified type
+function &get_markup($type) {
+
 	$markup_types = get_classes('txpmarkup');
 	if (isset($markup_types[$type]))
-		$obj = get_singleton($type);
+		$obj =& get_singleton($type);
 	else
-		$obj = get_singleton('txpnl2br');
-	return $obj->doMarkup($in);
-
+		$obj =& get_singleton('txpnl2br');
+	return $obj;
 }
 
 function get_markup_types() {

@@ -683,15 +683,15 @@ register_callback('article_event', 'article', '', 1);
 	{
 		if ($markup_body != $markup_excerpt)
 		{
-			$body = get_singleton($markup_body);
-			$excerpt = get_singleton($markup_excerpt);
+			$body = get_markup($markup_body);
+			$excerpt = get_markup($markup_excerpt);
 
 			return $body->sidehelp().$excerpt->sidehelp(gTxt('excerpt'));
 		}
 
 		else
 		{
-			$body = get_singleton($markup_body);
+			$body = get_markup($markup_body);
 
 			return $body->sidehelp();
 		}
