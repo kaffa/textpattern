@@ -32,7 +32,7 @@ $LastChangedRevision: 1008 $
 
 	function column_head($value, $sort = '', $event = '', $is_link = '', $dir = '', $crit = '', $method = '')
 	{
-		$o = '<th>';
+		$o = n.t.'<th>';
 
 		if ($is_link)
 		{
@@ -441,15 +441,25 @@ $LastChangedRevision: 1008 $
 	}
 
 // -------------------------------------------------------------
-	function pageby_form($event,$curval) 
+
+	function pageby_form($event, $val) 
 	{
-		$qtys = array(15=>15,25=>25,50=>50,100=>100);
-		return form(graf(
-			gTxt('view').sp.
-			selectInput('qty', $qtys, $curval,'',1).sp.
-			gTxt('per_page').
-			eInput($event).sInput($event.'_change_pageby')
-		,' align="center"'));
+		$vals = array(
+			15  => 15, 
+			25  => 25, 
+			50  => 50,
+			100 => 100
+		);
+
+		return form(
+			graf(
+				gTxt('view').sp.selectInput('qty', $vals, $val,'', 1).sp.
+				gTxt('per_page').
+				eInput($event).
+				sInput($event.'_change_pageby').
+				'<noscript> <input type="submit" value="'.gTxt('go').'" class="smallerbox" /></noscript>'
+			)
+		, 'margin: auto; text-align: center;');
 	}
 // -------------------------------------------------------------
 
@@ -491,8 +501,8 @@ $LastChangedRevision: 1008 $
 				eInput($event).
 				sInput($step).
 				fInput('submit', 'search', gTxt('go'), 'smallerbox')
-			,' style="text-align: center;"')
-		);
+			)
+		, 'margin: auto; text-align: center;');
 	}
 
 //-------------------------------------------------------------
