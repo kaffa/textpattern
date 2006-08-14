@@ -728,7 +728,7 @@ $LastChangedRevision$
 			$cats[] = doSlash($thisarticle['category2']);
 		}
 
-		$cats = join(chr(39).','.chr(39), $cats);
+		$cats = join("','", $cats);
 
 		$categories = array();
 
@@ -870,8 +870,7 @@ $LastChangedRevision$
 		if ($categories)
 		{
 			$categories = do_list($categories);
-
-			$categories = join(chr(39).','.chr(39), $categories);
+			$categories = join("','", doSlash($categories));
 
 			$rs = safe_rows_start('name, title', 'txp_category', 
 				"type = '$type' and name in ('$categories') order by field(name, '$categories')");
@@ -882,8 +881,7 @@ $LastChangedRevision$
 			if ($exclude)
 			{
 				$exclude = do_list($exclude);
-
-				$exclude = join(chr(39).','.chr(39), $exclude);
+				$exclude = join("','", doSlash($exclude));
 
 				$exclude = "and name not in('$exclude')";
 			}
@@ -959,8 +957,7 @@ $LastChangedRevision$
 		if ($sections)
 		{
 			$sections = do_list($sections);
-
-			$sections = join(chr(39).','.chr(39), $sections);
+			$sections = join("','", doSlash($sections));
 
 			$rs = safe_rows_start('name, title', 'txp_section', "name in ('$sections') order by field(name, '$sections')");
 		}
@@ -970,9 +967,8 @@ $LastChangedRevision$
 			if ($exclude)
 			{
 				$exclude = do_list($exclude);
+				$exclude = join("','", doSlash($exclude));
 
-				$exclude = join(chr(39).','.chr(39), $exclude);
-				
 				$exclude = "and name not in('$exclude')";
 			}
 
@@ -1370,12 +1366,16 @@ $LastChangedRevision$
 		global $thisarticle, $comment_preview, $pretext;
 
 		extract(lAtts(array(
-			'id'		   => @$pretext['id'],
-			'class'		=> __FUNCTION__,
-			'preview'   => false,
-			'form'		=> 'comment_form',
-			'wraptag'	=> ''
-		),$atts));
+			'class'        => __FUNCTION__,
+			'form'         => 'comment_form',
+			'id'           => @$pretext['id'],
+			'isize'        => '25',
+			'msgcols'      => '25',
+			'msgrows'      => '5',
+			'msgstyle'     => '',
+			'preview'      => false,
+			'wraptag'      => '',
+		), $atts));
 
 		# don't display the comment form at the bottom, since it's
 		# already shown at the top
