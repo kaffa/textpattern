@@ -33,7 +33,7 @@ $LastChangedRevision$
 
 	function css($atts)
 	{
-		global $s;
+		global $txp_error_code, $s;
 
 		extract(lAtts(array(
 			'format' => 'url',
@@ -43,7 +43,12 @@ $LastChangedRevision$
 			'title'  => '',
 		), $atts));
 
-		if ($n)
+		if ($txp_error_code == '404')
+		{
+			$url = hu.'textpattern/css.php?n=default';
+		}
+	
+		elseif ($n)
 		{
 			$url = hu.'textpattern/css.php?n='.$n;
 		}

@@ -159,9 +159,10 @@ $create_sql[] = "INSERT INTO ".PFX."txp_category VALUES ($incval, 'site-design',
 
 $create_sql[] = "CREATE TABLE ".PFX."txp_css (
   name varchar(255) default NULL,
-  css text,
-  PRIMARY KEY (name)
+  css text
 ) $tabletype ";
+
+$create_sql[] = 'CREATE UNIQUE INDEX '.PFX.'name ON '.PFX.'txp_css (name)';
 
 $create_sql[] = "INSERT INTO ".PFX."txp_css VALUES ('default', 'LyogYmFzZQ0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gKi8NCg0KYm9keSB7DQptYXJnaW46IDA7DQpwYWRkaW5nOiAwOw0KZm9udC1mYW1pbHk6IFZlcmRhbmEsICJMdWNpZGEgR3JhbmRlIiwgVGFob21hLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7DQpjb2xvcjogIzAwMDsNCmJhY2tncm91bmQtY29sb3I6ICNmZmY7DQp9DQoNCmJsb2NrcXVvdGUsIGgzLCBwLCBsaSB7DQpwYWRkaW5nLXJpZ2h0OiAxMHB4Ow0KcGFkZGluZy1sZWZ0OiAxMHB4Ow0KZm9udC1zaXplOiAwLjllbTsNCmxpbmUtaGVpZ2h0OiAxLjZlbTsNCn0NCg0KYmxvY2txdW90ZSB7DQptYXJnaW4tcmlnaHQ6IDA7DQptYXJnaW4tbGVmdDogMjBweDsNCn0NCg0KaDEsIGgyLCBoMyB7DQpmb250LXdlaWdodDogbm9ybWFsOw0KfQ0KDQpoMSwgaDIgew0KZm9udC1mYW1pbHk6IEdlb3JnaWEsIFRpbWVzLCBzZXJpZjsNCn0NCg0KaDEgew0KZm9udC1zaXplOiAzZW07DQp9DQoNCmgyIHsNCmZvbnQtc2l6ZTogMWVtOw0KZm9udC1zdHlsZTogaXRhbGljOw0KfQ0KDQpzbWFsbCwgLnNtYWxsIHsNCmZvbnQtc2l6ZTogMC45ZW07DQp9DQoNCi8qIGxpbmtzDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAqLw0KDQphIHsNCnRleHQtZGVjb3JhdGlvbjogbm9uZTsNCmNvbG9yOiAjMDAwOw0KYmFja2dyb3VuZC1jb2xvcjogaW5oZXJpdDsNCmJvcmRlci1ib3R0b206IDFweCAjMDAwIHNvbGlkOw0KfQ0KDQpoMSBhLCBoMiBhLCBoMyBhIHsNCmJvcmRlcjogbm9uZTsNCn0NCg0KaDMgYSB7DQpmb250OiAxLjVlbSBHZW9yZ2lhLCBUaW1lcywgc2VyaWY7DQp9DQoNCiNzaWRlYmFyLTIgYSwgI3NpZGViYXItMSBhIHsNCmNvbG9yOiAjYzAwOw0KYmFja2dyb3VuZC1jb2xvcjogaW5oZXJpdDsNCmJvcmRlcjogbm9uZTsNCn0NCg0KLyogb3ZlcnJpZGVzDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAqLw0KDQojc2lkZWJhci0yIHAsICNzaWRlYmFyLTEgcCB7DQpmb250LXNpemU6IDAuOGVtOw0KbGluZS1oZWlnaHQ6IDEuNWVtOw0KfQ0KDQojc2lkZWJhci0xIHAgew0KdGV4dC1hbGlnbjogcmlnaHQ7DQp9DQoNCiNjb250ZW50IGhyIHsNCm1hcmdpbjogMmVtIDA7DQp3aWR0aDogNjYlOw0KY29sb3I6ICNjY2M7DQpiYWNrZ3JvdW5kLWNvbG9yOiBpbmhlcml0Ow0KfQ0KDQouY2FwcyB7DQpmb250LXNpemU6IDAuOWVtOw0KbGV0dGVyLXNwYWNpbmc6IDAuMWVtOw0KfQ0KDQppbWcuZGl2aWRlciB7DQptYXJnaW46IDJlbSAwOw0KdGV4dC1hbGlnbjogY2VudGVyOw0KfQ0KDQovKiBnbG9iYWwgbGF5b3V0DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAqLw0KDQojYWNjZXNzaWJpbGl0eSB7DQpwb3NpdGlvbjogYWJzb2x1dGU7DQp0b3A6IC0xMDAwMHB4Ow0KfQ0KDQojY29udGFpbmVyIHsNCm1hcmdpbjogMTBweCBhdXRvOw0KcGFkZGluZzogMTBweDsNCndpZHRoOiA3NjBweDsNClx3aWR0aDogNzcwcHg7DQp3XGlkdGg6IDc2MHB4Ow0KfQ0KDQojaGVhZCB7DQpoZWlnaHQ6IDEwMHB4Ow0KdGV4dC1hbGlnbjogY2VudGVyOw0KfQ0KDQojc2lkZWJhci0xIHsNCm1hcmdpbi1yaWdodDogNXB4Ow0KcGFkZGluZy10b3A6IDEwMHB4Ow0KZmxvYXQ6IGxlZnQ7DQp3aWR0aDogMTUwcHg7DQpcd2lkdGg6IDE1MHB4Ow0Kd1xpZHRoOiAxNTBweDsNCn0NCg0KI3NpZGViYXItMiB7DQptYXJnaW4tbGVmdDogNXB4Ow0KcGFkZGluZy10b3A6IDEwMHB4Ow0KZmxvYXQ6IHJpZ2h0Ow0Kd2lkdGg6IDE1MHB4Ow0KXHdpZHRoOiAxNTBweDsNCndcaWR0aDogMTUwcHg7DQp9DQoNCiNjb250ZW50IHsNCm1hcmdpbjogMCAxNTVweDsNCnBhZGRpbmctdG9wOiAzMHB4Ow0KfQ0KDQojZm9vdCB7DQptYXJnaW4tdG9wOiA1cHg7DQpjbGVhcjogYm90aDsNCnRleHQtYWxpZ246IGNlbnRlcjsNCn0NCg0KLyogY29tbWVudHMNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICovDQoNCi5jb21tZW50c19lcnJvciB7DQpjb2xvcjogIzAwMDsNCmJhY2tncm91bmQtY29sb3I6ICNmZmY0ZjQgDQp9DQoNCnVsLmNvbW1lbnRzX2Vycm9yIHsNCnBhZGRpbmcgOiAwLjNlbTsNCmxpc3Qtc3R5bGUtdHlwZTogY2lyY2xlOw0KbGlzdC1zdHlsZS1wb3NpdGlvbjogaW5zaWRlOw0KYm9yZGVyOiAycHggc29saWQgI2ZkZDsNCn0NCg0KZGl2I2NwcmV2aWV3IHsNCmNvbG9yOiAjMDAwOw0KYmFja2dyb3VuZC1jb2xvcjogI2YxZjFmMTsNCmJvcmRlcjogMnB4IHNvbGlkICNkZGQ7DQp9DQoNCmZvcm0jdHhwQ29tbWVudElucHV0Rm9ybSB0ZCB7DQp2ZXJ0aWNhbC1hbGlnbjogdG9wOw0KfQ==')";
 
@@ -186,14 +187,16 @@ $create_sql[] = "CREATE TABLE ".PFX."txp_discuss_ipban (
   ip varchar(255) NOT NULL default '',
   name_used varchar(255) NOT NULL default '',
   date_banned $datetime NOT NULL default '$zerodatetime',
-  banned_on_message smallint NOT NULL default '0'
+  banned_on_message smallint NOT NULL default '0',
+  PRIMARY KEY (ip)
 ) $tabletype ";
 
 $create_sql[] = "CREATE TABLE ".PFX."txp_discuss_nonce (
   issue_time $datetime NOT NULL default '$zerodatetime',
   nonce varchar(255) NOT NULL default '',
   used smallint NOT NULL default '0',
-  secret varchar(255) NOT NULL default ''
+  secret varchar(255) NOT NULL default '',
+  PRIMARY KEY (nonce)
 ) $tabletype ";
 
 $create_sql[] = "CREATE TABLE ".PFX."txp_file (
@@ -211,10 +214,10 @@ $create_sql[] = 'CREATE UNIQUE INDEX '.PFX.'filename ON '.PFX.'txp_file (filenam
 $create_sql[] = "CREATE TABLE ".PFX."txp_form (
   name varchar(64) NOT NULL default '',
   type varchar(28) NOT NULL default '',
-  Form text NOT NULL,
-  PRIMARY KEY  (name)
+  Form text NOT NULL
 ) $tabletype";
 
+$create_sql[] = 'CREATE UNIQUE INDEX '.PFX.'name ON '.PFX.'txp_form (name)';
 
 $create_sql[] = "INSERT INTO ".PFX."txp_form VALUES ('Links', 'link', '<p><txp:link /><br />\r\n<txp:link_description /></p>')";
 $create_sql[] = "INSERT INTO ".PFX."txp_form VALUES ('lofi', 'article', '<h3><txp:title /></h3>\r\n\r\n<p class=\"small\"><txp:permlink>#</txp:permlink> <txp:posted /></p>\r\n\r\n<txp:body />\r\n\r\n<hr size=\"1\" noshade=\"noshade\" />')";
@@ -288,9 +291,10 @@ $create_sql[] = 'CREATE INDEX '.PFX.'time ON '.PFX.'txp_log (time)';
 
 $create_sql[] = "CREATE TABLE ".PFX."txp_page (
   name varchar(128) NOT NULL default '',
-  user_html text NOT NULL,
-  PRIMARY KEY  (name)
+  user_html text NOT NULL
 ) $tabletype";
+
+$create_sql[] = 'CREATE UNIQUE INDEX '.PFX.'name ON '.PFX.'txp_page (name)';
 
 $create_sql[] = "INSERT INTO ".PFX."txp_page VALUES ('default', '<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\r\n<head>\r\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\r\n\t<title><txp:page_title /></title>\r\n\r\n\t<txp:feed_link flavor=\"atom\" format=\"link\" label=\"Atom\" />\r\n\t<txp:feed_link flavor=\"rss\" format=\"link\" label=\"RSS\" />\r\n\r\n\t<txp:css format=\"link\" />\r\n</head>\r\n<body>\r\n\r\n<!-- accessibility -->\r\n<div id=\"accessibility\">\r\n\t<ul>\r\n\t\t<li><a href=\"#content\">Go to content</a></li>\r\n\t\t<li><a href=\"#sidebar-1\">Go to navigation</a></li>\r\n\t\t<li><a href=\"#sidebar-2\">Go to search</a></li>\r\n\t</ul>\r\n</div>\r\n\r\n<div id=\"container\">\r\n\r\n<!-- head -->\r\n\t<div id=\"head\">\r\n\t\t<h1><txp:link_to_home><txp:sitename /></txp:link_to_home></h1>\r\n\t\t<h2><txp:site_slogan /></h2>\r\n\t</div>\r\n\r\n<!-- left -->\r\n\t<div id=\"sidebar-1\">\r\n\t<txp:linklist wraptag=\"p\" />\r\n\t</div>\r\n\r\n<!-- right -->\r\n\t<div id=\"sidebar-2\">\r\n\t\t<txp:search_input label=\"Search\" wraptag=\"p\" />\r\n\r\n\t\t<txp:popup type=\"c\" label=\"Browse\" wraptag=\"p\" />\r\n\r\n\t\t<p><txp:feed_link label=\"RSS\" /> / <txp:feed_link flavor=\"atom\" label=\"Atom\" /></p>\r\n\r\n\t\t<p><img src=\"<txp:site_url />textpattern/txp_img/txp_slug105x45.gif\" width=\"105\" height=\"45\" alt=\"Textpattern\" title=\"\" /></p>\r\n\t</div>\r\n\r\n<!-- center -->\r\n\t<div id=\"content\">\r\n\t<txp:article limit=\"5\" />\r\n\t\r\n<txp:if_individual_article>\r\n\t\t<p><txp:link_to_prev><txp:prev_title /></txp:link_to_prev> \r\n\t\t\t<txp:link_to_next><txp:next_title /></txp:link_to_next></p>\r\n<txp:else />\r\n\t\t<p><txp:older><txp:text item=\"older\" /></txp:older> \r\n\t\t\t<txp:newer><txp:text item=\"newer\" /></txp:newer></p>\r\n</txp:if_individual_article>\r\n\t</div>\r\n\r\n<!-- footer -->\r\n\t<div id=\"foot\">&nbsp;</div>\r\n\r\n</div>\r\n\r\n</body>\r\n</html>')";
 $create_sql[] = "INSERT INTO ".PFX."txp_page VALUES ('archive', '<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\r\n<head>\r\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\r\n\t<title><txp:page_title /></title>\r\n\r\n\t<txp:feed_link flavor=\"atom\" format=\"link\" label=\"Atom\" />\r\n\t<txp:feed_link flavor=\"rss\" format=\"link\" label=\"RSS\" />\r\n\r\n\t<txp:css format=\"link\" />\r\n</head>\r\n<body>\r\n\r\n<!-- accessibility -->\r\n<div id=\"accessibility\">\r\n\t<ul>\r\n\t\t<li><a href=\"#content\">Go to content</a></li>\r\n\t\t<li><a href=\"#sidebar-1\">Go to navigation</a></li>\r\n\t\t<li><a href=\"#sidebar-2\">Go to search</a></li>\r\n\t</ul>\r\n</div>\r\n\r\n<div id=\"container\">\r\n\r\n<!-- head -->\r\n\t<div id=\"head\">\r\n\t\t<h1><txp:link_to_home><txp:sitename /></txp:link_to_home></h1>\r\n\t\t<h2><txp:site_slogan /></h2>\r\n\t</div>\r\n\r\n<!-- left -->\r\n\t<div id=\"sidebar-1\">\r\n\t<txp:linklist wraptag=\"p\" />\r\n\t</div>\r\n\r\n<!-- right -->\r\n\t<div id=\"sidebar-2\">\r\n\t\t<txp:search_input label=\"Search\" wraptag=\"p\" />\r\n\r\n\t\t<txp:popup type=\"c\" label=\"Browse\" wraptag=\"p\" />\r\n\r\n\t\t<p><txp:feed_link label=\"RSS\" /> / <txp:feed_link flavor=\"atom\" label=\"Atom\" /></p>\r\n\r\n\t\t<p><img src=\"<txp:site_url />textpattern/txp_img/txp_slug105x45.gif\" width=\"105\" height=\"45\" alt=\"Textpattern\" title=\"\" /></p>\r\n\t</div>\r\n\r\n<!-- center -->\r\n\t<div id=\"content\">\r\n\t<txp:article limit=\"5\" />\r\n\t\r\n<txp:if_individual_article>\r\n\t\t<p><txp:link_to_prev><txp:prev_title /></txp:link_to_prev> \r\n\t\t\t<txp:link_to_next><txp:next_title /></txp:link_to_next></p>\r\n<txp:else />\r\n\t\t<p><txp:older><txp:text item=\"older\" /></txp:older> \r\n\t\t\t<txp:newer><txp:text item=\"newer\" /></txp:newer></p>\r\n</txp:if_individual_article>\r\n\t</div>\r\n\r\n<!-- footer -->\r\n\t<div id=\"foot\">&nbsp;</div>\r\n\r\n</div>\r\n\r\n</body>\r\n</html>')";
@@ -421,9 +425,10 @@ $create_sql[] = "CREATE TABLE ".PFX."txp_section (
   in_rss smallint NOT NULL default '1',
   on_frontpage smallint NOT NULL default '1',
   searchable smallint NOT NULL default '1',
-  title varchar(255) NOT NULL default '',
-  PRIMARY KEY  (name)
+  title varchar(255) NOT NULL default ''
 ) $tabletype";
+
+$create_sql[] = 'CREATE UNIQUE INDEX '.PFX.'name ON '.PFX.'txp_section (name)';
 
 $create_sql[] = "INSERT INTO ".PFX."txp_section VALUES ('article', 'archive', 'default', 1, 1, 1, 1, 'Article')";
 $create_sql[] = "INSERT INTO ".PFX."txp_section VALUES ('default', 'default', 'default', 0, 1, 1, 1, 'default')";
