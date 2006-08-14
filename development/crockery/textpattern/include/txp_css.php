@@ -281,27 +281,44 @@ $LastChangedRevision$
 	}
 		
 // -------------------------------------------------------------
+
 	function css_save_posted() 
 	{
 		$name = gps('name');
 		$css  = parsePostedCSS();
 		$css  = base64_encode(css_format($css));
-		safe_update("txp_css", "css='$css'", "name='$name'");
-		css_edit(messenger('css',$name,'saved'));
+
+		safe_update('txp_css', "css = '$css'", "name = '$name'");
+
+		$message = gTxt('css_updated', array('{style}' => $name));
+
+		css_edit($message);
 	}
 
 //-------------------------------------------------------------
+
 	function css_save() 
 	{
-		extract(gpsa(array('name','css','savenew','newname','copy')));
+		extract(gpsa(array('name', 'css', 'savenew', 'newname', 'copy')));
+
 		$css = base64_encode($css);
 
-		if ($savenew or $copy) {
-			safe_insert("txp_css", "name='$newname', css='$css'");
-			css_edit(messenger('css',$newname,'created'));
-		} else {
-			safe_update("txp_css", "css='$css'", "name='$name'");	
-			css_edit(messenger('css',$name,'updated'));
+		if ($savenew or $copy)
+		{
+			safe_insert('txp_css', "name = '$newname', css = '$css'");
+
+			$message = gTxt('css_created', array('{style}' => $newname));
+
+			css_edit($message);
+		}
+
+		else
+		{
+			safe_update('txp_css', "css = '$css'", "name = '$name'");	
+
+			$message = gTxt('css_updated', array('{style}' => $name));
+
+			css_edit($message);
 		}
 	}
 
