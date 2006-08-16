@@ -457,18 +457,20 @@ $LastChangedRevision: 1008 $
 		$page = str_replace('{page}', $select_page, gTxt('view_per_page'));
 
 		return form(
-			graf(
+			'<div style="margin: auto; text-align: center;">'.
 				$page.
 				eInput($event).
 				sInput($event.'_change_pageby').
-				'<noscript> <input type="submit" value="'.gTxt('go').'" class="smallerbox" /></noscript>'
-			)
-		, 'margin: auto; text-align: center;');
+				'<noscript> <input type="submit" value="'.gTxt('go').'" class="smallerbox" /></noscript>'.
+			'</div>'
+		);
 	}
 // -------------------------------------------------------------
 
 	function upload_form($label, $pophelp, $step, $event, $id = '', $max_file_size = '1000000', $label_id = '', $class = 'upload-form')
 	{
+		global $sort, $dir, $page, $search_method, $crit;
+
 		$class = ($class) ? ' class="'.$class.'"' : '';
 
 		$label_id = ($label_id) ? $label_id : $event.'-upload';
@@ -480,6 +482,12 @@ $LastChangedRevision: 1008 $
 			n.eInput($event).
 			n.sInput($step).
 			n.hInput('id', $id).
+
+			n.hInput('sort', $sort).
+			n.hInput('dir', $dir).
+			n.hInput('page', $page).
+			n.hInput('search_method', $search_method).
+			n.hInput('crit', $crit).
 
 			n.graf(
 				'<label for="'.$label_id.'">'.$label.'</label>'.sp.popHelp($pophelp).sp.
