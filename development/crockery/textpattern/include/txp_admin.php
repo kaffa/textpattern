@@ -135,7 +135,7 @@ $LastChangedRevision$
 		if ($rs)
 		{
 			admin(
-				gTxt('author_updated', array('{author}' => $RealName))
+				gTxt('author_updated', array('{name}' => $RealName))
 			);
 		}
 	}
@@ -302,7 +302,7 @@ $LastChangedRevision$
 
 			graf('<label for="new_pass">'.gTxt('new_password').'</label> '.
 				fInput('password', 'new_pass', '', 'edit', '', '', '20', '1', 'new_pass').
-				checkbox('mail_password', '1', 1).gTxt('mail_it').' '.
+				checkbox('mail_password', '1', true, '', 'mail_password').'<label for="mail_password">'.gTxt('mail_it').'</label> '.
 				fInput('submit', 'change_pass', gTxt('submit'), 'smallerbox').
 				eInput('admin').
 				sInput('change_pass')
@@ -513,7 +513,7 @@ $LastChangedRevision$
 			if ($rs)
 			{
 				admin(
-					gTxt('author_deleted', array('{author}' => $name))
+					gTxt('author_deleted', array('{name}' => $name))
 				);
 			}
 		}
