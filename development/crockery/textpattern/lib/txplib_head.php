@@ -30,9 +30,9 @@ $LastChangedRevision: 1098 $
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="noindex, nofollow" />
 	<title>Txp &#8250; <?php echo $sitename ?> &#8250; <?php echo $pagetitle?></title>
-	<link href="textpattern.css" rel="Stylesheet" type="text/css" />
+	<link href="textpattern.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="js/textpattern.js"></script>
-	<script language="JavaScript" type="text/javascript">
+	<script type="text/javascript">
 	<!--
 
 		var cookieEnabled = checkCookies();
