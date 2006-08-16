@@ -390,7 +390,7 @@ $DB = new DB;
 	}
 
 // -------------------------------------------------------------
- 	function getTree($root, $type)
+ 	function getTree($root, $type, $where='1=1')
  	{ 
 
 		$root = doSlash($root);
@@ -413,7 +413,7 @@ $DB = new DB;
 	    $rs = safe_rows_start(
 	    	"id, name, lft, rgt, parent, title", 
 	    	"txp_category",
-	    	"lft between $l and $r and type = '$type' $inc_root order by lft asc"
+	    	"lft between $l and $r and type = '$type' and name != 'root' and $where order by lft asc"
 		); 
 
 	    while ($rs and $row = nextRow($rs)) {
