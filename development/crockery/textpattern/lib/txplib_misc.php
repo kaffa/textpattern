@@ -87,16 +87,24 @@ $LastChangedRevision: 1127 $
 		);
 	}
 
+// -------------------------------------------------------------
+
+	function escape_cdata($str)
+	{
+		return '<![CDATA['.str_replace(']]>', ']]]><![CDATA[]>', $str).']]>';
+	}
+
 //-------------------------------------------------------------
-	function gTxt($var, $reps=array())
+	function gTxt($var, $atts=array())
 	{
 		global $textarray;
 		if(isset($textarray[strtolower($var)])) {
 			$out = $textarray[strtolower($var)];
-			if ($reps)
-				$out = str_replace(array_keys($reps), array_values($reps), $out);
-			return $out;
+			return strtr($out, $atts);
 		}
+
+		if ($atts)
+			return $var.': '.join(', ', $atts);
 		return $var;
 	}
 
@@ -133,9 +141,9 @@ $LastChangedRevision: 1127 $
 			}
 		}else{
 			#backward compatibility stuff. Remove when necessary.
-			$filename = is_file($txpcfg['txpath'].'/lang/'.$lang.'.txt')
-			?	$txpcfg['txpath'].'/lang/'.$lang.'.txt'
-			:	$txpcfg['txpath'].'/lang/en-gb.txt';
+			$filename = is_file(txpath.'/lang/'.$lang.'.txt')
+			?	txpath.'/lang/'.$lang.'.txt'
+			:	txpath.'/lang/en-gb.txt';
 			 
 			$file = @fopen($filename, "r");
 			if ($file) {
@@ -156,10 +164,10 @@ $LastChangedRevision: 1127 $
 	function load_lang_dates($lang) 
 	{
 		global $txpcfg;
-		$filename = is_file($txpcfg['txpath'].'/lang/'.$lang.'_dates.txt')?
-			$txpcfg['txpath'].'/lang/'.$lang.'_dates.txt':
-			$txpcfg['txpath'].'/lang/en-gb_dates.txt';
-		$file = @file($txpcfg['txpath'].'/lang/'.$lang.'_dates.txt','r');
+		$filename = is_file(txpath.'/lang/'.$lang.'_dates.txt')?
+			txpath.'/lang/'.$lang.'_dates.txt':
+			txpath.'/lang/en-gb_dates.txt';
+		$file = @file(txpath.'/lang/'.$lang.'_dates.txt','r');
 		if(is_array($file)) {
 			foreach($file as $line) {
 				if($line[0]=='#' || strlen($line) < 2) continue;
@@ -431,7 +439,7 @@ $LastChangedRevision: 1127 $
 		printf ("<pre>".gTxt('plugin_load_error').' <b>%s</b> -> <b>%s: %s on line %s</b></pre>',
 				$txp_current_plugin, $error[$errno], $errstr, $errline);
 		if ($production_status == 'debug')
-			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".join("\n", get_caller(10))."</code></pre>";
+			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".escape_output(join("\n", get_caller(10)))."</code></pre>";
 	}
 
 // -------------------------------------------------------------
@@ -450,7 +458,7 @@ $LastChangedRevision: 1127 $
 		printf ("<pre>".gTxt('tag_error').' <b>%s</b> -> <b> %s: %s %s</b></pre>',
 				htmlspecialchars($txp_current_tag), $error[$errno], $errstr, $errline );
 		if ($production_status == 'debug')
-			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".join("\n", get_caller(10))."</code></pre>";
+			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".escape_output(join("\n", get_caller(10)))."</code></pre>";
 	}
 
 // -------------------------------------------------------------
@@ -559,7 +567,7 @@ $LastChangedRevision: 1127 $
 		{
 			foreach (array_diff(array_keys($atts), array_keys($pairs)) as $a)
 			{
-				trigger_error(gTxt('unknown_attribute').': '.$a);
+				trigger_error(gTxt('unknown_attribute', array('{att}' => $a)));
 			}
 		}
 
@@ -983,6 +991,8 @@ $LastChangedRevision: 1127 $
 	{
 		global $locale;
 
+		$old_locale = $locale;
+
 		if (!$time)
 			$time = time();
 
@@ -1024,7 +1034,7 @@ $LastChangedRevision: 1127 $
 
 		# revert to the old locale
 		if ($override_locale)
-			setlocale(LC_ALL, $locale);
+			$locale = setlocale(LC_ALL, $old_locale);
 
 		return $str;
 	}
@@ -1210,7 +1220,7 @@ $LastChangedRevision: 1127 $
 		else {
 			$row = safe_row('Form', 'txp_form',"name='".doSlash($name)."'");
 			if (!$row) {
-				trigger_error(gTxt('form_not_found', array('{name}' => $name)));
+				trigger_error(gTxt('form_not_found').': '.$name);
 				return;
 			}
 			$f = $row['Form'];
@@ -1302,7 +1312,7 @@ $LastChangedRevision: 1127 $
 	{
 		global $prefs, $txpcfg;
 
-		include_once $txpcfg['txpath'].'/lib/classTextile.php';
+		include_once txpath.'/lib/classTextile.php';
 		$textile = new Textile();
 		
 		extract($prefs);
@@ -1318,6 +1328,39 @@ $LastChangedRevision: 1127 $
 		return $msg;
 	}
 
+//-------------------------------------------------------------
+	function update_lastmod() {
+		safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
+	}
+
+//-------------------------------------------------------------
+	function handle_lastmod($unix_ts=NULL) {
+		global $prefs;
+		extract($prefs);
+
+		if($send_lastmod) {
+			if ($unix_ts === NULL)
+				$unix_ts = strtotime($lastmod);
+
+			# make sure lastmod isn't in the future
+			$unix_ts = min($unix_ts, time());
+
+			$last = safe_strftime('rfc822', $unix_ts, 1);
+			header("Last-Modified: $last");
+			header('Cache-Control: no-cache');
+			if ($production_status == 'live') {
+				$hims = serverset('HTTP_IF_MODIFIED_SINCE');
+				if ($hims >= $last) {
+					log_hit('304');
+					txp_status_header('304 Not Modified');
+					header('Connection: close');
+					# discard all output
+					while (@ob_end_clean());
+					exit;
+				}
+			}
+		}
+	}
 
 // -------------------------------------------------------------
 	function set_pref($name, $val, $event,  $type, $html='text_input') 
@@ -1523,10 +1566,23 @@ eod;
 		$list = explode($delim, $list);
 
 		foreach ($list as $key => $value) {
-			$list[$key] = doSlash(trim($value));
+			$list[$key] = trim($value);
 		}
 
 		return $list;
+	}
+
+// -------------------------------------------------------------
+	function doQuote($val)
+	{
+		return "'$val'";
+	}
+
+// -------------------------------------------------------------
+	function quote_list($in)
+	{
+		$out = doSlash($in);
+		return doArray($out, 'doQuote');
 	}
 
 // -------------------------------------------------------------
@@ -1534,7 +1590,7 @@ eod;
 	{
 		global $production_status,$txptrace,$txptracelevel;
 
-		if (in_array($production_status, array('debug', 'test')))
+		if (in_array($production_status, array('debug')))
 			 @$txptrace[] = str_repeat("\t", @$txptracelevel).$msg;
 	}
 
@@ -1643,12 +1699,15 @@ eod;
 			'el-gr' => array('el_GR.UTF-8', 'el_GR', 'el', 'gre', 'greek', 'el_GR.ISO_8859-7'),
 			'fr-fr' => array('fr_FR.UTF-8', 'fr_FR', 'fra', 'fre', 'fr', 'french', 'fr_FR.ISO_8859-1'),
 			'fi-fi' => array('fi_FI.UTF-8', 'fi_FI', 'fin', 'fi', 'finnish', 'fi_FI.ISO_8859-1'),
+			'he_il' => array('he_IL.UTF-8', 'he_IL', 'heb', 'he', 'hebrew'),
+			'hu_hu' => array('hu_HU.UTF-8', 'hu_HU', 'hun', 'hu', 'hungarian', 'hu_HU.ISO8859-2'),
 			'it-it' => array('it_IT.UTF-8', 'it_IT', 'it', 'ita', 'italian', 'it_IT.ISO_8859-1'),
 			'id-id' => array('id_ID.UTF-8', 'id_ID', 'id', 'ind', 'indonesian','id_ID.ISO_8859-1'),
 			'ja-jp' => array('ja_JP.UTF-8', 'ja_JP', 'ja', 'jpn', 'japanese', 'ja_JP.ISO_8859-1'),
 			'no-no' => array('no_NO.UTF-8', 'no_NO', 'no', 'nor', 'norwegian', 'no_NO.ISO_8859-1'),
 			'nl-nl' => array('nl_NL.UTF-8', 'nl_NL', 'dut', 'nla', 'nl', 'nld', 'dutch', 'nl_NL.ISO_8859-1'),
 			'pt-pt' => array('pt_PT.UTF-8', 'pt_PT', 'por', 'portuguese', 'pt_PT.ISO_8859-1'),
+			'ro-ro' => array('ro_RO.UTF-8', 'ro_RO', 'ron', 'rum', 'ro', 'romanian', 'ro_RO.ISO8859-2'),
 			'ru-ru' => array('ru_RU.UTF-8', 'ru_RU', 'ru', 'rus', 'russian', 'ru_RU.ISO8859-5'),
 			'sk-sk' => array('sk_SK.UTF-8', 'sk_SK', 'sk', 'slo', 'slk', 'sky', 'slovak', 'sk_SK.ISO_8859-1'),
 			'sv-se' => array('sv_SE.UTF-8', 'sv_SE', 'sv', 'swe', 'sve', 'swedish', 'sv_SE.ISO_8859-1'),
