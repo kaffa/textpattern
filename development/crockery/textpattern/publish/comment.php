@@ -28,11 +28,9 @@ $LastChangedRevision$
 		$rs = safe_row('*, unix_timestamp(Posted) as uPosted', 'textpattern', "ID='".doSlash($id)."' and Status >= 4");
 		if ($rs) {
 			populateArticleData($rs);
-			if (ps('preview')) 
-				$GLOBALS['comment_preview'] = 1;
 
 			$result = parse(fetch_form('comments_display'));
-			unset($GLOBALS['comment_preview']);
+
 			return $result;
 		}
 
@@ -67,7 +65,7 @@ $LastChangedRevision$
 			'msgcols'   => '25',
 			'msgstyle'  => '',
 			'form'   => 'comment_form',
-		),$atts));
+		),$atts, 0));
 
 		$namewarn = false;
 		$emailwarn = false;
@@ -75,6 +73,8 @@ $LastChangedRevision$
 		$name  = pcs('name');
 		$email = clean_url(pcs('email'));
 		$web   = clean_url(pcs('web'));
+		$n_message = 'message';
+
 		extract( doStripTags( doDeEnt ( psa( array(
 			'checkbox_type',
 			'remember',
@@ -85,7 +85,13 @@ $LastChangedRevision$
 			'submit',
 			'backpage'
 		) ) ) ) );
-			
+
+		if ($message == '')
+		{	//Second or later preview will have randomized message-field name
+			$in = getComment();
+			$message = doStripTags(doDeEnt($in['message']));
+		}
+
 		if ( $preview ) {
 			$name  = ps( 'name' );
 			$email = clean_url(ps('email'));
@@ -93,6 +99,7 @@ $LastChangedRevision$
 			$nonce = getNextNonce();
 			$secret = getNextSecret();
 			safe_insert("txp_discuss_nonce", "issue_time=now(), nonce='$nonce', secret='$secret'");
+			$n_message = md5('message'.$secret);
 
 			$namewarn = ($comments_require_name && !trim($name));
 			$emailwarn = ($comments_require_email && !trim($email));
@@ -142,7 +149,7 @@ $LastChangedRevision$
 		$msgrows = ($msgrows and is_numeric($msgrows)) ? ' rows="'.intval($msgrows).'"' : '';
 		$msgcols = ($msgcols and is_numeric($msgcols)) ? ' cols="'.intval($msgcols).'"' : '';
 		$textarea = '<textarea class="txpCommentInputMessage'.(($commentwarn) ? ' comments_error"' : '"')
-					.' name="message" id="message" '.$msgcols.$msgrows.$msgstyle.'>'
+					.' name="'.$n_message.'" id="message" '.$msgcols.$msgrows.$msgstyle.'>'
 					.htmlspecialchars($message).'</textarea>';
 
 		$comment_submit_button = ($preview)
@@ -153,13 +160,13 @@ $LastChangedRevision$
 		{
 			if ($forget == 1)
 				destroyCookies(); // inhibit default remember
-			$checkbox = checkbox('forget',1,$forget).tag(gTxt('forget'),'label',' for="forget"');
+			$checkbox = checkbox('forget', 1, $forget, '', 'forget').tag(gTxt('forget'),'label',' for="forget"');
 		}
 		else
 		{
 			if ($remember != 1)
 				destroyCookies(); // inhibit default remember
-			$checkbox = checkbox('remember',1,$remember).tag(gTxt('remember'),'label',' for="remember"');
+			$checkbox = checkbox('remember', 1, $remember, '', 'remember').tag(gTxt('remember'),'label',' for="remember"');
 		}
 		$checkbox .= hInput('checkbox_type', $checkbox_type); 
 
@@ -248,7 +255,7 @@ $LastChangedRevision$
 
 		$n = array();
 		foreach (stripPost() as $k=>$v)
-			if (strlen($k.$v) == 32) $n[] = "'".doSlash($k.$v)."'";
+			if (preg_match('#^[A-Fa-f0-9]{32}$#',$k.$v)) $n[] = "'".doSlash($k.$v)."'";
 		$c['nonce'] = '';
 		$c['secret'] = '';
 		if (!empty($n)) {
@@ -256,6 +263,7 @@ $LastChangedRevision$
 			$c['nonce'] = $rs['nonce'];
 			$c['secret'] = $rs['secret'];
 		}
+		$c['message'] = ps(md5('message'.$c['secret']));
 		return $c;
 	}
 
@@ -328,7 +336,7 @@ $LastChangedRevision$
 				if ($rs) {
 					safe_update("txp_discuss_nonce", "used='1'", "nonce='".doslash($nonce)."'");
 					if ($prefs['comment_means_site_updated']) {
-						safe_update("txp_prefs", "val=now()", "name='lastmod'");
+						update_lastmod();
 					}
 					if ($comments_sendmail) {
 						mail_comment($message,$name,$email,$web,$parentid, $rs);
@@ -339,17 +347,14 @@ $LastChangedRevision$
 					$backpage = substr($backpage, 0, $prefs['max_url_len']);
 					$backpage = preg_replace("/[\x0a\x0d#].*$/s",'',$backpage);
 					$backpage .= ((strstr($backpage,'?')) ? '&' : '?') . 'commented='.(($visible==VISIBLE) ? '1' : '0');
+					$backpage = preg_replace("#(https?://[^/]+)/.*$#","$1",hu).$backpage;
 					txp_status_header('302 Found');
 					if($comments_moderate){
 						header('Location: '.$backpage.'#txpCommentInputForm');
 					}else{
 						header('Location: '.$backpage.'#c'.sprintf("%06s",$rs));
 					}
-					if($prefs['logging'] == 'refer') { 
-						logit('refer'); 
-					} elseif ($prefs['logging'] == 'all') {
-						logit();
-					}
+					log_hit('302');
 					$evaluator->write_trace();
 					exit;
 				}
