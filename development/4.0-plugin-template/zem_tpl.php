@@ -53,7 +53,7 @@ function compile_plugin($file='') {
 		}
 	} elseif ($plugin['help_type'] === 1) {
 		// textpattern will textile it
-		$plugin['help'] = strip_tags(ltrim($plugin['help'],"\x0A\x0D"));
+		$plugin['help'] = ltrim($plugin['help'],"\x0A\x0D");
 	}
 
 	$plugin['md5'] = md5( $plugin['code'] );
