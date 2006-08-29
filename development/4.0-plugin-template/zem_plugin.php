@@ -22,11 +22,6 @@ $plugin['description'] = 'Short description';
 // 2 = library; loaded only when include_plugin() or require_plugin() is called
 $plugin['type'] = 0; 
 
-// Help type:
-// 0 = textile applied, otherwise untouched (old way)
-// 1 = textile applied, but all other tags are stripped (recommended)
-$plugin['help_type'] = 1; 
-
 @include_once('zem_tpl.php');
 
 if (0) {

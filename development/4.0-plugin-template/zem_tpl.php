@@ -45,15 +45,13 @@ function compile_plugin($file='') {
 	$plugin['help'] = extract_section($content, 'HELP');
 	$plugin['code'] = extract_section($content, 'CODE');
 
-	if ($plugin['help_type'] === 0) {
-		@include('classTextile.php');
-		if (class_exists('Textile')) {
-			$textile = new Textile();
-			$plugin['help'] = $textile->TextileThis($plugin['help']);
-		}
-	} elseif ($plugin['help_type'] === 1) {
-		// textpattern will textile it
-		$plugin['help'] = ltrim($plugin['help'],"\x0A\x0D");
+	// textpattern will textile it
+	$plugin['help_raw'] = trim($plugin['help']);
+
+	@include('classTextile.php');
+	if (class_exists('Textile')) {
+		$textile = new Textile();
+		$plugin['help'] = $textile->TextileThis($plugin['help']);
 	}
 
 	$plugin['md5'] = md5( $plugin['code'] );
