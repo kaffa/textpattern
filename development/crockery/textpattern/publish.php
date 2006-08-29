@@ -204,7 +204,7 @@ $LastChangedRevision$
 		$is_404 = 0;
 
 			// if messy vars exist, bypass url parsing
-		if (!$out['id'] && !$out['s'] && !(txpinterface=='css')) {
+		if (!$out['id'] && !$out['s'] && !(txpinterface=='css')  && !(txpinterface=='admin') ) {
 			
 			// return clean URL test results for diagnostics
 			if (gps('txpcleantest') and serverSet('SERVER_ADDR') == serverSet('REMOTE_ADDR')) {
@@ -377,8 +377,6 @@ $LastChangedRevision$
 			// by this point we should know the section, so grab its page and css
 		$rs = safe_row("*", "txp_section", "name = '".doSlash($s)."' limit 1");
 		$out['page'] = @$rs['page'];		
-// Remove the below line if nothing breaks
-// 		$out['css']  = @$rs['css'];
 
 		if(is_numeric($id)) {
 			$a = safe_row('*, unix_timestamp(Posted) as uPosted', 'textpattern', "ID='".doSlash($id)."' and Status in (4,5)");

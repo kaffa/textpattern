@@ -160,7 +160,7 @@ $LastChangedRevision$
 					graf(gTxt('form_type').br.
 						formtypes($type)).
 					graf(gTxt('only_articles_can_be_previewed')).
-					fInput('submit','preview',gTxt('preview'),'smallbox').
+					fInput('submit','form_preview',gTxt('preview'),'smallbox').
 					graf($inputs).
 					'</form>'
 
