@@ -830,8 +830,8 @@ $LastChangedRevision: 1127 $
 			$charset = 'UTF-8';
 		}
 
-		$RealName = strip_rn($RealName);
-		$subject = strip_rn($subject);
+		$RealName = encode_mailheader(strip_rn($RealName), 'phrase');
+		$subject = encode_mailheader(strip_rn($subject), 'text');
 		$email = strip_rn($email);
 
 		if (!is_null($reply_to))
@@ -862,6 +862,35 @@ $LastChangedRevision: 1127 $
 				$sep
 			);
 		}
+	}
+
+// -------------------------------------------------------------
+	function encode_mailheader($string, $type)
+	{
+		global $prefs;
+		if (!strstr($string,'=?') and !preg_match('/[\x00-\x1F\x7F-\xFF]/', $string)) {
+			if ("phrase" == $type) {
+				if (preg_match('/[][()<>@,;:".\x5C]/', $string)) {
+					$string = '"'. strtr($string, array("\\" => "\\\\", '"' => '\"')) . '"';
+				} 
+			}
+			elseif ( "text" != $type) {
+				trigger_error( 'Unknown encode_mailheader type', E_USER_WARNING);
+			}
+			return $string;
+		}
+		if ($prefs['override_emailcharset']) {
+			$start = '=?ISO-8859-1?B?';
+			$pcre  = '/.{1,42}/s';
+		}
+		else {
+			$start = '=?UTF-8?B?';
+			$pcre  = '/.{1,45}(?=[\x00-\x7F\xC0-\xFF]|$)/s';
+		}
+		$end = '?=';
+		$sep = is_windows() ? "\r\n" : "\n";
+		preg_match_all($pcre, $string, $matches);
+		return $start . join($end.$sep.' '.$start, array_map('base64_encode',$matches[0])) . $end;
 	}
 
 // -------------------------------------------------------------
