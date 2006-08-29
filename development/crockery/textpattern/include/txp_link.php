@@ -340,6 +340,8 @@ $LastChangedRevision$
 			description = '$description'"
 		);
 
+		$GLOBALS['ID'] = mysql_insert_id( );
+		
 		if ($q) {
 			//update lastmod due to link feeds
 			safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
