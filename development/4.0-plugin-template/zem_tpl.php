@@ -42,7 +42,7 @@ function compile_plugin($file='') {
 		$content[$i] = rtrim($content[$i]);
 	}
 
-	$plugin['help'] = extract_section($content, 'HELP');
+	$plugin['help'] = trim(extract_section($content, 'HELP'));
 	$plugin['code'] = extract_section($content, 'CODE');
 
 	// textpattern will textile it

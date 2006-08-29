@@ -16,8 +16,6 @@ $plugin['author'] = 'Threshold State';
 $plugin['author_uri'] = 'http://thresholdstate.com/';
 $plugin['description'] = 'Simple plugin examples';
 $plugin['type'] = 1; // 0 for regular plugin; 1 if it includes admin-side code
-$plugin['help_type'] = 1; // 1 only textile; 0 textile+html
-
 
 @include_once('zem_tpl.php');
 
