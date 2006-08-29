@@ -45,9 +45,11 @@ function compile_plugin($file='') {
 	$plugin['help'] = trim(extract_section($content, 'HELP'));
 	$plugin['code'] = extract_section($content, 'CODE');
 
-	// textpattern will textile it
-	$plugin['help_raw'] = trim($plugin['help']);
+	// textpattern will textile it, and encode html
+	if (!(@$plugin['allow_html_help'] == 1))
+		$plugin['help_raw'] = trim($plugin['help']);
 
+	// This is for bc; and for help that needs to use
 	@include('classTextile.php');
 	if (class_exists('Textile')) {
 		$textile = new Textile();
