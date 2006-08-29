@@ -46,8 +46,7 @@ function compile_plugin($file='') {
 	$plugin['code'] = extract_section($content, 'CODE');
 
 	// textpattern will textile it, and encode html
-	if (!(@$plugin['allow_html_help'] == 1))
-		$plugin['help_raw'] = trim($plugin['help']);
+	$plugin['help_raw'] = $plugin['help'];
 
 	// This is for bc; and for help that needs to use
 	@include('classTextile.php');
