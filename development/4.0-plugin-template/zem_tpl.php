@@ -57,8 +57,7 @@ function compile_plugin($file='') {
 
 	$plugin['md5'] = md5( $plugin['code'] );
 
-	$plugin['compress'] = ($plugin['compress'] && extension_loaded('zlib'));
-	$body = ($plugin['compress']) ?  gzencode(serialize($plugin),9) : serialize($plugin);
+	$body = serialize($plugin);
 
 	// to produce a copy of the plugin for distribution, load this file in a browser. 
 
