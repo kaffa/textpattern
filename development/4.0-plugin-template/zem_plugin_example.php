@@ -9,8 +9,7 @@
 // Plugin name is optional.  If unset, it will be extracted from the current
 // file name. Uncomment and edit this line to override:
 # $plugin['name'] = 'abc_plugin';
-# $plugin['compress'] = 1; // only works for 4.0.3 or later; only when zlib is enabled
-# $plugin['allow_html_help'] = 1 // Use only when you want to also use html in your help-text
+# $plugin['allow_html_help'] = 1 // Allow raw HTML help, as opposed to Textile.  Not recommended.
 
 $plugin['version'] = '0.1';
 $plugin['author'] = 'Threshold State';
