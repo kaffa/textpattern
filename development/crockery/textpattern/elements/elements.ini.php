@@ -15,4 +15,7 @@ event = "pub_file"
 [tag_file]
 event = "pub_page"
 
+[include/txp_section]
+event = "section"
+
 ; */ ?>

@@ -1,31 +1,28 @@
 <?php
 
 /*
-	This is Textpattern
-
-	Copyright 2005 by Dean Allen
-	www.textpattern.com
-	All rights reserved
-
-	Use of this software indicates acceptance ofthe Textpattern license agreement 
 
 $HeadURL$
 $LastChangedRevision$
 
 */
 
+register_callback('section_event', 'section');
+
+
 	if (!defined('txpinterface')) die('txpinterface is undefined.');
 
-	if ($event == 'section') {
-		require_privs('section');		
+	function section_event($event, $step) {
+		require_privs('section');
 
 		if(!$step or !function_exists($step) or !in_array($step, array('sec_section_list','section_create','section_delete','section_save'))){
 			sec_section_list();
 		} else $step();
 	}
+	
 
 // -------------------------------------------------------------
-	function sec_section_list($message='') 
+	function sec_section_list($message='')
 	{
 		pagetop(gTxt('sections'),$message);
 
@@ -38,7 +35,7 @@ $LastChangedRevision$
 			tr(
 				tdcs(strong(gTxt('section_head')).sp.popHelp('section_category'),3)
 			);
-		$out[] = 
+		$out[] =
 			tr(tdcs(form(
 				fInput('text','name','','edit','','',10).
 				fInput('submit','',gTxt('Create'),'smallerbox').
