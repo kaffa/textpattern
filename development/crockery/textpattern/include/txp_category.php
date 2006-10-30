@@ -174,11 +174,11 @@ if ($event == 'category') {
 		$o = hed(gTxt($evname.'_head').sp.popHelp($evname.'_category'), 3);
 
 		$o .= form(
-			fInput('text', 'name', '', 'edit', '', '', 20).
-			fInput('submit', '', gTxt('Create'), 'smallerbox').
-			eInput('category').
-			sInput('cat_'.$evname.'_create')
-		);
+				fInput('text', 'title', '', 'edit', '', '', 20).
+				fInput('submit', '', gTxt('Create'), 'smallerbox').
+				eInput('category').
+				sInput('cat_'.$event.'_create')
+			);
 
 		$rs = getTree('root', $evname);
 
@@ -306,9 +306,9 @@ if ($event == 'category') {
 		$name = preg_replace("/[^[:alnum:]\-_]/", "", str_replace(" ","-",$name));
 
 		$check = safe_field("name", "txp_category", "name='$name' and type='$evname'");
-		$title = doSlash($name);
+		$title = ps('title');
 
-		$name = stripSpace(ps('name'), 1);
+		$name = stripSpace($title, 1);
 
 		if (!$check) {
 			if($name) {				
@@ -325,7 +325,7 @@ if ($event == 'category') {
 			cat_category_list(messenger($evname.'_category',$name,'already_exists'));		
 		}
 
-		$exists = safe_field('name', 'txp_category', "name = '$name' and type = '$event'");
+		$exists = safe_field('name', 'txp_category', "name = '".doSlash($name)."' and type = '$event'");
 
 		if ($exists)
 		{
@@ -334,7 +334,7 @@ if ($event == 'category') {
 			return cat_category_list($message);
 		}
 
-		$q = safe_insert('txp_category', "name = '$name', title = '$title', type = '$event', parent = 'root'");
+		$q = safe_insert('txp_category', "name = '".doSlash($name)."', title = '".doSlash($title)."', type = '$event', parent = 'root'");
 
 		if ($q)
 		{
