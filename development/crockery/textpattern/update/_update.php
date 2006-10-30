@@ -21,6 +21,9 @@ $LastChangedRevision$
 		return $files;
 	}
 
+	if ( $txp_using_svn && (newest_file() <= $dbupdatetime) ) 
+		return;
+
 	@ignore_user_abort(1);
 	@set_time_limit(0);
 
@@ -63,7 +66,7 @@ $LastChangedRevision$
 
 	// keep track of updates for svn users
 	safe_delete('txp_prefs',"name = 'dbupdatetime'");
-	safe_insert('txp_prefs', "prefs_id=1, name='dbupdatetime',val='".max(filemtime(__FILE__),time())."', type='2'");
+	safe_insert('txp_prefs', "prefs_id=1, name='dbupdatetime',val='".max(newest_file(),time())."', type='2'");
 	// update version
 	safe_delete('txp_prefs',"name = 'version'");
 	safe_insert('txp_prefs', "prefs_id=1, name='version',val='$dbversion', type='2'");

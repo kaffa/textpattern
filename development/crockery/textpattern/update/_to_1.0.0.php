@@ -227,7 +227,7 @@ eod;
 	
 		while ($a = mysql_fetch_array($rs)){
 			extract($a);
-			$url_title = addslashes(stripSpace($Title));
+			$url_title = addslashes(stripSpace($Title,1));
 			safe_update("textpattern","url_title = '$url_title'","ID=$ID");
 		}
 

@@ -308,8 +308,7 @@ if ($event == 'category') {
 		$check = safe_field("name", "txp_category", "name='$name' and type='$evname'");
 		$title = ps('title');
 
-		$name = preg_replace("/(^|&\S+;)|(<[^>]*>)/U","",dumbDown($title));
-		$name = preg_replace("/[^A-Za-z0-9\-_]/","",$name);
+		$name = sanitizeForUrl($title);
 
 		if (!$check) {
 			if($name) {				
@@ -376,8 +375,7 @@ if ($event == 'category') {
 
 		extract(doSlash(psa(array('id', 'name', 'old_name', 'parent', 'title'))));
 
-		$name = preg_replace("/(^|&\S+;)|(<[^>]*>)/U","",dumbDown($name));
-		$name = preg_replace("/[^A-Za-z0-9\-_]/","",$name);
+		$name = sanitizeForUrl($name);
 
 		// make sure the name is valid
 		if (!$name)

@@ -590,19 +590,25 @@ $LastChangedRevision: 1127 $
 		global $prefs;
 		if ($force or !empty($prefs['attach_titles_to_permalinks'])) {
 		
-			$text = dumbDown($text);
-			$text = preg_replace("/(^|&\S+;)|(<[^>]*>)/U","",$text);		
-
+			$text = sanitizeForUrl($text);
 			if ($prefs['permalink_title_format']) {
-				$text =  
-				strtolower(
-					preg_replace('/[\s\-]+/', '-', trim(preg_replace('/[^\w\s\-]/', '', $text)))
-				);
-				return preg_replace("/[^A-Za-z0-9\-]/","",$text);
+				return strtolower($text);
 			} else {
-				return preg_replace("/[^A-Za-z0-9]/","",$text);
+				return str_replace('-','',$text);
 			}
 		}
+	}
+
+// -------------------------------------------------------------
+	function sanitizeForUrl($text) 
+	{
+		// Remove names entities and tags
+		$text = preg_replace("/(^|&\S+;)|(<[^>]*>)/U","",dumbDown($text));
+		// Collapse spaces, minuses and non-words
+		$text = preg_replace('/[\s\-]+/', '-', trim(preg_replace('/[^\w\s\-]/', '', $text)));
+		// Remove all non-whitelisted characters
+		$text = preg_replace("/[^A-Za-z0-9\-_]/","",$text);
+		return $text;
 	}
 
 // -------------------------------------------------------------
@@ -710,6 +716,13 @@ $LastChangedRevision: 1127 $
 	function clean_url($url)
 	{
 		return preg_replace("/\"|'|(?:\s.*$)/",'',$url);
+	}
+
+// -------------------------------------------------------------
+	function noWidow($str)
+	{
+		// replace the last space with a nbsp
+		return preg_replace('@[ ]+(\w+[[:punct:]]?)$@', '&nbsp;$1', $str);
 	}
 
 // -------------------------------------------------------------
@@ -1404,7 +1417,8 @@ $LastChangedRevision: 1127 $
 				if (!$exit)
 					return array('304', $last);
 				txp_status_header('304 Not Modified');
-				header('Connection: close');
+#				header('Connection: close');
+				header('Content-Length: 0');
 				# discard all output
 				while (@ob_end_clean());
 				exit;
