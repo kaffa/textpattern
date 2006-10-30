@@ -37,19 +37,22 @@ $LastChangedRevision$
 				,' colspan="8" style="height: 30px; border: none;"')
 			);
 
-		$rs = safe_rows_start('*', 'txp_plugin', "1 order by name");
+		$rs = safe_rows_start('*, md5(code) as md5', 'txp_plugin', "1 order by name");
 
 		if ($rs and numRows($rs) > 0)
 		{
-			echo assHead('plugin', 'author', 'version', 'description', 'active', 'help', '', '');
+			echo assHead('plugin', 'author', 'version', 'modified', 'description', 'active', 'help', '', '');
 
 			while ($a = nextRow($rs))
 			{
 				extract($a);
 
-				$help = !empty($help) ? 
-					'<a href="?event=plugin'.a.'step=plugin_help'.a.'name='.$name.'">'.gTxt('view').'</a>' : 
+				$help = !empty($help) ?
+					'<a href="?event=plugin'.a.'step=plugin_help'.a.'name='.$name.'">'.gTxt('view').'</a>' :
 					gTxt('none');
+
+				// modified?
+				$modified = (strtolower($md5) != strtolower($code_md5));
 
 				echo tr(
 
@@ -60,6 +63,7 @@ $LastChangedRevision$
 					).
 
 					td($version, 10).
+					td($modified ? gTxt('yes') : '').
 					td($description, 260).
 
 					td(

@@ -306,6 +306,9 @@ if ($event == 'category') {
 		$name = preg_replace("/[^[:alnum:]\-_]/", "", str_replace(" ","-",$name));
 
 		$check = safe_field("name", "txp_category", "name='$name' and type='$evname'");
+		$title = doSlash($name);
+
+		$name = stripSpace(ps('name'), 1);
 
 		if (!$check) {
 			if($name) {				
@@ -321,6 +324,27 @@ if ($event == 'category') {
 		} else {
 			cat_category_list(messenger($evname.'_category',$name,'already_exists'));		
 		}
+
+		$exists = safe_field('name', 'txp_category', "name = '$name' and type = '$event'");
+
+		if ($exists)
+		{
+			$message = gTxt($event.'_category_already_exists', array('{name}' => $name));
+
+			return cat_category_list($message);
+		}
+
+		$q = safe_insert('txp_category', "name = '$name', title = '$title', type = '$event', parent = 'root'");
+
+		if ($q)
+		{
+			rebuild_tree('root', 1, $event);
+
+			$message = gTxt($event.'_category_created', array('{name}' => $name));
+
+			cat_category_list($message);
+		}
+>>>>>>> .merge-right.r1744
 	}
 
 //-------------------------------------------------------------
