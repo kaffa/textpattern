@@ -16,7 +16,7 @@ $LastChangedRevision$
 	{
 		$rs = safe_rows(
 			"*, unix_timestamp(posted) as time", 
-			"txp_discuss", "parentid='".doSlash($id)."' and visible='.VISIBLE.' order by posted asc"
+			"txp_discuss", 'parentid='.intval($id).' and visible='.VISIBLE.' order by posted asc'
 		);
 
 		if ($rs) return $rs;
@@ -25,7 +25,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function discuss($id)
 	{
-		$rs = safe_row('*, unix_timestamp(Posted) as uPosted', 'textpattern', "ID='".doSlash($id)."' and Status >= 4");
+		$rs = safe_row('*, unix_timestamp(Posted) as uPosted', 'textpattern', 'ID='.intval($id).' and Status >= 4');
 		if ($rs) {
 			populateArticleData($rs);
 
@@ -98,7 +98,7 @@ $LastChangedRevision$
 			$web   = clean_url(ps('web'));
 			$nonce = getNextNonce();
 			$secret = getNextSecret();
-			safe_insert("txp_discuss_nonce", "issue_time=now(), nonce='$nonce', secret='$secret'");
+			safe_insert("txp_discuss_nonce", "issue_time=now(), nonce='".doSlash($nonce)."', secret='".doSlash($secret)."'");
 			$n_message = md5('message'.$secret);
 
 			$namewarn = ($comments_require_name && !trim($name));
@@ -147,7 +147,7 @@ $LastChangedRevision$
 			# prevent XHTML Strict validation gotchas
 			n.'<div class="comments-wrapper">'.n.n;
 
-		$Form = fetch('Form', 'txp_form', 'name', $form);
+		$Form = fetch('Form', 'txp_form', 'name', doSlash($form));
 
 		$msgstyle = ($msgstyle ? ' style="'.$msgstyle.'"' : '');
 		$msgrows = ($msgrows and is_numeric($msgrows)) ? ' rows="'.intval($msgrows).'"' : '';
@@ -278,7 +278,7 @@ $LastChangedRevision$
 		$c['nonce'] = '';
 		$c['secret'] = '';
 		if (!empty($n)) {
-			$rs = safe_row('nonce, secret', 'txp_discuss_nonce', "nonce in (".join(',', $n).")");
+			$rs = safe_row('nonce, secret', 'txp_discuss_nonce', "nonce in ('".join("','", $n)."')");
 			$c['nonce'] = $rs['nonce'];
 			$c['secret'] = $rs['secret'];
 		}
@@ -325,7 +325,7 @@ $LastChangedRevision$
 		$message2db = doSlash(markup_comment($message));
 
 		$isdup = safe_row("message,name", "txp_discuss", 
-			"name='$name' and message='$message2db' and ip='$ip'");
+			"name='$name' and message='$message2db' and ip='".doSlash($ip)."'");
 
 		if (   ($prefs['comments_require_name'] && !trim($name))
 			|| ($prefs['comments_require_email'] && !trim($email))
@@ -343,13 +343,13 @@ $LastChangedRevision$
 			if ($visible != RELOAD) {
 				$rs = safe_insert(
 					"txp_discuss",
-					"parentid  = '".doSlash($parentid)."',
+					"parentid  = '".intval($parentid)."',
 					 name		  = '$name',
 					 email	  = '$email',
 					 web		  = '$web',
-					 ip		  = '$ip',
+					 ip		  = '".doSlash($ip)."',
 					 message   = '$message2db',
-					 visible   = $visible,
+					 visible   = ".intval($visible).",
 					 posted	  = now()"
 				);
 				if ($rs) {
@@ -474,7 +474,7 @@ function checkNonce($nonce)
 // -------------------------------------------------------------
 	function checkBan($ip)
 	{
-		return (!fetch("ip", "txp_discuss_ipban", "ip", "$ip")) ? true : false;
+		return (!fetch("ip", "txp_discuss_ipban", "ip", doslash($ip))) ? true : false;
 	}
 
 // -------------------------------------------------------------
@@ -497,7 +497,7 @@ function checkNonce($nonce)
 			extract(	
 				safe_row(
 					"Annotate,unix_timestamp(Posted) as uPosted",
-						"textpattern", "ID='$id'"
+						"textpattern", "ID = $id"
 				)
 			);
 		}
@@ -524,7 +524,7 @@ function checkNonce($nonce)
 	function mail_comment($message, $cname, $cemail, $cweb, $parentid, $discussid) 
 	{
 		global $sitename;
-		$article = safe_row("Section, Posted, ID, url_title, AuthorID, Title", "textpattern", "ID = '$parentid'");
+		$article = safe_row("Section, Posted, ID, url_title, AuthorID, Title", "textpattern", 'ID = '.intval($parentid));
 		extract($article);
 		extract(safe_row("RealName, email", "txp_users", "name = '".doSlash($AuthorID)."'"));
 

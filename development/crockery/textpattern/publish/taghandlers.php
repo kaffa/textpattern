@@ -46,12 +46,16 @@ $LastChangedRevision$
 
 		if ($id)
 		{
+			$id = (int) $id;
+
 			$out = $sitename.$separator.
 				safe_field('Title', 'textpattern', "ID = $id");
 		}
 
 		if ($parentid)
 		{
+			$parent_id = (int) $parent_id;
+
 			$out = $sitename.$separator.gTxt('comments_on').' '.
 				safe_field('Title', 'textpattern', "ID = $parentid");
 		}
@@ -149,9 +153,9 @@ $LastChangedRevision$
 
 			else
 			{
-				$id = intval($id);
+				$id = (int) $id;
 
-				$rs = safe_row('*', 'txp_image', "id = '$id' limit 1");
+				$rs = safe_row('*', 'txp_image', "id = $id limit 1");
 
 				$cache['i'][$id] = $rs;
 			}
@@ -174,6 +178,8 @@ $LastChangedRevision$
 
 			$out = '<img src="'.hu.$img_dir.'/'.$id.$ext.'" width="'.$w.'" height="'.$h.'" alt="'.$alt.'"'.
 				($caption ? ' title="'.$caption.'"' : '').
+				( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
+				( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 				($style ? ' style="'.$style.'"' : '').
 				($align ? ' align="'.$align.'"' : '').
 				' />';
@@ -211,9 +217,9 @@ $LastChangedRevision$
 
 		elseif ($id)
 		{
-			$id = intval($id);
+			$id = (int) $id;
 
-			$rs = safe_row('*', 'txp_image', "id = '$id' limit 1");
+			$rs = safe_row('*', 'txp_image', "id = $id limit 1");
 		}
 
 		else
@@ -235,6 +241,8 @@ $LastChangedRevision$
 
 				$out = '<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="'.$alt.'"'.
 					($caption ? ' title="'.$caption.'"' : '').
+					( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
+					( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 					($style ? ' style="'.$style.'"' : '').
 					($align ? ' align="'.$align.'"' : '').
 					' />';
@@ -373,9 +381,9 @@ $LastChangedRevision$
 		$form = fetch_form($form);
 
 		$qparts = array(
-			($category) ? "category = '$category'" : '1',
-			"order by $sort",
-			($limit) ? "limit $limit" : ''
+			($category) ? "category = '".doSlash($category)."'" : '1',
+			'order by '.doSlash($sort),
+			($limit) ? 'limit '.intval($limit) : ''
 		);
 
 		$rs = safe_rows_start('*, unix_timestamp(date) as uDate', 'txp_link', join(' ', $qparts));
@@ -623,7 +631,7 @@ $LastChangedRevision$
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';
 
 		$rs = safe_rows_start('*, id as thisid, unix_timestamp(Posted) as posted', 'textpattern', 
-			"Status = 4 $section $categories and Posted <= now() order by $sort limit 0,$limit");
+			"Status = 4 $section $categories and Posted <= now() order by ".doSlash($sort).' limit 0,'.intval($limit));
 
 		if ($rs)
 		{
@@ -658,7 +666,7 @@ $LastChangedRevision$
 		), $atts));
 
 		$rs = safe_rows_start('parentid, name, discussid', 'txp_discuss', 
-			"visible = ".VISIBLE." order by $sort limit 0,$limit");
+			'visible = '.VISIBLE.' order by '.doSlash($sort).' limit 0,'.intval($limit));
 
 		if ($rs)
 		{
@@ -667,7 +675,7 @@ $LastChangedRevision$
 			while ($c = nextRow($rs))
 			{
 				$a = safe_row('*, ID as thisid, unix_timestamp(Posted) as posted', 
-					'textpattern', 'ID = '.$c['parentid']);
+					'textpattern', 'ID = '.intval($c['parentid']));
 
 				If ($a['Status'] >= 4)
 				{
@@ -752,7 +760,7 @@ $LastChangedRevision$
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';
 
 		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted', 'textpattern', 
-			"ID != ".$id." and Status = 4 and Posted <= now() $categories $section order by $sort limit 0,$limit");
+			'ID != '.intval($id)." and Status = 4 and Posted <= now() $categories $section order by ".doSlash($sort).' limit 0,'.intval($limit));
 	
 		if ($rs)
 		{
@@ -878,7 +886,7 @@ $LastChangedRevision$
 			$categories = join("','", doSlash($categories));
 
 			$rs = safe_rows_start('name, title', 'txp_category', 
-				"type = '$type' and name in ('$categories') order by field(name, '$categories')");
+				"type = '".doSlash($type)."' and name in ('$categories') order by field(name, '$categories')");
 		}
 
 		else
@@ -893,14 +901,14 @@ $LastChangedRevision$
 
 			if ($parent)
 			{
-				$qs = safe_row('lft, rgt', 'txp_category', "name = '$parent'");
+				$qs = safe_row('lft, rgt', 'txp_category', "name = '".doSlash($parent)."'");
 
 				if ($qs)
 				{
 					extract($qs);
 
 					$rs = safe_rows_start('name, title', 'txp_category', 
-						"(lft between $lft and $rgt) and type = '$type' and name != 'default' $exclude order by lft asc");
+						"(lft between $lft and $rgt) and type = '".doSlash($type)."' and name != 'default' $exclude order by lft asc");
 				}
 			}
 
@@ -1029,7 +1037,7 @@ $LastChangedRevision$
 		),$atts));	
 
 		if ($form) {
-			$rs = fetch('form','txp_form','name',$form);
+			$rs = fetch('form','txp_form','name',doSlash($form));
 			if ($rs) {
 				return $rs;
 			}
@@ -1463,7 +1471,7 @@ $LastChangedRevision$
 			extract(
 				safe_row(
 					"Annotate,AnnotateInvite,unix_timestamp(Posted) as uPosted",
-						"textpattern", "ID='{$id}'"
+						"textpattern", 'ID = '.intval($id)
 				)
 			);
 
@@ -1477,7 +1485,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function comments($atts)
 	{
-		global $thisarticle, $prefs, $comment_preview, $pretext;
+		global $thisarticle, $prefs, $pretext;
 		extract($prefs);
 
 		extract(lAtts(array(
@@ -1497,33 +1505,21 @@ $LastChangedRevision$
 
 		$Form = fetch_form($form);
 
-		if (!empty($comment_preview)) {
-			$preview = psas(array('name','email','web','message','parentid','remember'));
-			$preview['time'] = time();
-			$preview['discussid'] = 0;
-			$preview['message'] = markup_comment($preview['message']);
-			$GLOBALS['thiscomment'] = $preview;
-			$comments[] = parse($Form).n;
-			unset($GLOBALS['thiscomment']);
-			$out = doWrap($comments,$wraptag,$break,$class,$breakclass);
-		}
-		else {
-			$rs = safe_rows_start("*, unix_timestamp(posted) as time", "txp_discuss",
-				"parentid='$id' and visible=".VISIBLE." order by posted asc");
-							
-			$out = '';
+		$rs = safe_rows_start("*, unix_timestamp(posted) as time", "txp_discuss",
+			'parentid='.intval($id).' and visible='.VISIBLE.' order by posted asc');
 
-			if ($rs) {
-				$comments = array();
+		$out = '';
 
-				while($vars = nextRow($rs)) {
-					$GLOBALS['thiscomment'] = $vars;
-					$comments[] = parse($Form).n;
-					unset($GLOBALS['thiscomment']);
-				}
+		if ($rs) {
+			$comments = array();
 
-				$out .= doWrap($comments,$wraptag,$break,$class,$breakclass);
+			while($vars = nextRow($rs)) {
+				$GLOBALS['thiscomment'] = $vars;
+				$comments[] = parse($Form).n;
+				unset($GLOBALS['thiscomment']);
 			}
+
+			$out .= doWrap($comments,$wraptag,$break,$class,$breakclass);
 		}
 
 		return $out;
@@ -1532,30 +1528,18 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function comments_preview($atts, $thing='', $me='')
 	{
-		global $thisarticle;
+		global $thisarticle, $has_comments_preview;
 		if (!ps('preview'))
 			return;
 
-		
+
 		extract(lAtts(array(
 			'id'		   => @$pretext['id'],
 			'form'		=> 'comments',
-			'bc'		=> false,  // backwards-compatibility; only internally for old preview behaviour
 			'wraptag'	=> '',
 			'class'		=> __FUNCTION__,
-		),$atts));	
+		),$atts));
 
-		//FIXME for crockery. This emulates the old hardcoded preview behaviour.
-		if ($bc)
-		{
-			if (@$GLOBALS['pretext']['secondpass'] == false)
-				return $me;
-			if (@$GLOBALS['pretext']['comments_preview_shown'])
-				return '';
-			else
-				return '<a id="cpreview"></a>'.discuss($id);
-		}
-		$GLOBALS['pretext']['comments_preview_shown'] = true;
 
 		assert_article();
 		
@@ -1568,12 +1552,21 @@ $LastChangedRevision$
 		$preview = psas(array('name','email','web','message','parentid','remember'));
 		$preview['time'] = time();
 		$preview['discussid'] = 0;
+		if ($preview['message'] == '')
+		{
+			$in = getComment();
+			$preview['message'] = $in['message'];
+
+		}
 		$preview['message'] = markup_comment($preview['message']);
 
 		$GLOBALS['thiscomment'] = $preview;
 		$comments = parse($Form).n;
 		unset($GLOBALS['thiscomment']);
 		$out = doTag($comments,$wraptag,$class);
+		
+		# set a flag, to tell the comments_form tag that it doesn't have to show a preview
+		$has_comments_preview = true;
 
 		return $out;
 	}
@@ -2038,11 +2031,11 @@ function body($atts)
 			'escape'    => '',
 			'html_id'   => '',
 			'style' 	  => '', // remove in crockery?
-			'thumbnail' => 0
+			'thumbnail' => 0,
 			'wraptag'   => '',
 		), $atts));
 
-		if (isset($thisarticle['article_image']))
+		if ($thisarticle['article_image'])
 		{
 			$image = $thisarticle['article_image'];
 		}
@@ -2054,7 +2047,7 @@ function body($atts)
 
 		if (is_numeric($image))
 		{
-			$rs = safe_row('*', 'txp_image', "id = '$image'");
+			$rs = safe_row('*', 'txp_image', 'id = '.intval($image));
 
 			if ($rs)
 			{
@@ -2072,6 +2065,8 @@ function body($atts)
 
 						$out = '<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="'.$alt.'"'.
 							($caption ? ' title="'.$caption.'"' : '').
+							( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
+							( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 							($style ? ' style="'.$style.'"' : '').
 							($align ? ' align="'.$align.'"' : '').
 							' />';
@@ -2095,6 +2090,8 @@ function body($atts)
 
 					$out = '<img src="'.hu.$img_dir.'/'.$id.$ext.'" width="'.$w.'" height="'.$h.'" alt="'.$alt.'"'.
 						($caption ? ' title="'.$caption.'"' : '').
+						( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
+						( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 						($style ? ' style="'.$style.'"' : '').
 						($align ? ' align="'.$align.'"' : '').
 						' />';
@@ -2110,6 +2107,8 @@ function body($atts)
 		else
 		{
 			$out = '<img src="'.$image.'" alt=""'.
+				( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
+				( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 				($style ? ' style="'.$style.'"' : '').
 				($align ? ' align="'.$align.'"' : '').
 				' />';
@@ -2223,7 +2222,7 @@ function body($atts)
 		if (is_array($atts)) extract($atts);
 		global $s,$c,$p,$img_dir;
 		if($p) {
-			$rs = safe_row("*", "txp_image", "id='$p' limit 1");
+			$rs = safe_row("*", "txp_image", 'id='.intval($p).' limit 1');
 			if ($rs) {
 				extract($rs);
 				$impath = hu.$img_dir.'/'.$id.$ext;
@@ -2416,7 +2415,7 @@ function body($atts)
 		$article = safe_row(
 			"*,ID as thisid, unix_timestamp(Posted) as posted",
 			"textpattern",
-			"ID='".doSlash($ID)."'");
+			'ID='.intval($ID));
 		
 		return permlinkurl($article);
 	}
@@ -2488,7 +2487,7 @@ function body($atts)
 	{
 		global $comments_mode;
 
-		$dc = safe_count('txp_discuss',"parentid='$ID' and visible=".VISIBLE);
+		$dc = safe_count('txp_discuss','parentid='.intval($ID).' and visible='.VISIBLE);
 
 		$ccount = ($dc) ?  '['.$dc.']' : '';
 		if (!$comments_mode) {

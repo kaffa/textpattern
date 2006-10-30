@@ -361,7 +361,7 @@ $LastChangedRevision$
 			if (!is_numeric($out['id'])) {
 				$rs = safe_row("*", "txp_file", "filename='".doSlash($out['id'])."'");
 			} else {
-				$rs = safe_row("*", "txp_file", "id='".intval($out['id'])."'");
+				$rs = safe_row("*", "txp_file", 'id='.intval($out['id']));
 			}
 
 			$out = ($rs)? array_merge($out, $rs) : array('s'=>'file_download','file_error'=> 404);
@@ -382,11 +382,13 @@ $LastChangedRevision$
 		$out['page'] = @$rs['page'];		
 
 		if(is_numeric($id)) {
-			$a = safe_row('*, unix_timestamp(Posted) as uPosted', 'textpattern', "ID='".doSlash($id)."' and Status in (4,5)");
-			$Posted             = @$a['Posted'];
-			$out['id_keywords'] = @$a['Keywords'];
-			$out['id_author']   = @$a['AuthorID'];
-			populateArticleData($a);
+			$a = safe_row('*, unix_timestamp(Posted) as uPosted', 'textpattern', 'ID='.intval($id).' and Status = 4');
+			if ($a) {
+				$Posted             = @$a['Posted'];
+				$out['id_keywords'] = @$a['Keywords'];
+				$out['id_author']   = @$a['AuthorID'];
+				populateArticleData($a);
+			}
 
 			if ($np = getNextPrev($id, $Posted, $s))
 				$out = array_merge($out, $np);
@@ -618,11 +620,11 @@ $LastChangedRevision$
 		}
 
 		if ($q and $searchsticky)
-			$statusq = " and Status >= '4'";
+			$statusq = ' and Status >= 4';
 		elseif ($id)
-			$statusq = " and Status >= '4'";
+			$statusq = ' and Status >= 4';
 		else
-			$statusq = " and Status='".doSlash($status)."'";
+			$statusq = ' and Status = '.intval($status);
 
 		$where = "1=1" . $statusq. $time.
 			$search . $id . $category . $section . $excerpted . $month . $author . $keywords . $custom . $frontpage;
@@ -730,10 +732,10 @@ $LastChangedRevision$
 			if ($status and !is_numeric($status))
 				$status = getStatusNum($status);
 
-			$q_status = ($status ? "and Status='".doSlash($status)."'" : 'and Status in (4,5)');
+			$q_status = ($status ? 'and Status = '.intval($status) : 'and Status in (4,5)');
 
 			$rs = safe_row("*, unix_timestamp(Posted) as uPosted", 
-					"textpattern", "ID='".intval($id)."' $q_status limit 1");
+					"textpattern", 'ID = '.intval($id)." $q_status limit 1");
 
 			if ($rs) {
 				extract($rs);
@@ -963,19 +965,18 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function ckExID($val,$debug='') 
 	{
-		if (is_numeric($val))
-			return safe_row("ID,Section",'textpattern',"ID = '".doSlash($val)."' limit 1",$debug);
+		return safe_row("ID,Section",'textpattern','ID = '.intval($val).' and Status >= 4 limit 1',$debug);
 	}
 
 // -------------------------------------------------------------
 	function lookupByTitle($val,$debug='') 
 	{
-		return safe_row("ID,Section",'textpattern',"url_title like '".doSlash($val)."' limit 1",$debug);
+		return safe_row("ID,Section",'textpattern',"url_title like '".doSlash($val)."' and Status >= 4 limit 1",$debug);
 	}
 // -------------------------------------------------------------
 	function lookupByTitleSection($val,$section,$debug='') 
 	{
-		return safe_row("ID,Section",'textpattern',"url_title like '".doSlash($val)."' AND Section='$section' limit 1",$debug);
+		return safe_row("ID,Section",'textpattern',"url_title like '".doSlash($val)."' AND Section='".doSlash($section)."' and Status >= 4 limit 1",$debug);
 	}	
 
 // -------------------------------------------------------------
@@ -983,20 +984,20 @@ $LastChangedRevision$
 	function lookupByIDSection($id, $section, $debug = '') 
 	{
 		return safe_row('ID, Section', 'textpattern', 
-			"ID = ".intval($id)." and Section = '".doSlash($section)."' limit 1", $debug);
+			'ID = '.intval($id)." and Section = '".doSlash($section)."' and Status >= 4 limit 1", $debug);
 	}	
 
 // -------------------------------------------------------------
 	function lookupByID($id,$debug='') 
 	{
-		return safe_row("ID,Section",'textpattern',"ID = '".doSlash($id)."' limit 1",$debug);
+		return safe_row("ID,Section",'textpattern','ID = '.intval($id).' and Status >= 4 limit 1',$debug);
 	}
 
 // -------------------------------------------------------------
 	function lookupByDateTitle($when,$title,$debug='') 
 	{
 		return safe_row("ID,Section","textpattern",
-		"posted like '".doSlash($when)."%' and url_title like '".doSlash($title)."' limit 1");
+		"posted like '".doSlash($when)."%' and url_title like '".doSlash($title)."' and Status >= 4 limit 1");
 	}
 
 // -------------------------------------------------------------
