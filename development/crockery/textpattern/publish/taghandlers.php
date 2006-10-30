@@ -198,7 +198,6 @@ $LastChangedRevision$
 			'name'			=> '',
 			'poplink'		=> '',
 			'style'			=> '',
-			'thumbnail' => '',
 		), $atts));
 
 		if (!empty($name))
@@ -335,7 +334,7 @@ $LastChangedRevision$
 
 		$title = escape_output($title);
 
-		if ($format == '')
+		if ($format == 'link')
 		{
 			$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
 

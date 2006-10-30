@@ -186,7 +186,7 @@ $LastChangedRevision$
 				if(is_array($plugin)){
 					extract($plugin);
 					$source = '';
-					if (isset($help_raw)) {
+					if (isset($help_raw) && !(@$plugin['allow_html_help'] == 1)) {
 						include_once txpath.'/lib/classTextile.php';
 						$textile = new Textile();
 						$help_source = $textile->TextileThis(escape_tags($help_raw));
@@ -236,7 +236,9 @@ $LastChangedRevision$
 					if (isset($help_raw)) {
 						include_once txpath.'/lib/classTextile.php';
 						$textile = new Textile();
-						$help = $textile->TextileThis(escape_tags($help_raw));
+						if (!(@$plugin['allow_html_help'] == 1))
+							$help_raw = escape_tags($help_raw);
+						$help = $textile->TextileThis($help_raw);
 					}
 
 					if ($exists) {
