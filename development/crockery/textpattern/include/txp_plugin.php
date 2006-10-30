@@ -197,12 +197,16 @@ $LastChangedRevision$
 		
 					pagetop(gTxt('edit_plugins'));
 					echo 
-					form(startTable('edit')
-					.	tr(td(hed(gTxt('previewing_plugin'),3)))
-					.	tr(td(tag($source, 'div', ' id="preview-plugin" class="code"')))
-					.	tr(td($sub))
-					.	endTable().sInput('plugin_install').eInput('plugin').hInput('plugin64', base64_encode($plugin64))
-					, 'margin: 0 auto; width: 75%;');
+					form(
+						hed(gTxt('previewing_plugin'), 3).
+						tag($source, 'div', ' id="preview-plugin" class="code"').
+						hed(gTxt('plugin_help').':', 3).
+						tag($help_source, 'div', ' id="preview-help" class="code"').
+						$sub.
+						sInput('plugin_install').
+						eInput('plugin').
+						hInput('plugin64', $plugin_encoded)
+					, 'margin: 0 auto; width: 65%;');
 					return;
 				}
 			}
