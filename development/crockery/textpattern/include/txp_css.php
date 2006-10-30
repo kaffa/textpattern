@@ -75,7 +75,8 @@ $LastChangedRevision$
 	{
 		global $step;
 		$name = (!gps('name') or $step=='css_delete') ? 'default' : gps('name');
-//		if (gps('newname')) $name = gps('newname');
+		if (gps('copy') && trim(preg_replace('/[<>&"\']/', '', gps('newname'))) )
+			$name = gps('newname');
 		$css = base64_decode(fetch("css",'txp_css','name',$name));
 		$css = parseCSS($css);
 		
@@ -91,7 +92,7 @@ $LastChangedRevision$
 			graf(eLink('css', 'css_edit_raw', 'name', $name, gTxt('edit_raw_css'))).
 			graf(sLink('css', 'pour', gTxt('bulkload_existing_css'))); 
 
-		$out[] = startTable('edit');
+		$out[] = startTable('css-edit', '', '', 3);
 		
 		$out[] = 
 		tr(
@@ -163,7 +164,8 @@ $LastChangedRevision$
 	{
 		global $step;
 		$name = (!gps('name') or $step=='css_delete') ? 'default' : gps('name');
-		if (gps('newname')) $name = gps('newname');
+		if (gps('copy') && trim(preg_replace('/[<>&"\']/', '', gps('newname'))) )
+			$name = gps('newname');
 
 		if ($step=='pour') 
 		{
@@ -223,16 +225,16 @@ $LastChangedRevision$
 	function parseCSS($css) // parse raw css into a multidimensional array
 	{
 		$css = preg_replace("/\/\*.+\*\//Usi","",$css); // remove comments
-		$selectors = explode("}",$css);
-        foreach($selectors as $selector) { 
-	        if(trim($selector)) {
+		$selectors = preg_replace('/\s+/',' ',strip_rn(explode("}",$css)));
+		foreach($selectors as $selector) { 
+			if(trim($selector)) {
 			list($keystr,$codestr) = explode("{",$selector);
 				if (trim($keystr)) {
 					$codes = explode(";",trim($codestr));
 					foreach ($codes as $code) {
 						if (trim($code)) {
 							list($property,$value) = explode(":",$code,2);
-							$out[trim($keystr)][trim($property)] = $value;
+							$out[trim($keystr)][trim($property)] = trim($value);
 						} 
 					}
 				}
@@ -318,7 +320,6 @@ $LastChangedRevision$
 
 				$message = gTxt('css_created', array('{name}' => $newname));
 			}
-
 			else
 			{
 				$message = gTxt('css_name_required');

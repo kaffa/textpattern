@@ -285,20 +285,35 @@ $LastChangedRevision$
 		$fail['dev_version_live'] = gTxt('dev_version_live').cs.join(', '.n.t, $dev_files);
 
 	# anything might break if arbitrary functions are disabled
-	if (ini_get('disable_functions'))
-		$fail['some_php_functions_disabled'] = gTxt('some_php_functions_disabled').cs.ini_get('disable_functions');
+	if (ini_get('disable_functions')) {
+		$disabled_funcs = explode(',', ini_get('disable_functions'));
+		# commonly disabled functions taht we don't need
+		$disabled_funcs = array_diff($disabled_funcs, array(
+			'imagefilltoborder',
+			'exec',
+			'system',
+			'dl',
+			'passthru',
+			'chown',
+			'shell_exec',
+			'popen',
+			'proc_open',
+		));
+		if ($disabled_funcs)
+			$fail['some_php_functions_disabled'] = gTxt('some_php_functions_disabled').cs.ini_get('disable_functions');
+	}
 
 	# not sure about this one
 	#if (strncmp(php_sapi_name(), 'cgi', 3) == 0 and ini_get('cgi.rfc2616_headers'))
 	#	$fail['cgi_header_config'] = gTxt('cgi_header_config');
 
 	$guess_site_url = $_SERVER['HTTP_HOST'] . preg_replace('#[/\\\\]$#','',dirname(dirname($_SERVER['SCRIPT_NAME'])));
-	if ($siteurl and $siteurl != $guess_site_url)
+	if ($siteurl and strip_prefix($siteurl, 'www.') != strip_prefix($guess_site_url, 'www.'))
 		$fail['site_url_mismatch'] = gTxt('site_url_mismatch').cs.$guess_site_url;
 		
 	# test clean URL server vars
 	if (hu) {
-		if (ini_get('allow_url_fopen')) {
+		if (ini_get('allow_url_fopen') and ($permlink_mode != 'messy')) {
 			$s = md5(uniqid(rand(), true));
 			$pretext_data = @file(hu.$s.'/?txpcleantest=1');
 			if ($pretext_data) {
@@ -309,12 +324,6 @@ $LastChangedRevision$
 			else
 				$fail['clean_url_test_failed'] = gTxt('clean_url_test_failed');
 		}
-		else {
-			# unable to confirm whether or not clean URLs are working
-			if ($permlink_mode != 'messy')
-				$fail['clean_url_untested'] = gTxt('clean_url_untested');
-		}
-
 	}
 
 	if ($tables = list_txp_tables()) {

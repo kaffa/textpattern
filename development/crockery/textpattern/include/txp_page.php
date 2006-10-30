@@ -29,7 +29,7 @@ $LastChangedRevision$
 		pagetop(gTxt('edit_pages'),$message);
 		extract(gpsa(array('name','div','newname','copy')));
 		$name = (!$name or $step=='page_delete') ? 'default' : $name;
-		$name = ( $newname && $copy) ? $newname : $name;
+		$name = ( $copy && trim(preg_replace('/[<>&"\']/', '', $newname)) ) ? $newname : $name;
 
 		echo 
 			startTable('edit').
@@ -81,6 +81,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
+	#deprecated
 	function div_edit() 
 	{
 		return page_edit();
@@ -130,7 +131,7 @@ $LastChangedRevision$
 		while ($a = nextRow($rs)) {
 			extract($a);
 			$dlink = ($name!='default') ? dLink('page','page_delete','name',$name) :'';
-			$link =  '<a href="?event=page'.a.'name='.$name.'">'.$name.'</a>';
+			$link  = eLink('page', '', 'name', $name, $name);
 			$out[] = ($current == $name) 
 			?	tr(td($name).td($dlink))
 			:	tr(td($link).td($dlink));
@@ -148,14 +149,30 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function page_save() {
-		extract(doSlash(gpsa(array('name','html','newname','copy'))));
-		if($newname && $copy) {
-			safe_insert("txp_page", "name='$newname', user_html='$html'");
-			page_edit(messenger('page',$newname,'created'));
-		} else {
-			safe_update("txp_page","user_html='$html'", "name='$name'");
-			page_edit(messenger('page',$name,'updated'));
+	function page_save()
+	{
+		extract(doSlash(gpsa(array('name', 'html', 'copy'))));
+
+		if ($copy)
+		{
+			$newname = doSlash(trim(preg_replace('/[<>&"\']/', '', gps('newname'))));
+			if ($newname and safe_field('name', 'txp_page', "name = '$newname'"))
+			{
+				$message = gTxt('page_already_exists', array('{name}' => $newname));
+			}
+			elseif ($newname) 
+			{
+				safe_insert('txp_page', "name = '$newname', user_html = '$html'");
+				update_lastmod();
+ 
+				$message = gTxt('page_created', array('{name}' => $newname));
+			}
+			else 
+			{
+				$message = gTxt('page_name_invalid');
+			}
+
+ 			page_edit($message);
 		}
 	}
 	
@@ -166,6 +183,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
+	#deprecated
 	function extract_div() 
 	{
 		extract(doSlash(gpsa(array('name','div'))));
@@ -204,7 +222,8 @@ $LastChangedRevision$
 	}
 	
 // -------------------------------------------------------------
-	function div_save() 
+	#deprecated
+	function div_save()
 	{
 		extract(gpsa(array('html_array','html','start_pos','stop_pos','name')));
 		

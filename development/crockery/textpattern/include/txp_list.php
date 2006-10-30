@@ -34,7 +34,7 @@ $LastChangedRevision$
 
 	function list_list($message = '', $post = '')
 	{
-		global $statuses, $step;
+		global $statuses, $comments_disabled_after, $step, $txp_user;
 
 		pagetop(gTxt('tab_list'), $message);
 
@@ -258,9 +258,16 @@ $LastChangedRevision$
 
 					td($comments, 50, "articles_detail").
 
-					td(
-						fInput('checkbox', 'selected[]', $ID, '', '', '', '', '', $ID)
-					)
+					td((
+						(  ($a['Status'] >= 4 and has_privs('article.edit.published'))
+						or ($a['Status'] >= 4 and $AuthorID == $txp_user 
+											     and has_privs('article.edit.own.published'))
+						or ($a['Status'] < 4 and has_privs('article.edit'))
+						or ($a['Status'] < 4 and $AuthorID == $txp_user and has_privs('article.edit.own'))
+						)  
+						? fInput('checkbox', 'selected[]', $ID)
+						: '&nbsp;'
+					))
 				);
 			}
 
@@ -340,6 +347,7 @@ $LastChangedRevision$
 
 		$method = ps('edit_method');
 		$changed = false;
+		$ids = array();
 
 		if ($method == 'delete')
 		{
@@ -379,6 +387,24 @@ $LastChangedRevision$
 
 		else
 		{
+			$selected = array_map('assert_int', $selected);  
+			$selected = safe_rows('ID, AuthorID, Status', 'textpattern', 
+									  'ID in ('. implode(',',$selected) .')');
+
+			$allowed = array();
+			foreach ($selected as $item)
+			{
+				if ( ($item['Status'] >= 4 and has_privs('article.edit.published'))
+				  or ($item['Status'] >= 4 and $item['AuthorID'] == $txp_user and has_privs('article.edit.own.published'))
+				  or ($item['Status'] < 4 and has_privs('article.edit'))
+				  or ($item['Status'] < 4 and $item['AuthorID'] == $txp_user and has_privs('article.edit.own')))
+				{
+					$allowed[] = $item['ID'];
+				}
+			}
+
+			$selected = $allowed; unset($allowed);
+
 			switch ($method)
 			{
 				// change author
@@ -432,6 +458,7 @@ $LastChangedRevision$
 
 					$key = 'Status';
 					$val = ps('Status');
+					if (!has_privs('article.publish') && $val>=4) $val = 3;
 
 					// do not allow to be set to an empty value
 					if (!$val)
@@ -451,8 +478,6 @@ $LastChangedRevision$
 			{
 				foreach ($selected as $id)
 				{
-					$id = assert_int($id);
-
 					if (safe_update('textpattern', "$key = '".doSlash($val)."'", "ID = $id"))
 					{
 						$ids[] = $id;

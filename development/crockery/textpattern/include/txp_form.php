@@ -97,15 +97,16 @@ $LastChangedRevision$
 		pagetop(gTxt('edit_forms'),$message);
 
 		extract(gpsa(array('Form','name','type')));
+		$name = trim(preg_replace('/[<>&"\']/', '', $name));
 
 		if ($step=='form_create') {
-			$Form=''; $name=''; $type='';
 			$inputs = fInput('submit','savenew',gTxt('save_new'),'publish').
 				eInput("form").sInput('form_save');
 		} else {
 			$name = (!$name or $step=='form_delete') ? 'default' : $name;
 			$rs = safe_row("*", "txp_form", "name='".doSlash($name)."'");
-			if ($rs) {
+//			if ($rs)
+ {
 				extract($rs);
 				$inputs = fInput('submit','save',gTxt('save'),'publish').
 					eInput("form").sInput('form_save').hInput('oldname',$name);
@@ -178,7 +179,10 @@ $LastChangedRevision$
 	{
 		global $vars, $step,$essential_forms;
 		extract(doSlash(gpsa($vars)));
-		if (!$name) {
+		$name = doSlash(trim(preg_replace('/[<>&"\']/', '', gps('name'))));
+
+		if (!$name)
+		{
 			$step = 'form_create';
 			form_edit();
 		} elseif ($savenew) {
@@ -194,6 +198,43 @@ $LastChangedRevision$
 			);
 			form_edit(messenger('form',$name,'updated'));		
 		}
+
+		if (!in_array($type, array('article','comment','link','misc','file')))
+		{
+			$step = 'form_create';
+			$message = gTxt('form_type_missing');
+
+			return form_edit($message);
+		}
+
+		if ($savenew)
+		{
+			$exists = safe_field('name', 'txp_form', "name = '$name'");
+
+			if ($exists)
+			{
+				$step = 'form_create';
+				$message = gTxt('form_already_exists', array('{name}' => $name));
+
+				return form_edit($message);
+			}
+
+			safe_insert('txp_form', "Form = '$Form', type = '$type', name = '$name'");
+
+			update_lastmod();
+
+			$message = gTxt('form_created', array('{name}' => $name));
+
+			return form_edit($message);
+		}
+
+		safe_update('txp_form', "Form = '$Form', type = '$type', name = '$name'", "name = '$oldname'");
+
+		update_lastmod();
+
+		$message = gTxt('form_updated', array('{name}' => $name));
+
+		form_edit($message);
 	}
 
 // -------------------------------------------------------------

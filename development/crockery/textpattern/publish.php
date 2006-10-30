@@ -1004,7 +1004,7 @@ $LastChangedRevision$
 	function makeOut() 
 	{
 		foreach(func_get_args() as $a) {
-			$array[$a] = htmlspecialchars(gps($a));
+			$array[$a] = gps($a);
 		}
 		return $array;
 	}
