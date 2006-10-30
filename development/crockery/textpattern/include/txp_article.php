@@ -59,10 +59,13 @@ function article_event($event, $step) {
 register_callback('article_event', 'article', '', 1);
 
 //--------------------------------------------------------------
+
 	function article_post()
 	{
-		global $txp_user,$article_vars,$txpcfg, $ID;
-		extract(get_prefs());
+		global $txp_user,$article_vars,$txpcfg, $ID, $prefs;
+
+		extract($prefs);
+
 		$incoming = psa($article_vars);
 		$message='';
 
@@ -132,10 +135,12 @@ register_callback('article_event', 'article', '', 1);
 	}
 
 //--------------------------------------------------------------
+
 	function article_save()
 	{
-		global $txp_user,$article_vars,$txpcfg;
-		extract(get_prefs());
+		global $txp_user,$article_vars,$txpcfg,$prefs;
+		extract($prefs);
+
 		$incoming = psa($article_vars);
 
 		$oldArticle = safe_row('Status, url_title, Title','textpattern','ID = '.(int)$incoming['ID']);
@@ -228,9 +233,10 @@ register_callback('article_event', 'article', '', 1);
 //--------------------------------------------------------------
 	function article_edit($message="")
 	{
-		global $txpcfg,$txp_user,$article_vars;
+		global $txpcfg,$txp_user,$article_vars,$prefs;
 
-		extract(get_prefs());
+		extract($prefs);
+
 		extract(gpsa(array('view','from_view','step')));
 
 		if(!empty($GLOBALS['ID'])) { // newly-saved article
@@ -413,11 +419,11 @@ register_callback('article_event', 'article', '', 1);
 		{
 			echo '<p><input type="text" id="title" name="Title" value="'.cleanfInput($Title).'" class="edit" size="40" tabindex="1" />';
 
-			if ($Status == 4 or $Status == 5)
+			if ( ($Status == 4 or $Status == 5) and $step != 'create')
 			{
 				include_once txpath.'/publish/taghandlers.php';
 
-				echo sp.sp.'<a href="'.permlinkurl($article).'">'.gTxt('view').'</a>';
+				echo sp.sp.'<a href="'.permlinkurl_id($ID).'">'.gTxt('view').'</a>';
 			}
 
 			echo '</p>';
@@ -572,7 +578,7 @@ register_callback('article_event', 'article', '', 1);
 				echo n.n.'<fieldset id="write-timestamp">'.
 					n.'<legend>'.gTxt('timestamp').'</legend>'.
 
-					n.graf(checkbox('publish_now', '1').'<label for="publish_now">'.gTxt('set_to_now').'</label>').
+					n.graf(checkbox('publish_now', '1', ($Status < 4), '', 'publish_now').'<label for="publish_now">'.gTxt('set_to_now').'</label>').
 
 					n.graf(gTxt('or_publish_at').sp.popHelp('timestamp')).
 
@@ -603,7 +609,7 @@ register_callback('article_event', 'article', '', 1);
 				echo n.n.'<fieldset id="write-timestamp">'.
 					n.'<legend>'.gTxt('timestamp').'</legend>'.
 
-					n.graf(checkbox('reset_time', '1', 0).'<label for="reset_time">'.gTxt('reset_time').'</label>').
+					n.graf(checkbox('reset_time', '1', ($Status < 4), '', 'reset_time').'<label for="reset_time">'.gTxt('reset_time').'</label>').
 
 					n.graf(gTxt('published_at').sp.popHelp('timestamp')).
 
@@ -830,12 +836,11 @@ register_callback('article_event', 'article', '', 1);
 		return $incoming;
 	}
 // -------------------------------------------------------------
+
 	function do_pings()
 	{
-		global $txpcfg;
-		
-		$prefs = get_prefs();
-		
+		global $txpcfg, $prefs;
+
 		include_once txpath.'/lib/IXRClass.php';
 		
 		if ($prefs['ping_textpattern_com']) {
@@ -848,4 +853,5 @@ register_callback('article_event', 'article', '', 1);
 			$wl_client->query('weblogUpdates.ping', $prefs['sitename'], hu);
 		}
 	}
+
 ?>

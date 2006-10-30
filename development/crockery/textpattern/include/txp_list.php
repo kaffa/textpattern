@@ -143,7 +143,7 @@ $LastChangedRevision$
 
 		echo n.list_search_form($crit, $search_method);
 
-		$rs = safe_rows_start('*, unix_timestamp(Posted) as uPosted', 'textpattern',
+		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted', 'textpattern',
 			"$criteria order by $sort_sql limit $offset, $limit"
 		);
 
@@ -217,6 +217,19 @@ $LastChangedRevision$
 						' ('.$total_comments[$ID].')';
 				}
 
+				$comment_status = ($Annotate) ? gTxt('on') : gTxt('off');
+
+				if ($comments_disabled_after)
+				{
+					$lifespan = $comments_disabled_after * 86400;
+					$time_since = time() - $posted;
+
+					if ($time_since > $lifespan)
+					{
+						$comment_status = gTxt('expired');
+					}
+				}
+
 				$comments = n.'<ul>'.
 					n.t.'<li>'.( $Annotate ? gTxt('on') : gTxt('off') ).'</li>'.
 					n.t.'<li>'.$comments.'</li>'.
@@ -228,7 +241,7 @@ $LastChangedRevision$
 					td($manage, 35).
 
 					td(
-						safe_strftime('%d %b %Y %I:%M %p', $uPosted)
+						safe_strftime('%d %b %Y %I:%M %p', $posted)
 					, 75).
 
 					td($Title, 175).
