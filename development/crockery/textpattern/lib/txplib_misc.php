@@ -909,15 +909,19 @@ $LastChangedRevision: 1127 $
  * events to multiedit forms.
  */
 
- 	function event_category_popup($name, $cat="")
+ 	function event_category_popup($name, $cat = '', $id = '')
 	{
 		$arr = array('');
-		$rs = getTree("root",$name);
-		if ($rs) {
-			return treeSelectInput("category", $rs, $cat);
+		$rs = getTree('root', $name);
+
+		if ($rs)
+		{
+			return treeSelectInput('category', $rs, $cat, $id);
 		}
+
 		return false;
 	}
+
 // ------------------------------------------------------------- 	
  	function event_change_pageby($name) 
 	{
@@ -1382,7 +1386,7 @@ $LastChangedRevision: 1127 $
 		global $prefs;
 		extract($prefs);
 
-		if($send_lastmod) {
+		if($send_lastmod and $production_status == 'live') {
 			$unix_ts = get_lastmod($unix_ts);
 
 			# make sure lastmod isn't in the future
@@ -1393,19 +1397,19 @@ $LastChangedRevision: 1127 $
 			$last = safe_strftime('rfc822', $unix_ts, 1);
 			header("Last-Modified: $last");
 			header('Cache-Control: no-cache');
-			if ($production_status == 'live') {
-				$hims = serverset('HTTP_IF_MODIFIED_SINCE');
-				if ($hims >= $last) {
-					log_hit('304');
-					if (!$exit)
-						return array('304', $last);
-					txp_status_header('304 Not Modified');
-					header('Connection: close');
-					# discard all output
-					while (@ob_end_clean());
-					exit;
-				}
+
+			$hims = serverset('HTTP_IF_MODIFIED_SINCE');
+			if ($hims and @strtotime($hims) >= $unix_ts) {
+				log_hit('304');
+				if (!$exit)
+					return array('304', $last);
+				txp_status_header('304 Not Modified');
+				header('Connection: close');
+				# discard all output
+				while (@ob_end_clean());
+				exit;
 			}
+
 			if (!$exit)
 				return array('200', $last);
 		}

@@ -297,12 +297,12 @@ $LastChangedRevision: 1008 $
 
 // -------------------------------------------------------------
 
-	function fInputCell ($name, $var = '', $tabindex = '', $size = '', $help = '', $id = '') 
+	function fInputCell($name, $var = '', $tabindex = '', $size = '', $help = '', $id = '') 
 	{
-		$pop = ($help) ? popHelp($name) : '';
+		$pop = ($help) ? sp.popHelp($name) : '';
 
 		return tda(
-			fInput('text', $name, $var, 'edit', '', '', $size, $tabindex, $id).' '.$pop
+			fInput('text', $name, $var, 'edit', '', '', $size, $tabindex, $id).$pop
 		,' class="noline"');
 	}
 
