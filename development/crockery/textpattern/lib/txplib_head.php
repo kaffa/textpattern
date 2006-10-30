@@ -206,9 +206,11 @@ $LastChangedRevision: 1098 $
 	{
 		$areas = areas();
 		foreach($areas[$area] as $a=>$b) {
-			$out[] = tabber(gTxt($a),$b,$event,2);
+			if ($area == 'extensions' or has_privs($b)) {
+				$out[] = tabber($a,$b,$event,2);
+			}
 		}
-		return join('',$out);
+		return (empty($out) ? '' : join('',$out));
 	}
 
 // -------------------------------------------------------------

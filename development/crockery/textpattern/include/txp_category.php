@@ -308,7 +308,8 @@ if ($event == 'category') {
 		$check = safe_field("name", "txp_category", "name='$name' and type='$evname'");
 		$title = ps('title');
 
-		$name = stripSpace($title, 1);
+		$name = preg_replace("/(^|&\S+;)|(<[^>]*>)/U","",dumbDown($title));
+		$name = preg_replace("/[^A-Za-z0-9\-_]/","",$name);
 
 		if (!$check) {
 			if($name) {				
@@ -344,7 +345,6 @@ if ($event == 'category') {
 
 			cat_category_list($message);
 		}
->>>>>>> .merge-right.r1744
 	}
 
 //-------------------------------------------------------------
@@ -373,18 +373,30 @@ if ($event == 'category') {
 	{
 		
 		global $txpcfg;
-		
-		//Prevent non url chars on category names
-		include_once txpath.'/lib/classTextile.php';
-		$textile = new Textile();
-				
-		$in = psa(array('id','name','old_name','parent','title'));
-		extract(doSlash($in));
-		
-		$title = $textile->TextileThis($title,1);		
-		$name = dumbDown($textile->TextileThis($name,1));
-		$name = preg_replace("/[^[:alnum:]\-_]/", "", str_replace(" ","-",$name));
-		
+
+		extract(doSlash(psa(array('id', 'name', 'old_name', 'parent', 'title'))));
+
+		$name = preg_replace("/(^|&\S+;)|(<[^>]*>)/U","",dumbDown($name));
+		$name = preg_replace("/[^A-Za-z0-9\-_]/","",$name);
+
+		// make sure the name is valid
+		if (!$name)
+		{
+			$message = gTxt($event.'_category_invalid', array('{name}' => $name));
+
+			return cat_category_list($message);
+		}
+
+		// don't allow rename to clobber an existing category
+		$existing_id = safe_field('id', 'txp_category', "name = '$name' and type = '$event'");
+
+		if ($existing_id and $existing_id != $id)
+		{
+			$message = gTxt($event.'_category_already_exists', array('{name}' => $name));
+
+			return cat_category_list($message);
+		}
+
 		$parent = ($parent) ? $parent : 'root';
 		if (safe_update("txp_category", 
 					"name='$name',parent='$parent',title='$title'", 
