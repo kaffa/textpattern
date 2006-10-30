@@ -549,7 +549,7 @@ $LastChangedRevision$
 					if ( isset( $GLOBALS['ID'])) unset( $GLOBALS['ID']);
 					return $newpath.sp.gTxt('upload_dir_perms');
 				} else {
-					chmod($newpath,0755);
+					@chmod($newpath,0644);
 					// Auto-generate a thumbnail using the last settings
 					if (isset($prefs['thumb_w'], $prefs['thumb_h'], $prefs['thumb_crop'])) {
 						img_makethumb($id, $prefs['thumb_w'], $prefs['thumb_h'], $prefs['thumb_crop']);
