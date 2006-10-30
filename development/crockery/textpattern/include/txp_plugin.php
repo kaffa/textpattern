@@ -93,8 +93,12 @@ $LastChangedRevision$
 	{
 		extract(gpsa(array('name','status')));
 		$change = ($status) ? 0 : 1;
-		safe_update("txp_plugin", "status=$change", "name='$name'");
-		plugin_list(messenger('plugin',$name,'updated'));
+
+		safe_update('txp_plugin', "status = $change", "name = '".doSlash($name)."'");
+
+		$message = gTxt('plugin_updated', array('{name}' => $name));
+
+		plugin_list($message);
 	}
 
 // -------------------------------------------------------------
@@ -111,7 +115,7 @@ $LastChangedRevision$
 	{
 		$name = gps('name');
 		pagetop(gTxt('plugin_help'));
-		$help = ($name) ? safe_field('help','txp_plugin',"name = '$name'") : '';
+		$help = ($name) ? safe_field('help','txp_plugin',"name = '".doSlash($name)."'") : '';
 		echo 
 		startTable('edit')
 		.	tr(tda($help,' width="600"'))
@@ -230,8 +234,9 @@ $LastChangedRevision$
 	
 					extract(doSlash($plugin));
 					if (empty($type)) $type = 0;
+					$type = assert_int($type);
 
-					$exists = fetch('name','txp_plugin','name',doSlash($name));
+					$exists = fetch('name','txp_plugin','name',$name);
 
 					if (isset($help_raw) && empty($plugin['allow_html_help'])) {
 							// default: help is in Textile format
@@ -244,16 +249,16 @@ $LastChangedRevision$
 						$rs = safe_update(
 						   "txp_plugin",
 							"status      = 0,
-							type         = '$type',
-							author       = '$author',
-							author_uri   = '$author_uri',
-							version      = '$version',
-							description  = '$description',
-							help         = '$help',
-							code         = '$code',
-							code_restore = '$code',
-							code_md5     = '$md5'",
-							"name        = '$name'"
+							type         = $type,
+							author       = '".doSlash($author)."',
+							author_uri   = '".doSlash($author_uri)."',
+							version      = '".doSlash($version)."',
+							description  = '".doSlash($description)."',
+							help         = '".doSlash($help)."',
+							code         = '".doSlash($code)."',
+							code_restore = '".doSlash($code)."',
+							code_md5     = '".doSlash($md5)."'",
+							"name        = '".doSlash($name)."'"
 						);
 	
 					} else {
@@ -262,15 +267,15 @@ $LastChangedRevision$
 						   "txp_plugin",
 						   "name         = '$name',
 							status       = 0,
-							type         = '$type',
-							author       = '$author',
-							author_uri   = '$author_uri',
-							version      = '$version',
-							description  = '$description',
-							help         = '$help',
-							code         = '$code',
-							code_restore = '$code',
-							code_md5     = '$md5'"
+							type         = $type,
+							author       = '".doSlash($author)."',
+							author_uri   = '".doSlash($author_uri)."',
+							version      = '".doSlash($version)."',
+							description  = '".doSlash($description)."',
+							help         = '".doSlash($help)."',
+							code         = '".doSlash($code)."',
+							code_restore = '".doSlash($code)."',
+							code_md5     = '".doSlash($md5)."'"
 						);
 					}
 					if ($rs and $code) {

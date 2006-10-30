@@ -351,8 +351,8 @@ $LastChangedRevision$
 				{
 					foreach ($selected as $id)
 					{
-						$id = intval($id);
-						$author = safe_field('AuthorID', 'textpattern', "ID = '$id'");
+						$id = assert_int($id);
+						$author = safe_field('AuthorID', 'textpattern', "ID = $id");
 
 						if ($author == $txp_user)
 						{
@@ -366,9 +366,9 @@ $LastChangedRevision$
 
 			foreach ($selected as $id)
 			{
-				$id = intval($id);
+				$id = assert_int($id);
 
-				if (safe_delete('textpattern', "ID = '".$id."'"))
+				if (safe_delete('textpattern', "ID = $id"))
 				{
 					$ids[] = $id;
 				}
@@ -451,9 +451,9 @@ $LastChangedRevision$
 			{
 				foreach ($selected as $id)
 				{
-					$id = intval($id);
+					$id = assert_int($id);
 
-					if (safe_update('textpattern', "$key = '".doSlash($val)."'", "ID = '$id'"))
+					if (safe_update('textpattern', "$key = '".doSlash($val)."'", "ID = $id"))
 					{
 						$ids[] = $id;
 					}

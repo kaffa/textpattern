@@ -153,6 +153,7 @@ if ($event == 'category') {
 		$things = ps('selected');
 		if ($things) {
 			foreach($things as $catid) {
+				$catid = assert_int($catid);
 				if ($method == 'delete') {
 					if (safe_delete('txp_category',"id=$catid")) {
 						$categories[] = $catid;
@@ -325,7 +326,7 @@ if ($event == 'category') {
 			cat_category_list(messenger($evname.'_category',$name,'already_exists'));		
 		}
 
-		$exists = safe_field('name', 'txp_category', "name = '".doSlash($name)."' and type = '$event'");
+		$exists = safe_field('name', 'txp_category', "name = '".doSlash($name)."' and type = '".doSlash($event)."'");
 
 		if ($exists)
 		{
@@ -334,7 +335,7 @@ if ($event == 'category') {
 			return cat_category_list($message);
 		}
 
-		$q = safe_insert('txp_category', "name = '".doSlash($name)."', title = '".doSlash($title)."', type = '$event', parent = 'root'");
+		$q = safe_insert('txp_category', "name = '".doSlash($name)."', title = '".doSlash($title)."', type = '".doSlash($event)."', parent = 'root'");
 
 		if ($q)
 		{
@@ -351,7 +352,9 @@ if ($event == 'category') {
 	{
 		pagetop(gTxt('categories'));
 
-		extract(doSlash(gpsa(array('id','parent'))));
+		$id     = assert_int(gps('id'));
+		$parent = doSlash(gps('parent'));
+
 		$row = safe_row("*", "txp_category", "id=$id");
 		if($row){
 			extract($row);
@@ -374,6 +377,7 @@ if ($event == 'category') {
 		global $txpcfg;
 
 		extract(doSlash(psa(array('id', 'name', 'old_name', 'parent', 'title'))));
+		$id = assert_int($id);
 
 		$name = sanitizeForUrl($name);
 

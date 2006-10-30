@@ -30,7 +30,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function prefs_save() 
 	{
-		$prefnames = safe_column("name", "txp_prefs", "prefs_id='1'");
+		$prefnames = safe_column("name", "txp_prefs", "prefs_id = 1");
 
 		$post = doSlash(stripPost());
 
@@ -49,7 +49,7 @@ $LastChangedRevision$
 					safe_update(
 						"txp_prefs", 
 						"val = '".$post[$prefname]."'",
-						"name = '$prefname' and prefs_id ='1'"
+						"name = '".doSlash($prefname)."' and prefs_id = 1"
 					);
 				}
 			}			
@@ -68,19 +68,31 @@ $LastChangedRevision$
 		$textarray = load_lang($language);
 
 		echo 
-		pagetop(gTxt('edit_preferences'),$message),
-		'<form action="index.php" method="post">',
-		startTable('list'),		
-		tr(tdcs(hed(gTxt('site_prefs'),1),3)),
-		
-		tr(tdcs(sLink('prefs','advanced_prefs',gTxt('advanced_preferences'),'navlink').sp.
-			sLink('prefs','list_languages',gTxt('manage_languages'),'navlink'),'3'));
-		
-		$evt_list = safe_column('event','txp_prefs',"type='0' AND prefs_id='1' GROUP BY event ORDER BY event DESC");
-		
+		pagetop(gTxt('edit_preferences'),$message);
+
+		echo n.n.'<form method="post" action="index.php">'.
+
+			n.n.startTable('list').
+
+			n.n.tr(
+				tdcs(
+					hed(gTxt('site_prefs'), 1)
+				, 3)
+			).
+
+		n.n.tr(
+			tdcs(
+				sLink('prefs', 'advanced_prefs', gTxt('advanced_preferences'), 'navlink').sp.
+				sLink('prefs', 'list_languages', gTxt('manage_languages'), 'navlink')
+			, '3')
+		);
+
+		$evt_list = safe_column('event', 'txp_prefs', "type = 0 and prefs_id = 1 group by 'event' order by event desc");
+
 		foreach ($evt_list as $event)
-		{			
-			$rs = safe_rows_start('*','txp_prefs',"type='0' AND prefs_id='1' AND event='$event' ORDER BY position");
+		{
+			$rs = safe_rows_start('*', 'txp_prefs', "type = 0 and prefs_id = 1 and event = '".doSlash($event)."' order by position");
+
 			$cur_evt = '';
 			while ($a = nextRow($rs))
 			{			
@@ -320,16 +332,29 @@ $LastChangedRevision$
 	function advanced_prefs($message='')
 	{
 		global $textarray;
-		#this means new language strings and new help entries		
-		echo 
-		pagetop(gTxt('advanced_preferences'),$message),
-		'<form action="index.php" method="post">',
-		startTable('list'),
-		tr(tdcs(hed(gTxt('advanced_preferences'),1),3)),
-		tr(tdcs(sLink('prefs','prefs_list',gTxt('site_prefs'),'navlink').sp.sLink('prefs','list_languages',gTxt('manage_languages'),'navlink'),'3'));		
-				
-		$rs = safe_rows_start('*','txp_prefs',
-			"type='1' AND prefs_id='1' ORDER BY event,position");
+
+		// this means new language strings and new help entries
+		echo pagetop(gTxt('advanced_preferences'), $message).
+
+			n.n.'<form method="post" action="index.php">'.
+
+			n.n.startTable('list').
+
+			n.n.tr(
+				tdcs(
+					hed(gTxt('advanced_preferences'), 1)
+				, 3)
+			).
+
+			n.n.tr(
+				tdcs(
+					sLink('prefs', 'prefs_list', gTxt('site_prefs'), 'navlink').sp.
+					sLink('prefs', 'list_languages', gTxt('manage_languages'), 'navlink')
+				, '3')
+			);
+
+		$rs = safe_rows_start('*', 'txp_prefs', "type = 1 and prefs_id = 1 order by event, position");
+
 		$cur_evt = '';
 		while ($a = nextRow($rs))
 		{			
@@ -395,7 +420,7 @@ $LastChangedRevision$
 //-------------------------------------------------------------
 	function advanced_prefs_save()
 	{
-		$prefnames = safe_column("name", "txp_prefs", "prefs_id='1' AND type='1'");
+		$prefnames = safe_column("name", "txp_prefs", "prefs_id = 1 AND type = 1");
 		
 		$post = doSlash(stripPost());
 
@@ -407,7 +432,7 @@ $LastChangedRevision$
 					safe_update(
 						"txp_prefs", 
 						"val = '".$post[$prefname]."'",
-						"name = '$prefname' and prefs_id ='1'"
+						"name = '".doSlash($prefname)."' and prefs_id = 1"
 					);
 			}			
 		}
@@ -602,14 +627,14 @@ $LastChangedRevision$
 			function install_lang_key(&$value, $key)
 			{
 				extract(gpsa(array('lang_code','updating')));
-				$exists = safe_field('name','txp_lang',"name='$value[name]' AND lang='$lang_code'");				
-				$q = "name='".doSlash($value['name'])."', event='".doSlash($value['event'])."', data='".doSlash($value['data'])."', lastmod='".strftime('%Y-%m-%d %H:%M:%S',$value['uLastmod'])."'";
+				$exists = safe_field('name','txp_lang',"name='".doSlash($value[name])."' AND lang='".doSlash($lang_code)."'");				
+				$q = "name='".doSlash($value['name'])."', event='".doSlash($value['event'])."', data='".doSlash($value['data'])."', lastmod='".doSlash(strftime('%Y%m%d%H%M%S',$value['uLastmod']))."'";
 
 				if ($exists)
 				{
-					$value['ok'] = safe_update('txp_lang',$q,"lang='$lang_code' AND name='$value[name]'");
+					$value['ok'] = safe_update('txp_lang',$q,"lang='".doSlash($lang_code)."' AND name='".doSlash($value[name])."'");
 				}else{
-					$value['ok'] = safe_insert('txp_lang',$q.", lang='$lang_code'");
+					$value['ok'] = safe_insert('txp_lang',$q.", lang='".doSlash($lang_code)."'");
 				}
 			}			
 			array_walk($lang_struct,'install_lang_key');

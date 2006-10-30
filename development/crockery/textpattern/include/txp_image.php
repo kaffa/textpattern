@@ -244,13 +244,14 @@ $LastChangedRevision$
 	function image_edit($message='',$id='') 
 	{
 		if (!$id) $id = gps('id');
+		$id = assert_int($id);
 		global $txpcfg,$img_dir,$file_max_upload_size;
 
 		pagetop('image',$message);
 
 		$categories = getTree("root", "image");
 		
-		$rs = safe_row("*", "txp_image", "id='$id'");
+		$rs = safe_row("*", "txp_image", "id = $id");
 		
 		if ($rs) {
 			extract($rs);
@@ -351,7 +352,7 @@ $LastChangedRevision$
 	{
 		global $txpcfg,$extensions,$txp_user,$img_dir,$path_to_site;
 		extract($txpcfg);
-		$id = gps('id');
+		$id = assert_int(gps('id'));
 		
 		$file = $_FILES['thefile']['tmp_name'];
 		$name = $_FILES['thefile']['name'];
@@ -369,7 +370,7 @@ $LastChangedRevision$
 				image_list($newpath.sp.gTxt('upload_dir_perms'));
 			} else {
 				chmod($newpath,0755);
-				safe_update("txp_image", "thumbnail='1'", "id='$id'");
+				safe_update("txp_image", "thumbnail = 1", "id = $id");
 				image_edit(messenger('image',$name,'uploaded'),$id);
 			}
 		} else {
@@ -385,6 +386,7 @@ $LastChangedRevision$
 	function image_save() 
 	{
 		extract(doSlash(gpsa(array('id','name','category','caption','alt'))));
+		$id = assert_int($id);
 		
 		safe_update(
 			"txp_image",
@@ -392,7 +394,7 @@ $LastChangedRevision$
 			category = '$category',
 			alt      = '$alt',
 			caption  = '$caption'",
-			"id = '$id'"
+			"id = $id"
 		);
 		image_list(messenger("image",$name,"updated"));
 	}
@@ -402,12 +404,12 @@ $LastChangedRevision$
 	{
 		global $txpcfg;
 		extract($txpcfg);
-		$id = ps('id');
+		$id = assert_int(ps('id'));
 		
-		$rs = safe_row("*", "txp_image", "id='$id'");
+		$rs = safe_row("*", "txp_image", "id = $id");
 		if ($rs) {
 			extract($rs);
-			$rsd = safe_delete("txp_image","id='$id'");
+			$rsd = safe_delete("txp_image","id = $id");
 			$ul = unlink(IMPATH.$id.$ext) or exit(image_list());
 			if(is_file(IMPATH.$id.'t'.$ext)){
 				$ult = unlink(IMPATH.$id.'t'.$ext);
@@ -519,8 +521,8 @@ $LastChangedRevision$
 			$name .= $ext;
 			$name2db = doSlash($name);
 			
-			$q ="w        = '$w',
-				 h        = '$h',
+			$q ="w        = $w,
+				 h        = $h,
 				 ext      = '$ext',
 				 name     = '$name2db',
 				 date     = now(),
@@ -531,7 +533,7 @@ $LastChangedRevision$
 				$rs = safe_insert("txp_image",$q);
 				$id = $GLOBALS['ID'] = mysql_insert_id();
 			}else{
-				$id = doSlash($id);
+				$id = assert_int($id);
 				$rs = safe_update('txp_image',$q, "id = $id");
 			}
 			
@@ -544,8 +546,9 @@ $LastChangedRevision$
 				$newpath = IMPATH.$id.$ext;
 
 				if(shift_uploaded_file($file, $newpath) == false) {
-					safe_delete("txp_image","id='$id'");
-					safe_alter("txp_image", "auto_increment=$id");
+					$id = assert_int($id);
+					safe_delete("txp_image","id = $id");
+					safe_alter("txp_image", "auto_increment = $id");
 					if ( isset( $GLOBALS['ID'])) unset( $GLOBALS['ID']);
 					return $newpath.sp.gTxt('upload_dir_perms');
 				} else {

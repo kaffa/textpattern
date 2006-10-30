@@ -266,11 +266,11 @@ $LastChangedRevision$
 
 	function css_copy() 
 	{
-		extract(doSlash(gpsa(array('oldname', 'newname'))));
+		extract(gpsa(array('oldname', 'newname')));
 
-		$css = fetch('css', 'txp_css', 'name', $oldname);
+		$css = doSlash(fetch('css', 'txp_css', 'name', $oldname));
 
-		$rs = safe_insert('txp_css', "css = '$css', name = '$newname'");
+		$rs = safe_insert('txp_css', "css = '$css', name = '".doSlash($newname)."'");
 
 		css_edit(
 			gTxt('css_created', array('{name}' => $newname))
@@ -283,9 +283,9 @@ $LastChangedRevision$
 	{
 		$name = gps('name');
 		$css  = parsePostedCSS();
-		$css  = base64_encode(css_format($css));
+		$css  = doSlash(base64_encode(css_format($css)));
 
-		safe_update('txp_css', "css = '$css'", "name = '$name'");
+		safe_update('txp_css', "css = '$css'", "name = '".doSlash($name)."'");
 
 		$message = gTxt('css_updated', array('{name}' => $name));
 
@@ -298,20 +298,38 @@ $LastChangedRevision$
 	{
 		extract(gpsa(array('name', 'css', 'savenew', 'newname', 'copy')));
 
-		$css = base64_encode($css);
+		$css = doSlash(base64_encode($css));
 
 		if ($savenew or $copy)
 		{
-			safe_insert('txp_css', "name = '$newname', css = '$css'");
+			$newname = doSlash(trim(preg_replace('/[<>&"\']/', '', gps('newname'))));
 
-			$message = gTxt('css_created', array('{name}' => $newname));
+			if ($newname and safe_field('name', 'txp_css', "name = '$newname'"))
+			{
+				$message = gTxt('css_already_exists', array('{name}' => $newname));
+			}
+
+			elseif ($newname) 
+			{
+				safe_insert('txp_css', "name = '".$newname."', css = '$css'");
+
+				// update site last mod time
+				update_lastmod(); 
+
+				$message = gTxt('css_created', array('{name}' => $newname));
+			}
+
+			else
+			{
+				$message = gTxt('css_name_required');
+			}
 
 			css_edit($message);
 		}
 
 		else
 		{
-			safe_update('txp_css', "css = '$css'", "name = '$name'");	
+			safe_update('txp_css', "css = '$css'", "name = '".doSlash($name)."'");
 
 			$message = gTxt('css_updated', array('{name}' => $name));
 
@@ -365,7 +383,7 @@ $LastChangedRevision$
 			}
  		}
 		$css = base64_encode(css_format($out));
-		safe_update("txp_css", "css='$css'", "name='$name'");
+		safe_update("txp_css", "css='".doSlash($css)."'", "name='".doSlash($name)."'");
 		return parseCSS(base64_decode(fetch('css','txp_css','name',$name)));
 	}
 
@@ -377,7 +395,7 @@ $LastChangedRevision$
 
 		if ($name != 'default')
 		{
-			safe_delete('txp_css', "name = '$name'");
+			safe_delete('txp_css', "name = '".doSlash($name)."'");
 
 			css_edit(
 				gTxt('css_deleted', array('{name}' => $name))

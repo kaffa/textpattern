@@ -306,7 +306,9 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function fetch($col,$table,$key,$val,$debug='') 
 	{
-		$q = "select $col from ".safe_pfx($table)." where $key = '$val' limit 1";
+		$key = doSlash($key);
+		$val = (is_int($val)) ? $val : "'".doSlash($val)."'";
+		$q = "select $col from ".safe_pfx($table)." where `$key` = $val limit 1";
 		if ($r = safe_query($q,$debug)) {
 			$thing = (db_num_rows($r) > 0) ? db_fetch_result($r,0) : '';
 			db_free($r);
@@ -480,9 +482,11 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function rebuild_tree($parent, $left, $type) 
 	{ 
+		$left  = assert_int($left);
 		$right = $left+1;
 
 		$parent = doSlash($parent);
+		$type   = doSlash($type);
 
 		$result = safe_column("name", "txp_category", 
 			"parent='$parent' and type='$type' order by name");

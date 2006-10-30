@@ -27,13 +27,14 @@ $LastChangedRevision$
 //-------------------------------------------------------------
 	function discuss_save()
 	{
-		extract(doSlash(gpsa(array('email','name','web','message','discussid','ip','visible','parentid'))));
+		extract(doSlash(gpsa(array('email','name','web','message','ip'))));
+		extract(array_map('assert_int',gpsa(array('discussid','visible','parentid'))));
 		safe_update("txp_discuss",
 			"email   = '$email',
 			 name    = '$name',
 			 web     = '$web',
 			 message = '$message',
-			 visible = '$visible'",
+			 visible = $visible",
 			"discussid = $discussid");
 		update_comments_count($parentid);
 		discuss_list(messenger('message',$discussid,'updated'));
@@ -197,8 +198,9 @@ $LastChangedRevision$
 			while ($a = nextRow($rs))
 			{
 				extract($a);
+				$parentid = assert_int($parentid);
 
-				$tq = safe_row('*, ID as thisid, unix_timestamp(Posted) as posted', 'textpattern', "ID = '".$parentid."'");
+				$tq = safe_row('*, ID as thisid, unix_timestamp(Posted) as posted', 'textpattern', "ID = $parentid");
 
 				$edit_url = '?event=discuss'.a.'step=discuss_edit'.a.'discussid='.$discussid.a.'sort='.$sort.
 					a.'dir='.$dir.a.'page='.$page.a.'search_method='.$search_method.a.'crit='.$crit;
@@ -321,9 +323,9 @@ $LastChangedRevision$
 
 		extract(gpsa(array('discussid', 'sort', 'dir', 'page', 'crit', 'method')));
 
-		$discussid = doSlash($discussid);
+		$discussid = assert_int($discussid);
 
-		$rs = safe_row('*, unix_timestamp(posted) as uPosted', 'txp_discuss', "discussid = '$discussid'");
+		$rs = safe_row('*, unix_timestamp(posted) as uPosted', 'txp_discuss', "discussid = $discussid");
 
 		if ($rs)
 		{
@@ -413,28 +415,41 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function ipban_add() 
 	{
-		extract(doSlash(gpsa(array('ip','name','discussid'))));
-		
-		if (!$ip) exit(ipban_list(gTxt("cant_ban_blank_ip")));
-		
-		$chk = fetch('ip','txp_discuss_ipban','ip',$ip);
-		
-		if (!$chk) {
-			$rs = safe_insert("txp_discuss_ipban",
-				"ip = '$ip',
-				 name_used = '$name',
-				 banned_on_message = '$discussid',
-				 date_banned = now()
-			");
-			// hide all messages from that IP also
-			if ($rs)
-				safe_update('txp_discuss',
-					"visible=".SPAM,
-					"ip='".doSlash($ip)."'"
-				);
-			if ($rs) ipban_list(messenger('ip',$ip,'banned'));
-		} else ipban_list(messenger('ip',$ip,'already_banned'));
-		
+		extract(gpsa(array('ip', 'name', 'discussid')));
+		$discussid = assert_int($discussid);
+
+		if (!$ip)
+		{
+			return ipban_list(gTxt('cant_ban_blank_ip'));
+		}
+
+		$ban_exists = fetch('ip', 'txp_discuss_ipban', 'ip', $ip);
+
+		if ($ban_exists)
+		{
+			$message = gTxt('ip_already_banned', array('{ip}' => $ip));
+
+			return ipban_list($message);
+		}
+
+		$rs = safe_insert('txp_discuss_ipban', "
+			ip = '".doSlash($ip)."', 
+			name_used = '".doSlash($name)."', 
+			banned_on_message = $discussid, 
+			date_banned = now()
+		");
+
+		// hide all messages from that IP also
+		if ($rs)
+		{
+			safe_update('txp_discuss', "visible = ".SPAM, "ip = '".doSlash($ip)."'");
+
+			$message = gTxt('ip_banned', array('{ip}' => $ip));
+
+			return ipban_list($message);
+		}
+
+		ipban_list();
 	}
 
 // -------------------------------------------------------------
@@ -538,18 +553,18 @@ $LastChangedRevision$
 		if ($selected) {
 			// Get all articles for which we have to update the count
 			foreach($selected as $id)
-				$ids[] = "'".intval($id)."'";
+				$ids[] = assert_int($id);
 			$parentids = safe_column("DISTINCT parentid","txp_discuss","discussid IN (".implode(',',$ids).")");
 
 			$rs = safe_rows_start('*', 'txp_discuss', "discussid IN (".implode(',',$ids).")");
 			while ($row = nextRow($rs)) {
 				extract($row);
-				$id = intval($discussid);
+				$id = assert_int($discussid);
 				$parentids[] = $parentid;
 
 				if ($method == 'delete') {
 					// Delete and if succesful update commnet count 
-					if (safe_delete('txp_discuss', "discussid='$id'")) 
+					if (safe_delete('txp_discuss', "discussid = $id"))
 						$done[] = $id;
 				}
 				elseif ($method == 'ban') {
@@ -558,7 +573,7 @@ $LastChangedRevision$
 						safe_insert("txp_discuss_ipban",
 							"ip = '".doSlash($ip)."',
 							name_used = '".doSlash($name)."',
-							banned_on_message = '".doSlash($discussid)."',
+							banned_on_message = $id,
 							date_banned = now()
 						");
 						safe_update('txp_discuss',
