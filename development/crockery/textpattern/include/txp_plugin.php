@@ -186,10 +186,10 @@ $LastChangedRevision$
 				if(is_array($plugin)){
 					extract($plugin);
 					$source = '';
-					if (isset($help_raw) && !(@$plugin['allow_html_help'] == 1)) {
+					if (isset($help_raw) && empty($plugin['allow_html_help'])) {
 						include_once txpath.'/lib/classTextile.php';
 						$textile = new Textile();
-						$help_source = $textile->TextileThis(escape_tags($help_raw));
+						$help_source = $textile->TextileRestricted($help_raw, 0, 0);
 					} else {
 						$help_source= highlight_string($help, true);
 					}
@@ -233,12 +233,11 @@ $LastChangedRevision$
 
 					$exists = fetch('name','txp_plugin','name',doSlash($name));
 
-					if (isset($help_raw)) {
-						include_once txpath.'/lib/classTextile.php';
-						$textile = new Textile();
-						if (!(@$plugin['allow_html_help'] == 1))
-							$help_raw = escape_tags($help_raw);
-						$help = $textile->TextileThis($help_raw);
+					if (isset($help_raw) && empty($plugin['allow_html_help'])) {
+							// default: help is in Textile format
+							include_once txpath.'/lib/classTextile.php';
+							$textile = new Textile();
+							$help = $textile->TextileRestricted($help_raw, 0, 0);
 					}
 
 					if ($exists) {
