@@ -787,7 +787,7 @@ $LastChangedRevision$
 		global $s, $c;
 
 		extract(lAtts(array(
-			'label'        => '',
+			'label'        => gTxt('browse'),
 			'wraptag'      => '',
 			'section'      => '',
 			'this_section' => 0,
@@ -1031,7 +1031,7 @@ $LastChangedRevision$
 			'form'    => 'search_input',
 			'wraptag' => 'p',
 			'size'    => '15',
-			'label'   => 'Search',
+			'label'   => gTxt('search'),
 			'button'  => '',
 			'section' => '',
 		),$atts));	
