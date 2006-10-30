@@ -75,9 +75,9 @@ $DB = new DB;
 		$time = sprintf('%02.6f', getmicrotime() - $start);
 		@$qtime += $time;
 		@$qcount++;
-		if ($result == false and (@$production_status == 'debug' or @$production_status == 'testing')) {
-			$caller = join("\n", get_caller());
-			trigger_error(db_lasterror() . n . $q . $caller);
+		if ($result === false and (txpinterface === 'admin' or @$production_status == 'debug' or @$production_status == 'testing')) {
+			$caller = ($production_status == 'debug') ? n . join("\n", get_caller()) : '';
+			trigger_error(db_lasterror() . n . $q . $caller, E_USER_WARNING);
 		}
 
 		trace_add("[SQL ($time): $q]");
