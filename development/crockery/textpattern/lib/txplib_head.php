@@ -206,7 +206,7 @@ $LastChangedRevision: 1098 $
 	{
 		$areas = areas();
 		foreach($areas[$area] as $a=>$b) {
-			if ($area == 'extensions' or has_privs($b)) {
+			if (has_privs($b)) {
 				$out[] = tabber($a,$b,$event,2);
 			}
 		}
@@ -261,10 +261,12 @@ $LastChangedRevision: 1098 $
 				<select name="event" onchange="submit(this.form)">
 				<option>'.gTxt('go').'...</option>';
 		foreach ($areas as $a => $b) {
+			if ( !has_privs( 'tab.'.$a)) continue;
 			if (count($b) > 0) {
 				$o .= '<optgroup label="'.gTxt('tab_'.$a).'">';
 				foreach ($b as $c => $d) {
-					$o .= '<option value="'.$d.'">'.$c.'</option>';
+					if (has_privs($d)) 
+						$o .= '<option value="'.$d.'">'.$c.'</option>';
 				}
 				$o .= '</optgroup>';
 			}
