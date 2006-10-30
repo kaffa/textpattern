@@ -111,13 +111,13 @@ $LastChangedRevision: 952 $
 
 			$sp = str_repeat(sp.sp, $level);
 
-			$out[] = n.t.'<option value="'.htmlspecialchars($name).'"'.$sel.'>'.$sp.$title.'</option>';
+			$out[] = n.t.'<option value="'.htmlspecialchars($name).'"'.$sel.'>'.$sp.htmlspecialchars($title).'</option>';
 		}
 
 		return n.'<select'.( $select_id ? ' id="'.$select_id.'" ' : '' ).' name="'.$select_name.'" class="list"'.
 			($onchange == 1 ? ' onchange="submit(this.form);"' : $onchange).
 			'>'.
-			n.t.'<option value=""'.($selected == false ? ' selected="selected"' : '').'></option>'.
+			n.t.'<option value=""'.($selected == false ? ' selected="selected"' : '').'>&nbsp;</option>'.
 			( $out ? join('', $out) : '').
 			n.'</select>';
 	}

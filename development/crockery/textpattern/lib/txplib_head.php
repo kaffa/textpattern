@@ -45,13 +45,16 @@ $LastChangedRevision: 1098 $
 
 	if ($event == 'list')
 	{
+		$sarr = array("\n", '-');
+		$rarr = array('', '&#45;'); 
+
 		$sections = '';
 
 		$rs = safe_column('name', 'txp_section', "name != 'default'");
 
 		if ($rs)
 		{
-			$sections = str_replace("\n", '', stripslashes(selectInput('Section', $rs, '', true)));
+			$sections = str_replace($sarr, $rarr, addslashes(selectInput('Section', $rs, '', true)));
 		}
 
 		$category1 = '';
@@ -61,11 +64,11 @@ $LastChangedRevision: 1098 $
 
 		if ($rs)
 		{
-			$category1 = str_replace("\n", '', treeSelectInput('Category1', $rs, ''));
-			$category2 = str_replace("\n", '', treeSelectInput('Category2', $rs, ''));
+			$category1 = str_replace($sarr, $rarr, addslashes(treeSelectInput('Category1', $rs, '')));
+			$category2 = str_replace($sarr, $rarr, addslashes(treeSelectInput('Category2', $rs, '')));
 		}
 
-		$statuses = str_replace("\n", '', stripslashes(selectInput('Status', array(
+		$statuses = str_replace($sarr, $rarr, addslashes(selectInput('Status', array(
 			1 => gTxt('draft'),
 			2 => gTxt('hidden'),
 			3 => gTxt('pending'),
@@ -73,7 +76,7 @@ $LastChangedRevision: 1098 $
 			5 => gTxt('sticky'),
 		), '', true)));
 
-		$comments_annotate = onoffRadio('Annotate', safe_field('val', 'txp_prefs', "name = 'comments_on_default'"));
+		$comments_annotate = addslashes(onoffRadio('Annotate', safe_field('val', 'txp_prefs', "name = 'comments_on_default'")));
 
 		$authors = '';
 
@@ -81,7 +84,7 @@ $LastChangedRevision: 1098 $
 
 		if ($rs)
 		{
-			$authors = str_replace("\n", '', stripslashes(selectInput('AuthorID', $rs, '', true)));
+			$authors = str_replace($sarr, $rarr, addslashes(selectInput('AuthorID', $rs, '', true)));
 		}
 
 		// output JavaScript
