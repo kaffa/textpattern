@@ -67,7 +67,7 @@ $LastChangedRevision: 1008 $
 				$o .= ($sort) ? a."sort=$sort" : '';
 				$o .= ($dir) ? a."dir=$dir" : '';
 				$o .= ($crit) ? a."crit=$crit" : '';
-				$o .= ($method) ? a."method=$method" : '';
+				$o .= ($method) ? a."search_method=$method" : '';
 
 				$o .= '">';
 			}
