@@ -69,14 +69,13 @@ $LastChangedRevision$
 		//i18n: define("LANG","en-gb");
 		define('txp_version', $thisversion);
 		if ( !defined(  'PROTOCOL'))
-			define(  'PROTOCOL', 'http://');
+			define( 'PROTOCOL', ( strtolower( serverSet( 'HTTPS')) == 'on' ? 'https://' : 'http://'));
 		define("hu",PROTOCOL.$siteurl.'/');
 		// v1.0 experimental relative url global
 		define("rhu",preg_replace("/https?:\/\/.+(\/.*)\/?$/U","$1",hu));
 
 		if (!empty($locale)) setlocale(LC_ALL, $locale);
 		$textarray = load_lang(LANG);
-		set_textile_glyphs();
 	
 		include txpath.'/include/txp_auth.php';
 		doAuth();
