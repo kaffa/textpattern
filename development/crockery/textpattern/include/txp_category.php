@@ -160,7 +160,7 @@ if ($event == 'category') {
 					}
 				}
 			}
-			rebuild_tree('root', 1, $type);
+			rebuild_tree_full($type);
 			cat_category_list(messenger($type.'_category',join(', ',$categories),'deleted'));
 		}
 	}
@@ -339,7 +339,7 @@ if ($event == 'category') {
 
 		if ($q)
 		{
-			rebuild_tree('root', 1, $event);
+			rebuild_tree_full($event);
 
 			$message = gTxt($event.'_category_created', array('{name}' => $name));
 
@@ -406,14 +406,17 @@ if ($event == 'category') {
 			safe_update('txp_category', "parent='$name'", "parent='$old_name'");
 		
 					
-		rebuild_tree('root', 1, $evname);
+		rebuild_tree_full($event);
 		if ($evname=='article'){
 			safe_update("textpattern","Category1='$name'", "Category1 = '$old_name'"); 
 			safe_update("textpattern","Category2='$name'", "Category2 = '$old_name'"); 
 		}else {
 			safe_update($table_name, "category='$name'", "category='$old_name'");
 		}
-		cat_category_list(messenger($evname.'_category',stripslashes($name),'saved'));
+
+		$message = gTxt($event.'_category_updated', array('{name}' => doStrip($name)));
+
+		cat_category_list($message);
 	}
 
 	
