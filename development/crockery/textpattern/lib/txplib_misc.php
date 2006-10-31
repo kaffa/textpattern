@@ -1438,7 +1438,11 @@ $LastChangedRevision: 1127 $
 				if (!$exit)
 					return array('304', $last);
 				txp_status_header('304 Not Modified');
-#				header('Connection: close');
+				# some mod_deflate versions have a bug that breaks subsequent
+				# requests when keepalive is used.  dropping the connection
+				# is the only reliable way to fix this.
+				if (empty($lastmod_keepalive))
+					header('Connection: close');
 				header('Content-Length: 0');
 				# discard all output
 				while (@ob_end_clean());
@@ -1636,6 +1640,15 @@ eod;
 
 			return hu.join_qs($keys);
 		}
+	}
+
+// -------------------------------------------------------------
+	function filedownloadurl($id, $filename='')
+	{
+		global $permlink_mode;
+		return ($permlink_mode == 'messy') ?
+			hu.'index.php?s=file_download'.a.'id='.$id :
+			hu.gTxt('file_download').'/'.$id.($filename ? '/'.$filename : '');
 	}
 
 // -------------------------------------------------------------
