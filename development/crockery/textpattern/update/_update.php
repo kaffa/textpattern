@@ -21,9 +21,6 @@ $LastChangedRevision$
 		return $files;
 	}
 
-	if ( $txp_using_svn && (newest_file() <= $dbupdatetime) ) 
-		return;
-
 	@ignore_user_abort(1);
 	@set_time_limit(0);
 
