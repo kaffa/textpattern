@@ -1838,7 +1838,7 @@ function body($atts)
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
 					' href="'.pagelinkurl(array('s' => $section, 'c' => $category)).'"'.
 					($title ? ' title="'.$label.'"' : '').
-					'>'.$thing.'</a>';
+					'>'.parse($thing).'</a>';
 			}
 
 			elseif ($link)
@@ -1887,7 +1887,7 @@ function body($atts)
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
 					' href="'.pagelinkurl(array('s' => $section, 'c' => $category)).'"'.
 					($title ? ' title="'.$label.'"' : '').
-					'>'.$thing.'</a>';
+					'>'.parse($thing).'</a>';
 			}
 
 			elseif ($link)
@@ -1934,7 +1934,7 @@ function body($atts)
 			{
 				$out = '<a href="'.pagelinkurl(array('s' => $section, 'c' => $category,)).'"'.
 					($title ? ' title="'.$label.'"' : '').
-					'>'.$thing.'</a>';
+					'>'.parse($thing).'</a>';
 			}
 
 			elseif ($link)
@@ -1990,7 +1990,7 @@ function body($atts)
 			{
 				$out = '<a href="'.pagelinkurl(array('s' => $sec)).'"'.
 					($title ? ' title="'.$label.'"' : '').
-					'>'.$thing.'</a>';
+					'>'.parse($thing).'</a>';
 			}
 
 			elseif ($link)
