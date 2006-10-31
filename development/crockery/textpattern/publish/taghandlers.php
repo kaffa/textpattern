@@ -1090,7 +1090,7 @@ $LastChangedRevision$
 
 				return '<a rel="next" href="'.$url.'"'.
 					($next_title != $thing ? ' title="'.$next_title.'"' : '').
-					'>'.parse($thing).'</a>';
+					'>'.$thing.'</a>';
 			}
 
 			return $url;
