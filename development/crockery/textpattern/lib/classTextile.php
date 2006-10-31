@@ -200,6 +200,8 @@ class Textile
     var $pnct;
     var $rel;
     var $fn;
+    
+    var $doc_root;
 
 // -------------------------------------------------------------
     function Textile()
@@ -215,6 +217,17 @@ class Textile
         $this->s = "(?:{$this->cspn}?{$this->rspn}?|{$this->rspn}?{$this->cspn}?)";
         $this->c = "(?:{$this->clas}?{$this->styl}?{$this->lnge}?|{$this->styl}?{$this->lnge}?{$this->clas}?|{$this->lnge}?{$this->styl}?{$this->clas}?)";
         $this->pnct = '[\!"#\$%&\'()\*\+,\-\./:;<=>\?@\[\\\]\^_`{\|}\~]';
+
+        if (defined('DIRECTORY_SEPARATOR'))
+            $this->ds = constant('DIRECTORY_SEPARATOR');
+        else
+            $this->ds = '/';
+
+        $this->doc_root = @$_SERVER['DOCUMENT_ROOT'];
+        if (!$this->doc_root)
+            $this->doc_root = @$_SERVER['PATH_TRANSLATED']; // IIS
+            
+        $this->doc_root = rtrim($this->doc_root, $this->ds).$this->ds;
 
     }
 
@@ -634,6 +647,13 @@ function refs($m)
     }
 
 // -------------------------------------------------------------
+    function isRelURL($url)
+    {
+        $parts = parse_url($url);
+        return (empty($parts['scheme']) and empty($parts['host']));
+    }
+
+// -------------------------------------------------------------
     function image($text)
     {
         return preg_replace_callback("/
@@ -658,7 +678,9 @@ function refs($m)
         $atts .= ($algn != '')  ? ' align="' . $this->iAlign($algn) . '"' : '';
         $atts .= (isset($m[4])) ? ' title="' . $m[4] . '"' : '';
         $atts .= (isset($m[4])) ? ' alt="'   . $m[4] . '"' : ' alt=""';
-        $size = @getimagesize($url);
+        $size = false;
+        if ($this->isRelUrl($url))
+	        $size = @getimagesize(realpath($this->doc_root.ltrim($url, $this->ds)));
         if ($size) $atts .= " $size[3]";
 
         $href = (isset($m[5])) ? $this->checkRefs($m[5]) : '';
