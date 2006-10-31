@@ -198,7 +198,7 @@ $LastChangedRevision$
 		if (!$out['request_uri'] and serverSet('argv'))
 		{
 			$argv = serverSet('argv');
-			$out['request_uri'] = @substr($argv[0], strpos($argv[0], ';' + 1));
+			$out['request_uri'] = @substr($argv[0], strpos($argv[0], ';') + 1);
 		}			// define the useable url, minus any subdirectories.
 			// this is pretty fugly, if anyone wants to have a go at it - dean
 		$out['subpath'] = $subpath = preg_quote(preg_replace("/https?:\/\/.*(\/.*)/Ui","$1",hu),"/");
