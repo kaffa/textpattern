@@ -278,7 +278,7 @@ begin generic functions
 
 		if ($vals)
 		{
-			return ' '.treeSelectInput('parent', $vals, $val);
+			return ' '.treeSelectInput('category', $vals, $val);
 		}
 
 		return gTxt('no_categories_available');
