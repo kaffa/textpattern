@@ -51,7 +51,7 @@ $LastChangedRevision: 952 $
 
 //-------------------------------------------------------------
 
-	function selectInput($name = '', $array = '', $value = '', $blank_first = '', $onchange = '', $select_id = '')
+	function selectInput($name = '', $array = '', $value = '', $blank_first = '', $onchange = '', $select_id = '', $check_type = false)
 	{
 		$out = array();
 
@@ -59,15 +59,22 @@ $LastChangedRevision: 952 $
 
 		foreach ($array as $avalue => $alabel)
 		{
-			if ($avalue == $value || $alabel == $value)
-			{
-				$sel = ' selected="selected"';
-				$selected = true;
+			if ($check_type) {
+				if ($avalue === $value || $alabel === $value) {
+					$sel = ' selected="selected"';
+					$selected = true;
+				} else {
+					$sel = '';
+				}
 			}
 
-			else
-			{
-				$sel = '';
+			else {
+				if ($avalue == $value || $alabel == $value) {
+					$sel = ' selected="selected"';
+					$selected = true;
+				} else {
+					$sel = '';
+				}
 			}
 
 			$out[] = n.t.'<option value="'.htmlspecialchars($avalue).'"'.$sel.'>'.htmlspecialchars($alabel).'</option>';
@@ -266,5 +273,21 @@ $LastChangedRevision: 952 $
 			}
 		return join('',$out);
 	}
+
+
+//-------------------------------------------------------------
+	function radio_list($name, $values, $current_val='', $hilight_val='')
+	{
+		// $values is an array of value => label pairs
+		foreach ($values as $k => $v)
+		{
+			$id = $name.'-'.$k;
+			$out[] = n.t.'<li>'.radio($name, $k, ($current_val == $k) ? 1 : 0, $id).
+				'<label for="'.$id.'">'.($hilight_val == $k ? strong($v) : $v).'</label></li>';
+		}
+
+		return '<ul class="plain-list">'.join('', $out).n.'</ul>';
+	}
+
 
 ?>

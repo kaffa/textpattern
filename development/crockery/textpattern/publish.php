@@ -79,7 +79,7 @@ $LastChangedRevision$
 	if (!defined('rhu'))
 		define("rhu",preg_replace("/https?:\/\/.+(\/.*)\/?$/U","$1",hu));
 
-		// 1.0: a new $here variable in the top-level index.php 
+		// 1.0: a new $here variable in the top-level index.php
 		// should let us know the server path to the live site
 		// let's save it to prefs
 	if (isset($here) and $path_to_site != $here) updateSitePath($here);
@@ -115,7 +115,7 @@ $LastChangedRevision$
 	$pretext = !isset($pretext) ? array() : $pretext;
 	$pretext = array_merge($pretext, pretext($s,$prefs));
 	extract($pretext);
-	
+
 	// FIXME: just a rough idea for now/
 	$step = '';
 	if (txpinterface == 'css')
@@ -141,7 +141,7 @@ $LastChangedRevision$
 
 	// Now that everything is initialized, we can crank down error reporting
 	set_error_level($production_status);
-	
+
 	if (gps('parentid') && gps('submit')) {
 		saveComment();
 	} elseif (gps('parentid') and $comments_mode==1) { // popup comments?
@@ -953,7 +953,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function getStatusNum($name) 
+	function getStatusNum($name)
 	{
 		$labels = array('draft' => 1, 'hidden' => 2, 'pending' => 3, 'live' => 4, 'sticky' => 5);
 		$status = strtolower($name);
