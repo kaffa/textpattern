@@ -1411,8 +1411,16 @@ $LastChangedRevision$
 		if (@$thisid) $id = $thisid;
 
 		if ($id) {
+			$ip = serverset('REMOTE_ADDR');
+
+			$blacklisted = is_blacklisted($ip);
+
 			if (!checkCommentsAllowed($id)) {
-				$out = graf(gTxt("comments_closed"));
+				$out = graf(gTxt("comments_closed"), ' id="comments_closed"');
+			} elseif (!checkBan($ip)) {
+				$out = graf(gTxt('you_have_been_banned'), ' id="comments_banned"');
+			} elseif ($blacklisted) {
+				$out = graf(gTxt('your_ip_is_blacklisted_by'.' '.$blacklisted), ' id="comments_blacklisted"');
 			} elseif (gps('commented')!=='') {
 				$out = gTxt("comment_posted");
 				if (gps('commented')==='0')
@@ -2567,10 +2575,13 @@ function body($atts)
 			}
 		}
 
-		//Add the label at the end, to prevent breadcrumb for home page
-		if (!empty($content)) $content = array_merge(array($label),$content);
-		//Add article title without link if we're on an individual archive page?
-		return doTag(join($sep, $content), $wraptag, $class);
+		// add the label at the end, to prevent breadcrumb for home page
+		if ($content)
+		{
+			$content = array_merge(array($label), $content);
+
+			return doTag(join($sep, $content), $wraptag, $class);
+		}
 	}
 
 
