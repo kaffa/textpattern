@@ -165,7 +165,7 @@ register_callback('article_event', 'article', '', 1);
 		$Annotate = ( ps( 'Annotate')) ? assert_int( ps( 'Annotate')) : 0;
 
 		if (!has_privs('article.publish') && $Status>=4) $Status = 3;
-		
+
 		if($reset_time) {
 			$whenposted = "Posted=now()"; 
 		} else {
@@ -269,6 +269,10 @@ register_callback('article_event', 'article', '', 1);
 				"ID=$ID"
 			);
 
+			extract($article);
+
+			$reset_time = $publish_now = ($Status < 4);
+
 		} else {
 
 			if (!$from_view or $from_view=='text') {
@@ -281,13 +285,19 @@ register_callback('article_event', 'article', '', 1);
 					$article = unserialize(base64_decode($_POST['store']));
 				}
 			}
-			
+
 			$store_out = $article;
 		}
 
 		$GLOBALS['step'] = $step;
 
 		pagetop($article['Title'], $message);
+		if ($step == 'create')
+		{
+			$textile_body = $use_textile;
+			$textile_excerpt = $use_textile;
+
+		}
 
 		article_edit_form($step, $view, $from_view, $article);
 	}
@@ -580,27 +590,27 @@ register_callback('article_event', 'article', '', 1);
 		//-- timestamp ------------------- 
 
 				//Avoiding modified date to disappear
-				$persist_timestamp = (!empty($store_out['year']))? 
-					mktime($store_out['hour'],$store_out['minute'], $store_out['second'], $store_out['month'], $store_out['day'], $store_out['year'])
+				$persist_timestamp = (!empty($store_out['year']))?
+					safe_strtotime($store_out['year'].'-'.$store_out['month'].'-'.$store_out['day'].' '.$store_out['hour'].':'.$store_out['minute'].':'.$store_out['second'])
 					: time();
 
 				echo n.n.'<fieldset id="write-timestamp">'.
 					n.'<legend>'.gTxt('timestamp').'</legend>'.
 
-					n.graf(checkbox('publish_now', '1', ($Status < 4), '', 'publish_now').'<label for="publish_now">'.gTxt('set_to_now').'</label>').
+					n.graf(checkbox('publish_now', '1', $publish_now, '', 'publish_now').'<label for="publish_now">'.gTxt('set_to_now').'</label>').
 
 					n.graf(gTxt('or_publish_at').sp.popHelp('timestamp')).
 
 					n.graf(gtxt('date').sp.
-						tsi('year', 'Y', $persist_timestamp).' / '.
-						tsi('month', 'm', $persist_timestamp).' / '.
-						tsi('day', 'd', $persist_timestamp)
+						tsi('year', '%Y', $persist_timestamp).' / '.
+						tsi('month', '%m', $persist_timestamp).' / '.
+						tsi('day', '%d', $persist_timestamp)
 					).
 
 					n.graf(gTxt('time').sp.
-						tsi('hour', 'H', $persist_timestamp).' : '.
-						tsi('minute', 'i', $persist_timestamp).' : '.
-						tsi('second', 's', $persist_timestamp)
+						tsi('hour', '%H', $persist_timestamp).' : '.
+						tsi('minute', '%M', $persist_timestamp).' : '.
+						tsi('second', '%S', $persist_timestamp)
 					).
 
 				n.'</fieldset>'.
@@ -624,20 +634,20 @@ register_callback('article_event', 'article', '', 1);
 				echo n.n.'<fieldset id="write-timestamp">'.
 					n.'<legend>'.gTxt('timestamp').'</legend>'.
 
-					n.graf(checkbox('reset_time', '1', ($Status < 4), '', 'reset_time').'<label for="reset_time">'.gTxt('reset_time').'</label>').
+					n.graf(checkbox('reset_time', '1', $reset_time, '', 'reset_time').'<label for="reset_time">'.gTxt('reset_time').'</label>').
 
 					n.graf(gTxt('published_at').sp.popHelp('timestamp')).
 
 					n.graf(gtxt('date').sp.
-						tsi('year', 'Y', $sPosted).' / '.
-						tsi('month', 'm', $sPosted).' / '.
-						tsi('day', 'd', $sPosted)
+						tsi('year', '%Y', $sPosted).' / '.
+						tsi('month', '%m', $sPosted).' / '.
+						tsi('day', '%d', $sPosted)
 					).
 
 					n.graf(gTxt('time').sp.
-						tsi('hour', 'H', $sPosted).' : ' .
-						tsi('minute', 'i', $sPosted).' : '.
-						tsi('second', 's', $sPosted)
+						tsi('hour', '%H', $sPosted).' : ' .
+						tsi('minute', '%M', $sPosted).' : '.
+						tsi('second', '%S', $sPosted)
 					).
 
 					n.hInput('sPosted', $sPosted),
@@ -690,7 +700,7 @@ register_callback('article_event', 'article', '', 1);
 		$size = ($name=='year') ? 4 : 2;
 
 		return '<input type="text" name="'.$name.'" value="'.
-			date($datevar,$time+tz_offset())
+			safe_strftime($datevar, $time)
 		.'" size="'.$size.'" maxlength="'.$size.'" class="edit" tabindex="'.$tab.'" title="'.gTxt('article_'.$name).'" />';
 	}
 
