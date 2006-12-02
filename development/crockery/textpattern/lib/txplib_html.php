@@ -332,7 +332,7 @@ $LastChangedRevision: 1008 $
 	}
 
 // -------------------------------------------------------------
-	function tag($content,$tag,$atts='') 
+	function tag($content,$tag,$atts='')
 	{
 		return ($content) ? '<'.$tag.$atts.'>'.$content.'</'.$tag.'>' : '';
 	}
@@ -599,6 +599,12 @@ EOF;
 			return n.form($i);
 		else
 			return n.$i;
+	}
+	
+//-------------------------------------------------------------
+	function fieldset($content, $legend='', $id='') {
+		$a_id = ($id ? ' id="'.$id.'"' : '');
+		return tag(trim(tag($legend, 'legend').n.$content), 'fieldset', $a_id);
 	}
 
 ?>

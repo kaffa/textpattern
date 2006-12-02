@@ -381,8 +381,6 @@ $LastChangedRevision$
 			'wraptag'	 => '',
 		), $atts));
 
-		$form = fetch_form($form);
-
 		$qparts = array(
 			($category) ? "category = '".doSlash($category)."'" : '1',
 			'order by '.doSlash($sort),
@@ -407,7 +405,7 @@ $LastChangedRevision$
 					'category'    => $category,
 				);
 
-				$out[] = parse($form);
+				$out[] = parse_form($form);
 			}
 
 			if ($out)
@@ -1531,8 +1529,6 @@ $LastChangedRevision$
 
 		if (@$thisid) $id = $thisid;
 
-		$Form = fetch_form($form);
-
 		$rs = safe_rows_start("*, unix_timestamp(posted) as time", "txp_discuss",
 			'parentid='.intval($id).' and visible='.VISIBLE.' order by posted asc');
 
@@ -1543,7 +1539,7 @@ $LastChangedRevision$
 
 			while($vars = nextRow($rs)) {
 				$GLOBALS['thiscomment'] = $vars;
-				$comments[] = parse($Form).n;
+				$comments[] = parse_form($form).n;
 				unset($GLOBALS['thiscomment']);
 			}
 
@@ -1575,8 +1571,6 @@ $LastChangedRevision$
 
 		if (@$thisid) $id = $thisid;
 
-		$Form = fetch_form($form);
-
 		$preview = psas(array('name','email','web','message','parentid','remember'));
 		$preview['time'] = time();
 		$preview['discussid'] = 0;
@@ -1589,7 +1583,7 @@ $LastChangedRevision$
 		$preview['message'] = markup_comment($preview['message']);
 
 		$GLOBALS['thiscomment'] = $preview;
-		$comments = parse($Form).n;
+		$comments = parse_form($form).n;
 		unset($GLOBALS['thiscomment']);
 		$out = doTag($comments,$wraptag,$class);
 		
