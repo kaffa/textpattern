@@ -1325,6 +1325,24 @@ $LastChangedRevision: 1127 $
 	}
 
 // --------------------------------------------------------------
+	function parse_form($name)
+	{
+		static $stack = array();
+
+		$f = fetch_form($name);
+		if ($f) {
+			if (in_array($name, $stack)) {
+				trigger_error(gTxt('form_circular_reference', array('{name}' => $name)));
+				return;
+			}
+			array_push($stack, $name);
+			$out = parse($f);
+			array_pop($stack);
+			return $out;
+		}
+	}
+
+// --------------------------------------------------------------
 	function fetch_category_title($name, $type='article') 
 	{
 		static $cattitles = array();
@@ -1646,6 +1664,11 @@ eod;
 	function filedownloadurl($id, $filename='')
 	{
 		global $permlink_mode;
+
+		#FIXME: work around yet another mod_deflate problem (double compression)
+		# http://blogs.msdn.com/wndp/archive/2006/08/21/Content-Encoding-not-equal-Content-Type.aspx
+		if (preg_match('/gz$/i', $filename))
+			$filename .= '&';
 		return ($permlink_mode == 'messy') ?
 			hu.'index.php?s=file_download'.a.'id='.$id :
 			hu.gTxt('file_download').'/'.$id.($filename ? '/'.$filename : '');
