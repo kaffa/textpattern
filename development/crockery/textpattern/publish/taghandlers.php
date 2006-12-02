@@ -1274,6 +1274,16 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
+	function article_url_title() {
+		global $thisarticle;
+
+		assert_article();
+
+		return $thisarticle['url_title'];
+	}
+
+// -------------------------------------------------------------
+
 	function if_article_id($atts, $thing)
 	{
 		global $thisarticle;
