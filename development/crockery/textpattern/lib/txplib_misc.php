@@ -733,7 +733,7 @@ $LastChangedRevision: 1127 $
 	function noWidow($str)
 	{
 		// replace the last space with a nbsp
-		return preg_replace('@[ ]+(\w+[[:punct:]]?)$@', '&#160;$1', $str);
+		return preg_replace('@[ ]+(\w+[[:punct:]]?)$@', '&#160;$1', rtrim($str));
 	}
 
 // -------------------------------------------------------------
@@ -1252,6 +1252,18 @@ $LastChangedRevision: 1127 $
 		return (PHP_OS == 'WINNT' or PHP_OS == 'WIN32' or PHP_OS == 'Windows');
 	}
 
+// -------------------------------------------------------------
+	function is_cgi()
+	{
+		return (preg_match('/^cgi/i', php_sapi_name()) == 1);
+	}
+
+// -------------------------------------------------------------
+	function is_mod_php()
+	{
+		return (php_sapi_name() == 'apache');
+	}
+
 // --------------------------------------------------------------
 	function build_file_path($base,$path)
 	{
@@ -1665,10 +1677,11 @@ eod;
 	{
 		global $permlink_mode;
 
+		$filename = urlencode($filename);
 		#FIXME: work around yet another mod_deflate problem (double compression)
 		# http://blogs.msdn.com/wndp/archive/2006/08/21/Content-Encoding-not-equal-Content-Type.aspx
 		if (preg_match('/gz$/i', $filename))
-			$filename .= '&';
+			$filename .= a;
 		return ($permlink_mode == 'messy') ?
 			hu.'index.php?s=file_download'.a.'id='.$id :
 			hu.gTxt('file_download').'/'.$id.($filename ? '/'.$filename : '');

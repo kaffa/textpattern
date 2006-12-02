@@ -556,6 +556,11 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function password_protect($atts)
 	{
+		if (!is_mod_php()) {
+			trigger_error(gTxt('http_auth_requires_mod_php'));
+			return;
+		}
+
 		ob_start();
 
 		extract(lAtts(array(
@@ -567,7 +572,7 @@ $LastChangedRevision$
 		$ap = serverSet('PHP_AUTH_PW');
 		if ($login && $pass) {
 			if (!$au || !$ap || $au!= $login || $ap!= $pass) {
-				header('WWW-Authenticate: Basic realm="Private"'); 
+				header('WWW-Authenticate: Basic realm="Private"');
 				txp_die(gTxt('auth_required'), '401');
 			}
 		}
@@ -1319,7 +1324,7 @@ $LastChangedRevision$
 			}
 		}
 
-		return ($wraptag) ? doWrap($out, $wraptag, '', $class) : $out;
+		return ($wraptag) ? doTag($out, $wraptag, '', $class) : $out;
 	}
 
 // -------------------------------------------------------------
@@ -2398,11 +2403,6 @@ function body($atts)
 			if ($thing === NULL)
 			{
 				return $url;
-			}
-
-			if ($title == false and ($id == false or $id == $thisarticle['thisid']))
-			{
-				$title = gTxt('permanent_link');
 			}
 
 			return tag(parse($thing), 'a', ' rel="bookmark" href="'.$url.'"'.
