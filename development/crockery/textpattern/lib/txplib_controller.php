@@ -16,6 +16,7 @@ class ZemAdminController {
 
 	var $_messages = array();
 	var $_step;
+	var $_view_args = array();
 
 	function ZemAdminController() {
 	}
@@ -42,7 +43,7 @@ class ZemAdminController {
 			// ob buffering is for legacy reasons -- ideally, _view methods should return
 			// output, not echo it, but this will help older code work during migration
 			ob_start();
-			$out = $this->$step_view();
+			$out = call_user_func_array(array(&$this, $step_view), $this->_view_args);
 			$out .= ob_get_clean();
 			$this->_render($out);
 		}
@@ -80,9 +81,12 @@ class ZemAdminController {
 		return dLink($this->event, $step, $thing, $value, $verify);
 	}
 
-	function _set_step($step) {
+	function _set_step($step /*, $a, $b, ... */) {
 		// use this in a _post handler to switch to a different view
+		// additional args will be passed as parameters to the view function
 		$this->_step = $step;
+		$args = func_get_args();
+		$this->_view_args = array_slice($args, 1);
 	}
 
 	function _fieldset($contents, $name='') {

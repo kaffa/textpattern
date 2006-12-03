@@ -30,7 +30,6 @@ class FileController extends ZemAdminController {
 	var $area = 'file';
 	var $event = 'file';
 	var $default_step = 'list';
-	var $id;
 
 	function list_view($message = '')
 	{
@@ -270,13 +269,11 @@ class FileController extends ZemAdminController {
 
 // -------------------------------------------------------------
 
-	function edit_view()
+	function edit_view($id = '')
 	{
 		global $txpcfg, $file_base_path, $levels, $path_from_root;
 
 		extract(gpsa(array('name', 'category', 'permissions', 'description', 'sort', 'dir', 'page', 'crit', 'method')));
-		
-		$id = $this->id;
 
 		if (!$id)
 		{
@@ -464,9 +461,8 @@ class FileController extends ZemAdminController {
 				} else {
 					$this->file_set_perm($newpath);
 					$this->_message(messenger('file',$name,'uploaded'));
-					// switch to the 'edit' view
-					$this->_set_step('edit');
-					$this->id = $id;
+					// switch to the 'edit' view, passing $id
+					$this->_set_step('edit', $id);
 				}
 			}
 		} else {
