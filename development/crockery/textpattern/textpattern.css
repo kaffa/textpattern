@@ -539,3 +539,24 @@ text-align: center;
 h2.pref-heading {
 margin: 20px 0 0 0;
 }
+
+/* view
+----------------------------------------------- */
+#main-view {
+	padding: 0 100px 0 100px;
+}
+#main-view fieldset {
+	width: 300px;
+	margin: 15px auto;
+}
+#main-view table {
+	margin: 10px;
+}
+#main-view .message {
+	text-align: center;
+	background-color: #f4fff4;
+}
+#main-view .error {
+	text-align: center;
+	background-color: #fff4f4;
+}

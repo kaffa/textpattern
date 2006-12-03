@@ -50,6 +50,7 @@ $LastChangedRevision$
 	include txpath.'/lib/txplib_element.php';
 	include txpath.'/lib/txplib_class.php';
 	include txpath.'/lib/admin_config.php';
+	include txpath.'/lib/txplib_controller.php';
 
 	$microstart = getmicrotime();
 
@@ -76,7 +77,7 @@ $LastChangedRevision$
 
 		if (!empty($locale)) setlocale(LC_ALL, $locale);
 		$textarray = load_lang(LANG);
-	
+
 		include txpath.'/include/txp_auth.php';
 		doAuth();
 
@@ -95,6 +96,7 @@ $LastChangedRevision$
 		}
 
 		load_elements($event);
+		register_element_tabs();
 
 		if (!empty($admin_side_plugins) and gps('event') != 'plugin')
 			load_plugins(1);
@@ -108,9 +110,12 @@ $LastChangedRevision$
 		else 
 			require_privs($event);
 
-		$inc = txpath . '/include/txp_'.$event.'.php';
-		if (is_readable($inc))
-			include($inc);
+		// let elements override older /include/txp_foo.php admin pages
+		if (!controller_name($event)) {
+			$inc = txpath . '/include/txp_'.$event.'.php';
+			if (is_readable($inc))
+				include($inc);
+		}
 
 		callback_event($event, $step, 1);
 

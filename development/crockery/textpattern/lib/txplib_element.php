@@ -73,8 +73,10 @@ define('elements_dir', 'elements');
 						'status' => '1',
 					), $row);
 
-					if (!empty($er['status']))
+					if (!empty($er['status'])) {
 						$elements[$name] = $er;
+
+					}
 				}
 			}
 		}
@@ -90,6 +92,20 @@ define('elements_dir', 'elements');
 			foreach ($elements as $e) {
 				if ($e['event'] == $event) {
 					load_element($e['name']);
+				}
+			}
+		}
+	}
+
+// -------------------------------------------------------------
+	function register_element_tabs()
+	{
+		global $elements;
+
+		if (is_array($elements)) {
+			foreach ($elements as $e) {
+				if (!empty($e['tabarea'])) {
+					register_tab($e['tabarea'], $e['event'], 'tab_'.$e['event']);
 				}
 			}
 		}
