@@ -8,8 +8,8 @@
    /___________)                               (___________\
 
 	Textpattern Copyright 2004 by Dean Allen. All rights reserved.
-	Use of this software denotes acceptance of the Textpattern license agreement 
-	
+	Use of this software denotes acceptance of the Textpattern license agreement
+
 	"Mod File Upload" Copyright 2004 by Michael Manfre. All rights reserved.
 	Use of this mod denotes acceptance of the Textpattern license agreement
 
@@ -19,23 +19,22 @@ $LastChangedRevision$
 
 */
 
-register_callback('file_event', 'file');
+include_once(txpath.'/lib/txplib_controller.php');
 
-	function file_event($event, $step) {
-		require_privs('file');		
+// tell txp to run this controller for the 'file' event, and place it in the 'content' tab area
+register_controller('FileController', 'file');
 
-		if(!$step or !in_array($step, array('file_change_max_size','file_change_pageby','file_db_add','file_delete','file_edit','file_insert','file_list','file_replace','file_save','file_reset_count','file_create'))){
-			file_list();
-		} else $step();
-	}
 
 // -------------------------------------------------------------
+class FileController extends ZemAdminController {
+	var $area = 'file';
+	var $event = 'file';
+	var $default_step = 'list';
+	var $id;
 
-	function file_list($message = '') 
+	function list_view($message = '')
 	{
 		global $txpcfg, $extensions, $file_base_path;
-
-		pagetop(gTxt('file'), $message);
 
 		extract($txpcfg);
 		extract(get_prefs());
@@ -51,13 +50,13 @@ register_callback('file_event', 'file');
 
 		else
 		{
-			$existing_files = get_filenames();
+			$existing_files = $this->get_filenames();
 
 			if (count($existing_files) > 0)
 			{
 				echo form(
-					eInput('file').
-					sInput('file_create').
+					eInput($this->event).
+					sInput('create').
 
 					graf(gTxt('existing_file').sp.selectInput('filename', $existing_files, '', 1).sp.
 						fInput('submit', '', gTxt('Create'), 'smallerbox'))
@@ -65,7 +64,7 @@ register_callback('file_event', 'file');
 				, 'text-align: center;');
 			}
 
-			echo file_upload_form(gTxt('upload_file'), 'upload', 'file_insert');
+			echo $this->file_upload_form(gTxt('upload_file'), 'upload', 'insert');
 		}
 
 		$dir = ($dir == 'desc') ? 'desc' : 'asc';
@@ -131,7 +130,7 @@ register_callback('file_event', 'file');
 		{
 			if ($criteria != 1)
 			{
-				echo n.file_search_form($crit, $search_method).
+				echo n.$this->file_search_form($crit, $search_method).
 					n.graf(gTxt('no_results_found'), ' style="text-align: center;"');
 			}
 
@@ -147,7 +146,7 @@ register_callback('file_event', 'file');
 
 		list($page, $offset, $numPages) = pager($total, $limit, $page);
 
-		echo file_search_form($crit, $search_method);
+		echo $this->file_search_form($crit, $search_method);
 
 		$rs = safe_rows_start('*', 'txp_file', "$criteria order by $sort_sql limit $offset, $limit");
 
@@ -172,12 +171,12 @@ register_callback('file_event', 'file');
 			{
 				extract($a);
 
-				$edit_url = '?event=file'.a.'step=file_edit'.a.'id='.$id.a.'sort='.$sort.
+				$edit_url = '?event=file'.a.'step=edit'.a.'id='.$id.a.'sort='.$sort.
 					a.'dir='.$dir.a.'page='.$page.a.'search_method='.$search_method.a.'crit='.$crit;
 
 				$file_exists = file_exists(build_file_path($file_base_path, $filename));
 
-				$download_link = ($file_exists) ? '<li>'.make_download_link($id).'</li>' : '';
+				$download_link = ($file_exists) ? '<li>'.$this->make_download_link($id).'</li>' : '';
 
 				$category = ($category) ? '<span title="'.fetch_category_title($category, 'file').'">'.$category.'</span>' : '';
 
@@ -242,7 +241,7 @@ register_callback('file_event', 'file');
 					, 25).
 
 					td(
-						dLink('file', 'file_delete', 'id', $id)
+						dLink('file', 'delete', 'id', $id)
 					, 10)
 				);
 			}
@@ -271,13 +270,13 @@ register_callback('file_event', 'file');
 
 // -------------------------------------------------------------
 
-	function file_edit($message = '', $id = '') 
+	function edit_view()
 	{
 		global $txpcfg, $file_base_path, $levels, $path_from_root;
 
-		pagetop('file', $message);
-
 		extract(gpsa(array('name', 'category', 'permissions', 'description', 'sort', 'dir', 'page', 'crit', 'method')));
+		
+		$id = $this->id;
 
 		if (!$id)
 		{
@@ -295,8 +294,8 @@ register_callback('file_event', 'file');
 			if ($permissions=='') $permissions='-1';
 
 			$file_exists = file_exists(build_file_path($file_base_path,$filename));
-			
-			$existing_files = get_filenames();
+
+			$existing_files = $this->get_filenames();
 
 			$status = '<span class="';
 			$status .= ($file_exists) ? 'ok' : 'not-ok';
@@ -304,10 +303,10 @@ register_callback('file_event', 'file');
 			$status .= ($file_exists)?gTxt('file_status_ok'):gTxt('file_status_missing');
 			$status .= '</span>';
 
-			$downloadlink = ($file_exists)?make_download_link($id, $filename):$filename;
-			
+			$downloadlink = ($file_exists) ? $this->make_download_link($id, $filename) : $filename;
+
 			$form = '';
-			
+
 			if ($file_exists) {
 				$form =	tr(
 							td(
@@ -318,8 +317,8 @@ register_callback('file_event', 'file');
 									graf(gTxt('description').br.text_area('description','100','400',$description)) .
 									graf(fInput('submit','',gTxt('save'))) .
 
-									eInput('file') .
-									sInput('file_save').
+									eInput($this->event) .
+									sInput('save').
 
 									hInput('filename', $filename).
 									hInput('id', $id) .
@@ -333,7 +332,7 @@ register_callback('file_event', 'file');
 							)
 						);
 			} else {
-			
+
 				$form =	tr(
 							tda(
 								hed(gTxt('file_relink'),3).
@@ -343,8 +342,8 @@ register_callback('file_event', 'file');
 									selectInput('filename',$existing_files,"",1).
 									fInput('submit','',gTxt('Save'),'smallerbox').
 
-									eInput('file').
-									sInput('file_save').
+									eInput($this->event).
+									sInput('save').
 
 									hInput('id',$id).
 									hInput('category',$category).
@@ -390,127 +389,145 @@ register_callback('file_event', 'file');
 			$GLOBALS['ID'] = mysql_insert_id( );
 			return $GLOBALS['ID'];
 		}
-			
+
 		return false;
-	}	
-	
+	}
+
 // -------------------------------------------------------------
-	function file_create() 
-	{	
+	function create_post()
+	{
 		global $txpcfg,$extensions,$txp_user,$file_base_path;
 		extract($txpcfg);
 		extract(doSlash(gpsa(array('filename','category','permissions','description'))));
 
-		$id = file_db_add($filename,$category,$permissions,$description);
-		
+		$id = $this->file_db_add($filename,$category,$permissions,$description);
+
 		if($id === false){
-			file_list(gTxt('file_upload_failed').' (db_add)');
+			$this->_error(gTxt('file_upload_failed').' (db_add)');
 		} else {
 			$newpath = build_file_path($file_base_path,trim($filename));
 
 			if (is_file($newpath)) {
-				file_set_perm($newpath);
-				file_list(gTxt('linked_to_file').' '.$filename);
+				$this->file_set_perm($newpath);
+				$this->_message(gTxt('linked_to_file').' '.$filename);
 			} else {
-				file_list(gTxt('file_not_found').' '.$filename);
+				$this->_error(gTxt('file_not_found').' '.$filename);
 			}
 		}
 	}
 
 // -------------------------------------------------------------
-	function file_insert() 
-	{	
+	function create_view()
+	{
+		$this->list_view();
+	}
+
+// -------------------------------------------------------------
+	function insert_post()
+	{
 		global $txpcfg,$extensions,$txp_user,$file_base_path,$file_max_upload_size;
 		extract($txpcfg);
 		extract(doSlash(gpsa(array('category','permissions','description'))));
 
-		$name = file_get_uploaded_name();
-		$file = file_get_uploaded();
+		$name = $this->file_get_uploaded_name();
+		$file = $this->file_get_uploaded();
 
 		if ($file === false) {
 			// could not get uploaded file
-			file_list(gTxt('file_upload_failed') ." $name - ".upload_get_errormsg(@$_FILES['file']['error']));
+			$this->_error(gTxt('file_upload_failed') ." $name - ".upload_get_errormsg(@$_FILES['file']['error']));
 			return;
 		}
 
 		if ($file_max_upload_size < filesize($file)) {
 			unlink($file);
-			file_list(gTxt('file_upload_failed') ." $name - ".upload_get_errormsg(UPLOAD_ERR_FORM_SIZE));
+			$this->_error(gTxt('file_upload_failed') ." $name - ".upload_get_errormsg(UPLOAD_ERR_FORM_SIZE));
 			return;
 		}
-		
+
 		if (!is_file(build_file_path($file_base_path,$name))) {
 
-			$id = file_db_add($name,$category,$permissions,$description);
-			
+			$id = $this->file_db_add($name,$category,$permissions,$description);
+
 			if(!$id){
-				file_list(gTxt('file_upload_failed').' (db_add)');
+				$this->_error(gTxt('file_upload_failed').' (db_add)');
+				return;
 			} else {
 
 				$newpath = build_file_path($file_base_path,trim($name));
-				
+
 				if(!shift_uploaded_file($file, $newpath)) {
 					safe_delete("txp_file","id='$id'");
 					safe_alter("txp_file", "auto_increment=$id");
 					if ( isset( $GLOBALS['ID'])) unset( $GLOBALS['ID']);
-					file_list($newpath.' '.gTxt('upload_dir_perms'));
+					$this->_error($newpath.' '.gTxt('upload_dir_perms'));
 					// clean up file
 				} else {
-					file_set_perm($newpath);
-					file_edit(messenger('file',$name,'uploaded'),$id);
+					$this->file_set_perm($newpath);
+					$this->_message(messenger('file',$name,'uploaded'));
+					// switch to the 'edit' view
+					$this->_set_step('edit');
+					$this->id = $id;
 				}
 			}
 		} else {
-			file_list(messenger(gTxt('file'),$name,gTxt('already_exists')));
+			$this->_error(messenger(gTxt('file'),$name,gTxt('already_exists')));
 		}
 	}
 
 // -------------------------------------------------------------
-	function file_replace() 
-	{	
+	function insert_view()
+	{
+		$this->list_view();
+	}
+
+
+// -------------------------------------------------------------
+	function replace_post()
+	{
 		global $txpcfg,$extensions,$txp_user,$file_base_path;
 		extract($txpcfg);
 		$id = gps('id');
 
 		$rs = safe_row('filename','txp_file',"id='$id'");
-		
+
 		if (!$rs) {
-			file_list(messenger(gTxt('invalid_id'),$id,''));
+			$this->_error(messenger(gTxt('invalid_id'),$id,''));
 			return;
 		}
-		
+
 		extract($rs);
-		
-		$file = file_get_uploaded();
-		$name = file_get_uploaded_name();
+
+		$file = $this->file_get_uploaded();
+		$name = $this->file_get_uploaded_name();
 
 		if ($file === false) {
 			// could not get uploaded file
-			file_list(gTxt('file_upload_failed') ." $name ".upload_get_errormsg($_FILES['file']['error']));
+			$this->_error(gTxt('file_upload_failed') ." $name ".upload_get_errormsg($_FILES['file']['error']));
 			return;
 		}
 
 		if (!$filename) {
-			file_list(gTxt('invalid_filename'));
+			$this->_error(gTxt('invalid_filename'));
 		} else {
 			$newpath = build_file_path($file_base_path,$filename);
 
 			if (is_file($newpath)) {
 				rename($newpath,$newpath.'.tmp');
 			}
-	
+
 			if(!shift_uploaded_file($file, $newpath)) {
 				safe_delete("txp_file","id='$id'");
 
-				file_list($newpath.sp.gTxt('upload_dir_perms'));
+				$this->_error($newpath.sp.gTxt('upload_dir_perms'));
 				// rename tmp back
 				rename($newpath.'.tmp',$newpath);
-				
+
 				// remove tmp upload
-				unlink($file);				
+				unlink($file);
 			} else {
-				file_set_perm($newpath);
-				file_edit(messenger('file',$name,'uploaded'),$id);
+				$this->file_set_perm($newpath);
+				$this->_message(messenger('file',$name,'uploaded'),$id);
+				$this->_set_step('edit');
 				// clean up old
 				if (is_file($newpath.'.tmp'))
 					unlink($newpath.'.tmp');
@@ -518,28 +535,41 @@ register_callback('file_event', 'file');
 		}
 	}
 
+// -------------------------------------------------------------
+	function replace_view()
+	{
+		$this->list_view();
+	}
+
 
 // -------------------------------------------------------------
-	function file_reset_count() 
+	function reset_count_post()
 	{
 		extract(doSlash(gpsa(array('id','filename','category','description'))));
-		
-		
+
+
 		if ($id) {
 			if (safe_update('txp_file','downloads=0',"id='${id}'")) {
-				file_edit(gTxt('reset_file_count_success'),$id);
+				$this->_message(gTxt('reset_file_count_success'),$id);
+				$this->_set_step('edit');
 			}
 		} else {
-			file_list(gTxt('reset_file_count_failure'));
-		}		
+			$this->_error(gTxt('reset_file_count_failure'));
+		}
 	}
 
 // -------------------------------------------------------------
-	function file_save() 
+	function reset_count_view()
+	{
+		$this->list_view();
+	}
+
+// -------------------------------------------------------------
+	function save_post()
 	{
 		global $file_base_path;
 		extract(doSlash(gpsa(array('id','filename','category','description'))));
-		
+
 		$permissions = "";
 		if (isset($_GET['perms'])) {
 			$permissions =  urldecode($_GET['perms']);
@@ -552,21 +582,21 @@ register_callback('file_event', 'file');
 		}
 
 		$perms = doSlash($permissions);
-		
+
 		$old_filename = fetch('filename','txp_file','id','$id');
-		
+
 		if ($old_filename != false && strcmp($old_filename,$filename)!=0) {
 			$old_path = build_file_path($file_base_path,$old_filename);
 			$new_path = build_file_path($file_base_path,$filename);
-			
+
 			if (file_exists($old_path) && shift_uploaded_file($old_path,$new_path) === false) {
-				file_list(messenger("file",$filename,"could not be renamed"));
+				$this->_error(messenger("file",$filename,"could not be renamed"));
 				return;
 			} else {
-				file_set_perm($new_path);
+				$this->file_set_perm($new_path);
 			}
 		}
-		
+
 		$rs = safe_update(
 			"txp_file",
 			"filename = '$filename',
@@ -575,46 +605,58 @@ register_callback('file_event', 'file');
 			description = '$description'",
 			"id = '$id'"
 		);
-		
+
 		if (!$rs) {
 			// update failed, rollback name
 			if (shift_uploaded_file($new_path,$old_path) === false) {
-				file_list(messenger("file",$filename,"has become unsyned with database. Manually fix file name."));
+				$this->_error(messenger("file",$filename,"has become unsyned with database. Manually fix file name."));
 				return;
 			} else {
-				file_list(messenger(gTxt('file'),$filename,"was not updated"));
+				$this->_error(messenger(gTxt('file'),$filename,"was not updated"));
 				return;
 			}
 		}
-		
-		file_list(messenger(gTxt('file'),$filename,"updated"));
+
+		$this->_message(messenger(gTxt('file'),$filename,"updated"));
 	}
 
 // -------------------------------------------------------------
-	function file_delete() 
+	function save_view()
+	{
+		$this->list_view();
+	}
+
+// -------------------------------------------------------------
+	function delete_post()
 	{
 		global $txpcfg,$file_base_path;
 		extract($txpcfg);
 		$id = ps('id');
-		
+
 		$rs = safe_row("*", "txp_file", "id='$id'");
 		if ($rs) {
 			extract($rs);
-			
+
 			$filepath = build_file_path($file_base_path,$filename);
-			
+
 			$rsd = safe_delete("txp_file","id='$id'");
 			$ul = false;
 			if ($rsd && is_file($filepath))
 				$ul = unlink($filepath);
 			if ($rsd && $ul) {
-				file_list(messenger(gTxt('file'),$filename,gTxt('deleted')));
+				$this->_message(messenger(gTxt('file'),$filename,gTxt('deleted')));
 				return;
 			} else {
-				file_list(messenger(gTxt('file_delete_failed'),$filename,''));
+				$this->_error(messenger(gTxt('file_delete_failed'),$filename,''));
 			}
-		} else 
-			file_list(messenger(gTxt('file_not_found'),$filename,''));
+		} else
+			$this->_error(messenger(gTxt('file_not_found'),$filename,''));
+	}
+
+// -------------------------------------------------------------
+	function delete_view()
+	{
+		$this->list_view();
 	}
 
 // -------------------------------------------------------------
@@ -626,39 +668,37 @@ register_callback('file_event', 'file');
 // -------------------------------------------------------------
 	function file_get_uploaded()
 	{
-		return get_uploaded_file($_FILES['thefile']['tmp_name']);		
+		return get_uploaded_file($_FILES['thefile']['tmp_name']);
 	}
-	
+
 // -------------------------------------------------------------
 	function file_set_perm($file)
 	{
 		return @chmod($file,0755);
-	}	
+	}
 
 // -------------------------------------------------------------
 	function file_upload_form($label,$pophelp,$step,$id='')
 	{
 		global $file_max_upload_size;
-		
+
 		if (!$file_max_upload_size || intval($file_max_upload_size)==0) $file_max_upload_size = 2*(1024*1024);
-		
+
 		$max_file_size = (intval($file_max_upload_size) == 0) ? '': intval($file_max_upload_size);
-			
+
 		return upload_form($label, $pophelp, $step, 'file', $id, $max_file_size);
 	}
-	
+
 // -------------------------------------------------------------
-	function file_change_pageby() 
+	function change_pageby_post()
 	{
 		event_change_pageby('file');
-		file_list();
 	}
-	
+
 // -------------------------------------------------------------
-	function file_change_max_size() 
+	function change_pageby_view()
 	{
-		// DEPRECATED function; removed old code
-		file_list();
+		$this->list_view();
 	}
 
 // -------------------------------------------------------------
@@ -669,23 +709,23 @@ register_callback('file_event', 'file');
 
 		$label = ($label) ? $label : gTxt('download');
 
-		$url = ($permlink_mode == 'messy') ? 
-			hu.'index.php?s=file_download'.a.'id='.$id : 
+		$url = ($permlink_mode == 'messy') ?
+			hu.'index.php?s=file_download'.a.'id='.$id :
 			hu.''.gTxt('file_download').'/'.$id;
 
 		return '<a href="'.$url.'">'.$label.'</a>';
 	}
-	
+
 // -------------------------------------------------------------
 	function get_filenames()
 	{
 		global $file_base_path;
-		
+
 		$dirlist = array();
 
 		if (!is_dir($file_base_path))
-			return $dirlist;		
-		
+			return $dirlist;
+
 		if (chdir($file_base_path)) {
 			if (function_exists('glob'))
 				$g_array = glob("*.*");
@@ -696,9 +736,9 @@ register_callback('file_event', 'file');
 					$g_array[] = $filename;
 				}
 				closedir($dh);
-				
+
 			}
-			
+
 			if ($g_array) {
 				foreach ($g_array as $filename) {
 					if (is_file($filename)) {
@@ -716,8 +756,9 @@ register_callback('file_event', 'file');
 				$files[$a['filename']] = $a['filename'];
 			}
 		}
-		
+
 		return array_diff($dirlist,$files);
 	}
-	
+}
+
 ?>

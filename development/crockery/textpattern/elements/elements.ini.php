@@ -8,6 +8,7 @@ event = "element"
 
 [txp_file]
 event = "file"
+tabarea = "content"
 
 [pub_file]
 event = "pub_file"
