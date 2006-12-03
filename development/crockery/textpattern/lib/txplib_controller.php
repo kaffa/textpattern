@@ -27,7 +27,7 @@ class ZemAdminController {
 		$this->event = $event;
 		if (!$step)
 			$step = $this->default_step;
-		$this->_set_step($step);
+		$this->_set_view($step);
 
 		if ($this->_method() == 'POST') {
 			// call $this->{$step}_post() if it exists
@@ -81,7 +81,7 @@ class ZemAdminController {
 		return dLink($this->event, $step, $thing, $value, $verify);
 	}
 
-	function _set_step($step /*, $a, $b, ... */) {
+	function _set_view($step /*, $a, $b, ... */) {
 		// use this in a _post handler to switch to a different view
 		// additional args will be passed as parameters to the view function
 		$this->_step = $step;

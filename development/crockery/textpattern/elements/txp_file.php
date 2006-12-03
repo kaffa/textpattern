@@ -462,7 +462,7 @@ class FileController extends ZemAdminController {
 					$this->file_set_perm($newpath);
 					$this->_message(messenger('file',$name,'uploaded'));
 					// switch to the 'edit' view, passing $id
-					$this->_set_step('edit', $id);
+					$this->_set_view('edit', $id);
 				}
 			}
 		} else {
@@ -522,8 +522,8 @@ class FileController extends ZemAdminController {
 				unlink($file);
 			} else {
 				$this->file_set_perm($newpath);
-				$this->_message(messenger('file',$name,'uploaded'),$id);
-				$this->_set_step('edit');
+				$this->_message(messenger('file',$name,'uploaded'));
+				$this->_set_view('edit', $id);
 				// clean up old
 				if (is_file($newpath.'.tmp'))
 					unlink($newpath.'.tmp');
@@ -547,7 +547,7 @@ class FileController extends ZemAdminController {
 		if ($id) {
 			if (safe_update('txp_file','downloads=0',"id='${id}'")) {
 				$this->_message(gTxt('reset_file_count_success'),$id);
-				$this->_set_step('edit');
+				$this->_set_view('edit');
 			}
 		} else {
 			$this->_error(gTxt('reset_file_count_failure'));
