@@ -178,7 +178,7 @@ if ($event == 'category') {
 				fInput('text', 'title', '', 'edit', '', '', 20).
 				fInput('submit', '', gTxt('Create'), 'smallerbox').
 				eInput('category').
-				sInput('cat_'.$event.'_create')
+				sInput('cat_'.$evname.'_create')
 			);
 
 		$rs = getTree('root', $evname);
