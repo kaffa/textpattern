@@ -200,7 +200,7 @@ $LastChangedRevision: 1098 $
 	function tabber($label,$tabevent,$event) 
 	{
 		$tc = ($event==$tabevent) ? 'tabup' : 'tabdown2';
-		$out = '<td class="'.$tc.'" onclick="window.location.href=\'?event='.$tabevent.'\'" ><a href="?event='.$tabevent.'" class="plain">'.$label.'</a></td>';
+		$out = '<td class="'.$tc.'" onclick="window.location.href=\'?event='.$tabevent.'\'" ><a href="?event='.$tabevent.'" class="plain">'.gTxt($label).'</a></td>';
       	return $out;
 	}
 
