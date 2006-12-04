@@ -68,17 +68,29 @@ if ($event == 'category') {
 	}
 
 //--------------------------------------------------------------
-	function cat_parent_pop($name,$type)
+
+	function cat_parent_pop($name, $type, $id)
 	{
-		$rs = getTree("root",$type);
-		if ($rs) {
-			return ' '.treeSelectInput('parent', $rs, $name);
+		if ($id)
+		{
+			$id = assert_int($id);
+			list($lft, $rgt) = array_values(safe_row('lft, rgt', 'txp_category', 'id = '.$id));
+
+			$rs = getTree('root', $type, "lft not between $lft and $rgt");
 		}
-		return 'no categories created';
+
+		else
+		{
+			$rs = getTree('root', $type);
+		}
+
+		if ($rs)
+		{
+			return treeSelectInput('parent', $rs, $name);
+		}
+
+		return gTxt('no_other_categories_exist');
 	}
-
-
-
 
 // -------------------------------------------------------------
 	function cat_link_list() 
@@ -130,15 +142,15 @@ if ($event == 'category') {
 
 
 // -------------------------------------------------------------
-	function cat_article_multiedit_form($area, $array) 
+	function cat_article_multiedit_form($area, $array)
 	{
 		$methods = array('delete'=>gTxt('delete'));
 		if ($array) {
-		return 
+		return
 		form(
 			join('',$array).
 			eInput('category').sInput('cat_category_multiedit').hInput('type',$area).
-			small(gTxt('with_selected')).sp.selectInput('method',$methods,'',1).sp.
+			small(gTxt('with_selected')).sp.selectInput('edit_method',$methods,'',1).sp.
 			fInput('submit','',gTxt('go'),'smallerbox')
 			,'margin-top:1em',"verify('".gTxt('are_you_sure')."')"
 		);
@@ -146,22 +158,28 @@ if ($event == 'category') {
 	}
 
 // -------------------------------------------------------------
-	function cat_category_multiedit() 
+	function cat_category_multiedit()
 	{
 		$type = ps('type');
-		$method = ps('method');
+		$method = ps('edit_method');
 		$things = ps('selected');
 		if ($things) {
 			foreach($things as $catid) {
 				$catid = assert_int($catid);
 				if ($method == 'delete') {
+					$catname = safe_field('name', 'txp_category', "id=$catid");
 					if (safe_delete('txp_category',"id=$catid")) {
+						if ($catname)
+							safe_update('txp_category', "parent='root'", "type='".doSlash($type)."' and parent='".doSlash($catname)."'");
 						$categories[] = $catid;
 					}
 				}
 			}
 			rebuild_tree_full($type);
-			cat_category_list(messenger($type.'_category',join(', ',$categories),'deleted'));
+
+			$message = gTxt($type.'_categories_deleted', array('{list}' => join(', ',$categories)));
+
+			cat_category_list($message);
 		}
 	}
 
@@ -170,71 +188,71 @@ if ($event == 'category') {
 
 //-------------------------------------------------------------
 
-	function cat_event_category_list($evname) 
+	function cat_event_category_list($event) 
 	{
-		$o = hed(gTxt($evname.'_head').sp.popHelp($evname.'_category'), 3);
+		$out = n.n.hed(gTxt($event.'_head').sp.popHelp($event.'_category'), 3).
 
-		$o .= form(
+			form(
 				fInput('text', 'title', '', 'edit', '', '', 20).
 				fInput('submit', '', gTxt('Create'), 'smallerbox').
 				eInput('category').
-				sInput('cat_'.$evname.'_create')
+				sInput('cat_'.$event.'_create')
 			);
 
-		$rs = getTree('root', $evname);
+		$rs = getTree('root', $event);
 
 		if ($rs)
 		{
 			$total_count = array();
 
-			// fetch count
-			switch ($evname)
+			if ($event == 'article')
 			{
-				case 'article':
-					$rs2 = safe_rows_start('Category1, count(*) as num', 'textpattern', "1 group by Category1");
-					$rs3 = safe_rows_start('Category2, count(*) as num', 'textpattern', "1 group by Category2");
+				$rs2 = safe_rows_start('Category1, count(*) as num', 'textpattern', "1 = 1 group by Category1");
 
-					while ($a = nextRow($rs2))
+				while ($a = nextRow($rs2))
+				{
+					$name = $a['Category1'];
+					$num = $a['num'];
+
+					$total_count[$name] = $num;
+				}
+
+				$rs2 = safe_rows_start('Category2, count(*) as num', 'textpattern', "1 = 1 group by Category2");
+
+				while ($a = nextRow($rs2))
+				{
+					$name = $a['Category2'];
+					$num = $a['num'];
+
+					if (isset($total_count[$name]))
 					{
-						$name = $a['Category1'];
-						$num = $a['num'];
+						$total_count[$name] += $num;
+					}
 
+					else
+					{
 						$total_count[$name] = $num;
 					}
-
-					while ($a = nextRow($rs3))
-					{
-						$name = $a['Category2'];
-						$num = $a['num'];
-
-						if (isset($total_count[$name]))
-						{
-							$total_count[$name] += $num;
-						}
-
-						else
-						{
-							$total_count[$name] = $num;
-						}
-					}
-
-				break;
-
-				case 'link':
-					$rs2 = safe_rows_start('category, count(*) as num', 'txp_link', "1 group by category");
-				break;
-
-				case 'image':
-					$rs2 = safe_rows_start('category, count(*) as num', 'txp_image', "1 group by category");
-				break;
-
-				case 'file':
-					$rs2 = safe_rows_start('category, count(*) as num', 'txp_file', "1 group by category");
-				break;
+				}
 			}
 
-			if ($rs2 and $evname != 'article')
+			else
 			{
+				switch ($event)
+				{
+					case 'link':
+						$rs2 = safe_rows_start('category, count(*) as num', 'txp_link', "1 group by category");
+					break;
+
+					case 'image':
+						$rs2 = safe_rows_start('category, count(*) as num', 'txp_image', "1 group by category");
+					break;
+
+					case 'file':
+						$rs2 = safe_rows_start('category, count(*) as num', 'txp_file', "1 group by category");
+					break;
+				}
+
 				while ($a = nextRow($rs2))
 				{
 					$name = $a['category'];
@@ -250,80 +268,63 @@ if ($event == 'category') {
 			{
 				extract($a);
 
-				if ($name == 'root')
-				{
-					continue;
-				}
-
-				$cbox = checkbox('selected[]', $id, 0);
-				$editlink = eLink('category', 'cat_'.$evname.'_edit', 'id', $id, $title);
-
 				// format count
-				switch ($evname)
+				switch ($event)
 				{
 					case 'article':
-						$url = 'index.php?event=list'.a.'method=categories'.a.'crit='.$name;
+						$url = 'index.php?event=list'.a.'search_method=categories'.a.'crit='.$name;
 					break;
 	
 					case 'link':
-						$url = 'index.php?event=link'.a.'method=category'.a.'crit='.$name;
+						$url = 'index.php?event=link'.a.'search_method=category'.a.'crit='.$name;
 					break;
 	
 					case 'image':
-						$url = 'index.php?event=image'.a.'method=category'.a.'crit='.$name;
+						$url = 'index.php?event=image'.a.'search_method=category'.a.'crit='.$name;
 					break;
 	
 					case 'file':
-						$url = 'index.php?event=file'.a.'method=category'.a.'crit='.$name;
+						$url = 'index.php?event=file'.a.'search_method=category'.a.'crit='.$name;
 					break;
 				}
 
 				$count = isset($total_count[$name]) ? '('.href($total_count[$name], $url).')' : '(0)';
 
-				$items[] = graf($cbox.sp.str_repeat(sp.sp, max(0, $level - 1) * 2) .$editlink.sp.small($count));
+				$items[] = graf(
+					checkbox('selected[]', $id, 0).sp.str_repeat(sp.sp, $level * 2).
+					eLink('category', 'cat_'.$event.'_edit', 'id', $id, $title).sp.small($count)
+				);
 			}
 
 			if ($items)
 			{
-				$o .= cat_article_multiedit_form($evname, $items);
+				$out .= cat_article_multiedit_form($event, $items);
 			}
 		}
 
-		return $o;
+		else
+		{
+			$out .= graf(gTxt('no_categories_exist'));
+		}
+
+		return $out;
 	}
 
 //-------------------------------------------------------------
-	function cat_event_category_create($evname)
+
+	function cat_event_category_create($event)
 	{
 		global $txpcfg;
-		
-		//Prevent non url chars on category names
-		include_once txpath.'/lib/classTextile.php';
-		$textile = new Textile();
-		
-		$name = ps('name');		
-		$title = doSlash($name);				
-		$name = dumbDown($textile->TextileThis(trim(doSlash($name)),1));
-		$name = preg_replace("/[^[:alnum:]\-_]/", "", str_replace(" ","-",$name));
 
-		$check = safe_field("name", "txp_category", "name='$name' and type='$evname'");
 		$title = ps('title');
 
 		$name = sanitizeForUrl($title);
 
-		if (!$check) {
-			if($name) {				
-				$q = 
-				safe_insert("txp_category", "name='$name', title='$title', type='$evname', parent='root'");
-				
-				rebuild_tree('root', 1, $evname);
-				
-				if ($q) cat_category_list(messenger($evname.'_category',$name,'created'));
-			} else {
-				cat_category_list();
-			}
-		} else {
-			cat_category_list(messenger($evname.'_category',$name,'already_exists'));		
+		if (!$name)
+		{
+			$message = gTxt($event.'_category_invalid', array('{name}' => $name));
+
+			return cat_category_list($message);
 		}
 
 		$exists = safe_field('name', 'txp_category', "name = '".doSlash($name)."' and type = '".doSlash($event)."'");
@@ -360,7 +361,7 @@ if ($event == 'category') {
 			extract($row);
 			$out = stackRows(
 				fLabelCell($evname.'_category_name') . fInputCell('name', $name, 1, 20),
-				fLabelCell('parent') . td(cat_parent_pop($parent,$evname)),
+				fLabelCell('parent') . td(cat_parent_pop($parent,$evname,$id)),
 				fLabelCell($evname.'_category_title') . fInputCell('title', $title, 1, 30),
 				hInput('id',$id),
 				tdcs(fInput('submit', '', gTxt('save_button'),'smallerbox'), 2)
@@ -371,9 +372,9 @@ if ($event == 'category') {
 	}
 
 //-------------------------------------------------------------
-	function cat_event_category_save($evname,$table_name)
+
+	function cat_event_category_save($event, $table_name)
 	{
-		
 		global $txpcfg;
 
 		extract(doSlash(psa(array('id', 'name', 'old_name', 'parent', 'title'))));
@@ -400,18 +401,23 @@ if ($event == 'category') {
 		}
 
 		$parent = ($parent) ? $parent : 'root';
-		if (safe_update("txp_category", 
-					"name='$name',parent='$parent',title='$title'", 
-					"id=$id"))
-			safe_update('txp_category', "parent='$name'", "parent='$old_name'");
-		
-					
+
+		if (safe_update('txp_category', "name = '$name', parent = '$parent', title = '$title'", "id = $id"))
+		{
+			safe_update('txp_category', "parent = '$name'", "parent = '$old_name'");
+		}
+
 		rebuild_tree_full($event);
-		if ($evname=='article'){
-			safe_update("textpattern","Category1='$name'", "Category1 = '$old_name'"); 
-			safe_update("textpattern","Category2='$name'", "Category2 = '$old_name'"); 
-		}else {
-			safe_update($table_name, "category='$name'", "category='$old_name'");
+
+		if ($event == 'article')
+		{
+			safe_update('textpattern', "Category1 = '$name'", "Category1 = '$old_name'");
+			safe_update('textpattern', "Category2 = '$name'", "Category2 = '$old_name'");
+		}
+
+		else
+		{
+			safe_update($table_name, "category = '$name'", "category = '$old_name'");
 		}
 
 		$message = gTxt($event.'_category_updated', array('{name}' => doStrip($name)));
@@ -419,11 +425,10 @@ if ($event == 'category') {
 		cat_category_list($message);
 	}
 
-	
 // --------------------------------------------------------------
 // Non image file upload. Have I mentioned how much I love this file refactoring?
 // -------------------------------------------------------------
-	function cat_file_list() 
+	function cat_file_list()
 	{
 		return cat_event_category_list('file');
 	}

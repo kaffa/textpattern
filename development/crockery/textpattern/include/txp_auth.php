@@ -90,7 +90,7 @@ function doAuth() {
 				n.n.tr(
 					n.td().
 					td(
-						graf(checkbox('stay', 1, $stay, 3).'<label for="stay">'.gTxt('stay_logged_in').'</label>'.
+						graf(checkbox('stay', 1, $stay, 3, 'stay').'<label for="stay">'.gTxt('stay_logged_in').'</label>'.
 							sp.popHelp('remember_login'))
 					)
 				).
@@ -161,8 +161,9 @@ function doAuth() {
 						setcookie('txp_login',
 							$p_userid.','.md5($p_userid.$nonce),
 							time()+3600*24*365);	// expires in 1 year
-						if (cs('txp_nostay')) 
-							setcookie('txp_nostay','',time()-3600);
+						if (cs('txp_nostay')) setcookie('txp_nostay','',time()-3600);
+
+	
 					} else {    // session-only cookie required
 	
 						setcookie('txp_login',$p_userid.','.md5($p_userid.$nonce));    			

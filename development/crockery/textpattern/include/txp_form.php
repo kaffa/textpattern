@@ -40,7 +40,7 @@ $LastChangedRevision$
 		$methods = array('delete'=>gTxt('delete'));
 
 
-		$rs = safe_rows_start("*", "txp_form", "1 order by type asc, name asc");
+		$rs = safe_rows_start("*", "txp_form", "1=1 order by type asc, name asc");
 
 		if ($rs) {
 			while ($a = nextRow($rs)){
@@ -56,7 +56,7 @@ $LastChangedRevision$
 
 			$out[] = endTable();
 			$out[] = eInput('form').sInput('form_multi_edit');
-			$out[] = graf(selectInput('method',$methods,'',1).sp.gTxt('selected').sp.
+			$out[] = graf(selectInput('edit_method',$methods,'',1).sp.gTxt('selected').sp.
 				fInput('submit','form_multi_edit',gTxt('go'),'smallerbox')
 				, ' align="right"');
 
@@ -65,24 +65,37 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function form_multi_edit() 
+
+	function form_multi_edit()
 	{
 		global $essential_forms;
-		$method = ps('method');
+
+		$method = ps('edit_method');
 		$forms = ps('selected_forms');
 
-		if (is_array($forms)) {
-			if ($method == 'delete') {
-				foreach($forms as $name) {
-					if (!in_array($name, $essential_forms) && form_delete($name)) {
+		if (is_array($forms))
+		{
+			if ($method == 'delete')
+			{
+				foreach ($forms as $name)
+				{
+					if (!in_array($name, $essential_forms) && form_delete($name))
+					{
 						$deleted[] = $name;
 					}
 				}
-			form_edit(messenger('form',join(', ',$deleted),'deleted'));
-			}
-		} else form_edit('nothing to delete');
-	}
 
+				$message = gTxt('forms_deleted', array('{list}' => join(', ', $deleted)));
+
+				form_edit($message);
+			}
+		}
+
+		else
+		{
+			form_edit();
+		}
+	}
 
 // -------------------------------------------------------------
 	function form_create() 
@@ -175,28 +188,20 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function form_save() 
+
+	function form_save()
 	{
-		global $vars, $step,$essential_forms;
+		global $vars, $step, $essential_forms;
+
 		extract(doSlash(gpsa($vars)));
 		$name = doSlash(trim(preg_replace('/[<>&"\']/', '', gps('name'))));
 
 		if (!$name)
 		{
 			$step = 'form_create';
-			form_edit();
-		} elseif ($savenew) {
-			if (safe_insert("txp_form", "Form='$Form', type='$type', name='$name'")) {
-				form_edit(messenger('form',$name,'created'));
-			} else form_edit(messenger('form',$name,'already_exists'));
-		} else {
-			safe_update(
-				"txp_form", 
-				"Form='$Form',type='$type'". 
-					((!in_array($name, $essential_forms)) ? ",name='$name'" : ''),
-				"name='$oldname'"
-			);
-			form_edit(messenger('form',$name,'updated'));		
+			$message = gTxt('form_name_invalid');
+
+			return form_edit($message);
 		}
 
 		if (!in_array($type, array('article','comment','link','misc','file')))

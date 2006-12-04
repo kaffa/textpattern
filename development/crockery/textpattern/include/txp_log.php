@@ -42,9 +42,9 @@ $LastChangedRevision$
 
 //-------------------------------------------------------------
 
-	function log_list() 
+	function log_list($message = '') 
 	{
-		pagetop(gTxt('visitor_logs'));
+		pagetop(gTxt('visitor_logs'), $message);
 
 		extract(get_prefs());
 
@@ -96,7 +96,7 @@ $LastChangedRevision$
 
 		$criteria = 1;
 
-		if ($crit or $search_method)
+		if ($search_method and $crit)
 		{
 			$crit_escaped = doSlash($crit);
 
@@ -118,7 +118,14 @@ $LastChangedRevision$
 			else
 			{
 				$search_method = '';
+				$crit = '';
 			}
+		}
+
+		else
+		{
+			$search_method = '';
+			$crit = '';
 		}
 
 		$total = safe_count('txp_log', "$criteria");
@@ -277,7 +284,9 @@ $LastChangedRevision$
 
 		if (!empty($deleted))
 		{
-			return log_list(messenger('log', $deleted, 'deleted'));
+			$message = gTxt('logs_deleted', array('{list}' => $deleted));
+
+			return log_list($message);
 		}
 
 		return log_list();

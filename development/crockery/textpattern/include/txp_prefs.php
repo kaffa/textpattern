@@ -116,31 +116,48 @@ $LastChangedRevision$
 	
 				# Skip old settings that don't have an input type
 				if (!is_callable($a['html']))
+				{
 					continue;
-	
-				$out = tda(gTxt($a['name']), ' style="text-align:right;vertical-align:middle"');
+				}
+
+				$label = ($a['html'] != 'yesnoradio') ?
+					'<label for="'.$a['name'].'">'.gTxt($a['name']).'</label>' :
+					gTxt($a['name']);
+
+				$out = tda($label, ' style="text-align: right; vertical-align: middle;"');
+
 				if ($a['html'] == 'text_input')
 				{
-					$size = 20;
-					$out.= td(pref_func('text_input', $a['name'], $a['val'], $size));
-				}else{
+					$out.= td(
+						pref_func('text_input', $a['name'], $a['val'], 20)
+					);
+				}
+
+				else
+				{
 					$out.= td(pref_func($a['html'], $a['name'], $a['val']));
 				}
-				$out.= tda(popHelp($a['name']), ' style="vertical-align:middle"');
+
+				$out.= tda(popHelp($a['name']), ' style="vertical-align: middle;"');
+
 				echo tr($out);
-			}			
-		}		
-			
-		echo
-		tr(tda(fInput('submit','Submit',gTxt('save_button'),'publish'),
-			' colspan="3" class="noline"')),
-		endTable(),
-		sInput('prefs_save'),
-		eInput('prefs'),
-		hInput('prefs_id',"1"),
-		hInput('lastmod',"now()"),
-		'</form>';
-		
+			}
+		}
+
+		echo n.n.tr(
+			tda(
+				fInput('submit', 'Submit', gTxt('save_button'), 'publish').
+				n.sInput('prefs_save').
+				n.eInput('prefs').
+				n.hInput('prefs_id', '1').
+				n.hInput('lastmod', 'now()')
+			, ' colspan="3" class="noline"')
+		).
+
+		n.n.endTable().
+
+		n.n.'</form>';
+
 		$check_updates = gps('check_updates');
 		if (!empty($check_updates)){
 			$updates = checkUpdates();
@@ -150,15 +167,26 @@ $LastChangedRevision$
 			}else{
 				$out = $updates;
 			}
-			echo startTable('edit'),tr(tda($out)),endTable();
-		}else{
-			echo startTable('edit'),form(
-				tr(
-					tda(tag(gTxt('check_for_txp_updates'),'strong'),' style="text-align:right;vertical-align:middle"').
-				tda('<input type="submit" value="'.gTxt('go').'" name="check_updates" class="publish" />')).
-				eInput('prefs').
-				sInput('prefs_list')
-			),endTable();
+
+			echo n.n.startTable('edit').
+
+				n.n.tr(
+					tda($out)
+				).
+
+				n.n.endTable();
+		}
+
+		else
+		{
+			echo form(
+				graf(
+					'<strong>'.gTxt('check_for_txp_updates').'</strong>'.sp.
+					n.'<input type="submit" name="check_updates" value="'.gTxt('go').'" class="publish" />'.
+					n.eInput('prefs').
+					n.sInput('prefs_list')
+				)
+			, 'text-align: center;');
 		}
 	}
 
@@ -170,13 +198,16 @@ $LastChangedRevision$
 	}
 
 //-------------------------------------------------------------
-	function text_input($item,$var,$size="") 
+
+	function text_input($name, $val, $size = '')
 	{
-		return fInput("text",$item,$var,'edit','','',$size);
+		return fInput('text', $name, $val, 'edit', '', '', $size, '', $name);
 	}
 			
 //-------------------------------------------------------------
-	function gmtoffset_select($item,$var) {		
+
+	function gmtoffset_select($name, $val)
+	{
 		// Standard time zones as compiled by H.M. Nautical Almanac Office, June 2004
 		// http://aa.usno.navy.mil/faq/docs/world_tzones.html
 		$tz = array(
@@ -185,86 +216,115 @@ $LastChangedRevision$
 			+1, +2, +3, +3.5, +4, +4.5, +5, +5.5, +6, +6.5, +7, +8, +9, +9.5, +10, +10.5, +11, +11.5, +12, +13, +14,
 		);
 
-		foreach ($tz as $z) {
+		$vals = array();
+
+		foreach ($tz as $z)
+		{
 			$sign = ($z >= 0 ? '+' : '');
-			$name = sprintf("GMT %s%02d:%02d", $sign, $z, abs($z - (int)$z) * 60);
-			$timevals[sprintf("%s%d", $sign, $z * 3600)] = $name;
+			$label = sprintf("GMT %s%02d:%02d", $sign, $z, abs($z - (int)$z) * 60);
+
+			$vals[sprintf("%s%d", $sign, $z * 3600)] = $label;
 		}
 
-		return selectInput($item, $timevals, $var);
+		return selectInput($name, $vals, $val, '', '', $name);
 	}
 
 
 //-------------------------------------------------------------
-	function logging($item,$var) 
-	{	
-		$things = array(
-			"all"   => gTxt('all_hits'),
-			"refer" => gTxt('referrers_only'),
-			"none"  => gTxt('none'));
-		return selectInput($item, $things, $var);
-	}
 
-//-------------------------------------------------------------
-	function permlinkmodes($item,$var) 
+	function logging($name, $val)
 	{
-		$things = array(
-			"messy" => gTxt('messy'),
-			"id_title" => gTxt('id_title'),
-			"section_id_title" => gTxt("section_id_title"),
-			"year_month_day_title" => gTxt("year_month_day_title"),
-			"section_title"=>gTxt('section_title'),
-			"title_only" => gTxt("title_only"),
-#			"category_subcategory" => gTxt('category_subcategory')
+		$vals = array(
+			'all'		=> gTxt('all_hits'),
+			'refer' => gTxt('referrers_only'),
+			'none'	=> gTxt('none')
 		);
-		return selectInput($item, $things, $var);
+
+		return selectInput($name, $vals, $val, '', '', $name);
 	}
 
 //-------------------------------------------------------------
-	function urlmodes($item,$var) 
+
+	function permlinkmodes($name, $val)
 	{
-		$things = array("0"=>gTxt("messy"),"1"=>gTxt("clean"));
-		return selectInput($item, $things, $var);
+		$vals = array(
+			'messy'										=> gTxt('messy'),
+			'id_title'								=> gTxt('id_title'),
+			'section_id_title'				=> gTxt('section_id_title'),
+			'year_month_day_title'		=> gTxt('year_month_day_title'),
+			'section_title'						=> gTxt('section_title'),
+			'title_only'							=> gTxt('title_only'),
+			// 'category_subcategory' => gTxt('category_subcategory')
+		);
+
+		return selectInput($name, $vals, $val, '', '', $name);
 	}
 
 //-------------------------------------------------------------
-	function commentmode($item,$var) 
+
+	function urlmodes($name, $val)
 	{
-		$things = array("0"=>gTxt("nopopup"),"1"=>gTxt("popup"));
-		return selectInput($item, $things, $var);
+		$vals = array(
+			'0' => gTxt('messy'),
+			'1' => gTxt('clean')
+		);
+
+		return selectInput($name, $vals, $val, '', '', $name);
 	}
 
 //-------------------------------------------------------------
-	function weeks($item,$var)
+
+	function commentmode($name, $val)
+	{
+		$vals = array(
+			'0' => gTxt('nopopup'),
+			'1' => gTxt('popup')
+		);
+
+		return selectInput($name, $vals, $val, '', '', $name);
+	}
+
+//-------------------------------------------------------------
+
+	function weeks($name, $val)
 	{
 		$weeks = gTxt('weeks');
-		$things = array(
+
+		$vals = array(
 			'0' => gTxt('never'),
-			7   => '1 '.gTxt('week'),
-			14  => '2 '.$weeks,
-			21  => '3 '.$weeks,
-			28  => '4 '.$weeks,
-			35  => '5 '.$weeks,
-			42  => '6 '.$weeks);
-		return selectInput($item, $things, $var);
+			7		=> '1 '.gTxt('week'),
+			14	=> '2 '.$weeks,
+			21	=> '3 '.$weeks,
+			28	=> '4 '.$weeks,
+			35	=> '5 '.$weeks,
+			42	=> '6 '.$weeks
+		);
+
+		return selectInput($name, $vals, $val, '', '', $name);
 	}
 
 //-------------------------------------------------------------
-	function languages($item,$var) 
+
+	function languages($name, $val)
 	{
 		$installed_langs = safe_column('lang','txp_lang',"1=1 GROUP BY lang");
 		
-		$things = array();
+		$vals = array();
 		
 		foreach ($installed_langs as $lang)
 		{
-			$things[$lang] = safe_field('data','txp_lang',"name='$lang' AND lang='$lang'");
-			if (trim($things[$lang]) == '')
-				$things[$lang] = $lang;
+			$vals[$lang] = safe_field('data', 'txp_lang', "name = '".doSlash($lang)."' AND lang = '".doSlash($lang)."'");
+
+			if (trim($vals[$lang]) == '')
+			{
+				$vals[$lang] = $lang;
+			}
 		}
-					
-		asort($things);
-		reset($things);
+
+		asort($vals);
+		reset($vals);
+
+		$out = n.'<select id="'.$name.'" name="'.$name.'" class="list">';
 
 		$out = '<select name="'.$item.'" class="list">'.n;
 		foreach ($things as $avalue => $alabel) {
@@ -325,17 +385,19 @@ $LastChangedRevision$
 
 		$dateformats['since'] = 'hrs/days ago';
 
-		return selectInput($item, array_unique($dateformats), $var);
+		return selectInput($item, array_unique($dateformats), $var, '', '', $item);
 	}
 //-------------------------------------------------------------
-	function prod_levels($item, $var) {
-		$levels = array(
-			'debug'   => gTxt('production_debug'),
+
+	function prod_levels($name, $val)
+	{
+		$vals = array(
+			'debug'		=> gTxt('production_debug'),
 			'testing' => gTxt('production_test'),
-			'live'    => gTxt('production_live'),
+			'live'		=> gTxt('production_live'),
 		);
 
-		return selectInput($item, $levels, $var);
+		return selectInput($name, $vals, $val, '', '', $name);
 	}
 	
 //-------------------------------------------------------------
@@ -379,29 +441,53 @@ $LastChangedRevision$
 					, 3)
 				);
 			}
-			$out = tda(gTxt($a['name']), ' style="text-align:right;vertical-align:middle"');
+
+				$label = ($a['html'] != 'yesnoradio') ?
+					'<label for="'.$a['name'].'">'.gTxt($a['name']).'</label>' :
+					gTxt($a['name']);
+
+			$out = tda($label, ' style="text-align: right; vertical-align: middle;"');
+
 			if ($a['html'] == 'text_input')
 			{
-				$size = ($a['name'] == 'expire_logs_after' || $a['name'] == 'max_url_len' || $a['name'] == 'time_offset' || $a['name'] == 'rss_how_many' || $a['name'] == 'logs_expire')? 3 : 20;
-				$out.= td(pref_func('text_input', $a['name'], $a['val'], $size));
-			}else{
+				$look_for = array('expire_logs_after', 'max_url_len', 'time_offset', 'rss_how_many', 'logs_expire');
+
+				$size = in_array($a['name'], $look_for) ? 3 : 20;
+
+				$out.= td(
+					pref_func('text_input', $a['name'], $a['val'], $size)
+				);
+			}
+
+			else
+			{
 				if (is_callable($a['html']))
-					$out.= td(pref_func($a['html'], $a['name'], $a['val']));
+				{
+					$out.= td(
+						pref_func($a['html'], $a['name'], $a['val'])
+					);
+				}
+
 				else
 					$out.= td($a['val']);
 			}
 			$out.= tda(popHelp($a['name']), ' style="vertical-align:middle"');
 			echo tr($out);
 		}
-		
-		echo tr(tda(fInput('submit','Submit',gTxt('save_button'),'publish'),
-			' colspan="3" class="noline"')),
-		endTable(),
-		sInput('advanced_prefs_save'),
-		eInput('prefs'),
-		hInput('prefs_id',"1"),
-		hInput('lastmod',"now()"),
-		'</form>';	
+
+		echo n.n.tr(
+			tda(
+				fInput('submit', 'Submit', gTxt('save_button'), 'publish').
+				sInput('advanced_prefs_save').
+				eInput('prefs').
+				hInput('prefs_id', '1').
+				hInput('lastmod', 'now()')
+			, ' colspan="3" class="noline"')
+		).
+
+		n.n.endTable().
+
+		n.n.'</form>';
 	}
 
 //-------------------------------------------------------------
@@ -677,7 +763,7 @@ $LastChangedRevision$
 			$msg = gTxt($lang_code).sp.gTxt('updated');
 			if ($errors > 0) 
 				$msg .= sprintf(" (%s errors, %s ok)",$errors, ($size-$errors));
-			return list_languages(gTxt($lang_code).sp.gTxt('updated'));
+			return list_languages($msg);
 		}		
 	}
 	

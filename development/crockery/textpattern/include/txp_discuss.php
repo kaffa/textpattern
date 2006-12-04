@@ -37,7 +37,11 @@ $LastChangedRevision$
 			 visible = $visible",
 			"discussid = $discussid");
 		update_comments_count($parentid);
-		discuss_list(messenger('message',$discussid,'updated'));
+		update_lastmod();
+
+		$message = gTxt('comment_updated', array('{id}' => $discussid));
+
+		discuss_list($message);
 	}
 
  //-------------------------------------------------------------
@@ -64,7 +68,7 @@ $LastChangedRevision$
 
 		echo graf(
 			'<a href="index.php?event=discuss'.a.'step=ipban_list">'.gTxt('list_banned_ips').'</a>'
-		, ' colspan="2" align="center" valign="middle"');
+		, ' style="text-align: center;"');
 
 		extract(get_prefs());
 
@@ -120,7 +124,7 @@ $LastChangedRevision$
 
 		$criteria = 1;
 
-		if ($crit or $search_method)
+		if ($search_method and $crit)
 		{
 			$crit_escaped = doSlash($crit);
 
@@ -143,7 +147,14 @@ $LastChangedRevision$
 			else
 			{
 				$search_method = '';
+				$crit = '';
 			}
+		}
+
+		else
+		{
+			$search_method = '';
+			$crit = '';
 		}
 
 		$total = safe_count('txp_discuss', "$criteria");
@@ -325,7 +336,7 @@ $LastChangedRevision$
 	{
 		pagetop(gTxt('edit_comment'));
 
-		extract(gpsa(array('discussid', 'sort', 'dir', 'page', 'crit', 'method')));
+		extract(gpsa(array('discussid', 'sort', 'dir', 'page', 'crit', 'search_method')));
 
 		$discussid = assert_int($discussid);
 
@@ -396,7 +407,7 @@ $LastChangedRevision$
 					hInput('dir', $dir).
 					hInput('page', $page).
 					hInput('crit', $crit).
-					hInput('method', $method).
+					hInput('search_method', $search_method).
 
 					hInput('discussid', $discussid).
 					hInput('parentid', $parentid).
@@ -459,11 +470,16 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function ipban_unban() 
 	{
-		$ip = gps('ip');
-		
-		$rs = safe_delete("txp_discuss_ipban","ip='$ip'");
-		
-		if($rs) ipban_list(messenger('ip',$ip,'unbanned'));
+		$ip = doSlash(gps('ip'));
+
+		$rs = safe_delete('txp_discuss_ipban', "ip = '$ip'");
+
+		if ($rs)
+		{
+			$message = gTxt('ip_ban_removed', array('{ip}' => $ip));
+
+			ipban_list($message);
+		}
 	}
 
 // -------------------------------------------------------------
@@ -616,12 +632,15 @@ $LastChangedRevision$
 				// might as well clean up all comment counts while we're here.
 				clean_comment_counts($parentids);
 				$messages = array(
-					'delete'	=> messenger('comment',$done,'deleted'),
-					'ban'		=> messenger('comment',$done,'banned'),
-					'spam'		=>  gTxt('comment').' '.strong($done).' '. gTxt('marked_as').' '.gTxt('spam'),
-					'unmoderated'=> gTxt('comment').' '.strong($done).' '. gTxt('marked_as').' '.gTxt('unmoderated'),
-					'visible'	=>  gTxt('comment').' '.strong($done).' '. gTxt('marked_as').' '.gTxt('visible'),
+					'delete'			=> gTxt('comments_deleted', array('{list}' => $done)),
+					'ban'					=> gTxt('ips_banned', array('{list}' => $done)),
+					'spam'				=> gTxt('comments_marked_spam', array('{list}' => $done)),
+					'unmoderated' => gTxt('comments_marked_unmoderated', array('{list}' => $done)),
+					'visible'			=> gTxt('comments_marked_visible', array('{list}' => $done))
 				);
+
+				update_lastmod();
+
 				return discuss_list($messages[$method]);
 		}
 		}

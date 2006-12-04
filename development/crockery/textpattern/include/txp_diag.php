@@ -97,13 +97,13 @@ $LastChangedRevision$
 		return $table_names;
 	}
 
-	function check_tables($tables, $type='FAST QUICK') {
+	function check_tables($tables, $type='FAST', $warnings=0) {
 		$msgs = array();
 		foreach ($tables as $table) {
 			$rs = getRows("CHECK TABLE $table $type");
 			if ($rs) {
 				foreach ($rs as $r)
-					if ($r['Msg_type'] != 'status')
+					if ($r['Msg_type'] != 'status' and ($warnings or $r['Msg_type'] != 'warning'))
 						$msgs[] = $table.cs.$r['Msg_type'].cs.$r['Msg_text'];
 			}
 		}
@@ -353,7 +353,7 @@ $LastChangedRevision$
 			echo tr(tda(nl2br($message).sp.popHelp($help), ' class="not-ok"'));
 	}
 	else {
-		echo tr(td(gTxt('all_checks_passed')));
+		echo tr(tda(gTxt('all_checks_passed'), ' class="ok"'));
 	}
 
 	echo tr(td(hed(gTxt('diagnostic_info'),1)));
@@ -362,7 +362,7 @@ $LastChangedRevision$
 	$fmt_date = '%Y-%m-%d %H:%M:%S';
 	
 	$out = array(
-		'<textarea style="width:500px;height:300px;" readonly="readonly">',
+		'<textarea cols="78" rows="18" readonly="readonly" style="width: 500px; height: 300px;">',
 
 		gTxt('txp_version').cs.txp_version.' ('.($rev ? 'r'.$rev : 'unknown revision').')'.n,
 
@@ -413,7 +413,7 @@ $LastChangedRevision$
 		: '',
 
 		(is_readable($path_to_site.'/.htaccess'))
-		?	n.gTxt('htaccess_contents').cs.n.ln.join('',file($path_to_site.'/.htaccess')).n.ln
+		?	n.gTxt('htaccess_contents').cs.n.ln.htmlspecialchars(join('',file($path_to_site.'/.htaccess'))).n.ln
 		:	''
 	);
 

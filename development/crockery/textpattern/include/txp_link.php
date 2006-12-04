@@ -92,7 +92,7 @@ $LastChangedRevision$
 
 		$criteria = 1;
 
-		if ($crit or $search_method)
+		if ($search_method and $crit)
 		{
 			$crit_escaped = doSlash($crit);
 
@@ -112,7 +112,14 @@ $LastChangedRevision$
 			else
 			{
 				$search_method = '';
+				$crit = '';
 			}
+		}
+
+		else
+		{
+			$search_method = '';
+			$crit = '';
 		}
 
 		$total = getCount('txp_link', $criteria);  
@@ -171,7 +178,7 @@ $LastChangedRevision$
 						td(
 							n.'<ul>'.
 							n.t.'<li>'.href(gTxt('edit'), $edit_url).'</li>'.
-							n.t.'<li>'.href(gTxt('view'), $url).'</a></li>'.
+							n.t.'<li>'.href(gTxt('view'), $url).'</li>'.
 							n.'</ul>'
 						, 35).
 
@@ -299,7 +306,9 @@ $LastChangedRevision$
 
 			eInput('link').
 			sInput( ($step == 'link_edit' ? 'link_save' : 'link_post') ).
-			hInput('id', $id)
+			hInput('id', $id).
+			hInput('search_method', gps('search_method')).
+			hInput('crit', gps('crit'))
 		, 'margin-bottom: 25px;');
 
 		echo link_list();
@@ -345,9 +354,11 @@ $LastChangedRevision$
 		
 		if ($q) {
 			//update lastmod due to link feeds
-			safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
-			
-			link_edit(messenger('link',$linkname,'created'));			
+			update_lastmod();
+
+			$message = gTxt('link_created', array('{name}' => $linkname));
+
+			link_edit($message);			
 		}
 	}
 
@@ -412,8 +423,15 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function link_multi_edit() 
 	{
-		$deleted = event_multi_edit('txp_link','id');
-		if(!empty($deleted)) return link_edit(messenger('link',$deleted,'deleted'));
+		$deleted = event_multi_edit('txp_link', 'id');
+
+		if ($deleted)
+		{
+			$message = gTxt('links_deleted', array('{list}' => $deleted));
+
+			return link_edit($message);
+		}
+
 		return link_edit();
 	}
 

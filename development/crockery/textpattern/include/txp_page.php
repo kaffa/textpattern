@@ -190,6 +190,17 @@ $LastChangedRevision$
 
  			page_edit($message);
 		}
+
+		else
+		{
+			safe_update('txp_page', "user_html = '$html'", "name = '$name'");
+
+			update_lastmod();
+
+			$message = gTxt('page_updated', array('{name}' => $name));
+
+			page_edit($message);
+		}
 	}
 	
 //-------------------------------------------------------------
@@ -244,16 +255,8 @@ $LastChangedRevision$
 		extract(gpsa(array('html_array','html','start_pos','stop_pos','name')));
 		
 		$html_array = unserialize($html_array);
-		
-		$repl_array = preg_split("/(<.*>)/U",$html,-1,PREG_SPLIT_DELIM_CAPTURE);
-		
-		array_splice($html_array,$start_pos,($stop_pos - $start_pos)+1,$repl_array);
-		
-		$html = doSlash(join('',$html_array));
-		
-		safe_update("txp_page","user_html='$html'", "name='$name'");
 
-		page_edit(messenger('page',$name,'updated'));
+		$repl_array = preg_split("/(<.*>)/U", $html, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		array_splice($html_array, $start_pos, ($stop_pos - $start_pos) + 1, $repl_array);
 

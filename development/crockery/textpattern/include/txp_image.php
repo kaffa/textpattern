@@ -36,7 +36,7 @@ $LastChangedRevision$
 	{
 		global $txpcfg, $extensions, $img_dir, $file_max_upload_size;
 
-		pagetop(gTxt('image'), $message);
+		pagetop(gTxt('images'), $message);
 
 		extract($txpcfg);
 		extract(get_prefs());
@@ -93,7 +93,7 @@ $LastChangedRevision$
 
 		$criteria = 1;
 
-		if ($crit or $search_method)
+		if ($search_method and $crit)
 		{
 			$crit_escaped = doSlash($crit);
 
@@ -112,10 +112,16 @@ $LastChangedRevision$
 
 			else
 			{
-				$method = '';
+				$search_method = '';
+				$crit = '';
 			}
 		}
 
+		else
+		{
+			$search_method = '';
+			$crit = '';
+		}
 		$total = safe_count('txp_image', "$criteria");
 
 		if ($total < 1)
@@ -247,7 +253,9 @@ $LastChangedRevision$
 		$id = assert_int($id);
 		global $txpcfg,$img_dir,$file_max_upload_size;
 
-		pagetop('image',$message);
+		pagetop(gTxt('edit_image'),$message);
+
+		extract(gpsa(array('page', 'sort', 'dir', 'crit', 'search_method')));
 
 		$categories = getTree("root", "image");
 		
@@ -298,10 +306,16 @@ $LastChangedRevision$
 						graf('<label for="caption">'.gTxt('caption').'</label>'.br.
 							text_area('caption', '100', '400', $caption, 'caption')).
 
-						graf(fInput('submit', '', gTxt('save'), 'publish')).
-						hInput('id', $id).
-						eInput('image').
-						sInput('image_save')
+						n.graf(fInput('submit', '', gTxt('save'), 'publish')).
+						n.hInput('id', $id).
+						n.eInput('image').
+						n.sInput('image_save').
+
+						n.hInput('sort', $sort).
+						n.hInput('dir', $dir).
+						n.hInput('page', $page).
+						n.hInput('search_method', $search_method).
+						n.hInput('crit', $crit)
 					)
 				)
 			),
@@ -377,7 +391,10 @@ $LastChangedRevision$
 			} else {
 				chmod($newpath,0644);
 				safe_update("txp_image", "thumbnail = 1", "id = $id");
-				image_edit(messenger('image',$name,'uploaded'),$id);
+
+				$message = gTxt('image_uploaded', array('{name}' => $name));
+
+				image_edit($message, $id);
 			}
 		} else {
 			if ($file === false)
@@ -402,7 +419,10 @@ $LastChangedRevision$
 			caption  = '$caption'",
 			"id = $id"
 		);
-		image_list(messenger("image",$name,"updated"));
+
+		$message = gTxt('image_updated', array('{name}' => $name));
+
+		image_list($message);
 	}
 
 // -------------------------------------------------------------
@@ -421,7 +441,12 @@ $LastChangedRevision$
 				$ult = unlink(IMPATH.$id.'t'.$ext);
 			}
 
-			if ($rsd && $ul) image_list(messenger("image",$name,"deleted"));
+			if ($rsd && $ul)
+			{
+				$message = gTxt('image_deleted', array('{name}' => $name));
+
+				image_list($message);
+			}
 		} else image_list();
 	}
 
@@ -437,7 +462,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function thumb_ui($id)
 	{		
-		global $prefs;
+		global $prefs, $sort, $dir, $page, $search_method, $crit;
 		extract($prefs);
 		return
 		tr(
@@ -453,16 +478,23 @@ $LastChangedRevision$
 							fInputCell('height', @$thumb_h, 1, 4, '', 'height').
 
 							fLabelCell(gTxt('keep_square_pixels'), '', 'crop') . 
-							tda(checkbox('crop', 1, @$thumb_crop), ' class="noline"').
+							tda(checkbox('crop', 1, @$thumb_crop, '', 'crop'), ' class="noline"').
 
 							tda(
 								fInput('submit', '', gTxt('Create'), 'smallerbox')
 							, ' class="noline"')
 						).
 
-						hInput('id', $id).
-						eInput('image').
-						sInput('thumbnail_create').
+						n.hInput('id', $id).
+						n.eInput('image').
+						n.sInput('thumbnail_create').
+
+						n.hInput('sort', $sort).
+						n.hInput('dir', $dir).
+						n.hInput('page', $page).
+						n.hInput('search_method', $search_method).
+						n.hInput('crit', $crit).
+
 					endTable()
 				)
 			)
@@ -489,10 +521,22 @@ $LastChangedRevision$
 			$prefs['thumb_w'] = $width;
 			$prefs['thumb_h'] = $height;
 			$prefs['thumb_crop'] = $crop;
-			image_edit(messenger('thumbnail',$id,'saved'),$id);
+
+			// hidden prefs
+			set_pref('thumb_w', $width, 'image',	2);
+			set_pref('thumb_h', $height, 'image',	 2);
+			set_pref('thumb_crop', $crop, 'image',	2);
+
+			$message = gTxt('thumbnail_saved', array('{id}' => $id));
+
+			image_edit($message, $id);
 		}
-		else {
-			image_edit(messenger('thumbnail',$id,'not_saved'),$id);
+
+		else
+		{
+			$message = gTxt('thumbnail_not_saved', array('{id}' => $id));
+
+			image_edit($message, $id);
 		}
 	}
 
@@ -597,7 +641,10 @@ $LastChangedRevision$
 					{
 						img_makethumb($id, $prefs['thumb_w'], $prefs['thumb_h'], $prefs['thumb_crop']);
 					}
-					return array(messenger('image',$name,'uploaded'),$id);
+
+					$message = gTxt('image_uploaded', array('{name}' => $name));
+
+					return array($message, $id);
 				}
 			}
 		}

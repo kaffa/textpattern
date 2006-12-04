@@ -45,7 +45,15 @@ $LastChangedRevision$
 
 			while ($a = nextRow($rs))
 			{
-				extract($a);
+				foreach ($a as $key => $value) {
+					$$key = htmlspecialchars($value);
+				}
+				// Fix up the description for clean cases
+				$description = preg_replace(array('#&lt;br /&gt;#',
+												  '#&lt;(/?(a|b|i|em|strong))&gt;#',
+												  '#&lt;a href=&quot;(https?|\.|\/|ftp)([A-Za-z0-9:/?.=_]+?)&quot;&gt;#'),
+											array('<br />','<$1>','<a href="$1$2">'),
+											$description);
 
 				$help = !empty($help) ?
 					'<a href="?event=plugin'.a.'step=plugin_help'.a.'name='.$name.'">'.gTxt('view').'</a>' :
@@ -144,17 +152,25 @@ $LastChangedRevision$
 // -------------------------------------------------------------  
 	function plugin_save()
 	{
-		extract(doSlash(gpsa(array('name','code'))));
-		safe_update("txp_plugin","code='$code'", "name='$name'");
-		plugin_list(messenger('plugin',$name,'saved'));
+		extract(doSlash(gpsa(array('name', 'code'))));
+
+		safe_update('txp_plugin', "code = '$code'", "name = '$name'");
+
+		$message = gTxt('plugin_saved', array('{name}' => $name));
+
+		plugin_list($message);
 	}
   
 // -------------------------------------------------------------
 	function plugin_delete()
 	{
 		$name = doSlash(ps('name'));
-		safe_delete("txp_plugin","name='$name'");
-		plugin_list(messenger('plugin',$name,'deleted'));
+
+		safe_delete('txp_plugin', "name = '$name'");
+
+		$message = gTxt('plugin_deleted', array('{name}' => $name));
+
+		plugin_list($message);
 	}
 
 // -------------------------------------------------------------
@@ -177,16 +193,17 @@ $LastChangedRevision$
 			$plugin = ps('plugin');	
 		}
 
-		$plugin64 = preg_replace('@.*\$plugin=\'([\w=+/]+)\'.*@s', '$1', $plugin);
-		$plugin64 = preg_replace('/^#.*$/m', '', $plugin64);
+		$plugin = preg_replace('@.*\$plugin=\'([\w=+/]+)\'.*@s', '$1', $plugin);
+		$plugin = preg_replace('/^#.*$/m', '', $plugin);
 
- 		if(isset($plugin64)) {
-			$plugin64 = base64_decode($plugin64);
-			if (strncmp($plugin64,"\x1F\x8B",2)===0)
-				$plugin64 = gzinflate(substr($plugin64, 10));
- 
-			if ($plugin = unserialize($plugin64)) { 
+		if(isset($plugin)) {
+			$plugin_encoded = $plugin;
+			$plugin = base64_decode($plugin);
+			if (strncmp($plugin,"\x1F\x8B",2)===0)
+				$plugin = gzinflate(substr($plugin, 10));
 
+			if ($plugin = @unserialize($plugin))
+			{ 
 				if(is_array($plugin)){
 					extract($plugin);
 					$source = '';
@@ -226,13 +243,20 @@ $LastChangedRevision$
 
 		$plugin = ps('plugin64');	
 
-		if(isset($plugin)) {
+		$plugin = preg_replace('@.*\$plugin=\'([\w=+/]+)\'.*@s', '$1', $plugin);
+		$plugin = preg_replace('/^#.*$/m', '', $plugin);
 
-			if ($plugin = unserialize(base64_decode($plugin))) { 
+		if(trim($plugin)) {
+
+			$plugin = base64_decode($plugin);
+			if (strncmp($plugin,"\x1F\x8B",2)===0)
+				$plugin = gzinflate(substr($plugin, 10));
+
+			if ($plugin = unserialize($plugin)) {
 
 				if(is_array($plugin)){
-	
-					extract(doSlash($plugin));
+
+					extract($plugin);
 					if (empty($type)) $type = 0;
 					$type = assert_int($type);
 
@@ -265,7 +289,7 @@ $LastChangedRevision$
 					
 						$rs = safe_insert(
 						   "txp_plugin",
-						   "name         = '$name',
+						   "name         = '".doSlash($name)."',
 							status       = 0,
 							type         = $type,
 							author       = '".doSlash($author)."',
@@ -278,11 +302,27 @@ $LastChangedRevision$
 							code_md5     = '".doSlash($md5)."'"
 						);
 					}
-					if ($rs and $code) {
-						plugin_list(messenger('plugin',$name,'installed'));
-					} else plugin_list('plugin install failed');
+
+					if ($rs and $code)
+					{
+						$message = gTxt('plugin_installed', array('{name}' => escape_output($name)));
+
+						plugin_list($message);
+					}
+
+					else
+					{
+						$message = gTxt('plugin_install_failed', array('{name}' => escape_output($name)));
+
+						plugin_list($message);
+					}
 				}
-			} else plugin_list(gTxt('bad_plugin_code'));
+			}
+
+			else
+			{
+				plugin_list(gTxt('bad_plugin_code'));
+			}
 		}
 	}
 

@@ -128,7 +128,7 @@ register_callback('article_event', 'article', '', 1);
 				
 				do_pings();
 				
-				safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
+				update_lastmod();
 			}
 			article_edit(
 				get_status_message($Status).check_url_title($url_title)
@@ -225,7 +225,7 @@ register_callback('article_event', 'article', '', 1);
 			if ($oldArticle['Status'] < 4) {
 				do_pings();
 			}
-			safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
+			update_lastmod();
 		}
 
 		article_edit(
@@ -246,7 +246,7 @@ register_callback('article_event', 'article', '', 1);
 		if(!empty($GLOBALS['ID'])) { // newly-saved article
 			$ID = $GLOBALS['ID'];
 			$step = 'edit';
-		} else {
+		} else {  
 			$ID = gps('ID');
 		}
 
@@ -572,8 +572,29 @@ register_callback('article_event', 'article', '', 1);
 			if ($use_comments == 1)
 			{
 				echo n.n.'<fieldset id="write-comments">'.
-					n.'<legend>'.gTxt('comments').'</legend>'.
-					n.n.graf(
+					n.'<legend>'.gTxt('comments').'</legend>';
+
+				$comments_expired = false;
+
+				if ($step != 'create' && $comments_disabled_after)
+				{
+					$lifespan = $comments_disabled_after * 86400;
+					$time_since = time() - $sPosted;
+
+					if ($time_since > $lifespan)
+					{
+						$comments_expired = true;
+					}
+				}
+
+				if ($comments_expired)
+				{
+					echo n.n.graf(gTxt('expired'));
+				}
+
+				else
+				{
+					echo n.n.graf(
 						onoffRadio('Annotate', $Annotate)
 					).
 
@@ -583,6 +604,7 @@ register_callback('article_event', 'article', '', 1);
 					).
 
 				n.n.'</fieldset>';
+				}
 			}
 
 			if ($step == "create" and empty($GLOBALS['ID']))
