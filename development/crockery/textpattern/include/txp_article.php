@@ -271,7 +271,7 @@ register_callback('article_event', 'article', '', 1);
 
 			extract($article);
 
-			$reset_time = $publish_now = ($Status < 4);
+			$article['reset_time'] = $article['publish_now'] = ($Status < 4);
 
 		} else {
 
