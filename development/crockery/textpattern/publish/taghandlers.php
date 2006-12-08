@@ -25,9 +25,6 @@ $LastChangedRevision$
 			$out = $sitename.$separator.gTxt('comments_on').' '.safe_field('Title', 'textpattern', "ID = $parentid");
 		} elseif ($thisarticle['title']) {
 			$out = $sitename.$separator.$thisarticle['title'];
-		} elseif ($id) { // would this one still be needed?
-			$id = (int) $id;
-			$out = $sitename.$separator.safe_field('Title', 'textpattern', "ID = $id");
 		} elseif ($q) {
 			$out = $sitename.$separator.gTxt('search_results')."$separator $q";
 		} elseif ($c) {
