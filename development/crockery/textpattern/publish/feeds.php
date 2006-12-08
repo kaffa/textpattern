@@ -136,7 +136,7 @@ $LastChangedRevision: 2062 $
 					if ($atom)
 						$e['issued'] = tag(safe_strftime('w3cdtf',$uPosted),'published');
 					else
-						$e['issued'] = tag(safe_strftime('rfc822',$a['posted']),'pubDate');
+						$e['issued'] = tag(safe_strftime('rfc822',$uPosted),'pubDate');
 
 					if ($atom) {
 						$e['modified'] = tag(safe_strftime('w3cdtf',$uLastMod),'updated');
