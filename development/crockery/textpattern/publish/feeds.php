@@ -18,14 +18,17 @@ $LastChangedRevision: 2062 $
 		global $prefs;
 		extract($prefs);
 		extract(doSlash(gpsa(array('category','section','limit','area'))));
+		
+		if ($area != 'link')
+			$area = 'article';
 
 		$sitename .= ($section) ? ' - '.fetch_section_title($section) : '';
-		$sitename .= ($category) ? ' - '.fetch_category_title($category) : '';
+		$sitename .= ($category) ? ' - '.fetch_category_title($category, $area) : '';
 
 		$self_ref = pagelinkurl(array('atom'=>1, 'area'=>$area, 'section'=>$section, 'category'=>$category, 'limit'=>$limit));
 		$id_ext = ($section ? '/'.$section : '') . ($category ? '/'.$category : '');
 
-		if (!$area or $area=='article') {
+		if ($area=='article') {
 
 			$sfilter = ($section) ? "and Section = '".$section."'" : '';
 			$cfilter = ($category) ? "and (Category1='".$category."' or Category2='".$category."')":'';
