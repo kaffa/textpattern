@@ -1439,41 +1439,6 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-# DEPRECATED - provided only for backwards compatibility
-	# this functionality will be merged into comments_invite
-	# no point in having two tags for one functionality
-	function comments_annotateinvite($atts,$thing=NULL)
-	{
-		global $thisarticle, $pretext;
-
-		extract(lAtts(array(
-			'id'		   => @$pretext['id'],
-			'class'		=> __FUNCTION__,
-			'wraptag'	=> 'h3',
-		),$atts));
-
-		assert_article();
-		
-		if (is_array($thisarticle)) extract($thisarticle);
-
-		if (@$thisid) $id = $thisid;
-
-		if ($id) {
-			extract(
-				safe_row(
-					"Annotate,AnnotateInvite,unix_timestamp(Posted) as uPosted",
-						"textpattern", 'ID = '.intval($id)
-				)
-			);
-
-			if (!$thing)
-				$thing = $AnnotateInvite;
-
-			return (!$Annotate) ? '' : doTag($thing,$wraptag,$class,' id="'.gTxt('comment').'"');
-		}
-	}
-
-// -------------------------------------------------------------
 	function comments($atts)
 	{
 		global $thisarticle, $prefs, $pretext;
@@ -1683,13 +1648,6 @@ $LastChangedRevision$
 		
 		$thiscomment['has_anchor_tag'] = 1;
 		return '<a id="c'.$thiscomment['discussid'].'"></a>';
-	}
-
-// -------------------------------------------------------------
-// DEPRECATED: the old comment message body tag
-	function message($atts) 
-	{
-		return comment_message($atts);
 	}
 
 // -------------------------------------------------------------
@@ -2446,51 +2404,6 @@ function body($atts)
 	function lang($atts)
 	{
 		return LANG;
-	}
-
-// -------------------------------------------------------------
-	# DEPRECATED - provided only for backwards compatibility
-	function formatPermLink($ID,$Section)
-	{
-		return permlinkurl_id($ID);
-	}
-
-// -------------------------------------------------------------
-	# DEPRECATED - provided only for backwards compatibility
-	function formatCommentsInvite($AnnotateInvite,$Section,$ID)
-	{
-		global $comments_mode;
-
-		$dc = safe_count('txp_discuss','parentid='.intval($ID).' and visible='.VISIBLE);
-
-		$ccount = ($dc) ?  '['.$dc.']' : '';
-		if (!$comments_mode) {
-			return '<a href="'.permlinkurl_id($ID).'/#'.gTxt('comment').
-				'">'.$AnnotateInvite.'</a>'. $ccount;
-		} else {
-			return "<a href=\"".hu."?parentid=$ID\" onclick=\"window.open(this.href, 'popupwindow', 'width=500,height=500,scrollbars,resizable,status'); return false;\">".$AnnotateInvite.'</a> '.$ccount;
-		}
-
-	}
-// -------------------------------------------------------------
-	# DEPRECATED - provided only for backwards compatibility
-   function doPermlink($text, $plink, $Title, $url_title)
-	{
-		global $url_mode;
-		$Title = ($url_title) ? $url_title : stripSpace($Title);
-		$Title = ($url_mode) ? $Title : '';
-		return preg_replace("/<(txp:permlink)>(.*)<\/\\1>/sU",
-			"<a href=\"".$plink.$Title."\" title=\"".gTxt('permanent_link')."\">$2</a>",$text);
-	}
-
-// -------------------------------------------------------------
-	# DEPRECATED - provided only for backwards compatibility
-	function doArticleHref($ID,$Title,$url_title,$Section)
-	{
-		$conTitle = ($url_title) ? $url_title : stripSpace($Title);	
-		return ($GLOBALS['url_mode'])
-		?	tag($Title,'a',' href="'.hu.$Section.'/'.$ID.'/'.$conTitle.'"')
-		:	tag($Title,'a',' href="'.hu.'index.php?id='.$ID.'"');
 	}
 
 // -------------------------------------------------------------
