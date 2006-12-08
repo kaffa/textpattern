@@ -43,9 +43,6 @@ $LastChangedRevision$
 
 	ob_start();
 
-		// useful for clean urls with error-handlers
-	txp_status_header('200 OK');
-
     	// start the clock for runtime
 	$microstart = getmicrotime();
 
@@ -149,26 +146,13 @@ $LastChangedRevision$
 		exit(popComments(gps('parentid')));
 	}
 
-	if(!isset($nolog) && $status != '404') {
-		if($logging == 'refer') { 
-			logit('refer'); 
-		} elseif ($logging == 'all') {
-			logit();
-		}
-	}
 
-/* FIXME: have to convert mysql-timestamps to unixtimestamps first. Are timezones ok?
-	if($send_lastmod) {
-		$last = gmdate("D, d M Y H:i:s \G\M\T",$lastmod);
-		header("Last-Modified: $last");
 
-		$hims = serverset('HTTP_IF_MODIFIED_SINCE');
-		if ($hims == $last) {
-			header("HTTP/1.1 304 Not Modified");
-			exit; 
-		}
-	}
-*/
+	handle_lastmod();
+
+
+	log_hit($status);
+
 // -------------------------------------------------------------
 	function preText($s,$prefs) 
 	{
@@ -330,8 +314,12 @@ $LastChangedRevision$
 		}
 		else {
 			// Messy mode, but prevent to get the id for file_downloads
-			if ($out['id'] && !$out['s'])
-				$out['s'] = safe_field('section', 'textpattern', "ID='".doSlash($out['id'])."'");
+			if ($out['id'] && !$out['s']) {
+				$rs = lookupByID($out['id']);
+				$out['id'] = (!empty($rs['ID'])) ? $rs['ID'] : '';
+				$out['s'] = (!empty($rs['Section'])) ? $rs['Section'] : '';
+				$is_404 = (empty($out['s']) or empty($out['id']));
+			}
 		}
 
 		// Resolve AuthorID from Authorname
@@ -388,10 +376,10 @@ $LastChangedRevision$
 				$out['id_keywords'] = @$a['Keywords'];
 				$out['id_author']   = @$a['AuthorID'];
 				populateArticleData($a);
-			}
 
 			if ($np = getNextPrev($id, $Posted, $s))
 				$out = array_merge($out, $np);
+			}
 		}
 
 		$out['path_from_root'] = $path_from_root; // these are deprecated as of 1.0
@@ -424,6 +412,9 @@ $LastChangedRevision$
 		if (!$html) 
 			txp_die(gTxt('unknown_section'), '404');
 
+		// useful for clean urls with error-handlers
+		txp_status_header('200 OK');
+
 		trace_add('['.gTxt('page').': '.$pretext['page'].']');
 		set_error_handler("tagErrorHandler");
 		$pretext['secondpass'] = false;
@@ -434,7 +425,7 @@ $LastChangedRevision$
 		$html = ($prefs['allow_page_php_scripting']) ? evalString($html) : $html;
 
 		// make sure the page has an article tag if necessary
-		if (!$has_article_tag and (!empty($pretext['id']) or !empty($pretext['c']) or !empty($pretext['q']) or !empty($pretext['pg'])))
+		if (!$has_article_tag and $production_status != 'live' and (!empty($pretext['id']) or !empty($pretext['c']) or !empty($pretext['q']) or !empty($pretext['pg'])))
 			trigger_error(gTxt('missing_article_tag', array('{page}' => $pretext['page'])));
 		restore_error_handler();
 
@@ -495,6 +486,8 @@ $LastChangedRevision$
 		//getting attributes
 		$theAtts = lAtts(array(
 			'form'      => 'default',
+			'listform'  => '',
+			'searchform'=> '',
 			'limit'     => 10,
 			'pageby'    => '',
 			'category'  => '',
@@ -658,13 +651,9 @@ $LastChangedRevision$
 		$where. ' order by '.doslash($sort).' '.db_limit(intval($limit),  intval($pgoffset)));
 		// alternative form override for search or list
 		if ($q and !$iscustom and !$issticky)
-			$form = gAtt($atts, 'searchform', 'search_results');
+			$fname = ($searchform ? $searchform : 'search_results');
 		else
-			$form = gAtt($atts, 'listform', $form);         
-		// might be a form preview, otherwise grab it from the db
-		$form = (isset($_POST['Form']))
-		?	gps('Form')
-		:	fetch_form($form);
+			$fname = ($listform ? $listform : $form);
 
 		if ($rs) {
 			$count = 0;
@@ -738,8 +727,8 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'allowoverride' => '1',
 			'form'          => 'default',
-			'status'        => '',
-		),$atts));		
+			'status'        => '4',
+		),$atts, 0));		
 
 		if ($status or empty($thisarticle) or $thisarticle['thisid'] != $id) {
 			if ($status and !is_numeric($status))
@@ -836,19 +825,17 @@ $LastChangedRevision$
 	function getNeighbour($Posted, $s, $type) 
 	{
 		$type = ($type == '>') ? '>' : '<';
-		if ($Posted) {
-			$q = array(
-				"select ID, Title, url_title, unix_timestamp(Posted) as uposted
-				from ".PFX."textpattern where Posted $type '".doSlash($Posted)."'",
-				($s!='' && $s!='default') ? "and Section = '".doSlash($s)."'" : filterFrontPage(),
-				'and Status=4 and Posted < now() order by Posted',
-				($type=='<') ? 'desc' : 'asc',
-				'limit 1'
-			);
+		$q = array(
+			"select ID, Title, url_title, unix_timestamp(Posted) as uposted
+			from ".PFX."textpattern where Posted $type '".doSlash($Posted)."'",
+			($s!='' && $s!='default') ? "and Section = '".doSlash($s)."'" : filterFrontPage(),
+			'and Status=4 and Posted < now() order by Posted',
+			($type=='<') ? 'desc' : 'asc',
+			'limit 1'
+		);
 
-			$out = getRow(join(' ',$q));
-			return (is_array($out)) ? $out : '';
-		}
+		$out = getRow(join(' ',$q));
+		return (is_array($out)) ? $out : '';
 	}
 
 // -------------------------------------------------------------
