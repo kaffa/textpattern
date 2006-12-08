@@ -2528,16 +2528,7 @@ function body($atts)
 			'linkclass' => 'noline',
 		),$atts));
 
-		// bc, get rid of in crockery
-		if ($link == 'y') {
-			$linked = true;
-		} elseif ($link == 'n') {
-			$linked = false;
-		} else {
-			$linked = $link;
-		}
-
-		if ($linked) $label = doTag($label,'a',$linkclass,' href="'.hu.'"');
+		if ($link) $label = doTag($label,'a',$linkclass,' href="'.hu.'"');
 		
 		$content = array();
 		extract($pretext);
@@ -2545,7 +2536,7 @@ function body($atts)
 		{ 
 			$section_title = ($title) ? fetch_section_title($s) : $s;
 			$section_title_html = escape_title($section_title);
-			$content[] = ($linked)? (
+			$content[] = ($link)? (
 					doTag($section_title_html,'a',$linkclass,' href="'.pagelinkurl(array('s'=>$s)).'"')
 				):$section_title_html;
 		}
@@ -2555,7 +2546,7 @@ function body($atts)
 		foreach (getTreePath($category, 'article') as $cat) {
 			if ($cat['name'] != 'root') {
 				$category_title_html = $title ? escape_title($cat['title']) : $cat['name'];
-				$content[] = ($linked)? 
+				$content[] = ($link)? 
 					doTag($category_title_html,'a',$linkclass,' href="'.pagelinkurl(array('c'=>$cat['name'])).'"')
 						:$category_title_html;
 			}

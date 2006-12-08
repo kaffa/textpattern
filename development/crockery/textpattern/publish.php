@@ -492,7 +492,7 @@ $LastChangedRevision$
 			'pageby'    => '',
 			'category'  => '',
 			'section'   => '',
-			'excerpted' => '',
+			'excerpted' => 0,
 			'author'    => '',
 			'sort'      => '',
 			'sortby'    => '',
@@ -522,7 +522,7 @@ $LastChangedRevision$
 			$theAtts['author'] = (!empty($author)? $author: '');
 			$theAtts['month'] = (!empty($month)? $month: '');
 			$theAtts['frontpage'] = ($s && $s=='default')? true: false;
-			$theAtts['excerpted'] = '';			
+			$theAtts['excerpted'] = 0;			
 		}
 		extract($theAtts);
 		
@@ -576,7 +576,7 @@ $LastChangedRevision$
 		$frontpage = ($frontpage and !$q) ? filterFrontPage() : '';		
 		$category  = (!$category)  ? '' : " and ((Category1='".doSlash($category)."') or (Category2='".doSlash($category)."')) ";
 		$section   = (!$section)   ? '' : " and Section = '".doSlash($section)."'";
-		$excerpted = ($excerpted=='y')  ? " and Excerpt !=''" : '';
+		$excerpted = ($excerpted)  ? " and Excerpt !=''" : '';
 		$author    = (!$author)    ? '' : " and AuthorID = '".doSlash($author)."'";
 		$month     = (!$month)     ? '' : " and Posted like '".doSlash($month)."%'";
 		$id        = (!$id)        ? '' : " and ID = '".intval($id)."'";
