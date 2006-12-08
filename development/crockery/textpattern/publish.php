@@ -161,13 +161,13 @@ $LastChangedRevision$
 		callback_event('pretext');
 
 		if(gps('rss')) {
-			include txpath.'/publish/rss.php';
-			exit(rss());
+			include txpath.'/publish/feeds.php';
+			exit(feed(false));
 		}
 
 		if(gps('atom')) {
-			include txpath.'/publish/atom.php';
-			exit(atom());
+			include txpath.'/publish/feeds.php';
+			exit(feed(true));
 		}
 			// set messy variables
 		$out =  makeOut('id','s','c','q','pg','p','month','author');
@@ -206,10 +206,10 @@ $LastChangedRevision$
 				switch($u1) {
 	
 					case 'atom':
-						include txpath.'/publish/atom.php'; exit(atom());
+						include txpath.'/publish/feeds.php'; exit(feed(true));
 
 					case 'rss':
-						include txpath.'/publish/rss.php'; exit(rss());
+						include txpath.'/publish/feeds.php'; exit(feed(false));
 
 					// urldecode(strtolower(urlencode())) looks ugly but is the only way to
 					// make it multibyte-safe without breaking backwards-compatibility
