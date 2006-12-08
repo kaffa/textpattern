@@ -581,28 +581,9 @@ $LastChangedRevision$
 			'limit'    => 10,
 			'section'  => '',
 			'sort'     => 'Posted desc',
-			'sortby'   => '',
-			'sortdir'  => '',
 			'wraptag'  => '',
 			'no_widow' => @$prefs['title_no_widow'],
 		), $atts));
-
-		// for backwards compatibility
-		// sortby and sortdir are deprecated
-		if ($sortby)
-		{
-			if (!$sortdir)
-			{
-				$sortdir = 'desc';
-			}
-
-			$sort = "$sortby $sortdir";
-		}
-
-		elseif ($sortdir)
-		{
-			$sort = "Posted $sortdir";
-		}
 
 		$categories = ($category) ? "and (Category1 = '".doSlash($category)."' or Category2 = '".doSlash($category)."')" : '';
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';

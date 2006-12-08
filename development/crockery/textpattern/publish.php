@@ -495,8 +495,6 @@ $LastChangedRevision$
 			'excerpted' => 0,
 			'author'    => '',
 			'sort'      => '',
-			'sortby'    => '',
-			'sortdir'   => '',
 			'month'     => '',
 			'keywords'  => '',
 			'frontpage' => '',
@@ -553,23 +551,6 @@ $LastChangedRevision$
 		else {
 			$match = $search = '';
 			if (!$sort) $sort='Posted';
-		}
-
-		// for backwards compatibility
-		// sortby and sortdir are deprecated
-		if ($sortby)
-		{
-			if (!$sortdir)
-			{
-				$sortdir = 'desc';
-			}
-
-			$sort = "$sortby $sortdir";
-		}
-
-		elseif ($sortdir)
-		{
-			$sort = "Posted $sortdir";
 		}
 
 		//Building query parts
