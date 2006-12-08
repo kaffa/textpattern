@@ -95,13 +95,11 @@ $LastChangedRevision$
 		static $cache = array();
 
 		extract(lAtts(array(
-			'align'		=> '', // remove in crockery
 			'class'		=> '',
 			'escape'	=> '',
 			'html_id' => '',
 			'id'			=> '',
 			'name'		=> '',
-			'style'		=> '', // remove in crockery?
 			'wraptag' => '',
 		), $atts));
 
@@ -159,8 +157,6 @@ $LastChangedRevision$
 				($caption ? ' title="'.$caption.'"' : '').
 				( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
 				( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
-				($style ? ' style="'.$style.'"' : '').
-				($align ? ' align="'.$align.'"' : '').
 				' />';
 
 			return ($wraptag) ? doTag($out, $wraptag, $class, '', $html_id) : $out;
@@ -176,14 +172,12 @@ $LastChangedRevision$
 		global $img_dir;
 
 		extract(lAtts(array(
-			'align'			=> '', // remove in crockery
 			'class'			=> '',
 			'escape'		=> '',
 			'html_id'		=> '',
 			'id'				=> '',
 			'name'			=> '',
 			'poplink'		=> '',
-			'style'			=> '', // remove in crockery?
 			'wraptag'		=> ''
 		), $atts));
 
@@ -223,8 +217,6 @@ $LastChangedRevision$
 					($caption ? ' title="'.$caption.'"' : '').
 					( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
 					( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
-					($style ? ' style="'.$style.'"' : '').
-					($align ? ' align="'.$align.'"' : '').
 					' />';
 
 				if ($poplink)
@@ -2040,11 +2032,9 @@ function body($atts)
 		assert_article();
 
 		extract(lAtts(array(
-			'align' 	  => '', // remove in crockery
 			'class'     => '',
 			'escape'    => '',
 			'html_id'   => '',
-			'style' 	  => '', // remove in crockery?
 			'thumbnail' => 0,
 			'wraptag'   => '',
 		), $atts));
@@ -2081,8 +2071,6 @@ function body($atts)
 							($caption ? ' title="'.$caption.'"' : '').
 							( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
 							( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
-							($style ? ' style="'.$style.'"' : '').
-							($align ? ' align="'.$align.'"' : '').
 							' />';
 					}
 
@@ -2106,8 +2094,6 @@ function body($atts)
 						($caption ? ' title="'.$caption.'"' : '').
 						( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
 						( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
-						($style ? ' style="'.$style.'"' : '').
-						($align ? ' align="'.$align.'"' : '').
 						' />';
 				}
 			}
@@ -2124,8 +2110,6 @@ function body($atts)
 			$out = '<img src="'.$image.'" alt=""'.
 				( ($html_id and !$wraptag) ? ' id="'.$html_id.'"' : '' ).
 				( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
-				($style ? ' style="'.$style.'"' : '').
-				($align ? ' align="'.$align.'"' : '').
 				' />';
 		}
 
@@ -2394,7 +2378,6 @@ function body($atts)
 		extract(lAtts(array(
 			'class' => '',
 			'id'		=> '',
-			'style' => '',
 			'title' => ''
 		), $atts));
 
@@ -2414,7 +2397,6 @@ function body($atts)
 
 			return tag(parse($thing), 'a', ' rel="bookmark" href="'.$url.'"'.
 				($title ? ' title="'.$title.'"' : '').
-				($style ? ' style="'.$style.'"' : '').
 				($class ? ' class="'.$class.'"' : '')
 			);
 		}
