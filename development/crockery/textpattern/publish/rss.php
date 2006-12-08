@@ -4,7 +4,7 @@
 	This is Textpattern
 	Copyright 2005 by Dean Allen - all rights reserved.
 
-	Use of this software denotes acceptance of the Textpattern license agreement 
+	Use of this software denotes acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -35,9 +35,9 @@ $LastChangedRevision$
 		$articles = array();
 
 		if (!$area or $area=='article') {
-					
+
 			$sfilter = ($section) ? "and Section = '".$section."'" : '';
-			$cfilter = ($category) 
+			$cfilter = ($category)
 				? "and (Category1='".$category."' or Category2='".$category."')":'';
 			$limit = ($limit) ? $limit : $rss_how_many;
 			$limit = intval(min($limit,max(100,$rss_how_many)));
@@ -46,14 +46,14 @@ $LastChangedRevision$
 			if ($frs) foreach($frs as $f) $query[] = "and Section != '".doSlash($f)."'";
 			$query[] = $sfilter;
 			$query[] = $cfilter;
-			
+
 			$rs = safe_rows_start(
 				"*, unix_timestamp(Posted) as uPosted, ID as thisid",
-				"textpattern", 
+				"textpattern",
 				"Status = 4 ".join(' ',$query).
 				"and Posted < now() order by Posted desc limit $limit"
 			);
-				
+
 			if($rs) {
 				while ($a = nextRow($rs)) {
 					extract($a);
@@ -90,6 +90,8 @@ $LastChangedRevision$
 						tag(htmlspecialchars($thisauthor),'dc:creator').n.
 						tag('tag:'.$mail_or_domain.','.$feed_time.':'.$blog_uid.'/'.$uid,'guid', ' isPermaLink="false"').n.
 						$cb;
+
+
 
 					$articles[$ID] = tag($item,'item');
 
@@ -181,13 +183,13 @@ $LastChangedRevision$
 
 
 		if ($cutarticles) {
-			//header("HTTP/1.1 226 IM Used"); 
+			//header("HTTP/1.1 226 IM Used");
 			//This should be used as opposed to 200, but Apache doesn't like it.
 			//http://intertwingly.net/blog/2004/09/11/Vary-ETag/ says that the status code should be 200.
 			header("Cache-Control: no-store, im");
 			header("IM: feed");
 		}
-		
+
 		$out = array_merge($out, $articles);
 
 
@@ -201,6 +203,8 @@ $LastChangedRevision$
 	}
 
 
+// DEPRECATED FUNCTIONS
+// included for backwards compatibility with older plugins only
 	function rss_safe_hed($toUnicode) {
 
 		if (version_compare(phpversion(), "5.0.0", ">=")) {
