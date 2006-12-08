@@ -25,7 +25,7 @@ $LastChangedRevision: 2062 $
 		$sitename .= ($section) ? ' - '.fetch_section_title($section) : '';
 		$sitename .= ($category) ? ' - '.fetch_category_title($category, $area) : '';
 
-		$self_ref = pagelinkurl(array('atom'=>1, 'area'=>$area, 'section'=>$section, 'category'=>$category, 'limit'=>$limit));
+		$self_ref = pagelinkurl(array('atom'=>1, 'area'=>($area == 'article' ? '' : $area), 'section'=>$section, 'category'=>$category, 'limit'=>$limit));
 		$id_ext = ($section ? '/'.$section : '') . ($category ? '/'.$category : '');
 
 		if ($area=='article') {
