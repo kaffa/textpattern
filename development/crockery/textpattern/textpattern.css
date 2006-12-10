@@ -131,6 +131,10 @@ background-color: #eee;
 /* form elements
 ----------------------------------------------- */
 
+form {
+margin: auto;
+}
+
 fieldset {
 margin: 0 0 10px 0;
 padding: 5px;
@@ -156,11 +160,9 @@ font-size: 0.9em;
 background-color: #eee;
 }
 
-form.search-form {
-margin: auto;
-text-align: center;
-}
-
+form.pageby-form,
+form.search-form,
+form.update-form,
 form.upload-form {
 text-align: center;
 }

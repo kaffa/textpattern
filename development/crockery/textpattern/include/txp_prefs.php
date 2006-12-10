@@ -186,7 +186,7 @@ $LastChangedRevision$
 					n.eInput('prefs').
 					n.sInput('prefs_list')
 				)
-			, 'text-align: center;');
+			, '', '', 'update-form');
 		}
 	}
 
