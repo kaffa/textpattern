@@ -122,7 +122,7 @@ $LastChangedRevision: 952 $
 		}
 
 		return n.'<select'.( $select_id ? ' id="'.$select_id.'" ' : '' ).' name="'.$select_name.'" class="list"'.
-			($onchange == 1 ? ' onchange="submit(this.form);"' : $onchange).
+			($onchange == 1 ? ' onchange="submit(this.form);"' : '').
 			'>'.
 			n.t.'<option value=""'.($selected == false ? ' selected="selected"' : '').'>&nbsp;</option>'.
 			( $out ? join('', $out) : '').
@@ -233,13 +233,14 @@ $LastChangedRevision: 952 $
 
 //-------------------------------------------------------------
 
-	function form($contents, $style = '', $onsubmit = '', $method = 'post', $class = '')
-	{	
+	function form($contents, $onsubmit = '', $method = '', $class = '') {
+
+		$method = ($method) ? $method : 'post';
+
 		return n.'<form method="'.$method.'" action="index.php"'.
 			($class ? ' class="'.$class.'"' : '').
-			($style ? ' style="'.$style.'"' : '').
 			($onsubmit ? ' onsubmit="return '.$onsubmit.'"' : '').
-			'>'.$contents.'</form>'.n;
+			'>'.n.$contents.n.'</form>';
 	}
 
 // -------------------------------------------------------------

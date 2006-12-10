@@ -531,31 +531,25 @@ register_callback('article_event', 'article', '', 1);
 
 		//-- status radios --------------
 
-			echo n.n.'<fieldset id="write-status">'.
-				n.'<legend>'.gTxt('status').'</legend>'.
-				n.status_radio($Status).
-				n.'</fieldset>';
+			echo n.n.fieldset(
+				status_radio($Status)
+			, gTxt('status'), 'write-status').
 
+		//-- sort and dispplay --------------
 
-		//-- category selects -----------
+				n.n.fieldset(
+					n.graf('<label for="section">'.gTxt('section').'</label> '.
+						'<span class="small">['.eLink('section', '', '', '', gTxt('edit')).']</span>'.br.
+						section_popup($Section, 'section')).
 
-			echo n.n.'<fieldset id="write-sort">'.
-				n.'<legend>'.gTxt('sort_display').'</legend>'.
+					n.graf('<label for="category-1">'.gTxt('category1').'</label> '.
+						'<span class="small">['.eLink('category', '', '', '', gTxt('edit')).']</span>'.br.
+						n.category_popup('Category1', $Category1, 'category-1')).
 
-				n.graf('<label for="category-1">'.gTxt('category1').'</label> '.
-					'<span class="small">['.eLink('category', '', '', '', gTxt('edit')).']</span>'.br.
-					n.category_popup('Category1', $Category1, 'category-1')).
+					n.graf('<label for="category-2">'.gTxt('category2').'</label>'.br.
+						n.category_popup('Category2', $Category2, 'category-2'))
 
-				n.graf('<label for="category-2">'.gTxt('category2').'</label>'.br.
-					n.category_popup('Category2', $Category2, 'category-2'));
-
-		//-- section select --------------
-
-			echo n.graf('<label for="section">'.gTxt('section').'</label> '.
-				'<span class="small">['.eLink('section', '', '', '', gTxt('edit')).']</span>'.br.
-				section_popup($Section, 'section')).
-
-				n.'</fieldset>'.
+				, gTxt('sort_display'), 'write-sort').
 
 		//-- "More" section
 				n.n.'<h3 class="plain"><a href="#more" onclick="toggleDisplay(\'more\'); return false;">'.gTxt('more').'</a></h3>',
@@ -616,8 +610,7 @@ register_callback('article_event', 'article', '', 1);
 					safe_strtotime($store_out['year'].'-'.$store_out['month'].'-'.$store_out['day'].' '.$store_out['hour'].':'.$store_out['minute'].':'.$store_out['second'])
 					: time();
 
-				echo n.n.'<fieldset id="write-timestamp">'.
-					n.'<legend>'.gTxt('timestamp').'</legend>'.
+				echo n.n.fieldset(
 
 					n.graf(checkbox('publish_now', '1', $publish_now, '', 'publish_now').'<label for="publish_now">'.gTxt('set_to_now').'</label>').
 
@@ -633,9 +626,9 @@ register_callback('article_event', 'article', '', 1);
 						tsi('hour', '%H', $persist_timestamp).' : '.
 						tsi('minute', '%M', $persist_timestamp).' : '.
 						tsi('second', '%S', $persist_timestamp)
-					).
+					)
 
-				n.'</fieldset>'.
+				, gTxt('timestamp'), 'write-timestamp').
 
 				// end "More" section
 				n.n.'</div>';
@@ -653,8 +646,7 @@ register_callback('article_event', 'article', '', 1);
 
 			//-- timestamp ------------------- 
 
-				echo n.n.'<fieldset id="write-timestamp">'.
-					n.'<legend>'.gTxt('timestamp').'</legend>'.
+				echo n.n.fieldset(
 
 					n.graf(checkbox('reset_time', '1', $reset_time, '', 'reset_time').'<label for="reset_time">'.gTxt('reset_time').'</label>').
 
@@ -672,12 +664,12 @@ register_callback('article_event', 'article', '', 1);
 						tsi('second', '%S', $sPosted)
 					).
 
-					n.hInput('sPosted', $sPosted),
-					n.hInput('sLastMod', $sLastMod),
-					n.hInput('AuthorID', $AuthorID),
-					n.hInput('LastModID', $LastModID),
+					n.hInput('sPosted', $sPosted).
+					n.hInput('sLastMod', $sLastMod).
+					n.hInput('AuthorID', $AuthorID).
+					n.hInput('LastModID', $LastModID)
 
-				n.'</fieldset>'.
+				, gTxt('timestamp'), 'write-timestamp').
 
 				// end "More" section
 				n.n.'</div>';
