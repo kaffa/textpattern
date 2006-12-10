@@ -305,9 +305,9 @@ $LastChangedRevision$
 
 //-------------------------------------------------------------
 
-	function languages($name, $val)
+	function languages($name, $val) 
 	{
-		$installed_langs = safe_column('lang','txp_lang',"1=1 GROUP BY lang");
+		$installed_langs = safe_column('lang', 'txp_lang', "1 = 1 GROUP BY lang");
 		
 		$vals = array();
 		
@@ -324,18 +324,17 @@ $LastChangedRevision$
 		asort($vals);
 		reset($vals);
 
-		$out = n.'<select id="'.$name.'" name="'.$name.'" class="list">';
+		$out = array();
 
-		$out = '<select name="'.$item.'" class="list">'.n;
-		foreach ($things as $avalue => $alabel) {
-			$selected = ($avalue == $var || $alabel == $var)
-			?	' selected="selected"'
-			:	'';
-			$out .= t.'<option value="'.htmlspecialchars($avalue).'"'.$selected.'>'.
-					$alabel.'</option>'.n;
+		foreach ($vals as $avalue => $alabel) {
+			$out[] = n.t.'<option value="'.htmlspecialchars($avalue).'"'.
+				( ($avalue == $val || $alabel == $val) ? ' selected="selected"' :	'' ).
+				'>'.$alabel.'</option>';
 		}
-		$out .= '</select>'.n;
-		return $out;			
+
+		return n.'<select id="'.$name.'" name="'.$name.'" class="list">'.
+			join('', $out).
+			n.'</select>';			
 	}
 
 // -------------------------------------------------------------
