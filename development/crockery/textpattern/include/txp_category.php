@@ -349,26 +349,46 @@ if ($event == 'category') {
 	}
 
 //-------------------------------------------------------------
-	function cat_event_category_edit($evname)
-	{
+
+	function cat_event_category_edit($event) {
 		pagetop(gTxt('categories'));
 
-		$id     = assert_int(gps('id'));
-		$parent = doSlash(gps('parent'));
+		$id = assert_int(gps('id'));
 
-		$row = safe_row("*", "txp_category", "id=$id");
-		if($row){
+		$row = safe_row('*', 'txp_category', "id = $id");
+
+		if ($row) {
 			extract($row);
-			$out = stackRows(
-				fLabelCell($evname.'_category_name') . fInputCell('name', $name, 1, 20),
-				fLabelCell('parent') . td(cat_parent_pop($parent,$evname,$id)),
-				fLabelCell($evname.'_category_title') . fInputCell('title', $title, 1, 30),
-				hInput('id',$id),
-				tdcs(fInput('submit', '', gTxt('save_button'),'smallerbox'), 2)
+
+			$parent = doSlash(gps('parent'));
+
+			echo form(
+				n.startTable('edit').
+
+				stackRows(
+					n.tdcs(n.hed(gTxt($event.'_category'), 1), 2),
+
+					fLabelCell('name').
+					fInputCell('name', $name, 1, 20),
+
+					fLabelCell('parent').
+					n.td(cat_parent_pop($parent, $event, $id)),
+
+					fLabelCell('title').
+					fInputCell('title', $title, 1, 30),
+
+					n.tdcs(fInput('submit', '', gTxt('save_button'), 'smallerbox'), 2)
+				).
+
+				endTable().
+
+				n.eInput('category').
+				n.sInput('cat_'.$event.'_save').
+
+				n.hInput('id', $id).
+				n.hInput('old_name', $name)
 			);
 		}
-		$out.= eInput( 'category' ) . sInput( 'cat_'.$evname.'_save' ) . hInput( 'old_name',$name );
-		echo form( startTable( 'edit' ) . $out . endTable() );
 	}
 
 //-------------------------------------------------------------

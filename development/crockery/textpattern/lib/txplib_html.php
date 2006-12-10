@@ -250,12 +250,14 @@ $LastChangedRevision: 1008 $
 	}
 	
 // -------------------------------------------------------------
-	function stackRows() 
-	{
-		foreach(func_get_args() as $a) { $o[] = tr($a); }
-		return join('',$o);
+
+	function stackRows() {
+		foreach (func_get_args() as $a) {
+			$o[] = n.tr($a.n);
+		}
+		return join('', $o);
 	}
-	
+
 // -------------------------------------------------------------
 	function td($content='',$width='',$class='',$id='')
 	{
@@ -317,7 +319,7 @@ $LastChangedRevision: 1008 $
 			$cell = '<label for="'.$label_id.'">'.$cell.'</label>';
 		}
 
-		return tda($cell,' class="noline" style="text-align: right; vertical-align: middle;"');
+		return n.t.tda($cell,' class="noline" style="text-align: right; vertical-align: middle;"');
 	}
 
 // -------------------------------------------------------------
@@ -326,7 +328,7 @@ $LastChangedRevision: 1008 $
 	{
 		$pop = ($help) ? sp.popHelp($name) : '';
 
-		return tda(
+		return n.t.tda(
 			fInput('text', $name, $var, 'edit', '', '', $size, $tabindex, $id).$pop
 		,' class="noline"');
 	}
