@@ -74,7 +74,7 @@ $LastChangedRevision$
 		$web   = clean_url(pcs('web'));
 		$n_message = 'message';
 
-		extract( doStripTags( doDeEnt ( psa( array(
+		extract( doDeEnt ( psa( array(
 			'checkbox_type',
 			'remember',
 			'forget',
@@ -83,12 +83,12 @@ $LastChangedRevision$
 			'message',
 			'submit',
 			'backpage'
-		) ) ) ) );
+		) ) ) );
 
 		if ($message == '')
 		{	//Second or later preview will have randomized message-field name
 			$in = getComment();
-			$message = doStripTags(doDeEnt($in['message']));
+			$message = doDeEnt($in['message']);
 		}
 
 		if ( $preview ) {
