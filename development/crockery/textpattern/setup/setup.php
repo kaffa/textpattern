@@ -22,7 +22,7 @@
 
 	function getDbInfo()
 	{
-		$lang = isPost('lang');
+		$lang = ps('lang');
 
 		$GLOBALS['textarray'] = setup_load_lang($lang);
 	
@@ -199,7 +199,7 @@
 // -------------------------------------------------------------
 	function getTxpLogin() 
 	{
-		$carry = postDecode(isPost('carry'));
+		$carry = postDecode(ps('carry'));
 		extract($carry);
 
 		$GLOBALS['textarray'] = setup_load_lang($lang);
@@ -258,14 +258,14 @@
 
 	function createTxp() 
 	{
-		$email = isPost('email');
+		$email = ps('email');
 
 		if (!is_valid_email($email))
 		{
 			exit(graf(gTxt('email_required')));
 		}
 	
-		$carry = isPost('carry');
+		$carry = ps('carry');
 
 		extract(postDecode($carry));
 
@@ -309,18 +309,6 @@
 		db_query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");
 
  		echo fbCreate();
-	}
-
-
-// -------------------------------------------------------------
-	function isPost($val)
-	{
-		if(isset($_POST[$val])) {
-			return (MAGIC_QUOTES_GPC) 
-			?	stripslashes($_POST[$val])
-			:	$_POST[$val];						
-		} 
-		return '';
 	}
 
 // -------------------------------------------------------------
@@ -394,7 +382,7 @@
 // -------------------------------------------------------------
 	function enumPostItems() 
 	{
-		foreach(func_get_args() as $item) { $out[$item] = isPost($item); }
+		foreach(func_get_args() as $item) { $out[$item] = ps($item); }
 		return $out; 
 	}
 

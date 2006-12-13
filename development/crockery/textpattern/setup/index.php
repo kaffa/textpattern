@@ -47,7 +47,7 @@ print <<<eod
 eod;
 
 
-	$step = isPost('step');
+	$step = ps('step');
 	switch ($step) {	
 		case "": chooseLang(); break;
 		case "getDbInfo": getDbInfo(); break;
