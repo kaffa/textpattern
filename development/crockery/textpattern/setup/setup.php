@@ -401,39 +401,17 @@
 //-------------------------------------------------------------
 	function langs() 
 	{
-		$things = array(
-			'en-gb' => 'English (GB)',
-			'en-us' => 'English (US)',
-			'fr-fr' => 'Fran&#231;ais',
-			'es-es' => 'Espa&#241;ol',
-			'da-dk' => 'Dansk',
-			'el-gr' => '&#917;&#955;&#955;&#951;&#957;&#953;&#954;&#940;',
-			'sv-se' => 'Svenska',
-			'it-it' => 'Italiano',
-			'cs-cz' => '&#268;e&#353;tina',
-			'ja-jp' => '&#26085;&#26412;&#35486;',
-			'de-de' => 'Deutsch',
-			'no-no' => 'Norsk',
-			'pt-pt' => 'Portugu&#234;s',
-			'ru-ru' => '&#1056;&#1091;&#1089;&#1089;&#1082;&#1080;&#1081;',
-			'sk-sk' => 'Sloven&#269;ina',
-			'th-th' => '&#3652;&#3607;&#3618;',
-			'nl-nl' => 'Nederlands',
-			'is-is' => '&Iacute;slenska(Icelandic)',
-			'fi-fi' => 'Suomi',
-			'ca-es' => 'Catal&agrave;',
-			'he-il' => 'Hebrew',
-			'ro-ro' => 'Rom&acirc;n&#259;',
-			'hu-hu' => 'Magyar',
-			'uk-ua' => '&#1059;&#1082;&#1088;&#1072;&#1111;&#1085;&#1089;&#1100;&#1082;&#1072;',
-			'et-ee' => 'Eesti',
-			'id-id' => 'Bahasa Indonesia',
-			'lv-lv' => 'Latviešu',
-			'pl-pl' => 'Polski',
-			'zh-cn' => '&#20013;&#25991;(&#31616;&#20307;)',
-			'zh-tw' => '&#20013;&#25991;(&#32321;&#39636;)',
-			
-		);
+		require_once txpath.'/setup/setup-langs.php';
+		require_once txpath.'/setup/en-gb.php';
+		$lang_codes = array_keys($langs);
+		
+		$things = array('en-gb' => 'English (GB)');
+		
+		foreach($lang_codes as $code){
+			if(array_key_exists($code, $en_gb_lang['public']) && $code != 'en-gb'){
+				$things[$code] = $en_gb_lang['public'][$code];
+			}
+		}
 
 		$out = '<select name="lang">';
 
