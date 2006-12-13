@@ -497,7 +497,7 @@ $LastChangedRevision$
 			'class'		 => '',
 			'label'		 => '',
 			'labeltag' => '',
-			'title'		 => 0,
+			'title'		 => 1,
 			'wraptag'	 => '',
 		), $atts));
 
@@ -1659,7 +1659,7 @@ $LastChangedRevision$
 		assert_article();
 
 		extract(lAtts(array(
-			'link'				 => '',
+			'link'				 => 1,
 			'section'			 => '',
 			'this_section' => 0
 		), $atts));
@@ -1760,8 +1760,8 @@ function body($atts)
 
 		extract(lAtts(array(
 			'class'				 => '',
-			'link'				 => 0,
-			'title'				 => 0,
+			'link'				 => 1,
+			'title'				 => 1,
 			'section'			 => '',
 			'this_section' => 0,
 			'wraptag'			 => ''
@@ -1809,8 +1809,8 @@ function body($atts)
 
 		extract(lAtts(array(
 			'class'				 => '',
-			'link'				 => 0,
-			'title'				 => 0,
+			'link'				 => 1,
+			'title'				 => 1,
 			'section'			 => '',
 			'this_section' => 0,
 			'wraptag'			 => ''
@@ -1856,11 +1856,11 @@ function body($atts)
 
 		extract(lAtts(array(
 			'class'				 => '',
-			'link'				 => 0,
+			'link'				 => 1,
 			'name'				 => '',
-			'section'			 => $s, // fixme in crockery
+			'section'			 => '',
 			'this_section' => 0,
-			'title'				 => 0,
+			'title'				 => 1,
 			'type'				 => 'article',
 			'wraptag'			 => '',
 		), $atts));
@@ -1903,9 +1903,9 @@ function body($atts)
 
 		extract(lAtts(array(
 			'class'   => '',
-			'link'		=> 0,
+			'link'		=> 1,
 			'name'		=> '',
-			'title'		=> 0,
+			'title'		=> 1,
 			'wraptag' => '',
 		), $atts));
 
@@ -2417,7 +2417,7 @@ function body($atts)
 			'sep' => '&#160;&#187;&#160;',
 			'link' => 1,
 			'label' => $sitename,
-			'title' => '',
+			'title' => 1,
 			'class' => '',
 			'linkclass' => 'noline',
 		),$atts));
