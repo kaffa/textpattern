@@ -1211,6 +1211,10 @@ $LastChangedRevision: 1127 $
 		}
 	}
 
+// --------------------------------------------------------------
+	function is_production_status($level='live') {
+		return (get_pref('production_status', 'debug') == $level);
+	}
 	
 // -------------------------------------------------------------
 	function shift_uploaded_file($f, $dest)
@@ -1502,6 +1506,18 @@ $LastChangedRevision: 1127 $
         	return safe_update('txp_prefs', "val = '$val'","name like '$name'");    	
     	}
     	return false;
+	}
+
+// -------------------------------------------------------------
+	function get_pref($name, $default=NULL) {
+		global $prefs;
+		
+		if (isset($prefs[$name]))
+			return $prefs[$name];
+		else {
+			trigger_error(gTxt('unknown_preference', array('{name}'=>$name)));
+			return $default;
+		}
 	}
 
 // -------------------------------------------------------------
