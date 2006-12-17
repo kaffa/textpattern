@@ -1617,6 +1617,65 @@ eod;
 		$str = join('&amp;', $qs);
 		return ($str ? '?'.$str : '');
 	}
+	
+// -------------------------------------------------------------
+	function permlinkurl_id($ID)
+	{
+		$article = safe_row(
+			"*,ID as thisid, unix_timestamp(Posted) as posted",
+			"textpattern",
+			'ID='.intval($ID));
+		
+		return permlinkurl($article);
+	}
+
+// -------------------------------------------------------------
+	function permlinkurl($article_array) 
+	{
+		global $permlink_mode, $prefs;
+
+		if (isset($prefs['custom_url_func']) and is_callable($prefs['custom_url_func']))
+			return call_user_func($prefs['custom_url_func'], $article_array);
+
+		if (empty($article_array)) return;
+		
+		extract($article_array);
+		
+		if (!isset($title)) $title = $Title;
+		if (empty($url_title)) $url_title = stripSpace($title);
+		if (empty($section)) $section = $Section; // lame, huh?
+		if (empty($posted)) $posted = $Posted;
+		if (empty($thisid)) $thisid = $ID;
+
+		$section = urlencode($section);
+		$url_title = urlencode($url_title);
+		
+		switch($permlink_mode) {
+			case 'section_id_title':
+				if ($prefs['attach_titles_to_permalinks'])
+				{
+					return hu."$section/$thisid/$url_title";
+				}else{
+					return hu."$section/$thisid/";
+				}
+			case 'year_month_day_title':
+				list($y,$m,$d) = explode("-",date("Y-m-d",$posted));
+				return hu."$y/$m/$d/$url_title";
+			case 'id_title':
+				if ($prefs['attach_titles_to_permalinks'])
+				{
+					return hu."$thisid/$url_title";
+				}else{
+					return hu."$thisid/";
+				}
+			case 'section_title':
+				return hu."$section/$url_title";
+			case 'title_only':
+				return hu."$url_title";	
+			case 'messy':
+				return hu."index.php?id=$thisid";	
+		}
+	}
 
 // -------------------------------------------------------------
 
