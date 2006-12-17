@@ -468,34 +468,39 @@ $LastChangedRevision$
 		tr(
 			td(
 				form(
-					graf(gTxt('create_thumbnail')) .
-					startTable('','left','',1) .
-						tr(
-							fLabelCell(gTxt('thumb_width'), '', 'width') . 
-							fInputCell('width', @$thumb_w, 1, 4, '', 'width').
+					graf(gTxt('manage_thumbnail')).
 
-							fLabelCell(gTxt('thumb_height'), '', 'height') . 
-							fInputCell('height', @$thumb_h, 1, 4, '', 'height').
+					startTable('', 'left', '', 1).
+					tr(
+						tda(
+							'<label for="width">'.gTxt('thumb_width').'</label>'.sp.
+								fInput('text', 'width', @$thumb_w, 'edit', '', '', 4, '', 'width').sp.
 
-							fLabelCell(gTxt('keep_square_pixels'), '', 'crop') . 
-							tda(checkbox('crop', 1, @$thumb_crop, '', 'crop'), ' class="noline"').
+							'<label for="height">'.gTxt('thumb_height').'</label>'.sp.
+								fInput('text', 'height', @$thumb_h, 'edit', '', '', 4, '', 'height').sp.
 
-							tda(
-								fInput('submit', '', gTxt('Create'), 'smallerbox')
-							, ' class="noline"')
-						).
+							'<label for="crop">'.gTxt('keep_square_pixels').'</label>'.sp.
+								checkbox('crop', 1, @$thumb_crop, '', 'crop')
+						, ' class="noline" style="vertical-align: top;"').
 
-						n.hInput('id', $id).
-						n.eInput('image').
-						n.sInput('thumbnail_create').
+						tda(
+							graf(fInput('submit', 'create', gTxt('create'), 'smallerbox').sp.
+								fInput('submit', 'remove', gTxt('remove'), 'smallerbox')).
 
-						n.hInput('sort', $sort).
-						n.hInput('dir', $dir).
-						n.hInput('page', $page).
-						n.hInput('search_method', $search_method).
-						n.hInput('crit', $crit).
+							graf(fInput('submit', 'clear_settings', gTxt('clear_settings'), 'smallerbox'))
+						, ' colspan="6" class="noline"')
+					).
+					endTable().
 
-					endTable()
+					n.hInput('id', $id).
+					n.eInput('image').
+					n.sInput('thumbnail_create').
+
+					n.hInput('sort', $sort).
+					n.hInput('dir', $dir).
+					n.hInput('page', $page).
+					n.hInput('search_method', $search_method).
+					n.hInput('crit', $crit)
 				)
 			)
 		);
@@ -505,15 +510,37 @@ $LastChangedRevision$
 
 	function thumbnail_create()
 	{
-		extract(doSlash(gpsa(array('id', 'width', 'height'))));
+		extract(doSlash(gpsa(array('create', 'clear_settings', 'remove', 'id', 'width', 'height', 'crop'))));
 
-		if (!is_numeric ($width) && !is_numeric($height))
-		{
-			image_edit(messenger('invalid_width_or_height', "($width)/($height)", ''), $id);
+		// reset thumbnail preferences
+		if ($clear_settings) {
+			set_pref('thumb_w', '', 'image',	2);
+			set_pref('thumb_h', '', 'image',	 2);
+			set_pref('thumb_crop', 0, 'image',	2);
+
+			$GLOBALS['prefs'] = get_prefs();
+
+			image_edit(gTxt('thumbnail_prefs_reset'), $id);
 			return;
 		}
 
-		$crop = gps('crop');
+		// remove thumbnail
+		if ($remove) {
+			$ext = safe_field('ext', 'txp_image', "id = $id");
+
+			$file = IMPATH.DS.$id.'t'.$ext;
+
+			if (unlink($file)) {
+				safe_update('txp_image', 'thumbnail = 0', "id = $id");
+
+				$message = gTxt('thumbnail_removed');
+			} else {
+				$message = gTxt('thumbnail_not_removed');
+			}
+
+			image_edit($message, $id);
+			return;
+		}
 
 		if (img_makethumb($id, $width, $height, $crop)) {
 			global $prefs;
