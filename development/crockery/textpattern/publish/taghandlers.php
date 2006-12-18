@@ -279,22 +279,24 @@ $LastChangedRevision$
 
 		$title = escape_output($title);
 
+		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+
 		if ($format == 'link')
 		{
-			$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
-
+			
 			return '<link rel="alternate" type="'.$type.'" title="'.$title.'" href="'.$url.'" />';
 		}
 
 		$txt = ($thing === NULL ? $label : parse($thing));
-		$out = '<a href="'.$url.'" title="'.$title.'">'.$txt.'</a>';
+
+		$out = '<a rel="alternate" type="'.$type.'" href="'.$url.'" title="'.$title.'">'.$txt.'</a>';
 
 		return ($wraptag) ? tag($out, $wraptag) : $out;
 	}
 
 // -------------------------------------------------------------
 
-	function link_feed_link($atts)
+	function link_feed_link($atts, $thing = NULL)
 	{
 		global $c;
 
@@ -320,14 +322,16 @@ $LastChangedRevision$
 
 		$title = escape_output($title);
 
+		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+
 		if ($format == 'link')
 		{
-			$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
-
 			return '<link rel="alternate" type="'.$type.'" title="'.$title.'" href="'.$url.'" />';
 		}
 
-		$out = '<a href="'.$url.'" title="'.$title.'">'.$label.'</a>';
+		$txt = ($thing === NULL ? $label : parse($thing));
+
+		$out = '<a rel="alternate" type="'.$type.'" href="'.$url.'"  title="'.$title.'">'.$txt.'</a>';
 
 		return ($wraptag) ? tag($out, $wraptag) : $out;
 	}
