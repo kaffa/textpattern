@@ -12,7 +12,7 @@ if (!defined('PFX')) {
 
 set_magic_quotes_runtime(0);
 
-include_once('mdb.php');
+include_once(dirname(__FILE__).'/mdb.php');
 
 class DB {
     function DB() 
