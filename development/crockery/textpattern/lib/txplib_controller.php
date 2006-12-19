@@ -127,6 +127,40 @@ class ZemAdminController {
 	function _error($msg) {
 		$this->_message($msg, 'error');
 	}
+
+	// GET/POST values
+
+	// GET or POST
+	function gps($name, $default='') {
+		return gps($name, $default);
+	}
+
+	// GET only
+	function gs($name, $default='') {
+		if (isset($_GET[$thing])) {
+			if (MAGIC_QUOTES_GPC) {
+				return doStrip($_GET[$thing]);
+			} else {
+				return $_GET[$thing];
+			}
+		}
+		return $default;
+	}
+
+	// POST only
+	function ps($name, $default='') {
+		return ps($name, $default);
+	}
+
+	// this does ps() and assert_int() in one step
+	// and also gives a more informative error message than assert_int() alone
+	function psi($name, $default='') {
+		$i = ps($name, $default);
+		if (is_numeric($i) and intval($i) == $i)
+			return intval($i);
+		trigger_error(gTxt('post_var_not_int', array('{name}' => $name, '{val}' => $i)));
+		return $default;
+	}
 }
 
 function register_controller($classname, $event) {
