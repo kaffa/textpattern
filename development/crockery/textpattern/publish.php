@@ -66,7 +66,7 @@ $LastChangedRevision$
 		updateSitePath(dirname(dirname(__FILE__)));
 
 	if (!defined( 'PROTOCOL'))
-		define( 'PROTOCOL', ( ( serverSet('HTTPS') != '' ) ? 'https://' : 'http://') );
+		define( 'PROTOCOL', ( ( serverSet('HTTPS') != '' and strtolower(serverSet('HTTPS')) != 'off' ) ? 'https://' : 'http://') );
 		
 		// v1.0: this should be the definitive http address of the site	
 	if (!defined('hu'))
