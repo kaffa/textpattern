@@ -168,7 +168,7 @@
 		}
 
 		// On 4.1 or greater use utf8-tables
-		if ($dbtype!='pdo_sqlite' && db_query("SET NAMES utf8")) {
+		if ($dbtype!='pdo_sqlite' && db_query("SET NAMES 'utf8'")) {
 			$carry['dbcharset'] = "utf8";
 			$carry['dbcollate'] = "utf8_general_ci";
 		}elseif ($dbtype == 'pdo_sqlite' && db_query('PRAGMA encoding="UTF-8"')){
