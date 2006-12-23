@@ -2060,9 +2060,9 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function search_result_title($atts)
-	{
-		return permlink($atts, '<txp:title />');
+
+	function search_result_title($atts) {
+		return title($atts);
 	}
 
 // -------------------------------------------------------------
@@ -2093,13 +2093,9 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function search_result_url($atts) 
-	{
-		global $thisarticle;
-		assert_article();
-		
-		$l = permlinkurl($thisarticle);
-		return permlink($atts, $l);
+
+	function search_result_permlink($atts, $thing = NULL) {
+		return ($thing) ? permlink($atts, $thing) : permlink($atts, NULL);
 	}
 
 // -------------------------------------------------------------

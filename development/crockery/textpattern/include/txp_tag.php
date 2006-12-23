@@ -2993,11 +2993,20 @@ begin tag builder functions
 
 // -------------------------------------------------------------
 
-	function tag_search_result_url()
+	function tag_search_result_permlink()
 	{
 		global $step, $endform, $tag_name;
 
-		return form(
+		$atts = gpsa(array(
+			'class',
+			'title'
+		));
+
+		extract($atts);
+
+		$thing = gps('thing');
+
+		$out = form(
 			startTable('tagbuilder').
 
 			tr(
@@ -3006,10 +3015,24 @@ begin tag builder functions
 				, 2)
 			).
 
-			n.endTable()
-		).
+			tagRow('link_text',
+				fInput('text', 'thing', ($thing ? $thing : '<txp:search_result_title />'), 'edit', '', '', 25)).
 
-		tdb(tb($tag_name));
+			tagRow('title',
+				fInput('text', 'title', $title, 'edit', '', '', 25)).
+
+			tagRow('class',
+				fInput('text', 'class', $class, 'edit', '', '', 25)).
+
+			$endform
+		);
+
+		if ($step == 'build')
+		{
+			$out .= tdb(tb($tag_name, $atts, $thing));
+		}
+
+		return $out;
 	}
 
 // -------------------------------------------------------------

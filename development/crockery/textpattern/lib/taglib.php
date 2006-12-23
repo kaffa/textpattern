@@ -57,7 +57,7 @@ $search_result_tags = array(
 	'search_result_title',
 	'search_result_excerpt',
 	'search_result_date',
-	'search_result_url',
+	'search_result_permlink',
 );
 
 $file_download_tags = array(
