@@ -232,10 +232,7 @@ $LastChangedRevision: 952 $
 	}
 
 //-------------------------------------------------------------
-
-	function form($contents, $onsubmit = '', $method = '', $class = '') {
-
-		$method = ($method) ? $method : 'post';
+	function form($contents, $style = '', $onsubmit = '', $method = 'post', $class = '') {
 
 		return n.'<form method="'.$method.'" action="index.php"'.
 			($class ? ' class="'.$class.'"' : '').
