@@ -67,8 +67,8 @@ class txp_article_table extends zem_table {
 		'feed_time' => 'date not null',
 	);
 	
-	function upgrade_table(){
-		parent::upgrade_table();
+	function create_table(){
+		parent::create_table();
 
 		unsafe_upgrade_index($this->_table_name,'categories_idx','','Category1,Category2');
 		unsafe_upgrade_index($this->_table_name,'Posted','','Posted');
@@ -123,8 +123,10 @@ class txp_category_table extends zem_table
 		'title' => "varchar(255) NOT NULL default ''"
 	);
 	
-	function upgrade_table(){
-		parent::upgrade_table();
+	
+	function create_table(){
+		parent::create_table();
+		
 		if (!$this->row(array('name' => 'root','type' => 'article'))) {
 			$this->insert(
 				array('id' => ZEM_INCVAL,'name' => 'root','type' => 'article','ltf' => 1,'rgt' => 2,'title' => 'root')
@@ -150,7 +152,7 @@ class txp_category_table extends zem_table
 		# are those values going to stay on this file?
 	}
 }
-/*
+
 class txp_section_table extends zem_table 
 {
 	var $_table_name = 'txp_section';
@@ -171,6 +173,72 @@ class txp_section_table extends zem_table
 	  'rgt' => "int(11) NOT NULL default '0'",
 	  'inherit' => "smallint(6) NOT NULL default '0'",
 	);
-}*/
+	
+	function create_table(){
+		parent::create_table();
+		
+		if (!$this->row(array('name' => 'default'))) {
+			$this->insert(
+				array(
+					'name' => 'default',
+					'page' => 'default',
+					'css' => 'default',
+					'is_default' => 1,
+					'in_rss' => 1,
+					'on_frontpage' => 1,
+					'searchable' => 1,
+					'title' => 'Article',
+	  			)
+			);
+		}
+		
+		if (!$this->row(array('name' => 'article'))) {
+			$this->insert(
+				array(
+					'name' => 'article',
+					'page' => 'archive',
+					'css' => 'default',
+					'is_default' => 0,
+					'in_rss' => 1,
+					'on_frontpage' => 1,
+					'searchable' => 1,
+					'title' => 'default',
+	  			)
+			);
+		}
+		if (!$this->row(array('name' => 'about'))) {
+			$this->insert(
+				array(
+					'name' => 'about',
+					'page' => 'default',
+					'css' => 'default',
+					'is_default' => 0,
+					'in_rss' => 0,
+					'on_frontpage' => 0,
+					'searchable' => 1,
+					'title' => 'About',
+	  			)
+			);
+		}
+		$this->upgrade_table();
+	}
+	
+	function upgrade_table() {
+		parent::upgrade_table();
+		safe_update($this->_table_name, 'path=name', "path=''");
+
+		# shortname has to be unique within a parent
+		if (!safe_index_exists($this->_table_name, 'parent_idx')) 
+		safe_upgrade_index($this->_table_name, 'parent_idx', 'unique', 'parent,name');
+
+		safe_update('txp_section', 'parent=0', "name='default'");
+		$this->update(array('parent' => 0), array('name' => 'default'));
+
+		$root_id = safe_field('id', $this->_table_name, "name='default'");
+		safe_update($this->_table_name, "parent='".$root_id."'", "parent IS NULL");
+		include_once(txpath.'/lib/txplib_tree.php');
+		tree_rebuild($this->_table_name, $root_id, 1);
+	}
+}
 
 ?>
