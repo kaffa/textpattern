@@ -16,7 +16,7 @@ class textpattern_setup_controller
 	
 	var $_default_step = 'chooseLang';
 	
-	var $_step_viev = '';
+	var $_step_view;
 	
 	var $vars = array();
 	
@@ -26,7 +26,7 @@ class textpattern_setup_controller
 	
 	function textpattern_setup_controller()
 	{
-		return $this->__construct();
+		$this->__construct();
 	}
 	
 	function __construct()
@@ -43,18 +43,14 @@ class textpattern_setup_controller
 		
 		# delegate control into step method
 		if(method_exists($this,$this->_step) && is_callable(array(&$this,$this->_step))){
-			$this->{$this->_step}();
+			call_user_method($this->_step,$this);
 		}
 	}
 	
 	function render()
 	{
 
-		# something weird with undefined properties sometimes. Investigating
-		$content = $this->_step_viev;
-		header("Content-type: text/html; charset=utf-8");
-
-		echo <<<eod
+		$content = <<<eod
 		<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 					"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 			<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -65,11 +61,18 @@ class textpattern_setup_controller
 			</head>
 			<body style="border-top:15px solid #FC3">
 			<div align="center">
-			$content
+			$this->_step_view
 			</div>
 			</body>
 			</html>
 eod;
+
+		# force cache clean
+		header("Cache-Control: no-cache, must-revalidate");
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Content-type: text/html; charset=utf-8");
+		
+		echo $content;
 
 	}
 	
@@ -79,6 +82,7 @@ eod;
 	{
 		require txpath.'/setup/en-gb.php';
 		$GLOBALS['en_gb_lang'] = $en_gb_lang;
+		
 		#$this->_step_view =  '<form action="'.$this->rel_siteurl.'/textpattern/setup/index.php" method="post">'.
 		$this->_step_view = '<form action="'.$this->rel_siteurl.'/textpattern/setup/install.php" method="post">'.
 		 	'<table id="setup" cellpadding="0" cellspacing="0" border="0">'.
@@ -92,6 +96,7 @@ eod;
 				,' width="400" height="50" colspan="4" align="left"')
 			).
 		'</table></form>';
+
 	}
 	
 // -------------------------------------------------------------
@@ -313,8 +318,8 @@ eod;
 			return;
 		}
 
-		#$this->_step_viev = '<form action="'.$this->rel_siteurl.'/textpattern/setup/index.php" method="post">'.
-		$this->_step_viev = '<form action="'.$this->rel_siteurl.'/textpattern/setup/install.php" method="post">'.
+		#$this->_step_view = '<form action="'.$this->rel_siteurl.'/textpattern/setup/index.php" method="post">'.
+		$this->_step_view = '<form action="'.$this->rel_siteurl.'/textpattern/setup/install.php" method="post">'.
 	  	startTable('edit').
 		tr(
 			tda(
@@ -363,6 +368,7 @@ eod;
 		extract($carry);
 
 		require txpath.'/config.php';
+		$GLOBALS['txpcfg'] = $txpcfg;
 		$dbb = $txpcfg['db'];
 		$duser = $txpcfg['user'];
 		$dpass = $txpcfg['pass'];
@@ -382,10 +388,11 @@ eod;
 		$name = addslashes(gps('name'));
 
 		include_once txpath.'/lib/txplib_update.php';
- 		include txpath.'/setup/txpsql.php';
+		#include_once txpath.'/setup/txpsql.php';
+ 		include txpath.'/setup/tables.php';
 
 		// This has to come after txpsql.php, because otherwise we can't call mysql_real_escape_string
-		if (MDB_TYPE=='pdo_sqlite') {
+/*		if (MDB_TYPE=='pdo_sqlite') {
 			extract(gpsa(array('name','pass','RealName','email')));
 		}else{
 			extract($this->sDoSlash(gpsa(array('name','pass','RealName','email'))));
@@ -399,9 +406,9 @@ eod;
 
 		db_query("update ".PFX."txp_prefs set val = '$siteurl' where name='siteurl'");
 		db_query("update ".PFX."txp_prefs set val = '$lang' where name='language'");
-		db_query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");
+		db_query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");*/
 
- 		$this->_step_viev = $this->fbCreate();
+ 		$this->_step_view = $this->fbCreate();
 	}
 	
 // -------------------------------------------------------------

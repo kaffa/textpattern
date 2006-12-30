@@ -12,6 +12,11 @@ $LastChangedRevision$
 define('ZEM_PRIMARY_KEY', 'bigint auto_increment');
 define('ZEM_FOREIGN_KEY', 'bigint');
 define('ZEM_MEDIUMTEXT', 'mediumtext');
+if (MDB_TYPE == 'pg') {
+	define('ZEM_DATETIME','timestamp without time zone');
+}else {
+	define('ZEM_DATETIME','datetime');
+}
 
 // abstract table class, represents a database table
 // nb: this is concerned with _rows_, not the particular contents of each row
