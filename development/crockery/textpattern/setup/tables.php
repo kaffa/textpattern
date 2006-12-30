@@ -10,7 +10,7 @@ include_once txpath.'/lib/txplib_db.php';
 $GLOBALS['DB'] = $DB;
 include_once txpath.'/model/txp_tables.php';
 
-$textpattern_tables = array('txp_article_table');
+$textpattern_tables = array('txp_article_table','txp_category_table');
 
 foreach ($textpattern_tables as $table_name) {
 	

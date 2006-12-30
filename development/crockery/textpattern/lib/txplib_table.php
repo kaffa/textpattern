@@ -14,9 +14,13 @@ define('ZEM_FOREIGN_KEY', 'bigint');
 define('ZEM_MEDIUMTEXT', 'mediumtext');
 if (MDB_TYPE == 'pg') {
 	define('ZEM_DATETIME','timestamp without time zone');
+	define('ZEM_INCVAL','DEFAULT');
 }else {
 	define('ZEM_DATETIME','datetime');
+	define('ZEM_INCVAL','NULL');
 }
+
+
 
 // abstract table class, represents a database table
 // nb: this is concerned with _rows_, not the particular contents of each row

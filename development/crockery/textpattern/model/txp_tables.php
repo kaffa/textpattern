@@ -108,7 +108,7 @@ class txp_article_table extends zem_table {
 	}
 
 }
-/*
+
 class txp_category_table extends zem_table 
 {
 	var $_table_name = 'txp_category'; # this could be inferable through introspection
@@ -125,14 +125,32 @@ class txp_category_table extends zem_table
 	
 	function upgrade_table(){
 		parent::upgrade_table();
-		$incval = ZEM_INCVAL;
-		safe_insert('txp_category',"$incval, 'root', 'article', '', 1, 2, 'root'");
-		safe_insert('txp_category',"$incval, 'root', 'link', '', 1, 2, 'root'");
-		safe_insert('txp_category',"$incval, 'root', 'image', '', 1, 2, 'root'");
-		safe_insert('txp_category',"$incval, 'root', 'file', '', 1, 2, 'root'");
+		if (!$this->row(array('name' => 'root','type' => 'article'))) {
+			$this->insert(
+				array('id' => ZEM_INCVAL,'name' => 'root','type' => 'article','ltf' => 1,'rgt' => 2,'title' => 'root')
+			);
+		}
+		if (!$this->row(array('name' => 'root','type' => 'link'))) {
+			$this->insert(
+				array('id' => ZEM_INCVAL,'name' => 'root','type' => 'link','ltf' => 1,'rgt' => 2,'title' => 'root')
+			);
+		}
+		if (!$this->row(array('name' => 'root','type' => 'image'))) {
+			$this->insert(
+				array('id' => ZEM_INCVAL,'name' => 'root','type' => 'image','ltf' => 1,'rgt' => 2,'title' => 'root')
+			);
+		}
+		if (!$this->row(array('name' => 'root','type' => 'file'))) {
+			$this->insert(
+				array('id' => ZEM_INCVAL,'name' => 'root','type' => 'file','ltf' => 1,'rgt' => 2,'title' => 'root')
+			);			
+		}
+
+		# are we going to use values to populate the DB?
+		# are those values going to stay on this file?
 	}
 }
-
+/*
 class txp_section_table extends zem_table 
 {
 	var $_table_name = 'txp_section';
