@@ -51,4 +51,8 @@ include_once(txpath.'/lib/txplib_tree.php');
 tree_rebuild('txp_section', $root_id, 1);
 
 safe_insert('txp_prefs', "prefs_id = 1, event='publish', name = 'markup_default', val = 'txptextile', type = '0', html='pref_markup'");
+
+// <txp:message /> is dropped
+safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
+
 ?>
