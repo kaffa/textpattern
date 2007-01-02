@@ -2421,8 +2421,6 @@ function body($atts)
 	}
 
 //--------------------------------------------------------------------------
-// Searches use default page. This tag allows you to use different templates if searching
-//--------------------------------------------------------------------------
 
 	function if_search($atts, $thing)
 	{
