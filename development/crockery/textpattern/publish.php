@@ -777,6 +777,7 @@ $LastChangedRevision$
 		trace_add("[".gTxt('Article')." $ID]");
 		$out['thisid']          = $ID;
 		$out['posted']          = $uPosted;
+		$out['modified']        = $LastMod;
 		$out['annotate']        = $Annotate;
 		$out['comments_invite'] = $AnnotateInvite;
 		$out['authorid']        = $AuthorID;

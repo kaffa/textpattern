@@ -1276,39 +1276,50 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function posted($atts)
-	{
-		global $thisarticle, $id, $c, $pg, $dateformat, $archive_dateformat;
+	function posted($atts) {
+		global $thisarticle, $pretext, $prefs;
 
 		assert_article();
 
 		extract(lAtts(array(
-			'class'   => '',
 			'format'  => '',
 			'gmt'     => '',
 			'lang'    => '',
-			'wraptag' => '',
 		), $atts));
 
-		if ($format)
-		{
-			$out = safe_strftime($format, $thisarticle['posted'], $gmt, $lang);
-		}
-
-		else
-		{
-			if ($id or $c or $pg)
-			{
-				$out = safe_strftime($archive_dateformat, $thisarticle['posted']);
-			}
-
-			else
-			{
-				$out = safe_strftime($dateformat, $thisarticle['posted']);
+		if ($format) {
+			return safe_strftime($format, $thisarticle['posted'], $gmt, $lang);
+		} else {
+			if ($pretext['id'] or $pretext['c'] or $pretext['pg']) {
+				return safe_strftime($prefs['archive_dateformat'], $thisarticle['posted']);
+			} else {
+				return safe_strftime($prefs['dateformat'], $thisarticle['posted']);
 			}
 		}
+	}
 
-		return ($wraptag) ? doTag($out, $wraptag, '', $class) : $out;
+// -------------------------------------------------------------
+
+	function modified($atts) {
+		global $thisarticle, $pretext, $prefs;
+
+		assert_article();
+
+		extract(lAtts(array(
+			'format'  => '',
+			'gmt'     => '',
+			'lang'    => '',
+		), $atts));
+
+		if ($format) {
+			return safe_strftime($format, $thisarticle['modified'], $gmt, $lang);
+		} else {
+			if ($pretext['id'] or $pretext['c'] or $pretext['pg']) {
+				return safe_strftime($prefs['archive_dateformat'], $thisarticle['modified']);
+			} else {
+				return safe_strftime($prefs['dateformat'], $thisarticle['modified']);
+			}
+		}
 	}
 
 // -------------------------------------------------------------
