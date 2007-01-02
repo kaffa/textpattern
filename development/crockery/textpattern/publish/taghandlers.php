@@ -1966,11 +1966,21 @@ function body($atts)
 
 // -------------------------------------------------------------
 
+	function if_article_image($atts, $thing = NULL) {
+		global $thisarticle;
+
+		assert_article();
+
+		$condition = ($thisarticle['article_image']);
+
+		return EvalElse($thing, $condition);
+	}
+
+// -------------------------------------------------------------
+
 	function article_image($atts)
 	{
 		global $thisarticle, $img_dir;
-
-		assert_article();
 
 		assert_article();
 
