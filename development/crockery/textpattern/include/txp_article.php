@@ -358,23 +358,6 @@ register_callback('article_event', 'article', '', 1);
 			?	graf('<label for="override-form">'.gTxt('override_default_form').'</label>'.br.
 					form_pop($override_form, 'override-form').sp.popHelp('override_form'))
 			:	'',
-			
-				// custom fields, believe it or not
-			($custom_1_set)  ? custField(  1, $custom_1_set,  $custom_1 )    : '',
-			($custom_2_set)  ? custField(  2, $custom_2_set,  $custom_2 )    : '',
-			($custom_3_set)  ? custField(  3, $custom_3_set,  $custom_3 )    : '',
-			($custom_4_set)  ? custField(  4, $custom_4_set,  $custom_4 )    : '',
-			($custom_5_set)  ? custField(  5, $custom_5_set,  $custom_5 )    : '',
-			($custom_6_set)  ? custField(  6, $custom_6_set,  $custom_6 )    : '',
-			($custom_7_set)  ? custField(  7, $custom_7_set,  $custom_7 )    : '',
-			($custom_8_set)  ? custField(  8, $custom_8_set,  $custom_8 )    : '',
-			($custom_9_set)  ? custField(  9, $custom_9_set,  $custom_9 )    : '',
-			($custom_10_set) ? custField( 10, $custom_10_set, $custom_10 )   : '',
-
-
-			// keywords
-				n.graf('<label for="keywords">'.gTxt('keywords').'</label>'.sp.popHelp('keywords').br.
-					'<textarea id="keywords" name="Keywords" cols="18" rows="5">'.$Keywords.'</textarea>'),
 
 			// article image
 				n.graf('<label for="article-image">'.gTxt('article_image').'</label>'.sp.popHelp('article_image').br.
@@ -432,7 +415,8 @@ register_callback('article_event', 'article', '', 1);
 
 		if ($view == 'text')
 		{
-			echo '<p><input type="text" id="title" name="Title" value="'.cleanfInput($Title).'" class="edit" size="40" tabindex="1" />';
+			echo '<p><label for="title">'.gTxt('title').'</label><br />'.
+				n.'<input type="text" id="title" name="Title" value="'.cleanfInput($Title).'" class="edit" size="65" tabindex="1" />';
 
 			if ( ($Status == 4 or $Status == 5) and $step != 'create')
 			{
@@ -457,7 +441,8 @@ register_callback('article_event', 'article', '', 1);
 
 		else
 		{
-			echo n.graf('<textarea id="body" name="Body" cols="55" rows="31" tabindex="2">'.htmlspecialchars($Body).'</textarea>');
+			echo n.graf('<label for="body">'.gTxt('body').'</label><br />'.
+				n.'<textarea id="body" name="Body" cols="55" rows="31" tabindex="2">'.htmlspecialchars($Body).'</textarea>');
 		}
 
 	//-- excerpt --------------------
@@ -469,7 +454,7 @@ register_callback('article_event', 'article', '', 1);
 				$Excerpt = str_replace('&amp;', '&', htmlspecialchars($Excerpt));
 
 				echo n.graf('<label for="excerpt">'.gTxt('excerpt').'</label>'.sp.popHelp('excerpt').br.
-					'<textarea id="excerpt" name="Excerpt" cols="55" rows="5" tabindex="3">'.$Excerpt.'</textarea>');
+					'<textarea id="excerpt" name="Excerpt" cols="55" rows="10" tabindex="3">'.$Excerpt.'</textarea>');
 			}
 
 			else
@@ -484,6 +469,25 @@ register_callback('article_event', 'article', '', 1);
 			}
 		}
 
+	//-- keywords --------------
+
+		if ($view == 'text') {
+			echo n.graf('<label for="keywords">'.gTxt('keywords').'</label>'.sp.popHelp('keywords').br.
+				'<textarea id="keywords" name="Keywords" cols="55" rows="5">'.$Keywords.'</textarea>');
+
+	//-- custom fields --------------
+
+			echo ($custom_1_set)  ? custField(  1, $custom_1_set,  $custom_1 )    : '',
+				($custom_2_set)  ? custField(  2, $custom_2_set,  $custom_2 )    : '',
+				($custom_3_set)  ? custField(  3, $custom_3_set,  $custom_3 )    : '',
+				($custom_4_set)  ? custField(  4, $custom_4_set,  $custom_4 )    : '',
+				($custom_5_set)  ? custField(  5, $custom_5_set,  $custom_5 )    : '',
+				($custom_6_set)  ? custField(  6, $custom_6_set,  $custom_6 )    : '',
+				($custom_7_set)  ? custField(  7, $custom_7_set,  $custom_7 )    : '',
+				($custom_8_set)  ? custField(  8, $custom_8_set,  $custom_8 )    : '',
+				($custom_9_set)  ? custField(  9, $custom_9_set,  $custom_9 )    : '',
+				($custom_10_set) ? custField( 10, $custom_10_set, $custom_10 )   : '';
+		}
 
 	//-- author --------------
 	
@@ -693,7 +697,8 @@ register_callback('article_event', 'article', '', 1);
 	function custField($num, $field, $content) 
 	{
 		return n.n.graf('<label for="custom-'.$num.'">'.$field.'</label>'.br.
-			n.fInput('text', 'custom_'.$num, $content, 'edit', '', '', 22, '', 'custom-'.$num));
+			n.fInput('text', 'custom_'.$num, $content, 'edit', '', '', 30, '', 'custom-'.$num)
+		, ' class="custom-field"');
 	}
 
 // -------------------------------------------------------------

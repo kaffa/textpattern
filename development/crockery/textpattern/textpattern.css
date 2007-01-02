@@ -429,6 +429,14 @@ border-top: 1px solid #ddd;
 /* write
 ----------------------------------------------- */
 
+p.custom-field {
+float: left;
+}
+
+p.custom-field + p.custom-field {
+margin-left: 15px;
+}
+
 td#article-col-1 {
 width: 165px;
 }
@@ -439,7 +447,7 @@ width: 400px;
 }
 
 td#article-tabs {
-padding-top: 35px;
+padding-top: 65px;
 width: 20px;
 }
 
@@ -455,12 +463,12 @@ height: 420px;
 
 textarea#excerpt {
 width: 400px;
-height: 75px;
+height: 145px;
 }
 
 textarea#keywords {
-width: 140px;
-height: 80px;
+width: 400px;
+height: 85px;
 }
 
 /* comments
