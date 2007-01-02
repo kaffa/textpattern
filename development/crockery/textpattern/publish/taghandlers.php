@@ -2076,30 +2076,41 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function search_result_excerpt($atts) 
-	{
+
+	function search_result_excerpt($atts) {
 		global $thisarticle, $pretext;
+
+		assert_article();
+
 		extract(lAtts(array(
-			'hilight'     => 'strong',
-			'limit'       => 5,
-		),$atts));
-	
-		assert_article();	
-		extract($pretext);
-		extract($thisarticle);
-		
-		$result = preg_replace("/>\s*</","> <",$body);
-		preg_match_all("/(?:\s|^).{1,50}".preg_quote($q).".{1,50}(?:\s|$)/iu",$result,$concat);
+			'break'		=> ' &#8230;',
+			'hilight' => 'strong',
+			'limit'		=> 5,
+		), $atts));
 
-		$r = array();
-		for ($i=0; $i < min($limit, count($concat[0])); $i++)
-			$r[] = trim($concat[0][$i]);
-		$concat = join(" ...\n", $r);
+		$q = preg_quote($pretext['q']);
 
-		$concat = strip_tags($concat);
-		$concat = preg_replace('/^[^>]+>/U',"",$concat);
-		$concat = preg_replace("/(".preg_quote($q).")/i","<$hilight>$1</$hilight>",$concat);
-		return ($concat) ? "... ".$concat." ..." : '';
+		$result = preg_replace("/>\s*</", "> <", $thisarticle['body']);
+
+		preg_match_all("/(?:\s|^).{1,50}".$q.".{1,50}(?:\s|$)/iu", $result, $concat);
+
+		if ($concat) {
+			$r = array();
+
+			for ($i = 0; $i < min($limit, count($concat[0])); $i++) {
+				$r[] = trim($concat[0][$i]);
+			}
+
+			if ($r) {
+				$concat = join($break, $r);
+				$concat = strip_tags($concat);
+
+				$concat = preg_replace('/^[^>]+>/U', '', $concat);
+				$concat = preg_replace("/(".$q.")/i", "<$hilight>$1</$hilight>", $concat);
+
+				return trim($break.$concat.$break);
+			}
+		}
 	}
 
 // -------------------------------------------------------------
