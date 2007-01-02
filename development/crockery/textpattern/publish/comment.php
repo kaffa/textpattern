@@ -552,18 +552,5 @@ function checkNonce($nonce)
 
 		$success = txpMail($email, $subject, $out, $cemail);
 	}
-// -------------------------------------------------------------
-	# deprecated, use fInput instead
-	function input($type,$name,$val,$size='',$class='',$tab='',$chkd='') 
-	{
-		$o = array(
-			'<input type="'.$type.'" name="'.$name.'" id="'.$name.'" value="'.$val.'"',
-			($size)	? ' size="'.$size.'"'	  : '',
-			($class) ? ' class="'.$class.'"'	: '',
-			($tab)	 ? ' tabindex="'.$tab.'"'	: '',
-			($chkd)	? ' checked="checked"'	: '',
-			' />'.n
-		);
-		return join('',$o);
-	}
+
 ?>
