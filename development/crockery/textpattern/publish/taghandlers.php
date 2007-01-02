@@ -2441,6 +2441,18 @@ function body($atts)
 	}
 
 //--------------------------------------------------------------------------
+
+	function if_search_results($atts, $thing) {
+		global $thispage, $pretext;
+
+		$total = (int) $thispage['total'];
+
+		$condition = ( $pretext['q'] and ($total > 0) );
+
+		return parse(EvalElse($thing, $condition));
+	}
+
+//--------------------------------------------------------------------------
 	function if_category($atts, $thing)
 	{
 		global $c;
