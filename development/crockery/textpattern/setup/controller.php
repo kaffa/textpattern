@@ -392,7 +392,7 @@ eod;
  		include txpath.'/setup/tables.php';
 
 		// This has to come after txpsql.php, because otherwise we can't call mysql_real_escape_string
-/*		if (MDB_TYPE=='pdo_sqlite') {
+		if (MDB_TYPE=='pdo_sqlite') {
 			extract(gpsa(array('name','pass','RealName','email')));
 		}else{
 			extract($this->sDoSlash(gpsa(array('name','pass','RealName','email'))));
@@ -406,7 +406,7 @@ eod;
 
 		db_query("update ".PFX."txp_prefs set val = '$siteurl' where name='siteurl'");
 		db_query("update ".PFX."txp_prefs set val = '$lang' where name='language'");
-		db_query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");*/
+		db_query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");
 
  		$this->_step_view = $this->fbCreate();
 	}

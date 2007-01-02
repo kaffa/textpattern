@@ -315,10 +315,10 @@ class txp_page_table extends zem_table
 	
 	function _default_rows(){
 		if (!$this->row(array('name' => 'default'))) {
-			$this->insert(array('name' => 'default', 'user_html' => '<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\r\n<head>\r\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\r\n\t<title><txp:page_title /></title>\r\n\r\n\t<txp:feed_link flavor=\"atom\" format=\"link\" label=\"Atom\" />\r\n\t<txp:feed_link flavor=\"rss\" format=\"link\" label=\"RSS\" />\r\n\r\n\t<txp:css format=\"link\" />\r\n</head>\r\n<body>\r\n\r\n<!-- accessibility -->\r\n<div id=\"accessibility\">\r\n\t<ul>\r\n\t\t<li><a href=\"#content\">Go to content</a></li>\r\n\t\t<li><a href=\"#sidebar-1\">Go to navigation</a></li>\r\n\t\t<li><a href=\"#sidebar-2\">Go to search</a></li>\r\n\t</ul>\r\n</div>\r\n\r\n<div id=\"container\">\r\n\r\n<!-- head -->\r\n\t<div id=\"head\">\r\n\t\t<h1><txp:link_to_home><txp:sitename /></txp:link_to_home></h1>\r\n\t\t<h2><txp:site_slogan /></h2>\r\n\t</div>\r\n\r\n<!-- left -->\r\n\t<div id=\"sidebar-1\">\r\n\t<txp:linklist wraptag=\"p\" />\r\n\t</div>\r\n\r\n<!-- right -->\r\n\t<div id=\"sidebar-2\">\r\n\t\t<txp:search_input label=\"Search\" wraptag=\"p\" />\r\n\r\n\t\t<txp:popup type=\"c\" label=\"Browse\" wraptag=\"p\" />\r\n\r\n\t\t<p><txp:feed_link label=\"RSS\" /> / <txp:feed_link flavor=\"atom\" label=\"Atom\" /></p>\r\n\r\n\t\t<p><img src=\"<txp:site_url />textpattern/txp_img/txp_slug105x45.gif\" width=\"105\" height=\"45\" alt=\"Textpattern\" title=\"\" /></p>\r\n\t</div>\r\n\r\n<!-- center -->\r\n\t<div id=\"content\">\r\n\t<txp:article limit=\"5\" />\r\n\t\r\n<txp:if_individual_article>\r\n\t\t<p><txp:link_to_prev><txp:prev_title /></txp:link_to_prev> \r\n\t\t\t<txp:link_to_next><txp:next_title /></txp:link_to_next></p>\r\n<txp:else />\r\n\t\t<p><txp:older><txp:text item=\"older\" /></txp:older> \r\n\t\t\t<txp:newer><txp:text item=\"newer\" /></txp:newer></p>\r\n</txp:if_individual_article>\r\n\t</div>\r\n\r\n<!-- footer -->\r\n\t<div id=\"foot\">&nbsp;</div>\r\n\r\n</div>\r\n\r\n</body>\r\n</html>'));
+			$this->insert(array('name' => 'default', 'user_html' => "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\r\n<head>\r\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\r\n\t<title><txp:page_title /></title>\r\n\r\n\t<txp:feed_link flavor=\"atom\" format=\"link\" label=\"Atom\" />\r\n\t<txp:feed_link flavor=\"rss\" format=\"link\" label=\"RSS\" />\r\n\r\n\t<txp:css format=\"link\" />\r\n</head>\r\n<body>\r\n\r\n<!-- accessibility -->\r\n<div id=\"accessibility\">\r\n\t<ul>\r\n\t\t<li><a href=\"#content\">Go to content</a></li>\r\n\t\t<li><a href=\"#sidebar-1\">Go to navigation</a></li>\r\n\t\t<li><a href=\"#sidebar-2\">Go to search</a></li>\r\n\t</ul>\r\n</div>\r\n\r\n<div id=\"container\">\r\n\r\n<!-- head -->\r\n\t<div id=\"head\">\r\n\t\t<h1><txp:link_to_home><txp:sitename /></txp:link_to_home></h1>\r\n\t\t<h2><txp:site_slogan /></h2>\r\n\t</div>\r\n\r\n<!-- left -->\r\n\t<div id=\"sidebar-1\">\r\n\t<txp:linklist wraptag=\"p\" />\r\n\t</div>\r\n\r\n<!-- right -->\r\n\t<div id=\"sidebar-2\">\r\n\t\t<txp:search_input label=\"Search\" wraptag=\"p\" />\r\n\r\n\t\t<txp:popup type=\"c\" label=\"Browse\" wraptag=\"p\" />\r\n\r\n\t\t<p><txp:feed_link label=\"RSS\" /> / <txp:feed_link flavor=\"atom\" label=\"Atom\" /></p>\r\n\r\n\t\t<p><img src=\"<txp:site_url />textpattern/txp_img/txp_slug105x45.gif\" width=\"105\" height=\"45\" alt=\"Textpattern\" title=\"\" /></p>\r\n\t</div>\r\n\r\n<!-- center -->\r\n\t<div id=\"content\">\r\n\t<txp:article limit=\"5\" />\r\n\t\r\n<txp:if_individual_article>\r\n\t\t<p><txp:link_to_prev><txp:prev_title /></txp:link_to_prev> \r\n\t\t\t<txp:link_to_next><txp:next_title /></txp:link_to_next></p>\r\n<txp:else />\r\n\t\t<p><txp:older><txp:text item=\"older\" /></txp:older> \r\n\t\t\t<txp:newer><txp:text item=\"newer\" /></txp:newer></p>\r\n</txp:if_individual_article>\r\n\t</div>\r\n\r\n<!-- footer -->\r\n\t<div id=\"foot\">&nbsp;</div>\r\n\r\n</div>\r\n\r\n</body>\r\n</html>"));
 		}
 		if (!$this->row(array('name' => 'archive'))) {
-			$this->insert(array('name' => 'archive', 'user_html' => '<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\r\n<head>\r\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\r\n\t<title><txp:page_title /></title>\r\n\r\n\t<txp:feed_link flavor=\"atom\" format=\"link\" label=\"Atom\" />\r\n\t<txp:feed_link flavor=\"rss\" format=\"link\" label=\"RSS\" />\r\n\r\n\t<txp:css format=\"link\" />\r\n</head>\r\n<body>\r\n\r\n<!-- accessibility -->\r\n<div id=\"accessibility\">\r\n\t<ul>\r\n\t\t<li><a href=\"#content\">Go to content</a></li>\r\n\t\t<li><a href=\"#sidebar-1\">Go to navigation</a></li>\r\n\t\t<li><a href=\"#sidebar-2\">Go to search</a></li>\r\n\t</ul>\r\n</div>\r\n\r\n<div id=\"container\">\r\n\r\n<!-- head -->\r\n\t<div id=\"head\">\r\n\t\t<h1><txp:link_to_home><txp:sitename /></txp:link_to_home></h1>\r\n\t\t<h2><txp:site_slogan /></h2>\r\n\t</div>\r\n\r\n<!-- left -->\r\n\t<div id=\"sidebar-1\">\r\n\t<txp:linklist wraptag=\"p\" />\r\n\t</div>\r\n\r\n<!-- right -->\r\n\t<div id=\"sidebar-2\">\r\n\t\t<txp:search_input label=\"Search\" wraptag=\"p\" />\r\n\r\n\t\t<txp:popup type=\"c\" label=\"Browse\" wraptag=\"p\" />\r\n\r\n\t\t<p><txp:feed_link label=\"RSS\" /> / <txp:feed_link flavor=\"atom\" label=\"Atom\" /></p>\r\n\r\n\t\t<p><img src=\"<txp:site_url />textpattern/txp_img/txp_slug105x45.gif\" width=\"105\" height=\"45\" alt=\"Textpattern\" title=\"\" /></p>\r\n\t</div>\r\n\r\n<!-- center -->\r\n\t<div id=\"content\">\r\n\t<txp:article limit=\"5\" />\r\n\t\r\n<txp:if_individual_article>\r\n\t\t<p><txp:link_to_prev><txp:prev_title /></txp:link_to_prev> \r\n\t\t\t<txp:link_to_next><txp:next_title /></txp:link_to_next></p>\r\n<txp:else />\r\n\t\t<p><txp:older><txp:text item=\"older\" /></txp:older> \r\n\t\t\t<txp:newer><txp:text item=\"newer\" /></txp:newer></p>\r\n</txp:if_individual_article>\r\n\t</div>\r\n\r\n<!-- footer -->\r\n\t<div id=\"foot\">&nbsp;</div>\r\n\r\n</div>\r\n\r\n</body>\r\n</html>'));
+			$this->insert(array('name' => 'archive', 'user_html' => "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\r\n<head>\r\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\r\n\t<title><txp:page_title /></title>\r\n\r\n\t<txp:feed_link flavor=\"atom\" format=\"link\" label=\"Atom\" />\r\n\t<txp:feed_link flavor=\"rss\" format=\"link\" label=\"RSS\" />\r\n\r\n\t<txp:css format=\"link\" />\r\n</head>\r\n<body>\r\n\r\n<!-- accessibility -->\r\n<div id=\"accessibility\">\r\n\t<ul>\r\n\t\t<li><a href=\"#content\">Go to content</a></li>\r\n\t\t<li><a href=\"#sidebar-1\">Go to navigation</a></li>\r\n\t\t<li><a href=\"#sidebar-2\">Go to search</a></li>\r\n\t</ul>\r\n</div>\r\n\r\n<div id=\"container\">\r\n\r\n<!-- head -->\r\n\t<div id=\"head\">\r\n\t\t<h1><txp:link_to_home><txp:sitename /></txp:link_to_home></h1>\r\n\t\t<h2><txp:site_slogan /></h2>\r\n\t</div>\r\n\r\n<!-- left -->\r\n\t<div id=\"sidebar-1\">\r\n\t<txp:linklist wraptag=\"p\" />\r\n\t</div>\r\n\r\n<!-- right -->\r\n\t<div id=\"sidebar-2\">\r\n\t\t<txp:search_input label=\"Search\" wraptag=\"p\" />\r\n\r\n\t\t<txp:popup type=\"c\" label=\"Browse\" wraptag=\"p\" />\r\n\r\n\t\t<p><txp:feed_link label=\"RSS\" /> / <txp:feed_link flavor=\"atom\" label=\"Atom\" /></p>\r\n\r\n\t\t<p><img src=\"<txp:site_url />textpattern/txp_img/txp_slug105x45.gif\" width=\"105\" height=\"45\" alt=\"Textpattern\" title=\"\" /></p>\r\n\t</div>\r\n\r\n<!-- center -->\r\n\t<div id=\"content\">\r\n\t<txp:article limit=\"5\" />\r\n\t\r\n<txp:if_individual_article>\r\n\t\t<p><txp:link_to_prev><txp:prev_title /></txp:link_to_prev> \r\n\t\t\t<txp:link_to_next><txp:next_title /></txp:link_to_next></p>\r\n<txp:else />\r\n\t\t<p><txp:older><txp:text item=\"older\" /></txp:older> \r\n\t\t\t<txp:newer><txp:text item=\"newer\" /></txp:newer></p>\r\n</txp:if_individual_article>\r\n\t</div>\r\n\r\n<!-- footer -->\r\n\t<div id=\"foot\">&nbsp;</div>\r\n\r\n</div>\r\n\r\n</body>\r\n</html>"));
 		}
 	}
 }
@@ -456,51 +456,51 @@ class txp_form_table extends zem_table
 	
 	function _default_rows(){
 		if (!$this->row(array('name' => 'Links'))) {
-			$this->insert(array('name' => 'Links', 'type' => 'link', 'Form' => '<p><txp:link /><br />\r\n<txp:link_description /></p>'));
+			$this->insert(array('name' => 'Links', 'type' => 'link', 'Form' => "<p><txp:link /><br />\r\n<txp:link_description /></p>"));
 		}
 		
 		if (!$this->row(array('name' => 'lofi'))) {
-			$this->insert(array('name' => 'lofi', 'type' => 'article', 'Form' => '<h3><txp:title /></h3>\r\n\r\n<p class=\"small\"><txp:permlink>#</txp:permlink> <txp:posted /></p>\r\n\r\n<txp:body />\r\n\r\n<hr />'));
+			$this->insert(array('name' => 'lofi', 'type' => 'article', 'Form' => "<h3><txp:title /></h3>\r\n\r\n<p class=\"small\"><txp:permlink>#</txp:permlink> <txp:posted /></p>\r\n\r\n<txp:body />\r\n\r\n<hr />"));
 		}
 		
 		if (!$this->row(array('name' => 'single'))) {
-			$this->insert(array('name' => 'single', 'type' => 'article', 'Form' => '<h3><txp:title /> <span class=\"permlink\"><txp:permlink>::</txp:permlink></span> <span class=\"date\"><txp:posted /></span></h3>\r\n\r\n<txp:body />'));
+			$this->insert(array('name' => 'single', 'type' => 'article', 'Form' => "<h3><txp:title /> <span class=\"permlink\"><txp:permlink>::</txp:permlink></span> <span class=\"date\"><txp:posted /></span></h3>\r\n\r\n<txp:body />"));
 		}
 		
 		if (!$this->row(array('name' => 'plainlinks'))) {
-			$this->insert(array('name' => 'plainlinks', 'type' => 'link', 'Form' => '<txp:linkdesctitle /><br />'));
+			$this->insert(array('name' => 'plainlinks', 'type' => 'link', 'Form' => "<txp:linkdesctitle /><br />"));
 		}
 		
 		if (!$this->row(array('name' => 'comments'))) {
-			$this->insert(array('name' => 'comments', 'type' => 'comment', 'Form' => '<txp:message />\r\n\r\n<p class=\"small\">&#8212; <txp:comment_name /> &#183; <txp:comment_time /> &#183; <txp:comment_permlink>#</txp:comment_permlink></p>'));
+			$this->insert(array('name' => 'comments', 'type' => 'comment', 'Form' => "<txp:message />\r\n\r\n<p class=\"small\">&#8212; <txp:comment_name /> &#183; <txp:comment_time /> &#183; <txp:comment_permlink>#</txp:comment_permlink></p>"));
 		}
 		
 		if (!$this->row(array('name' => 'default'))) {
-			$this->insert(array('name' => 'default', 'type' => 'article', 'Form' => '<h3><txp:permlink><txp:title /></txp:permlink> &#183; <txp:posted /> by <txp:author /></h3>\r\n\r\n<txp:body />\r\n\r\n<txp:comments_invite wraptag=\"p\" />\r\n\r\n<div class=\"divider\"><img src=\"<txp:site_url />images/1.gif\" width=\"400\" height=\"1\" alt=\"---\" title=\"\" /></div>'));
+			$this->insert(array('name' => 'default', 'type' => 'article', 'Form' => "<h3><txp:permlink><txp:title /></txp:permlink> &#183; <txp:posted /> by <txp:author /></h3>\r\n\r\n<txp:body />\r\n\r\n<txp:comments_invite wraptag=\"p\" />\r\n\r\n<div class=\"divider\"><img src=\"<txp:site_url />images/1.gif\" width=\"400\" height=\"1\" alt=\"---\" title=\"\" /></div>"));
 		}
 		
 		if (!$this->row(array('name' => 'comment_form'))) {
-			$this->insert(array('name' => 'comment_form', 'type' => 'comment', 'Form' => '<table cellpadding=\"4\" cellspacing=\"0\" border=\"0\">\r\n\r\n<tr>\r\n\t<td align=\"right\">\r\n\t\t<label for=\"name\"><txp:text item=\"name\" /></label>\r\n\t</td>\r\n\r\n\t<td>\r\n\t\t<txp:comment_name_input />\r\n\t</td>\r\n\r\n\t<td>\r\n\t\t<txp:comment_remember />\r\n\t</td> \r\n</tr>\r\n\r\n<tr>\r\n\t<td align=\"right\">\r\n\t\t<label for=\"email\"><txp:text item=\"email\" /></label>\r\n\t</td>\r\n\r\n\t<td colspan=\"2\">\r\n\t\t<txp:comment_email_input />\r\n\t</td>\r\n</tr>\r\n\r\n<tr> \r\n\t<td align=\"right\">\r\n\t\t<label for=\"web\">http://</label>\r\n\t</td>\r\n\r\n\t<td colspan=\"2\">\r\n\t\t<txp:comment_web_input />\r\n\t</td>\r\n</tr>\r\n\r\n<tr>\r\n\t<td align=\"right\">\r\n\t\t<label for=\"message\"><txp:text item=\"message\" /></label>\r\n\t</td>\r\n\r\n\t<td colspan=\"2\">\r\n\t\t<txp:comment_message_input />\r\n\t</td>\r\n</tr>\r\n\r\n<tr>\r\n\t<td align=\"right\">&nbsp;</td>\r\n\r\n\t<td>\r\n\t\t<txp:comments_help />\r\n\t</td>\r\n\r\n\t<td align=\"right\">\r\n\t\t<txp:comment_preview />\r\n\t\t<txp:comment_submit />\r\n\t</td>\r\n</tr>\r\n\r\n</table>'));
+			$this->insert(array('name' => 'comment_form', 'type' => 'comment', 'Form' => "<table cellpadding=\"4\" cellspacing=\"0\" border=\"0\">\r\n\r\n<tr>\r\n\t<td align=\"right\">\r\n\t\t<label for=\"name\"><txp:text item=\"name\" /></label>\r\n\t</td>\r\n\r\n\t<td>\r\n\t\t<txp:comment_name_input />\r\n\t</td>\r\n\r\n\t<td>\r\n\t\t<txp:comment_remember />\r\n\t</td> \r\n</tr>\r\n\r\n<tr>\r\n\t<td align=\"right\">\r\n\t\t<label for=\"email\"><txp:text item=\"email\" /></label>\r\n\t</td>\r\n\r\n\t<td colspan=\"2\">\r\n\t\t<txp:comment_email_input />\r\n\t</td>\r\n</tr>\r\n\r\n<tr> \r\n\t<td align=\"right\">\r\n\t\t<label for=\"web\">http://</label>\r\n\t</td>\r\n\r\n\t<td colspan=\"2\">\r\n\t\t<txp:comment_web_input />\r\n\t</td>\r\n</tr>\r\n\r\n<tr>\r\n\t<td align=\"right\">\r\n\t\t<label for=\"message\"><txp:text item=\"message\" /></label>\r\n\t</td>\r\n\r\n\t<td colspan=\"2\">\r\n\t\t<txp:comment_message_input />\r\n\t</td>\r\n</tr>\r\n\r\n<tr>\r\n\t<td align=\"right\">&nbsp;</td>\r\n\r\n\t<td>\r\n\t\t<txp:comments_help />\r\n\t</td>\r\n\r\n\t<td align=\"right\">\r\n\t\t<txp:comment_preview />\r\n\t\t<txp:comment_submit />\r\n\t</td>\r\n</tr>\r\n\r\n</table>"));
 		}
 		
 		if (!$this->row(array('name' => 'noted'))) {
-			$this->insert(array('name' => 'noted', 'type' => 'link', 'Form' => '<p><txp:link />. <txp:link_description /></p>'));
+			$this->insert(array('name' => 'noted', 'type' => 'link', 'Form' => "<p><txp:link />. <txp:link_description /></p>"));
 		}
 		
 		if (!$this->row(array('name' => 'popup_comments'))) {
-			$this->insert(array('name' => 'popup_comments', 'type' => 'comment', 'Form' => '<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\r\n<head>\r\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\t<title><txp:page_title /></title>\r\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"<txp:css />\" />\r\n</head>\r\n<body>\r\n\r\n<div style=\"padding: 1em; width:300px;\">\r\n<txp:popup_comments />\r\n</div>\r\n\r\n</body>\r\n</html>'));
+			$this->insert(array('name' => 'popup_comments', 'type' => 'comment', 'Form' => "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\r\n<head>\r\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\r\n\t<title><txp:page_title /></title>\r\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"<txp:css />\" />\r\n</head>\r\n<body>\r\n\r\n<div style=\"padding: 1em; width:300px;\">\r\n<txp:popup_comments />\r\n</div>\r\n\r\n</body>\r\n</html>"));
 		}
 		
 		if (!$this->row(array('name' => 'files'))) {
-			$this->insert(array('name' => 'files', 'type' => 'file', 'Form' => '<txp:text item=\"file\" />: \n<txp:file_download_link>\n<txp:file_download_name /> [<txp:file_download_size format=\"auto\" decimals=\"2\" />]\n</txp:file_download_link>\n<br />\n<txp:text item=\"category\" />: <txp:file_download_category /><br />\n<txp:text item=\"download\" />: <txp:file_download_downloads />'));
+			$this->insert(array('name' => 'files', 'type' => 'file', 'Form' => "<txp:text item=\"file\" />: \n<txp:file_download_link>\n<txp:file_download_name /> [<txp:file_download_size format=\"auto\" decimals=\"2\" />]\n</txp:file_download_link>\n<br />\n<txp:text item=\"category\" />: <txp:file_download_category /><br />\n<txp:text item=\"download\" />: <txp:file_download_downloads />"));
 		}
 		
 		if (!$this->row(array('name' => 'search_results'))) {
-			$this->insert(array('name' => 'search_results', 'type' => 'article', 'Form' => '<h3><txp:search_result_permlink><txp:search_result_title /></txp:search_result_permlink></h3>\r\n\r\n<p><txp:search_result_excerpt /></p>\r\n\r\n<p class=\"small\"><txp:search_result_permlink><txp:search_result_permlink /></txp:search_result_permlink> &#183; \r\n\t<txp:search_result_date /></p>'));
+			$this->insert(array('name' => 'search_results', 'type' => 'article', 'Form' => "<h3><txp:search_result_permlink><txp:search_result_title /></txp:search_result_permlink></h3>\r\n\r\n<p><txp:search_result_excerpt /></p>\r\n\r\n<p class=\"small\"><txp:search_result_permlink><txp:search_result_permlink /></txp:search_result_permlink> &#183; \r\n\t<txp:search_result_date /></p>"));
 		}
 		
 		if (!$this->row(array('name' => 'comments_display'))) {
-			$this->insert(array('name' => 'comments_display', 'type' => 'article', 'Form' => '<h3 id=\"comment\"><txp:comments_invite textonly=\"1\" showalways=\"1\" showcount=\"0\" /></h3>\r\n\r\n<txp:comments />\r\n\r\n<txp:if_comments_preview>\r\n<div id=\"cpreview\">\r\n<txp:comments_preview />\r\n</div>\r\n</txp:if_comments_preview>\r\n\r\n<txp:if_comments_allowed>\r\n<txp:comments_form preview=\"1\" />\r\n<txp:else />\r\n<p><txp:text item=\"comments_closed\" /></p>\r\n</txp:if_comments_allowed>'));
+			$this->insert(array('name' => 'comments_display', 'type' => 'article', 'Form' => "<h3 id=\"comment\"><txp:comments_invite textonly=\"1\" showalways=\"1\" showcount=\"0\" /></h3>\r\n\r\n<txp:comments />\r\n\r\n<txp:if_comments_preview>\r\n<div id=\"cpreview\">\r\n<txp:comments_preview />\r\n</div>\r\n</txp:if_comments_preview>\r\n\r\n<txp:if_comments_allowed>\r\n<txp:comments_form preview=\"1\" />\r\n<txp:else />\r\n<p><txp:text item=\"comments_closed\" /></p>\r\n</txp:if_comments_allowed>"));
 		}
 		
 	}
@@ -602,6 +602,27 @@ class txp_log_table extends zem_table
 	}
 }
 
+class txp_plugin_table extends zem_table 
+{
+	var $_table_name = 'txp_plugin';
+	
+	var $_cols = array(
+  		'name' => "varchar(64) NOT NULL default ''",
+  		'status' => "smallint NOT NULL default '1'",
+  		'author' => "varchar(128) NOT NULL default ''",
+  		'author_uri' => "varchar(128) NOT NULL default ''",
+  		'version' => "varchar(10) NOT NULL default '1.0'",
+  		'description' => "text NOT NULL",
+  		'help' => "text NOT NULL",
+  		'code' => "text NOT NULL",
+  		'code_restore' => "text NOT NULL",
+  		'code_md5' => "varchar(32) NOT NULL default ''",
+  		'type' => "smallint NOT NULL default '0'",
+	);
+
+	var $_primary_key = 'name';
+}
+
 class txp_prefs_table extends zem_table 
 {
 	var $_table_name = 'txp_prefs';
@@ -626,10 +647,127 @@ class txp_prefs_table extends zem_table
 	}
 	
 	function _default_rows(){
-		//$prefs['blog_uid'] = md5(uniqid(rand(),true));
+		
+		# Default to messy URLs if we know clean ones won't work
+		$permlink_mode = 'section_id_title';
+		if (is_callable('apache_get_modules')) {
+			$modules = apache_get_modules();
+			if (!in_array('mod_rewrite', $modules))
+			$permlink_mode = 'messy';
+		}
+		else {
+			$server_software = (@$_SERVER['SERVER_SOFTWARE'] || @$_SERVER['HTTP_HOST'])
+			? ( (@$_SERVER['SERVER_SOFTWARE']) ?  @$_SERVER['SERVER_SOFTWARE'] :  $_SERVER['HTTP_HOST'] )
+			: '';
+			if (!stristr($server_software, 'Apache'))
+			$permlink_mode = 'messy';
+		}
+		
+		$setup_comment_invite = addslashes( ( gTxt('setup_comment_invite')=='setup_comment_invite') ? 'Comment' : gTxt('setup_comment_invite') );
+		
 		require_once txpath.'/lib/txplib_prefs.php';
 		$prefs = get_default_prefs();
+		$prefs['blog_uid'] = md5(uniqid(rand(),true));
+/*		echo '<pre>';
 		echo var_dump($prefs);
+		echo '</pre>';*/
+		$preferences = array();
+		# public prefs:
+		$preferences[] = array('name' => 'sitename', 'val' => gTxt('my_site'), 'type' => 0, 'event' => 'publish', 'html' => 'text_input', 'position' => 10);
+		$preferences[] = array('name' => 'siteurl', 'val' => 'comment.local', 'type' => 0, 'event' => 'publish', 'html' => 'text_input', 'position' => 20);
+		$preferences[] = array('name' => 'site_slogan', 'val' => gTxt('my_slogan'), 'type' => 0, 'event' => 'publish', 'html' => 'text_input', 'position' => 30);
+		$preferences[] = array('name' => 'is_dst', 'val' => '0', 'type' => 0, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 60);
+		$preferences[] = array('name' => 'dateformat', 'val' => 'since', 'type' => 0, 'event' => 'publish', 'html' => 'dateformats', 'position' => 70);
+		$preferences[] = array('name' => 'archive_dateformat', 'val' => '%b %d, %I:%M %p', 'type' => 0, 'event' => 'publish', 'html' => 'dateformats', 'position' => 80);
+		$preferences[] = array('name' => 'permlink_mode', 'val' => $permlink_mode, 'type' => 0, 'event' => 'publish', 'html' => 'permlinkmodes', 'position' => 90);
+		$preferences[] = array('name' => 'logging', 'val' => 'all', 'type' => 0, 'event' => 'publish', 'html' => 'logging', 'position' => 100);
+		$preferences[] = array('name' => 'use_textile', 'val' => '2', 'type' => 0, 'event' => 'publish', 'html' => 'pref_text', 'position' => 110);
+		$preferences[] = array('name' => 'use_comments', 'val' => '1', 'type' => 0, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 120);
+		$preferences[] = array('name' => 'production_status', 'val' => 'testing', 'type' => 0, 'event' => 'publish', 'html' => 'prod_levels', 'position' => 210);
+		# public comments prefs:
+		$preferences[] = array('name' => 'comments_moderate', 'val' => '1', 'type' => 0, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 130);
+		$preferences[] = array('name' => 'comments_on_default', 'val' => '0', 'type' => 0, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 140);
+		$preferences[] = array('name' => 'comments_are_ol', 'val' => '1', 'type' => 0, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 150);
+		$preferences[] = array('name' => 'comments_sendmail', 'val' => '0', 'type' => 0, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 160);
+		$preferences[] = array('name' => 'comments_disallow_images', 'val' => '0', 'type' => 0, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 170);
+		$preferences[] = array('name' => 'comments_default_invite', 'val' => $setup_comment_invite, 'type' => 0, 'event' => 'comments', 'html' => 'text_input', 'position' => 180);
+		$preferences[] = array('name' => 'comments_dateformat', 'val' => '%b %d, %I:%M %p', 'type' => 0, 'event' => 'comments', 'html' => 'dateformats', 'position' => 190);
+		$preferences[] = array('name' => 'comments_mode', 'val' => '0', 'type' => 0, 'event' => 'comments', 'html' => 'commentmode', 'position' => 200);
+		$preferences[] = array('name' => 'comments_disabled_after', 'val' => '42', 'type' => 0, 'event' => 'comments', 'html' => 'weeks', 'position' => 210);
+		$preferences[] = array('name' => 'comments_auto_append', 'val' => '1', 'type' => 0, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 211);		
+		# admin prefs:
+		$preferences[] = array('name' => 'ping_weblogsdotcom', 'val' => '0', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'rss_how_many', 'val' => '5', 'type' => 1, 'event' => 'admin', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'send_lastmod', 'val' => '0', 'type' => 1, 'event' => 'admin', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'img_dir', 'val' => 'images', 'type' => 1, 'event' => 'admin', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'file_max_upload_size', 'val' => '2000000', 'type' => 1, 'event' => 'admin', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'tempdir', 'val' => find_temp_dir(), 'type' => 1, 'event' => 'admin', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'file_base_path', 'val' => dirname(txpath).DS.'files', 'type' => 1, 'event' => 'admin', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'edit_raw_css_by_default', 'val' => '1', 'type' => 1, 'event' => 'css', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'allow_page_php_scripting', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'allow_article_php_scripting', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'allow_raw_php_scripting', 'val' => '0', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'textile_links', 'val' => '0', 'type' => 1, 'event' => 'link', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'show_comment_count_in_feed', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'syndicate_body_or_excerpt', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'include_email_atom', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'comment_means_site_updated', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'never_display_email', 'val' => '0', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'comments_require_name', 'val' => '1', 'type' => 1, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'comments_require_email', 'val' => '1', 'type' => 1, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'articles_use_excerpts', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'allow_form_override', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'attach_titles_to_permalinks', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'permalink_title_format', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'expire_logs_after', 'val' => '7', 'type' => 1, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'use_plugins', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'custom_1_set', 'val' => 'custom1', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 1);
+		$preferences[] = array('name' => 'custom_2_set', 'val' => 'custom2', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 2);
+		$preferences[] = array('name' => 'custom_3_set', 'val' => '', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 3);
+		$preferences[] = array('name' => 'custom_4_set', 'val' => '', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 4);
+		$preferences[] = array('name' => 'custom_5_set', 'val' => '', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 5);
+		$preferences[] = array('name' => 'custom_6_set', 'val' => '', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 6);
+		$preferences[] = array('name' => 'custom_7_set', 'val' => '', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 7);
+		$preferences[] = array('name' => 'custom_8_set', 'val' => '', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 8);
+		$preferences[] = array('name' => 'custom_9_set', 'val' => '', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 9);
+		$preferences[] = array('name' => 'custom_10_set', 'val' => '', 'type' => 1, 'event' => 'custom', 'html' => 'text_input', 'position' => 10);
+		$preferences[] = array('name' => 'ping_textpattern_com', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'use_dns', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'admin_side_plugins', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'comment_nofollow', 'val' => '1', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'use_mail_on_feeds_id', 'val' => '0', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'max_url_len', 'val' => '200', 'type' => 1, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'spam_blacklists', 'val' => 'sbl.spamhaus.org', 'type' => 1, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'override_emailcharset', 'val' => '0', 'type' => 1, 'event' => 'admin', 'html' => 'yesnoradio', 'position' => 21);
+		# hidden prefs:
+		$preferences[] = array('name' => 'prefs_id', 'val' => '1', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'use_categories', 'val' => '1', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'use_sections', 'val' => '1', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'path_from_root', 'val' => '/', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'language', 'val' => 'en-gb', 'type' => 2, 'event' => 'publish', 'html' => 'languages', 'position' => 40);
+		$preferences[] = array('name' => 'url_mode', 'val' => '1', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'timeoffset', 'val' => '0', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'lastmod', 'val' => '2005-07-23 16:24:10', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'file_list_pageby', 'val' => '25', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'path_to_site', 'val' => '', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'article_list_pageby', 'val' => '25', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'link_list_pageby', 'val' => '25', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'image_list_pageby', 'val' => '25', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'log_list_pageby', 'val' => '25', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'comment_list_pageby', 'val' => '25', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'locale', 'val' => 'en_GB.UTF-8', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'blog_uid', 'val' => $prefs['blog_uid'], 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'blog_mail_uid', 'val' => $_POST['email'], 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'blog_time_uid', 'val' => '2005', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'show_article_category_count', 'val' => '1', 'type' => 2, 'event' => 'category', 'html' => 'yesnoradio', 'position' => 0);
+		$preferences[] = array('name' => 'dbupdatetime', 'val' => '1122194504', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		$preferences[] = array('name' => 'version', 'val' => '1.0rc4', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
+		
+		foreach ($preferences as $preference){
+			if(!$this->row(array('name' => $preference['name']))){
+				$this->insert($preference);
+			}
+		}
 	}
 
 }
