@@ -60,10 +60,10 @@ if (MDB_TYPE == 'pg') {
 	db_query("create function old_password(text) returns text as 'select md5($1) as result' language 'sql';");
 }
 
-/*# Skip the RPC language fetch when testing
+# Skip the RPC language fetch when testing
 if (defined('TXP_TEST'))
 	return;
-$blog_uid = get_pref('blog_uid');
+$blog_uid = safe_field('val','txp_prefs',"name='blog_uid'");
 require_once txpath.'/lib/IXRClass.php';
 $client = new IXR_Client('http://rpc.textpattern.com');
 if (!$client->query('tups.getLanguage',$blog_uid,$lang))
@@ -101,6 +101,6 @@ if (!$client->query('tups.getLanguage',$blog_uid,$lang))
 			db_query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
 		}
 	}		
-}*/
+}
 
 ?>
