@@ -413,19 +413,17 @@ register_callback('article_event', 'article', '', 1);
 			echo hed('XHTML',2).graf($Title);
 		}
 
-		if ($view == 'text')
-		{
-			echo '<p><label for="title">'.gTxt('title').'</label><br />'.
-				n.'<input type="text" id="title" name="Title" value="'.cleanfInput($Title).'" class="edit" size="65" tabindex="1" />';
+		if ($view == 'text') {
+			echo '<p><label for="title">'.gTxt('title').'</label>';
 
-			if ( ($Status == 4 or $Status == 5) and $step != 'create')
-			{
+			if ( ($Status == 4 or $Status == 5) and $step != 'create') {
 				include_once txpath.'/publish/taghandlers.php';
 
-				echo sp.sp.'<a href="'.permlinkurl_id($ID).'">'.gTxt('view').'</a>';
+				echo sp.sp.'[<a href="'.permlinkurl_id($ID).'">'.gTxt('view').'</a>]';
 			}
 
-			echo '</p>';
+			echo '<br />'.
+				n.'<input type="text" id="title" name="Title" value="'.cleanfInput($Title).'" class="edit" size="65" tabindex="1" /></p>';
 		}
 
     if ($view == 'preview')
