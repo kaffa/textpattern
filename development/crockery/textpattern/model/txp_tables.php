@@ -451,12 +451,14 @@ class txp_form_table extends zem_table
 	
 	function upgrade_table(){
 		parent::upgrade_table();
-		$this->update(array("Form" => "REPLACE(Form, '<txp:message', '<txp:comment_message')"), array('1'=>'1'));
+		safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
 	}
 	
 	function create_table(){
 		parent::create_table();
 		$this->_default_rows();
+		# needs to call the update method again
+		$this->upgrade_table();
 	}
 	
 	function _default_rows(){
