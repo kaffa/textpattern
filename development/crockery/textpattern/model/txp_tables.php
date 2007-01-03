@@ -449,6 +449,11 @@ class txp_form_table extends zem_table
 	
 	var $_primary_key = 'name';
 	
+	function upgrade_table(){
+		parent::upgrade_table();
+		$this->update(array("Form" => "REPLACE(Form, '<txp:message', '<txp:comment_message')"), array('1'=>'1'));
+	}
+	
 	function create_table(){
 		parent::create_table();
 		$this->_default_rows();
