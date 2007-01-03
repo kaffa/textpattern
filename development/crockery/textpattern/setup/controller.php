@@ -389,8 +389,9 @@ eod;
 
 		include_once txpath.'/lib/txplib_update.php';
 		#include_once txpath.'/setup/txpsql.php';
- 		include txpath.'/setup/tables.php';
 
+ 		include txpath.'/setup/tables.php';
+ 		
 		// This has to come after txpsql.php, because otherwise we can't call mysql_real_escape_string
 		if (MDB_TYPE=='pdo_sqlite') {
 			extract(gpsa(array('name','pass','RealName','email')));
@@ -419,9 +420,10 @@ eod;
 			return '<div width="450" valign="top" style="margin-right: auto; margin-left: auto;">'.
 				graf(
 					gTxt('errors_during_install', array(
-						'{num}' => $GLOBALS['txp_err_count']
+						'{num}' => sizeof($GLOBALS['txp_error_messages'])
 					))
 				,' style="margin-top: 3em;"').
+				'<div id="error" style="text-align:left;"><pre>'.join("</pre>\r\n<pre>",$GLOBALS['txp_error_messages']).'</pre></div>'.
 				'</div>';
 		}
 
@@ -576,5 +578,15 @@ eod;
 	}
 }
 
+
+function setup_error_handler($errno, $errstr, $errfile, $errline){
+	switch ($errno){
+		case E_USER_ERROR:
+		case E_USER_WARNING:
+			$GLOBALS['txp_error_messages'][] = $errstr;
+		break;
+	}
+	
+}
 
 ?>

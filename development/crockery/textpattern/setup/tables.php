@@ -30,12 +30,27 @@ $textpattern_tables = array(
 	'txp_prefs_table',
 );
 
+$GLOBALS['txp_install_successful'] = true;
+$GLOBALS['txp_error_messages'] = array();
+
+error_reporting(E_ALL ^ E_NOTICE);
+set_error_handler('setup_error_handler');
+
 foreach ($textpattern_tables as $table_name) {
 	
 	$table = new $table_name($DB);
 	/* @var $table zem_table */
-	$table->create_table();
+	$result = $table->create_table();
+	$db_error = db_lasterror();
+	if (!$result && !empty($db_error)) 
+	{
+		$GLOBALS['txp_error_messages'][] = $db_error;
+		$GLOBALS['txp_install_successful'] = false;
+	}
 }
+
+restore_error_handler();
+error_reporting(E_ALL);
 
 if (MDB_TYPE == 'pg') {
 	# mimic some mysql-specific functions in postgres
