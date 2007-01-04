@@ -696,7 +696,7 @@ register_callback('article_event', 'article', '', 1);
 	{
 		return n.n.graf('<label for="custom-'.$num.'">'.$field.'</label>'.br.
 			n.fInput('text', 'custom_'.$num, $content, 'edit', '', '', 30, '', 'custom-'.$num)
-		, ' class="custom-field"');
+		, ' class="custom-field'.($num & 1 ? ' odd' : ' even').'"');
 	}
 
 // -------------------------------------------------------------

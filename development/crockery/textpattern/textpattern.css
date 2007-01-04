@@ -433,7 +433,7 @@ p.custom-field {
 float: left;
 }
 
-p.custom-field + p.custom-field {
+p.custom-field.even {
 margin-left: 15px;
 }
 
