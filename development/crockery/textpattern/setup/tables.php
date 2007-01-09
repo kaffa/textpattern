@@ -46,6 +46,8 @@ foreach ($textpattern_tables as $table_name) {
 	{
 		$GLOBALS['txp_error_messages'][] = $db_error;
 		$GLOBALS['txp_install_successful'] = false;
+	}elseif (method_exists($table,'default_rows')){
+		call_user_method('default_rows',$table);
 	}
 }
 
