@@ -149,7 +149,7 @@ $LastChangedRevision: $
 				elseif ($m[1] == '' and $m[4] == '/') {
 					// self closing
 						if (empty($stack))
-							$out .= processTags(array('blah', $m[2], $m[3], '', ''));
+							$out .= processTags(array('blah', $m[2], $m[3]));
 						else
 							$inside .= $chunk;
 				}
