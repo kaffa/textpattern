@@ -36,6 +36,9 @@ $GLOBALS['txp_error_messages'] = array();
 error_reporting(E_ALL ^ E_NOTICE);
 set_error_handler('setup_error_handler');
 
+include_once txpath.'/setup/data.php';
+$default_rows = new textpattern_setup_rows();
+
 foreach ($textpattern_tables as $table_name) {
 	
 	$table = new $table_name($DB);
@@ -46,8 +49,12 @@ foreach ($textpattern_tables as $table_name) {
 	{
 		$GLOBALS['txp_error_messages'][] = $db_error;
 		$GLOBALS['txp_install_successful'] = false;
-	}elseif (method_exists($table,'default_rows')){
-		call_user_method('default_rows',$table);
+	}else{
+		if (method_exists($default_rows,"$table_name")){
+			$default_rows->{$table_name}();
+			$table->upgrade_table();
+		}
+		
 	}
 }
 
