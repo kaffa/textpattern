@@ -17,6 +17,9 @@ $LastChangedRevision: 820 $
 
 */
 
+# this is required for isolation:
+require_once txpath.'/lib/txplib_misc.php';
+
 // One of 'my' or 'pg', MySQL and Postgresql respectively
 global $txpcfg;
 define('MDB_TYPE', (empty($txpcfg['dbtype']) ? 'my' : $txpcfg['dbtype']));
