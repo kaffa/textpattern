@@ -13,14 +13,13 @@ if (!defined('TXP_INSTALL'))
 @set_time_limit(0);
 
 include_once(txpath.'/lib/mdb.php');
-db_connect($dhost,$duser,$dpass, $ddb);
-db_selectdb($ddb);
+$DB =& mdb_factory($dhost,$ddb,$duser,$dpass,$dbcharset);
 
-if (db_table_exists(PFX.'textpattern')) die("Textpattern database table already exist. Can't run setup.");
+if ($DB->table_exists(PFX.'textpattern')) die("Textpattern database table already exist. Can't run setup.");
 
 if (MDB_TYPE == 'pg') {
-	if (isset($dbcharset))
-		db_query('SET NAMES '.$dbcharset);
+#	if (isset($dbcharset))
+#		$DB->query('SET NAMES '.$dbcharset);
 
 	$zerodate = '1970-01-01';
 	$zerodatetime = $zerodate.' 00:00:00';
@@ -34,17 +33,17 @@ if (MDB_TYPE == 'pg') {
 elseif(MDB_TYPE == 'my')  {
 	$version = mysql_get_server_info();
 	//Use "ENGINE" if version of MySQL > (4.0.18 or 4.1.2)
-	$tabletype = ( intval($version[0]) >= 5 || preg_match('#^4\.(0\.[2-9]|(1[89]))|(1\.[2-9])#',$version)) 
-					? " ENGINE=MyISAM " 
+	$tabletype = ( intval($version[0]) >= 5 || preg_match('#^4\.(0\.[2-9]|(1[89]))|(1\.[2-9])#',$version))
+					? " ENGINE=MyISAM "
 					: " TYPE=MyISAM ";
 
 	// On 4.1 or greater use utf8-tables
-	if ( isset($dbcharset) && (intval($version[0]) >= 5 || preg_match('#^4\.[1-9]#',$version))) 
+	if ( isset($dbcharset) && (intval($version[0]) >= 5 || preg_match('#^4\.[1-9]#',$version)))
 	{
 		$tabletype .= " CHARACTER SET = $dbcharset ";
-		if (isset($dbcollate)) 
+		if (isset($dbcollate))
 			$tabletype .= " COLLATE $dbcollate ";
-		db_query("SET NAMES ".$dbcharset);
+#		$DB->query("SET NAMES ".$dbcharset);
 	}
 
 	$zerodate = '1970-01-01';
@@ -447,10 +446,10 @@ $create_sql[] = 'CREATE UNIQUE INDEX '.PFX.'user_name ON '.PFX.'txp_users (name)
 
 if (MDB_TYPE == 'pg') {
 	# mimic some mysql-specific functions in postgres
-	db_query("create function unix_timestamp(timestamp) returns integer as 'select date_part(''epoch'', $1)::int4 as result' language 'sql';");
-	db_query("create function from_unixtime(integer) returns abstime as 'select abstime($1) as result' language 'sql';");
-	db_query("create function password(text) returns text as 'select md5($1) as result' language 'sql';");
-	db_query("create function old_password(text) returns text as 'select md5($1) as result' language 'sql';");
+	$DB->query("create function unix_timestamp(timestamp) returns integer as 'select date_part(''epoch'', $1)::int4 as result' language 'sql';");
+	$DB->query("create function from_unixtime(integer) returns abstime as 'select abstime($1) as result' language 'sql';");
+	$DB->query("create function password(text) returns text as 'select md5($1) as result' language 'sql';");
+	$DB->query("create function old_password(text) returns text as 'select md5($1) as result' language 'sql';");
 }elseif (MDB_TYPE == 'pdo_sqlite'){
 
 }
@@ -459,11 +458,11 @@ $GLOBALS['txp_install_successful'] = true;
 $GLOBALS['txp_err_count'] = 0;
 foreach ($create_sql as $query)
 {
-	$result = db_query($query);
+	$result = $DB->query($query);
 	if (!$result) 
 	{
 		$GLOBALS['txp_err_count']++;
-		echo "<b>".$GLOBALS['txp_err_count'].".</b> ".db_lasterror()."<br />\r\n";
+		echo "<b>".$GLOBALS['txp_err_count'].".</b> ".$DB->lasterror()."<br />\r\n";
 		echo "<!--\r\n $query \r\n-->\r\n";
 		$GLOBALS['txp_install_successful'] = false;
 	}
@@ -489,7 +488,7 @@ if (!$client->query('tups.getLanguage',$prefs['blog_uid'],$lang))
 			{
 				$lang_val = addslashes($lang_val);
 				if (@$lang_val)
-					db_query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('en-gb','$lang_key','$evt_name','$lang_val','$lastmod')");
+					$DB->query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('en-gb','$lang_key','$evt_name','$lang_val','$lastmod')");
 			}
 		}
 	}
@@ -498,7 +497,7 @@ if (!$client->query('tups.getLanguage',$prefs['blog_uid'],$lang))
 	$lang_struct = unserialize($response);
 	if (MDB_TYPE == 'pdo_sqlite') {
 		
-		$stmt = db_prepare("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang', ?, ?, ?, ?)");
+		$stmt = $DB->prepare("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang', ?, ?, ?, ?)");
 		foreach ($lang_struct as $item){
 			$stmt->execute(array_values($item));
 		}
@@ -507,7 +506,7 @@ if (!$client->query('tups.getLanguage',$prefs['blog_uid'],$lang))
 		{
 			foreach ($item as $name => $value) 
 				$item[$name] = addslashes($value);
-			db_query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
+			$DB->query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
 		}
 	}		
 }

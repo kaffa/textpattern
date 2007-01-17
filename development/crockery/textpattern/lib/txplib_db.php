@@ -14,8 +14,9 @@ set_magic_quotes_runtime(0);
 
 include_once(dirname(__FILE__).'/mdb.php');
 
+/*
 class DB {
-    function DB() 
+    function DB()
 	{
 		global $txpcfg;
 
@@ -36,7 +37,12 @@ class DB {
 		if ($txpcfg['dbtype']!='pdo_sqlite') @db_query("SET NAMES ". $txpcfg['dbcharset']);
     }
 }
-$DB = new DB;
+*/
+
+global $txpcfg;
+
+if (empty($GLOBALS['DB']))
+	$GLOBALS['DB'] =& mdb_factory($txpcfg['host'], $txpcfg['db'], $txpcfg['user'], $txpcfg['pass'], @$txpcfg['dbcharset']);
 
 //-------------------------------------------------------------
 	function safe_pfx($table) {
@@ -64,8 +70,19 @@ $DB = new DB;
 	function safe_query($q='',$debug='')
 	{
 		global $DB,$txpcfg, $qcount, $qtime, $production_status;
+
+		if ($debug)
+			dmp($q);
+		if (txpinterface === 'admin' or @$production_status != 'live')
+			$debug = true;
+
+		$r = $DB->query($q, $debug);
+
+		return $r;
+
+/*
 		if (!$q) return false;
-		if ($debug or TXP_DEBUG === 1) { 
+		if ($debug or TXP_DEBUG === 1) {
 			dmp($q);
 			dmp(db_lasterror());
 //			dmp(debug_backtrace());
@@ -84,6 +101,7 @@ $DB = new DB;
 
 		if(!$result) return false;
 		return $result;
+*/
 	}
 
 // -------------------------------------------------------------
@@ -97,7 +115,7 @@ $DB = new DB;
 	}
 
 // -------------------------------------------------------------
-	function safe_update($table, $set, $where, $debug='') 
+	function safe_update($table, $set, $where, $debug='')
 	{
 		$q = "update ".safe_pfx($table)." set $set where $where";
 		if ($r = safe_query($q,$debug)) {
@@ -109,31 +127,33 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_update_rec($table, $rec, $where, $debug='')
 	{
-		return db_update_rec(PFX.$table, $rec, $where);
+		global $DB;
+		return $DB->update_rec(PFX.$table, $rec, $where);
 	}
 
 // -------------------------------------------------------------
-	function safe_insert($table,$set,$debug='') 
+	function safe_insert($table,$set,$debug='')
 	{
 		global $DB;
-		return db_insert(safe_pfx($table), $set);
+		return $DB->insert(safe_pfx($table), $set);
 	}
 
 // -------------------------------------------------------------
 	function safe_insert_rec($table,$rec,$debug='') 
 	{
 		global $DB;
-		return db_insert_rec(PFX.$table, $rec, $debug);
+		return $DB->insert_rec(PFX.$table, $rec, $debug);
 	}
 
 // -------------------------------------------------------------
 // insert or update
 	function safe_upsert($table,$set,$where,$debug='') 
 	{
+		global $DB;
 		// FIXME: lock the table so this is atomic?
 		$wa = (is_array($where) ? join(' and ', $where) : $where);
 		$r = safe_update($table, $set, $wa, $debug);
-		if ($r and db_affected_rows())
+		if ($r and $DB->affected_rows())
 			return $r;
 		else {
 			$wc = (is_array($where) ? join(', ', $where) : $where);
@@ -143,10 +163,11 @@ $DB = new DB;
 	}
 
 // -------------------------------------------------------------
-	function safe_table_list($debug='') 
+	function safe_table_list($debug='')
 	{
 		$out = array();
-		$tables = db_table_list();
+		global $DB;
+		$tables = $DB->table_list();
 
 		// only include tables starting with PFX, and strip the prefix
 		foreach ($tables as $table)
@@ -169,8 +190,9 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_upgrade_table($table, $cols, $primary_key='', $debug='') 
 	{
-		if (db_table_exists(PFX.$table)) {
-			$current = db_column_list(PFX.$table);
+		global $DB;
+		if ($DB->table_exists(PFX.$table)) {
+			$current = $DB->column_list(PFX.$table);
 			foreach ($cols as $name=>$type) {
 				if (empty($current[$name]))
 					safe_alter($table, 'add '.$name.' '.$type);
@@ -189,14 +211,16 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_column_exists($table, $colname, $debug='') 
 	{
-		$cols = db_column_list(PFX.$table);
+		global $DB;
+		$cols = $DB->column_list(PFX.$table);
 		return !empty($cols[$colname]);
 	}
 
 // -------------------------------------------------------------
-	function safe_index_exists($table, $idxname, $debug='') 
+	function safe_index_exists($table, $idxname, $debug='')
 	{
-		return db_index_exists(PFX.$table, PFX.$idxname);
+		global $DB;
+		return $DB->index_exists(PFX.$table, PFX.$idxname);
 	}
 
 // -------------------------------------------------------------
@@ -230,11 +254,12 @@ $DB = new DB;
 // -------------------------------------------------------------
 	function safe_field($thing, $table, $where, $debug='') 
 	{
+		global $DB;
 		$q = "select $thing from ".safe_pfx_j($table)." where $where";
 		$r = safe_query($q,$debug);
-		if (@db_num_rows($r) > 0) {
-			$f = db_fetch_result($r,0);
-			db_free($r);
+		if (@$DB->num_rows($r) > 0) {
+			$f = $DB->fetch_result($r,0);
+			$DB->free($r);
 			return $f;
 		}
 		return false;
@@ -306,12 +331,13 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function fetch($col,$table,$key,$val,$debug='') 
 	{
+		global $DB;
 		$key = doSlash($key);
 		$val = (is_int($val)) ? $val : "'".doSlash($val)."'";
 		$q = "select $col from ".safe_pfx($table)." where `$key` = $val limit 1";
 		if ($r = safe_query($q,$debug)) {
-			$thing = (db_num_rows($r) > 0) ? db_fetch_result($r,0) : '';
-			db_free($r);
+			$thing = ($DB->num_rows($r) > 0) ? $DB->fetch_result($r,0) : '';
+			$DB->free($r);
 			return $thing;
 		}
 		return false;
@@ -320,21 +346,23 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function getRow($query,$debug='') 
 	{
+		global $DB;
 		if ($r = safe_query($query,$debug)) {
-			$row = (db_num_rows($r) > 0) ? db_fetch_assoc($r) : false;
-			db_free($r);
+			$row = ($DB->num_rows($r) > 0) ? $DB->fetch_assoc($r) : false;
+			$DB->free($r);
 			return $row;
 		}
 		return false;
 	}
 
 //-------------------------------------------------------------
-	function getRows($query,$debug='') 
+	function getRows($query,$debug='')
 	{
+		global $DB;
 		if ($r = safe_query($query,$debug)) {
-			if (db_num_rows($r) > 0) {
-				while ($a = db_fetch_assoc($r)) $out[] = $a; 
-				db_free($r);
+			if ($DB->num_rows($r) > 0) {
+				while ($a = $DB->fetch_assoc($r)) $out[] = $a;
+				$DB->free($r);
 				return $out;
 			}
 		}
@@ -350,31 +378,34 @@ $DB = new DB;
 //-------------------------------------------------------------
 	function nextRow($r)
 	{
-		$row = db_fetch_assoc($r);
+		global $DB;
+		$row = $DB->fetch_assoc($r);
 		if ($row === false)
-			db_free($r);
+			$DB->free($r);
 		return $row;
 	}
 
 //-------------------------------------------------------------
 	function numRows($r)
 	{
-		return db_num_rows($r);
+		global $DB;
+		return $DB->num_rows($r);
 	}
 
 //-------------------------------------------------------------
-	function getThing($query,$debug='') 
+	function getThing($query,$debug='')
 	{
+		global $DB;
 		if ($r = safe_query($query,$debug)) {
-			$thing = (db_num_rows($r) != 0) ? db_fetch_result($r,0) : '';
-			db_free($r);
+			$thing = ($DB->num_rows($r) != 0) ? $DB->fetch_result($r,0) : '';
+			$DB->free($r);
 			return $thing;
 		}
 		return false;
 	}
 
 //-------------------------------------------------------------
-	function getThings($query,$debug='') 
+	function getThings($query,$debug='')
 	// return values of one column from multiple rows in an num indexed array
 	{
 		$rs = getRows($query,$debug);
@@ -384,23 +415,23 @@ $DB = new DB;
 		}
 		return array();
 	}
-	
+
 //-------------------------------------------------------------
-	function getCount($table,$where,$debug='') 
+	function getCount($table,$where,$debug='')
 	{
 		return getThing("select count(*) from ".safe_pfx_j($table)." where $where",$debug);
 	}
 
 // -------------------------------------------------------------
  	function getTree($root, $type, $where='1=1')
- 	{ 
+ 	{
 
 		$root = doSlash($root);
 		$type = doSlash($type);
 
 	   $rs = safe_row(
-	    	"lft as l, rgt as r", 
-	    	"txp_category", 
+	    	"lft as l, rgt as r",
+	    	"txp_category",
 			"name='$root' and type = '$type'"
 		);
 
@@ -410,98 +441,98 @@ $DB = new DB;
 		$inc_root = ($root == 'root') ? " and name != 'root'" : '';
 
 		$out = array();
-		$right = array(); 
+		$right = array();
 
 	    $rs = safe_rows_start(
-	    	"id, name, lft, rgt, parent, title", 
+	    	"id, name, lft, rgt, parent, title",
 	    	"txp_category",
 	    	"lft between $l and $r and type = '$type' and name != 'root' and $where order by lft asc"
-		); 
+		);
 
 	    while ($rs and $row = nextRow($rs)) {
 	   		extract($row);
-			while (count($right) > 0 && $right[count($right)-1] < $rgt) { 
+			while (count($right) > 0 && $right[count($right)-1] < $rgt) {
 				array_pop($right);
 			}
 
-        	$out[] = 
+        	$out[] =
         		array(
         			'id' => $id,
         			'name' => $name,
         			'title' => $title,
-        			'level' => count($right), 
+        			'level' => count($right),
         			'children' => ($rgt - $lft - 1) / 2
         		);
 
-	        $right[] = $rgt; 
+	        $right[] = $rgt;
 	    }
     	return($out);
  	}
 
 // -------------------------------------------------------------
  	function getTreePath($target, $type)
- 	{ 
+ 	{
 
 	  	$rs = safe_row(
-	    	"lft as l, rgt as r", 
-	    	"txp_category", 
+	    	"lft as l, rgt as r",
+	    	"txp_category",
 			"name='".doSlash($target)."' and type = '".doSlash($type)."'"
 		);
 		if (!$rs) return array();
 		extract($rs);
 
 	    $rs = safe_rows_start(
-	    	"*", 
+	    	"*",
 	    	"txp_category",
 				"lft <= $l and rgt >= $r and type = '".doSlash($type)."' order by lft asc"
-		); 
+		);
 
 		$out = array();
-		$right = array(); 
+		$right = array();
 
 	    while ($rs and $row = nextRow($rs)) {
 	   		extract($row);
-			while (count($right) > 0 && $right[count($right)-1] < $rgt) { 
+			while (count($right) > 0 && $right[count($right)-1] < $rgt) {
 				array_pop($right);
 			}
 
-        	$out[] = 
+        	$out[] =
         		array(
         			'id' => $id,
         			'name' => $name,
         			'title' => $title,
-        			'level' => count($right), 
+        			'level' => count($right),
         			'children' => ($rgt - $lft - 1) / 2
         		);
 
-	        $right[] = $rgt; 
+	        $right[] = $rgt;
 	    }
 		return $out;
 	}
 
 // -------------------------------------------------------------
-	function rebuild_tree($parent, $left, $type) 
-	{ 
+	function rebuild_tree($parent, $left, $type)
+	{
 		$left  = assert_int($left);
 		$right = $left+1;
 
 		$parent = doSlash($parent);
 		$type   = doSlash($type);
 
-		$result = safe_column("name", "txp_category", 
+		$result = safe_column("name", "txp_category",
 			"parent='$parent' and type='$type' order by name");
-	
-		foreach($result as $row) { 
-    	    $right = rebuild_tree($row, $right, $type); 
-	    } 
+
+		foreach($result as $row) {
+    	    $right = rebuild_tree($row, $right, $type);
+	    }
 
 	    safe_update(
-	    	"txp_category", 
+	    	"txp_category",
 	    	"lft=$left, rgt=$right",
 	    	"name='$parent' and type='$type'"
 	    );
-    	return $right+1; 
- 	} 
+    	return $right+1;
+ 	}
 
 //-------------------------------------------------------------
 	function rebuild_tree_full($type)
@@ -509,16 +540,17 @@ $DB = new DB;
 		# fix circular references, otherwise rebuild_tree() could get stuck in a loop
 		safe_update('txp_category', "parent=''", "type='".doSlash($type)."' and name='root'");
 		safe_update('txp_category', "parent='root'", "type='".doSlash($type)."' and parent=name");
-		
+
 		rebuild_tree('root', 1, $type);
 	}
 
 // -------------------------------------------------------------
-	function db_down() 
+	function db_down()
 	{
 		// 503 status might discourage search engines from indexing or caching the error message
 		header('Status: 503 Service Unavailable');
-		$error = db_lasterror();
+		global $DB;
+		$error = $DB->lasterror();
 		return <<<eod
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

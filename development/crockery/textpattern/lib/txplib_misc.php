@@ -8,7 +8,7 @@ $LastChangedRevision: 1127 $
 // -------------------------------------------------------------
 	function doArray($in,$function)
 	{
-		return is_array($in) ? array_map($function,$in) : $function($in);
+		return is_array($in) ? array_map($function,$in) : call_user_func($function,$in);
 	}
 
 // -------------------------------------------------------------
@@ -40,7 +40,7 @@ $LastChangedRevision: 1127 $
 			'&gt;'   => '>',
 			'&#x3E;' => '>'
 		);
-		
+
 		foreach($array as $k=>$v){
 			$in = preg_replace("/".preg_quote($k)."/i",$v, $in);
 		}
@@ -50,7 +50,7 @@ $LastChangedRevision: 1127 $
 // -------------------------------------------------------------
 	function doSlash($in)
 	{ 
-		return doArray($in,'db_escape');
+		return doArray($in,array(&$GLOBALS['DB'],'escape'));
 	}
 
 // -------------------------------------------------------------
@@ -132,7 +132,7 @@ $LastChangedRevision: 1127 $
 // -------------------------------------------------------------
 	function load_lang($lang)
 	{
-		global $txpcfg;
+		global $txpcfg, $DB;
 
 		$installed = safe_field('name', 'txp_lang',"lang='".doSlash($lang)."' limit 1");
 
@@ -144,7 +144,7 @@ $LastChangedRevision: 1127 $
 
 		$out = array();
 
-		if ($rs && db_num_rows($rs) > 0)
+		if ($rs && $DB->num_rows($rs) > 0)
 		{
 			while ($a = nextRow($rs))
 			{

@@ -477,7 +477,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function doArticles($atts, $iscustom)
 	{	
-		global $pretext, $prefs, $txpcfg;
+		global $pretext, $prefs, $txpcfg, $DB;
 		extract($pretext);
 		extract($prefs);
 		$customFields = getCustomFields();
@@ -536,11 +536,11 @@ $LastChangedRevision$
 			$q = urldecode($q);
 			include_once txpath.'/publish/search.php';
 			$s_filter = ($searchall ? filterSearch() : '');
-			$match = ", ".db_match('Title,Body', doSlash($q));
+			$match = ", ".$DB->match('Title,Body', doSlash($q));
 
 			$words = preg_split('/\s+/', $q);
 			foreach ($words as $w) {
-				$rlike[] = "(Title ".db_rlike()." '".doSlash(preg_quote($w))."' or Body ".db_rlike()." '".doSlash(preg_quote($w))."')";
+				$rlike[] = "(Title ".$DB->rlike()." '".doSlash(preg_quote($w))."' or Body ".$DB->rlike()." '".doSlash(preg_quote($w))."')";
 			}
 			$search = " and " . join(' and ', $rlike) . " $s_filter";
 
@@ -629,7 +629,7 @@ $LastChangedRevision$
 		}
 
 		$rs = safe_rows_start("*, unix_timestamp(Posted) as uPosted".$match, 'textpattern', 
-		$where. ' order by '.doslash($sort).' '.db_limit(intval($limit),  intval($pgoffset)));
+		$where. ' order by '.doslash($sort).' '.$DB->limit(intval($limit),  intval($pgoffset)));
 		// alternative form override for search or list
 		if ($q and !$iscustom and !$issticky)
 			$fname = ($searchform ? $searchform : 'search_results');

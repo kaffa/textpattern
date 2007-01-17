@@ -7,7 +7,7 @@ if (!defined('TXP_INSTALL'))
 @set_time_limit(0);
 
 include_once txpath.'/lib/txplib_db.php';
-$GLOBALS['DB'] = $DB;
+#$GLOBALS['DB'] = $DB;
 include_once txpath.'/model/txp_tables.php';
 
 $textpattern_tables = array(
