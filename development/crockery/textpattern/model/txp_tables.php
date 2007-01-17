@@ -8,15 +8,17 @@ require_once dirname(dirname(__FILE__)).'/lib/txplib_table.php';
 // -------------------------------------------------------------
 	function unsafe_index_exists($table, $idxname, $debug='') 
 	{
-		return db_index_exists(PFX.$table, $idxname);
+		global $DB;
+		return $DB->index_exists(PFX.$table, $idxname);
 	}
 
 // -------------------------------------------------------------
 	function unsafe_upgrade_index($table, $idxname, $type, $def, $debug='') 
 	{
+		global $DB;
 		// $type would typically be '' or 'unique'
 		if (!unsafe_index_exists($table, $idxname))
-			return safe_query('create '.$type.' index '.$idxname.' on '.PFX.$table.' ('.$def.');');
+			return $DB->do_query('create '.$type.' index '.$idxname.' on '.PFX.$table.' ('.$def.');');
 	}
 
 class txp_article_table extends zem_table {

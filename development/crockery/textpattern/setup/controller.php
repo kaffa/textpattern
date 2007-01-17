@@ -188,7 +188,7 @@ eod;
 	# Step 3: Print the contents of the config file
 	function printConfig()
 	{
-
+		
 		# Is anybody using the ftp values for something?
 		$this->vars = psa(array('ddb','duser','dpass','dhost','dprefix','dbtype','txprefix','txpath',
 			'siteurl','ftphost','ftplogin','ftpass','ftpath','lang'));
@@ -224,13 +224,15 @@ eod;
 		$GLOBALS['txpcfg']['dbtype'] = $dbtype;
 		# include here in order to load only the required driver
 		include_once txpath.'/lib/mdb.php';
-
+		
 		if ($dbtype == 'pdo_sqlite') {
 			$ddb = $txpath.DS.$ddb;
 			$carry['ddb'] = $ddb;
 		}
-
-		if (!db_connect($dhost,$duser,$dpass,$ddb)){
+		if (empty($GLOBALS['DB']))
+		$GLOBALS['DB'] =& mdb_factory($dhost, $ddb, $duser, $dpass);
+		$DB = $GLOBALS['DB'];
+		if (!$DB->connect($dhost,$duser,$dpass,$ddb)){
 			exit(graf(gTxt('db_cant_connect')));
 		}
 
@@ -245,7 +247,7 @@ eod;
 			));
 		}
 
-		if (!db_selectdb($ddb))
+		if (!$DB->selectdb($ddb))
 		{
 			exit(graf(
 				gTxt('db_doesnt_exist', array(
@@ -255,7 +257,7 @@ eod;
 		}
 
 		# On 4.1 or greater use utf8-tables
-		if ($dbtype!='pdo_sqlite' && db_query("SET NAMES 'utf8'")) {
+		if ($dbtype!='pdo_sqlite' && $DB->query("SET NAMES 'utf8'")) {
 			$this->vars['dbcharset'] = "utf8";
 			$this->vars['dbcollate'] = "utf8_general_ci";
 		}elseif ($dbtype == 'pdo_sqlite' && db_query('PRAGMA encoding="UTF-8"')){
@@ -402,12 +404,12 @@ eod;
 
  		$nonce = md5( uniqid( rand(), true ) );
 
-		db_query("INSERT INTO ".PFX."txp_users VALUES
+		$DB->query("INSERT INTO ".PFX."txp_users VALUES
 			(1,'$name',password(lower('$pass')),'$RealName','$email',1,now(),'$nonce')");
 
-		db_query("update ".PFX."txp_prefs set val = '$siteurl' where name='siteurl'");
-		db_query("update ".PFX."txp_prefs set val = '$lang' where name='language'");
-		db_query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");
+		$DB->query("update ".PFX."txp_prefs set val = '$siteurl' where name='siteurl'");
+		$DB->query("update ".PFX."txp_prefs set val = '$lang' where name='language'");
+		$DB->query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");
 
  		$this->_step_view = $this->fbCreate();
 	}

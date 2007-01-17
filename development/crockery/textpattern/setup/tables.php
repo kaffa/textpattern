@@ -7,7 +7,7 @@ if (!defined('TXP_INSTALL'))
 @set_time_limit(0);
 
 include_once txpath.'/lib/txplib_db.php';
-#$GLOBALS['DB'] = $DB;
+global $DB;
 include_once txpath.'/model/txp_tables.php';
 
 $textpattern_tables = array(
@@ -44,7 +44,8 @@ foreach ($textpattern_tables as $table_name) {
 	$table = new $table_name($DB);
 	/* @var $table zem_table */
 	$result = $table->create_table();
-	$db_error = db_lasterror();
+
+	$db_error = $DB->lasterror();
 	if (!$result && !empty($db_error)) 
 	{
 		$GLOBALS['txp_error_messages'][] = $db_error;
@@ -89,7 +90,7 @@ if (!$client->query('tups.getLanguage',$blog_uid,$lang))
 			{
 				$lang_val = addslashes($lang_val);
 				if (@$lang_val)
-					db_query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('en-gb','$lang_key','$evt_name','$lang_val','$lastmod')");
+					$DB->query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('en-gb','$lang_key','$evt_name','$lang_val','$lastmod')");
 			}
 		}
 	}
@@ -98,7 +99,7 @@ if (!$client->query('tups.getLanguage',$blog_uid,$lang))
 	$lang_struct = unserialize($response);
 	if (MDB_TYPE == 'pdo_sqlite') {
 		
-		$stmt = db_prepare("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang', ?, ?, ?, ?)");
+		$stmt = $DB->prepare("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang', ?, ?, ?, ?)");
 		foreach ($lang_struct as $item){
 			$stmt->execute(array_values($item));
 		}
@@ -107,7 +108,7 @@ if (!$client->query('tups.getLanguage',$blog_uid,$lang))
 		{
 			foreach ($item as $name => $value) 
 				$item[$name] = addslashes($value);
-			db_query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
+			$DB->query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
 		}
 	}		
 }

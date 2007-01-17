@@ -71,7 +71,7 @@ class zem_table {
 	}
 
 	function table_exists() {
-		return db_table_exists(PFX.$this->_table_name);
+		return $this->DB->table_exists(PFX.$this->_table_name);
 	}
 
 //-------------------------------------------------------------
@@ -97,7 +97,7 @@ class zem_table {
 			return false;
 
 		$start = getmicrotime();
-		$result = db_query($q,$this->DB->link);
+		$result = $this->DB->do_query($q,$this->DB->link);
 
 		if ($debug or $this->_debug)
 			dmp($q, $result);
@@ -107,7 +107,7 @@ class zem_table {
 		@$qcount++;
 		if ($result === false and (txpinterface === 'admin' or !is_production_status('live'))) {
 			$caller = is_production_status('debug') ? n . join("\n", get_caller()) : '';
-			trigger_error(db_lasterror() . n . $q . $caller, E_USER_WARNING);
+			trigger_error($this->DB->lasterror() . n . $q . $caller, E_USER_WARNING);
 		}
 
 		trace_add("[SQL ($time): $q]");
@@ -120,8 +120,8 @@ class zem_table {
 	function getRow($query,$debug='') 
 	{
 		if ($r = $this->query($query,$debug)) {
-			$row = (db_num_rows($r) > 0) ? db_fetch_assoc($r) : false;
-			db_free($r);
+			$row = ($this->DB->num_rows($r) > 0) ? db_fetch_assoc($r) : false;
+			$this->DB->free($r);
 			return $row;
 		}
 		return false;
@@ -131,9 +131,9 @@ class zem_table {
 	function getRows($query,$debug='') 
 	{
 		if ($r = $this->query($query,$debug)) {
-			if (db_num_rows($r) > 0) {
-				while ($a = db_fetch_assoc($r)) $out[] = $a; 
-				db_free($r);
+			if ($this->DB->num_rows($r) > 0) {
+				while ($a = $this->DB->fetch_assoc($r)) $out[] = $a; 
+				$this->DB->free($r);
 				return $out;
 			}
 		}
@@ -144,9 +144,9 @@ class zem_table {
 //-------------------------------------------------------------
 	function nextRow(&$r)
 	{
-		$row = db_fetch_assoc($r);
+		$row = $this->DB->fetch_assoc($r);
 		if ($row === false)
-			db_free($r);
+			$this->DB->free($r);
 		return $row;
 	}
 
@@ -154,8 +154,8 @@ class zem_table {
 	function getThing($query,$debug='')
 	{
 		if ($r = $this->query($query,$debug)) {
-			$thing = (db_num_rows($r) != 0) ? db_fetch_result($r,0) : '';
-			db_free($r);
+			$thing = ($this->DB->num_rows($r) != 0) ? $this->DB->fetch_result($r,0) : '';
+			$this->DB->free($r);
 			return $thing;
 		}
 		return false;
@@ -200,7 +200,7 @@ class zem_table {
 			$out .= ' ORDER BY '.doSlash($extra['sort']);
 
 		if (isset($extra['limit']) or isset($extra['offset']))
-			$out .= ' '.db_limit(@$extra['limit'], @$extra['offset']);
+			$out .= ' '.$this->DB->limit(@$extra['limit'], @$extra['offset']);
 
 		return $out;
 	}
@@ -266,7 +266,7 @@ class zem_table {
 			return false;
 		}
 
-		$last = db_last_insert_id($this->table_name());
+		$last = $this->DB->last_insert_id($this->table_name());
 		return ($last ? $last : true);
 	}
 
