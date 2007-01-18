@@ -110,9 +110,7 @@ eod;
 		# this should be on the top most method of the controller!
 		if (!empty($txpcfg['db']))
 		{
-			exit(graf(
-				gTxt('already_installed', array('{txpath}' => txpath))
-			));
+			$this->setup_error(gTxt('already_installed', array('{txpath}' => txpath)));
 		}
 
 		$temp_txpath = txpath;
@@ -198,11 +196,10 @@ eod;
 
 		if (!empty($txpcfg['db']))
 		{
-			exit(graf(
-				gTxt('already_installed', array(
+
+			$this->setup_error(gTxt('already_installed', array(
 					'{txpath}' => txpath
-				))
-			));
+			)));
 		}
 		
 		
@@ -233,14 +230,14 @@ eod;
 		$GLOBALS['DB'] =& mdb_factory($dhost, $ddb, $duser, $dpass);
 		$DB = $GLOBALS['DB'];
 		if (!$DB->connect($dhost,$duser,$dpass,$ddb)){
-			exit(graf(gTxt('db_cant_connect')));
+			$this->setup_error(graf(gTxt('db_cant_connect')));
 		}
 
 		$this->_step_view.= graf(gTxt('db_connected'));
 
 		if (! ($dprefix == '' || preg_match('#^[a-zA-Z_][a-zA-Z0-9_]*$#',$dprefix)) )
 		{
-			exit(graf(
+			$this->setup_error(graf(
 				gTxt('prefix_bad_characters', array(
 					'{dbprefix}' => strong($dprefix)
 				))
@@ -249,7 +246,7 @@ eod;
 
 		if (!$DB->selectdb($ddb))
 		{
-			exit(graf(
+			$this->setup_error(graf(
 				gTxt('db_doesnt_exist', array(
 					'{dbname}' => strong($ddb)
 				))
@@ -577,6 +574,12 @@ eod;
 	function sDoSlash($in)
 	{ 
 		return doArray($in,'db_escape');
+	}
+	
+// -------------------------------------------------------------
+	function setup_error($error_msg){
+		$this->_step_view = hed(gTxt('textpattern_error'),1,' style="margin: 3em;" class="not-ok"').graf($error_msg,' id="warning" class="error"');
+		exit($this->render());
 	}
 }
 
