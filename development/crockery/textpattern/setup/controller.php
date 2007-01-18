@@ -573,7 +573,8 @@ eod;
 // -------------------------------------------------------------
 	function sDoSlash($in)
 	{ 
-		return doArray($in,'db_escape');
+		global $DB;
+		return doArray($in,array($DB,'escape'));
 	}
 	
 // -------------------------------------------------------------
