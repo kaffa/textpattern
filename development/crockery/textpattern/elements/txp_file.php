@@ -30,6 +30,21 @@ class FileController extends ZemAdminController {
 	var $area = 'file';
 	var $event = 'file';
 	var $default_step = 'list';
+	
+	var $file_statuses = array(
+			2 => 'hidden',
+			3 => 'pending',
+			4 => 'live',
+	);
+
+
+	function file_statuses() {
+		$out = array();
+		foreach ($this->file_statuses as $k=>$v)
+			$out[$k] = gTxt($v);
+		return $out;
+	}
+
 
 	function list_view($message = '')
 	{
@@ -282,7 +297,7 @@ class FileController extends ZemAdminController {
 
 		$categories = getTree('root', 'file');
 
-		$rs = safe_row('*', 'txp_file', "id = '$id'");
+		$rs = safe_row('*, unix_timestamp(created) as created, unix_timestamp(modified) as modified', 'txp_file', "id = '$id'");
 
 		if ($rs)
 		{
@@ -301,6 +316,24 @@ class FileController extends ZemAdminController {
 			$status .= '</span>';
 
 			$downloadlink = ($file_exists) ? $this->make_download_link($id, $filename) : $filename;
+			
+			$created =
+					n.graf(checkbox('publish_now', '1', $publish_now, '', 'publish_now').'<label for="publish_now">'.gTxt('set_to_now').'</label>').
+
+					n.graf(gTxt('or_publish_at').sp.popHelp('timestamp')).
+
+					n.graf(gtxt('date').sp.
+						tsi('year', '%Y', $rs['created']).' / '.
+						tsi('month', '%m', $rs['created']).' / '.
+						tsi('day', '%d', $rs['created'])
+					).
+
+					n.graf(gTxt('time').sp.
+						tsi('hour', '%H', $rs['created']).' : '.
+						tsi('minute', '%M', $rs['created']).' : '.
+						tsi('second', '%S', $rs['created'])
+					);
+
 
 			$form = '';
 
@@ -312,6 +345,8 @@ class FileController extends ZemAdminController {
 									 		$categories,$category)) .
 //									graf(gTxt('permissions').br.selectInput('perms',$levels,$permissions)).
 									graf(gTxt('description').br.text_area('description','100','400',$description)) .
+									fieldset(radio_list('status', $file_statuses, $status, 4), gTxt('status'), 'file-status').
+									fieldset($created, gTxt('timestamp'), 'file-created').
 									graf(fInput('submit','',gTxt('save'))) .
 
 									eInput($this->event) .
@@ -373,13 +408,16 @@ class FileController extends ZemAdminController {
 	}
 
 // -------------------------------------------------------------
-	function file_db_add($filename,$category,$permissions,$description)
+	function file_db_add($filename,$category,$permissions,$description,$size)
 	{
 		$rs = safe_insert("txp_file",
 			"filename = '$filename',
 			 category = '$category',
 			 permissions = '$permissions',
-			 description = '$description'
+			 description = '$description',
+			 size = '$size',
+			 created = now(),
+			 modified = now()
 		");
 		
 		if ($rs) {
@@ -435,7 +473,8 @@ class FileController extends ZemAdminController {
 			return;
 		}
 
-		if ($file_max_upload_size < filesize($file)) {
+		$size = filesize($file);
+		if ($file_max_upload_size < $size) {
 			unlink($file);
 			$this->_error(gTxt('file_upload_failed') ." $name - ".upload_get_errormsg(UPLOAD_ERR_FORM_SIZE));
 			return;
@@ -443,7 +482,7 @@ class FileController extends ZemAdminController {
 
 		if (!is_file(build_file_path($file_base_path,$name))) {
 
-			$id = $this->file_db_add($name,$category,$permissions,$description);
+			$id = $this->file_db_add($name,$category,$permissions,$description,$size);
 
 			if(!$id){
 				$this->_error(gTxt('file_upload_failed').' (db_add)');
@@ -522,6 +561,9 @@ class FileController extends ZemAdminController {
 				unlink($file);
 			} else {
 				$this->file_set_perm($newpath);
+				if ($size = filesize($newpath))
+					safe_update('txp_file', "size='".doSlash($size)."'", "id='".doSlash($id)."'");
+
 				$this->_message(messenger('file',$name,'uploaded'));
 				$this->_set_view('edit', $id);
 				// clean up old
@@ -593,14 +635,17 @@ class FileController extends ZemAdminController {
 			}
 		}
 
-		$rs = safe_update(
-			"txp_file",
-			"filename = '$filename',
+		$size = filesize(build_file_path($file_base_path,$filename));
+		$rs = safe_update('txp_file', "
+			filename = '$filename',
 			category = '$category',
 			permissions = '$perms',
-			description = '$description'",
-			"id = '$id'"
-		);
+			description = '$description',
+			status = '$status',
+			size = '$size',
+			modified = now()"
+			.($created ? ", created = $created" : '')
+		, "id = $id");
 
 		if (!$rs) {
 			// update failed, rollback name

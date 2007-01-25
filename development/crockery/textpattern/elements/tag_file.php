@@ -24,29 +24,34 @@ $LastChangedRevision: $
 			'offset'	 => '0',
 			'sort'		 => 'filename asc',
 			'wraptag'	 => '',
+			'status'     => '4',
 		), $atts));
+		
+		if (!is_numeric($status))
+			$status = getStatusNum($status);
+
+		$where = array('1=1');
+		if ($category) $where[] = "category = '".doSlash($category)."'";
+		if ($status) $where[] = "status = '".doSlash($status)."'";
 
 		$qparts = array(
-			($category) ? "category = '".doSlash($category)."'" : '1',
-			"order by $sort",
-			($limit) ? "limit $offset, $limit" : ''
+			'order by '.doSlash($sort),
+			($limit) ? 'limit '.intval($offset).', '.intval($limit) : '',
 		);
 
-		$rs = safe_rows_start('id, filename, category, description, downloads', 'txp_file', join(' ', $qparts));
+		$rs = safe_rows_start('*', 'txp_file', join(' and ', $where).' '.join(' ', $qparts));
 
 		if ($rs)
 		{
-			$form = fetch_form($form);
-
 			$out = array();
 
 			while ($a = nextRow($rs))
 			{
-				$thisfile = file_download_format_info($a);
+				$GLOBALS['thisfile'] = file_download_format_info($a);
 
-				$out[] = parse($form);
+				$out[] = parse_form($form);
 
-				unset($thisfile);
+				$GLOBALS['thisfile'] = '';
 			}
 
 			if ($out)
@@ -74,26 +79,33 @@ $LastChangedRevision: $
 			'id'			 => '',
 		), $atts));
 
-		if (empty($thisfile))
-		{
-			if ($id)
-			{
-				$thisfile = fileDownloadFetchInfo('id = '.intval($id));
-			}
+		$from_form = false;
 
-			elseif ($filename)
-			{
-				$thisfile = fileDownloadFetchInfo("filename = '".doSlash($filename)."'");
-			}
+		if ($id)
+		{
+			$thisfile = fileDownloadFetchInfo('id = '.intval($id));
+		}
+
+		elseif ($filename)
+		{
+			$thisfile = fileDownloadFetchInfo("filename = '".doSlash($filename)."'");
+		}
+
+		elseif ($thisfile)
+		{
+			$from_form = true;
 		}
 
 		if ($thisfile)
 		{
-			$form = fetch_form($form);
+			$out = parse_form($form);
 
-			$out = parse($form);
-
-			unset($thisfile);
+			// cleanup: this wasn't called from a form,
+			// so we don't want this value remaining
+			if (!$from_form)
+			{
+				$GLOBALS['thisfile'] = '';
+			}
 
 			return $out;
 		}
@@ -110,36 +122,34 @@ $LastChangedRevision: $
 			'id'			 => '',
 		), $atts));
 
-		$from_form = true;
+		$from_form = false;
 
-		if (empty($thisfile))
+		if ($id)
 		{
-			$from_form = false;
+			$thisfile = fileDownloadFetchInfo('id = '.intval($id));
+		}
 
-			if ($id)
-			{
-				$thisfile = fileDownloadFetchInfo('id = '.intval($id));
-			}
+		elseif ($filename)
+		{
+			$thisfile = fileDownloadFetchInfo("filename = '".doSlash($filename)."'");
+		}
 
-			elseif ($filename)
-			{
-				$thisfile = fileDownloadFetchInfo("filename = '".doSlash($filename)."'");
-			}
+		elseif ($thisfile)
+		{
+			$from_form = true;
 		}
 
 		if ($thisfile)
 		{
-			$url = ($permlink_mode == 'messy') ?
-				hu.'index.php?s=file_download'.a.'id='.$thisfile['id'] :
-				hu.gTxt('file_download').'/'.$thisfile['id'];
+			$url = filedownloadurl($thisfile['id'], $thisfile['filename']);
 
 			$out = ($thing) ? href(parse($thing), $url) : $url;
 
 			// cleanup: this wasn't called from a form,
 			// so we don't want this value remaining
-			if ($from_form == false)
+			if (!$from_form)
 			{
-				unset($thisfile);
+				$GLOBALS['thisfile'] = '';
 			}
 
 			return $out;
@@ -150,7 +160,7 @@ $LastChangedRevision: $
 
 	function fileDownloadFetchInfo($where)
 	{
-		$rs = safe_row('id, filename, category, description, downloads', 'txp_file', $where);
+		$rs = safe_row('*', 'txp_file', $where);
 
 		if ($rs)
 		{
@@ -164,34 +174,10 @@ $LastChangedRevision: $
 
 	function file_download_format_info($file)
 	{
-		global $file_base_path;
-
-		// get filesystem info
-		$filepath = build_file_path($file_base_path, $file['filename']);
-
-		if (file_exists($filepath))
-		{
-			$filesize = filesize($filepath);
-
-			if ($filesize !== false)
-			{
-				$file['size'] = $filesize;
-			}
-
-			$created = filectime($filepath);
-
-			if ($created !== false)
-			{
-				$file['created'] = $created;
-			}
-
-			$modified = filemtime($filepath);
-
-			if ($modified !== false)
-			{
-				$file['modified'] = $modified;
-			}
-		}
+		if (($unix_ts = @strtotime($file['created'])) > 0)
+			$file['created'] = $unix_ts;
+		if (($unix_ts = @strtotime($file['modified'])) > 0)
+			$file['modified'] = $unix_ts;
 
 		return $file;
 	}
@@ -204,7 +190,7 @@ $LastChangedRevision: $
 
 		extract(lAtts(array(
 			'decimals' => 2,
-			'format'	 => ''
+			'format'	 => '',
 		), $atts));
 
 		if (is_numeric($decimals) and $decimals >= 0)
@@ -225,7 +211,7 @@ $LastChangedRevision: $
 			{
 				$divs = 0;
 
-				while ($size > 1024)
+				while ($size >= 1024)
 				{
 					$size /= 1024;
 					$divs++;
@@ -298,13 +284,15 @@ $LastChangedRevision: $
 		global $thisfile;
 
 		extract(lAtts(array(
-			'format' => ''
+			'format' => '',
 		), $atts));
 
-		return fileDownloadFormatTime(array(
-			'ftime'	 => $thisfile['created'],
-			'format' => $format
-		));
+		if ($thisfile['created']) {
+			return fileDownloadFormatTime(array(
+				'ftime'	 => $thisfile['created'],
+				'format' => $format
+			));
+		}
 	}
 
 //--------------------------------------------------------------------------
@@ -314,13 +302,15 @@ $LastChangedRevision: $
 		global $thisfile;
 
 		extract(lAtts(array(
-			'format' => ''
+			'format' => '',
 		), $atts));
 
-		return fileDownloadFormatTime(array(
-			'ftime'	 => $thisfile['modified'],
-			'format' => $format
-		));
+		if ($thisfile['modified']) {
+			return fileDownloadFormatTime(array(
+				'ftime'	 => $thisfile['modified'],
+				'format' => $format
+			));
+		}
 	}
 
 //-------------------------------------------------------------------------
@@ -366,7 +356,7 @@ $LastChangedRevision: $
 		extract(lAtts(array(
 			'class'   => '',
 			'escape'  => '',
-			'wraptag' => ''
+			'wraptag' => '',
 		), $atts));
 
 		if ($thisfile['category'])
@@ -395,7 +385,7 @@ $LastChangedRevision: $
 		extract(lAtts(array(
 			'class'   => '',
 			'escape'  => '',
-			'wraptag' => ''
+			'wraptag' => '',
 		), $atts));
 
 		if ($thisfile['description'])
@@ -406,5 +396,5 @@ $LastChangedRevision: $
 			return ($wraptag) ? doTag($description, $wraptag, $class) : $description;
 		}
 	}
-
+	
 ?>
