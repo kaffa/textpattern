@@ -345,7 +345,7 @@ class FileController extends ZemAdminController {
 									 		$categories,$category)) .
 //									graf(gTxt('permissions').br.selectInput('perms',$levels,$permissions)).
 									graf(gTxt('description').br.text_area('description','100','400',$description)) .
-									fieldset(radio_list('status', $file_statuses, $status, 4), gTxt('status'), 'file-status').
+									fieldset(radio_list('status', $this->file_statuses(), $status, 4), gTxt('status'), 'file-status').
 									fieldset($created, gTxt('timestamp'), 'file-created').
 									graf(fInput('submit','',gTxt('save'))) .
 
