@@ -309,11 +309,11 @@ class FileController extends ZemAdminController {
 
 			$existing_files = $this->get_filenames();
 
-			$status = '<span class="';
-			$status .= ($file_exists) ? 'ok' : 'not-ok';
-			$status .= '">';
-			$status .= ($file_exists)?gTxt('file_status_ok'):gTxt('file_status_missing');
-			$status .= '</span>';
+			$condition = '<span class="';
+			$condition .= ($file_exists) ? 'ok' : 'not-ok';
+			$condition .= '">';
+			$condition .= ($file_exists)?gTxt('file_status_ok'):gTxt('file_status_missing');
+			$condition .= '</span>';
 
 			$downloadlink = ($file_exists) ? $this->make_download_link($id, $filename) : $filename;
 			
@@ -397,7 +397,7 @@ class FileController extends ZemAdminController {
 			echo startTable('list'),
 			tr(
 				td(
-					graf(gTxt('file_status').br.$status) .
+					graf(gTxt('file_status').br.$condition) .
 					graf(gTxt('file_name').br.$downloadlink) .
 					graf(gTxt('file_download_count').br.(isset($downloads)?$downloads:0))					
 				)
