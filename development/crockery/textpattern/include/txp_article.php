@@ -712,16 +712,6 @@ register_callback('article_event', 'article', '', 1);
 	}
 
 //--------------------------------------------------------------
-	function tsi($name,$datevar,$time,$tab='')
-	{
-		$size = ($name=='year') ? 4 : 2;
-
-		return '<input type="text" name="'.$name.'" value="'.
-			safe_strftime($datevar, $time)
-		.'" size="'.$size.'" maxlength="'.$size.'" class="edit" tabindex="'.$tab.'" title="'.gTxt('article_'.$name).'" />';
-	}
-
-//--------------------------------------------------------------
 	function article_delete()
 	{
 		$dID = ps('dID');

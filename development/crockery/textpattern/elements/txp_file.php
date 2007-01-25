@@ -288,7 +288,7 @@ class FileController extends ZemAdminController {
 	{
 		global $txpcfg, $file_base_path, $levels, $path_from_root;
 
-		extract(gpsa(array('name', 'category', 'permissions', 'description', 'sort', 'dir', 'page', 'crit', 'method')));
+		extract(gpsa(array('name', 'category', 'permissions', 'description', 'sort', 'dir', 'page', 'crit', 'method','publish_now')));
 
 		if (!$id)
 		{
@@ -606,7 +606,7 @@ class FileController extends ZemAdminController {
 	function save_post()
 	{
 		global $file_base_path;
-		extract(doSlash(gpsa(array('id','filename','category','description'))));
+		extract(doSlash(gpsa(array('id', 'filename', 'category', 'description', 'status', 'publish_now', 'year', 'month', 'day', 'hour', 'minute', 'second'))));
 
 		$permissions = "";
 		if (isset($_GET['perms'])) {
@@ -634,6 +634,14 @@ class FileController extends ZemAdminController {
 				$this->file_set_perm($new_path);
 			}
 		}
+
+		$created_ts = @safe_strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second);
+		if ($publish_now)
+			$created = 'now()';
+		elseif ($created_ts > 0)
+			$created = "from_unixtime('".$created_ts."')";
+		else
+			$created = '';
 
 		$size = filesize(build_file_path($file_base_path,$filename));
 		$rs = safe_update('txp_file', "
