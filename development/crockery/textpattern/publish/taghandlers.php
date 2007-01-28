@@ -2099,11 +2099,10 @@ function body($atts)
 			'limit'		=> 5,
 		), $atts));
 
-		$q = preg_quote($pretext['q']);
-
-		$result = preg_replace("/>\s*</", "> <", $thisarticle['body']);
-
-		preg_match_all("/(?:\s|^).{1,50}".$q.".{1,50}(?:\s|$)/iu", $result, $concat);
+		$q = @$pretext['q'];
+		
+		$result = preg_replace("/>\s*</", "> <", strip_tags($thisarticle['body']));
+		preg_match_all("/\b.{1,50}".preg_quote($q).".{1,50}\b/i",$result,$concat);
 
 		if ($concat) {
 			$r = array();
@@ -2113,11 +2112,11 @@ function body($atts)
 			}
 
 			if ($r) {
-				$concat = join($break, $r);
+				$concat = join($break.n, $r);
 				$concat = strip_tags($concat);
 
 				$concat = preg_replace('/^[^>]+>/U', '', $concat);
-				$concat = preg_replace("/(".$q.")/i", "<$hilight>$1</$hilight>", $concat);
+				$concat = preg_replace("/(".preg_quote($q).")/i", "<$hilight>$1</$hilight>", $concat);
 
 				return trim($break.$concat.$break);
 			}
