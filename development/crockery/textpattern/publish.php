@@ -500,10 +500,9 @@ $LastChangedRevision$
 			'frontpage' => '',
 			'id'        => '',
 			'time'      => 'past',
-			'status'    => '4',
+			'status'    => '',
 			'pgonly'    => 0,
 			'searchall' => 1,
-			'searchsticky' => 0,
 			'allowoverride' => (!$q and !$iscustom),
 			'offset'    => 0,
 		)+$customlAtts,$atts);
@@ -527,12 +526,12 @@ $LastChangedRevision$
 		$pageby = (empty($pageby) ? $limit : $pageby);
 
 		// treat sticky articles differently wrt search filtering, etc
-		if (!is_numeric($status))
+		if ($status and !is_numeric($status))
 			$status = getStatusNum($status);
 		$issticky = ($status == 5);
 			
 		//give control to search, if necesary
-		if($q && !$iscustom && !$issticky) {
+		if($q && !$iscustom) {
 			$q = urldecode($q);
 			include_once txpath.'/publish/search.php';
 			$s_filter = ($searchall ? filterSearch() : '');
@@ -593,12 +592,10 @@ $LastChangedRevision$
 			$keywords = " and (" . join(' or ',$keyparts) . ")"; 
 		}
 
-		if ($q and $searchsticky)
-			$statusq = ' and Status >= 4';
-		elseif ($id)
-			$statusq = ' and Status >= 4';
-		else
+		if ($status)
 			$statusq = ' and Status = '.intval($status);
+		else
+			$statusq = ' and Status >= 4';
 
 		$where = "1=1" . $statusq. $time.
 			$search . $id . $category . $section . $excerpted . $month . $author . $keywords . $custom . $frontpage;
