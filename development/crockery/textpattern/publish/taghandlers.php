@@ -1967,6 +1967,18 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
+
+	function if_keywords($atts, $thing = NULL) {
+		global $thisarticle;
+
+		assert_article();
+
+		$condition = ($thisarticle['keywords']);
+
+		return EvalElse($thing, $condition);
+	}
+
+// -------------------------------------------------------------
 	function keywords($atts) 
 	{
 		global $thisarticle;
