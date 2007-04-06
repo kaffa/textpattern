@@ -35,6 +35,7 @@ you_have_been_registered => You have been registered as a contributor to the sit
 #@article
 advanced_options => Advanced Options
 article_deleted => Article deleted!
+article_expires_before_postdate => Article expires <strong>before</strong> postdate!
 article_image => Article image
 article_posted => Article posted
 article_saved => Article saved
@@ -427,6 +428,7 @@ use_plugins => Use plugins?
 year_month_day_title => /year/month/day/title
 #@public
 404_not_found => 404 - The requested page was not found.
+410_gone => 410 - The requested page is gone.
 active => Active
 add => Add
 admin => Admin
@@ -503,6 +505,7 @@ es-es => Español
 et-ee => Eesti
 excerpt => Excerpt
 experts_only => experts only
+expires => Expires
 extensions => Extensions
 fi-fi => Suomi
 forget => Forget

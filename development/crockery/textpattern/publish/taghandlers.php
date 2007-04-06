@@ -593,7 +593,7 @@ $LastChangedRevision$
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';
 
 		$rs = safe_rows_start('*, id as thisid, unix_timestamp(Posted) as posted', 'textpattern', 
-			"Status = 4 $section $categories and Posted <= now() order by ".doSlash($sort).' limit 0,'.intval($limit));
+			"Status = 4 $section $categories and Posted <= now() and (now() <= Expires or Expires = ".NULLDATETIME.") order by ".doSlash($sort).' limit 0,'.intval($limit));
 
 		if ($rs)
 		{
@@ -637,10 +637,10 @@ $LastChangedRevision$
 
 			while ($c = nextRow($rs))
 			{
-				$a = safe_row('*, ID as thisid, unix_timestamp(Posted) as posted', 
+				$a = safe_row('*, ID as thisid, unix_timestamp(Posted) as posted, unix_timestamp(Expires) as expires', 
 					'textpattern', 'ID = '.intval($c['parentid']));
 
-				If ($a['Status'] >= 4)
+				If ($a['Status'] >= 4 and (time() <= $a['expires'] or $a['expires'] == NULLDATETIME))
 				{
 					$out[] = href(
 						$c['name'].' ('.escape_title($a['Title']).')', 
@@ -723,7 +723,7 @@ $LastChangedRevision$
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';
 
 		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted', 'textpattern', 
-			'ID != '.intval($id)." and Status = 4 and Posted <= now() $categories $section order by ".doSlash($sort).' limit 0,'.intval($limit));
+			'ID != '.intval($id)." and Status = 4 and Posted <= now() and (now() <= Expires or Expires = ".NULLDATETIME.") $categories $section order by ".doSlash($sort).' limit 0,'.intval($limit));
 	
 		if ($rs)
 		{
@@ -1297,6 +1297,46 @@ $LastChangedRevision$
 			}
 		}
 	}
+
+
+// -------------------------------------------------------------
+
+	function expires($atts)	{
+		global $thisarticle, $pretext, $prefs;
+
+		assert_article();
+		
+		if($thisarticle['expires'] == NULLDATETIME)	{
+			return;
+		}
+
+		extract(lAtts(array(
+			'format'  => '',
+			'gmt'     => '',
+			'lang'    => '',
+		), $atts));
+
+		if ($format) {
+			return safe_strftime($format, $thisarticle['expires'], $gmt, $lang);
+		} else {
+			if ($pretext['id'] or $pretext['c'] or $pretext['pg']) {
+				return safe_strftime($prefs['archive_dateformat'], $thisarticle['expires']);
+			} else {
+				return safe_strftime($prefs['dateformat'], $thisarticle['expires']);
+			}
+		}
+	}
+
+
+// -------------------------------------------------------------
+
+	function if_expires($atts, $thing)	{
+		global $thisarticle;
+
+		assert_article();	
+		return parse(EvalElse($thing, !empty($thisarticle['expires'])));
+	}
+
 
 // -------------------------------------------------------------
 

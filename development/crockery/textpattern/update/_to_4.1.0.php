@@ -55,4 +55,11 @@ safe_insert('txp_prefs', "prefs_id = 1, event='publish', name = 'markup_default'
 // <txp:message /> is dropped
 safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
 
+	// Expiry datetime for articles
+safe_upgrade_table('textpattern', array(
+	'Expires' => "datetime NOT NULL default '0000-00-00 00:00:00' after `Posted`"
+));
+
+safe_upgrade_index('textpattern', 'Expires_idx', '', 'Expires');
+
 ?>

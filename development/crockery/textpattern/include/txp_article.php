@@ -19,11 +19,12 @@ global $article_vars, $statuses;
 
 $article_vars = array(
 	'ID','Title','Title_html','Body','Body_html','Excerpt','markup_excerpt','Image',
-	'markup_body', 'Keywords','Status','Posted','Section','Category1','Category2',
+	'markup_body', 'Keywords','Status','Posted','Expires','Section','Category1','Category2',
 	'Annotate','AnnotateInvite','publish_now','reset_time','AuthorID','sPosted',
 	'LastModID','sLastMod','override_form','from_view','year','month','day','hour',
 	'minute','second','url_title','custom_1','custom_2','custom_3','custom_4','custom_5',
-	'custom_6','custom_7','custom_8','custom_9','custom_10'
+	'custom_6','custom_7','custom_8','custom_9','custom_10','exp_year','exp_month','exp_day','exp_hour',
+	'exp_minute','exp_second','sExpires'
 );
 
 $statuses = array(
@@ -72,14 +73,40 @@ register_callback('article_event', 'article', '', 1);
 		$incoming = markup_main_fields($incoming);
 
 		extract(doSlash($incoming));
-		extract(array_map('assert_int', psa(array( 'Status', 'textile_body', 'textile_excerpt'))));
+		$Status = assert_int(ps('Status'));  
+		extract(psa(array('markup_body', 'markup_excerpt')));  
+
 		$Annotate = ( ps( 'Annotate')) ? assert_int( ps( 'Annotate')) : 0;
 
-		if ($publish_now==1) {
+		if ($publish_now == 1) {
 			$when = 'now()';
+			$when_ts = time();
 		} else {
-			$when = strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second)-tz_offset();
+			$when = $when_ts = strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second)-tz_offset();
 			$when = "from_unixtime($when)";
+		}
+
+		if (empty($exp_year)) {
+			$expires =  NULLDATETIME;
+			$whenexpires = "from_unixtime(0)";
+		}
+		else {			
+			if(empty($exp_month)) $exp_month=1;
+			if(empty($exp_day)) $exp_day=1;
+			if(empty($exp_hour)) $exp_hour=0;
+			if(empty($exp_minute)) $exp_minute=0;
+			if(empty($exp_second)) $exp_second=0;
+			
+			$expires = strtotime($exp_year.'-'.$exp_month.'-'.$exp_day.' '.
+				$exp_hour.':'.$exp_minute.':'.$exp_second)-tz_offset();
+			$whenexpires = "from_unixtime($expires)";
+		}		
+
+		if ($expires != NULLDATETIME) {
+			if ($expires <= $when_ts) {
+				article_edit(gTxt('article_expires_before_postdate'));
+				return;
+			}
 		}
 
 		if ($Title or $Body or $Excerpt) {
@@ -99,6 +126,7 @@ register_callback('article_event', 'article', '', 1);
 				Keywords        = '$Keywords',
 				Status          =  $Status,
 				Posted          =  $when,
+				Expires         =  $whenexpires,
 				LastMod         =  now(),
 				AuthorID        = '$txp_user',
 				Section         = '$Section',
@@ -161,19 +189,41 @@ register_callback('article_event', 'article', '', 1);
 		$incoming = markup_main_fields($incoming);
 
 		extract(doSlash($incoming));
-		extract(array_map('assert_int', psa(array('ID', 'Status', 'textile_body', 'textile_excerpt'))));  
+		extract(array_map('assert_int', psa(array('ID', 'Status'))));  
+		extract(psa(array('markup_body', 'markup_excerpt')));  
 		$Annotate = ( ps( 'Annotate')) ? assert_int( ps( 'Annotate')) : 0;
 
 		if (!has_privs('article.publish') && $Status>=4) $Status = 3;
 
 		if($reset_time) {
-			$whenposted = "Posted=now()"; 
+			$whenposted = "Posted=now()";
+			$when_ts = time();
 		} else {
-			$when = strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second)-tz_offset();
-			$when = "from_unixtime('$when')";
-			$whenposted = "Posted=$when";
+			$when = $when_ts = strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second)-tz_offset();
+			$whenposted = "Posted=from_unixtime($when)";
 		}
-		
+
+		if(empty($exp_year)) {
+			$expires = NULLDATETIME;
+			$whenexpires = "Expires='".NULLDATETIME."'";
+		} else {
+			if(empty($exp_month)) $exp_month=1;
+			if(empty($exp_day)) $exp_day=1;
+			if(empty($exp_hour)) $exp_hour=0;
+			if(empty($exp_minute)) $exp_minute=0;
+			if(empty($exp_second)) $exp_second=0;
+			
+			$expires = strtotime($exp_year.'-'.$exp_month.'-'.$exp_day.' '.$exp_hour.':'.$exp_minute.':'.$exp_second)-tz_offset();
+			$whenexpires = "Expires=from_unixtime($expires)";	
+		}
+
+		if ($expires != NULLDATETIME) {
+			if ($expires <= $when_ts) {
+				article_edit(gTxt('article_expires_before_postdate'));
+				return;
+			}
+		}
+
 		//Auto-Update custom-titles according to Title, as long as unpublished and NOT customized
 		if ( empty($url_title)
 			  || ( ($oldArticle['Status'] < 4) 
@@ -217,7 +267,8 @@ register_callback('article_event', 'article', '', 1);
 			custom_8        = '$custom_8',
 			custom_9        = '$custom_9',
 			custom_10       = '$custom_10',
-			$whenposted",
+			$whenposted,
+			$whenexpires",
 			"ID = $ID"
 		);
 
@@ -256,7 +307,7 @@ register_callback('article_event', 'article', '', 1);
 		$article = getFreshArticle();
 
 		if ($step == "edit"
-			&& $view=="text"
+			&& $view == "text"
 			&& !empty($ID)
 			&& $from_view != "preview"
 			&& $from_view != 'html') {
@@ -264,6 +315,7 @@ register_callback('article_event', 'article', '', 1);
 			$ID = assert_int($ID);
 			$article = safe_row(
 				"*, unix_timestamp(Posted) as sPosted,
+				unix_timestamp(Expires) as sExpires,
 				unix_timestamp(LastMod) as sLastMod",
 				"textpattern",
 				"ID=$ID"
@@ -292,11 +344,9 @@ register_callback('article_event', 'article', '', 1);
 		$GLOBALS['step'] = $step;
 
 		pagetop($article['Title'], $message);
-		if ($step == 'create')
-		{
-			$textile_body = $use_textile;
-			$textile_excerpt = $use_textile;
-
+		if ($step == 'create') {
+			$markup_body = $markup_default;
+			$markup_excerpt = $markup_default;
 		}
 
 		article_edit_form($step, $view, $from_view, $article);
@@ -630,8 +680,29 @@ register_callback('article_event', 'article', '', 1);
 						tsi('second', '%S', $persist_timestamp)
 					)
 
-				, gTxt('timestamp'), 'write-timestamp').
+				, gTxt('timestamp'), 'write-timestamp');
 
+		//-- expires ------------------- 
+
+				$persist_timestamp = (!empty($store_out['exp_year']))?
+					safe_strtotime($store_out['exp_year'].'-'.$store_out['exp_month'].'-'.$store_out['exp_day'].' '.$store_out['exp_hour'].':'.$store_out['exp_minute'].':'.$store_out['second'])
+					: NULLDATETIME;
+
+				echo n.n.fieldset(
+
+					n.graf(gtxt('date').sp.
+						tsi('exp_year', '%Y', $persist_timestamp).' / '.
+						tsi('exp_month', '%m', $persist_timestamp).' / '.
+						tsi('exp_day', '%d', $persist_timestamp)
+					).
+
+					n.graf(gTxt('time').sp.
+						tsi('exp_hour', '%H', $persist_timestamp).' : '.
+						tsi('exp_minute', '%M', $persist_timestamp).' : '.
+						tsi('exp_second', '%S', $persist_timestamp)
+					)
+
+				, gTxt('expires').sp.popHelp('expires'), 'write-expires').
 				// end "More" section
 				n.n.'</div>';
 
@@ -648,6 +719,10 @@ register_callback('article_event', 'article', '', 1);
 
 			//-- timestamp ------------------- 
 
+				if (!empty($year)) {
+					$sPosted = safe_strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second);					
+				}
+				
 				echo n.n.fieldset(
 
 					n.graf(checkbox('reset_time', '1', $reset_time, '', 'reset_time').'<label for="reset_time">'.gTxt('reset_time').'</label>').
@@ -671,7 +746,36 @@ register_callback('article_event', 'article', '', 1);
 					n.hInput('AuthorID', $AuthorID).
 					n.hInput('LastModID', $LastModID)
 
-				, gTxt('timestamp'), 'write-timestamp').
+				, gTxt('timestamp'), 'write-timestamp');
+
+			//-- expires -------------------
+
+				if (!empty($exp_year))
+				{	
+					if(empty($exp_month)) $exp_month=1;
+					if(empty($exp_day)) $exp_day=1;
+					if(empty($exp_hour)) $exp_hour=0;
+					if(empty($exp_minute)) $exp_minute=0;
+					if(empty($exp_second)) $exp_second=0;
+					$sExpires = safe_strtotime($exp_year.'-'.$exp_month.'-'.$exp_day.' '.$exp_hour.':'.$exp_minute.':'.$exp_second);
+				}
+					
+				echo n.n.fieldset(
+
+					n.graf(gtxt('date').sp.
+						tsi('exp_year', '%Y', $sExpires).' / '.
+						tsi('exp_month', '%m', $sExpires).' / '.
+						tsi('exp_day', '%d', $sExpires)
+					).
+
+					n.graf(gTxt('time').sp.
+						tsi('exp_hour', '%H', $sExpires).' : '.
+						tsi('exp_minute', '%M', $sExpires).' : '.
+						tsi('exp_second', '%S', $sExpires)
+					).
+					n.hInput('sExpires', $sExpires)
+
+				, gTxt('expires').sp.popHelp('expires'), 'write-expires').
 
 				// end "More" section
 				n.n.'</div>';

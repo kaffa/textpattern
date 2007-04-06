@@ -370,12 +370,17 @@ $LastChangedRevision$
 		$out['page'] = @$rs['page'];		
 
 		if(is_numeric($id)) {
-			$a = safe_row('*, unix_timestamp(Posted) as uPosted', 'textpattern', 'ID='.intval($id).' and Status = 4');
+			$a = safe_row('*, unix_timestamp(Posted) as uPosted, unix_timestamp(Expires) as uExpires', 'textpattern', 'ID='.intval($id).' and Status = 4');
 			if ($a) {
 				$Posted             = @$a['Posted'];
 				$out['id_keywords'] = @$a['Keywords'];
 				$out['id_author']   = @$a['AuthorID'];
 				populateArticleData($a);
+
+				$uExpires = $a['uExpires'];
+				if ($uExpires != NULLDATETIME and time() > $uExpires) {
+					$out['status'] = '410';
+				}
 
 			if ($np = getNextPrev($id, $Posted, $s))
 				$out = array_merge($out, $np);
@@ -407,6 +412,9 @@ $LastChangedRevision$
 
 		if ($pretext['status'] == '404')
 			txp_die(gTxt('404_not_found'), '404');
+
+		if ($pretext['status'] == '410')
+			txp_die(gTxt('410_gone'), '410');
 
 		$html = fetch_page_template($pretext['page']);
 		if (!$html) 
@@ -549,7 +557,7 @@ $LastChangedRevision$
 		}
 		else {
 			$match = $search = '';
-			if (!$sort) $sort='Posted';
+			if (!$sort) $sort='Posted desc';
 		}
 
 		//Building query parts
@@ -568,6 +576,8 @@ $LastChangedRevision$
 			default:
 				$time = " and Posted < now()";
 		}
+		$time .= " and (now() <= Expires or Expires = ".NULLDATETIME.")";
+		
 		if (!is_numeric($status))
 			$status = getStatusNum($status);
 			
@@ -714,7 +724,7 @@ $LastChangedRevision$
 
 			$q_status = ($status ? 'and Status = '.intval($status) : 'and Status in (4,5)');
 
-			$rs = safe_row("*, unix_timestamp(Posted) as uPosted", 
+			$rs = safe_row("*, unix_timestamp(Posted) as uPosted, unix_timestamp(Expires) as uExpires", 
 					"textpattern", 'ID = '.intval($id)." $q_status limit 1");
 
 			if ($rs) {
@@ -774,6 +784,7 @@ $LastChangedRevision$
 		trace_add("[".gTxt('Article')." $ID]");
 		$out['thisid']          = $ID;
 		$out['posted']          = $uPosted;
+		$out['expires']         = $uExpires;
 		$out['modified']        = $LastMod;
 		$out['annotate']        = $Annotate;
 		$out['comments_invite'] = $AnnotateInvite;
@@ -809,6 +820,7 @@ $LastChangedRevision$
 			"select ID, Title, url_title, unix_timestamp(Posted) as uposted
 			from ".$safe_name." where Posted $type '".doSlash($Posted)."'",
 			($s!='' && $s!='default') ? "and Section = '".doSlash($s)."'" : filterFrontPage(),
+			'and (now() <= Expires or Expires = '.NULLDATETIME.')',
 			'and Status=4 and Posted < now() order by Posted',
 			($type=='<') ? 'desc' : 'asc',
 			'limit 1'
@@ -829,7 +841,7 @@ $LastChangedRevision$
 			$current = safe_row('ID, Posted', 'textpattern', 
 				'1=1 '.
 				(($s!='' && $s!='default') ? "and Section = '".doSlash($s)."'" : filterFrontPage()).
-				'and Status=4 and Posted < now() order by Posted desc limit 1');
+				'and Status=4 and Posted < now() and (now() <= Expires or Expires = '.NULLDATETIME.') order by Posted desc limit 1');
 			if ($current) {
 				$id = $current['ID'];
 				$Posted = $current['Posted'];

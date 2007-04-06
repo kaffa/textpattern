@@ -5,6 +5,7 @@
  */
 
 	define('DB_AUTOINC', 'SERIAL NOT NULL');
+	define('NULLDATETIME', 'allballs');
 
 function db_connect($host, $user, $pass, $dbname='') {
 	global $mdb_res;

@@ -56,6 +56,10 @@ $LastChangedRevision$
 				$sort_sql = 'Posted '.$dir;
 			break;
 
+			case 'expires':
+				$sort_sql = 'Expires '.$dir;
+			break;
+
 			case 'title':
 				$sort_sql = 'Title '.$dir.', Posted desc';
 			break;
@@ -150,7 +154,7 @@ $LastChangedRevision$
 
 		echo n.list_search_form($crit, $search_method);
 
-		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted', 'textpattern',
+		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted, unix_timestamp(Expires) as expires', 'textpattern',
 			"$criteria order by $sort_sql limit $offset, $limit"
 		);
 
@@ -179,6 +183,7 @@ $LastChangedRevision$
 				n.tr(
 					n.column_head('ID', 'id', 'list', true, $switch_dir, $crit, $search_method).
 					column_head('posted', 'posted', 'list', true, $switch_dir, $crit, $search_method).
+					column_head('expires', 'expires', 'list', true, $switch_dir, $crit, $search_method, 'articles_detail').
 					column_head('title', 'title', 'list', true, $switch_dir, $crit, $search_method).
 					column_head('section', 'section', 'list', true, $switch_dir, $crit, $search_method).
 					column_head('category1', 'category1', 'list', true, $switch_dir, $crit, $search_method, 'articles_detail').
@@ -249,6 +254,10 @@ $LastChangedRevision$
 						safe_strftime('%d %b %Y %X', $posted)
 					).
 
+					td(
+						($expires != NULLDATETIME) ? safe_strftime('%d %b %Y %X', $expires) : '', '' ,'articles_detail'
+					).
+					
 					td($Title).
 
 					td(

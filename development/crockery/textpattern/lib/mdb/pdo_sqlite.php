@@ -22,6 +22,7 @@
 # PDO::ATTR_DRIVER_NAME
 
 define('DB_AUTOINC', 'INTEGER');
+define('NULLDATETIME', 0); /* @todo: add a PDO specific constant for 'no date' */
 
 if (!extension_loaded('pdo') && !load_extension('pdo')) {
 	die("PDO extension not loaded");

@@ -44,7 +44,9 @@ $LastChangedRevision: 2062 $
 			$rs = safe_rows_start(
 				"*, ID as thisid, unix_timestamp(Posted) as uPosted, unix_timestamp(LastMod) as uLastMod",
 				"textpattern",
-				"Status=4 and Posted <= now() ".join(' ',$query)." order by Posted desc limit $limit"
+				"Status=4 and Posted <= now() ".join(' ',$query).
+				"and Posted < now() and (now() <= Expires or Expires = ".NULLDATETIME.") ".
+				"order by Posted desc limit $limit"
 			);
 
 			return render_feed($rs, $area, $type, $sitename, $self_ref, $id_ext);
