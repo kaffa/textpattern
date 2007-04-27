@@ -137,7 +137,7 @@ $LastChangedRevision: 1008 $
 		}
 
 		return join('',array(
-			'<form action="index.php" method="post" onsubmit="return confirm(\''.gTxt('confirm_delete_popup').'\');">',
+			'<form class="delete" action="index.php" method="post" onsubmit="return confirm(\''.gTxt('confirm_delete_popup').'\');">',
 			fInput('submit','','&#215;','smallerbox'),
 			eInput($event).sInput($step),
 			hInput($thing,$value),
@@ -250,7 +250,6 @@ $LastChangedRevision: 1008 $
 	}
 	
 // -------------------------------------------------------------
-
 	function stackRows() {
 		foreach (func_get_args() as $a) {
 			$o[] = n.tr($a.n);
@@ -468,12 +467,11 @@ $LastChangedRevision: 1008 $
 	}
 
 // -------------------------------------------------------------
-
-	function pageby_form($event, $val) 
+	function pageby_form($event, $val)
 	{
 		$vals = array(
-			15  => 15, 
-			25  => 25, 
+			15  => 15,
+			25  => 25,
 			50  => 50,
 			100 => 100
 		);
@@ -488,10 +486,10 @@ $LastChangedRevision: 1008 $
 			eInput($event).
 			sInput($event.'_change_pageby').
 			'<noscript> <input type="submit" value="'.gTxt('go').'" class="smallerbox" /></noscript>'
-		, '', '', 'pageby-form');
+		, '', '', 'post', 'pageby-form');
 	}
-// -------------------------------------------------------------
 
+// -------------------------------------------------------------
 	function upload_form($label, $pophelp, $step, $event, $id = '', $max_file_size = '1000000', $label_id = '', $class = 'upload-form')
 	{
 		global $sort, $dir, $page, $search_method, $crit;
