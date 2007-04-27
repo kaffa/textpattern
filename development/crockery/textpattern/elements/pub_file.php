@@ -14,8 +14,15 @@ function file_download_send($event, $step) {
 	extract($pretext);
 
 	// we are dealing with a download
-	if (@$s == 'file_download') {
-		if (!isset($file_error)) {
+#	if (@$s == 'file_download') {
+
+	$file_error = 0;
+	$file = safe_row('*', 'txp_file', "id='".doSlash($pretext['tail'][1])."' and status >= 4");
+	if (!$file)
+		$file_error = 404;
+
+		if (!$file_error) {
+			extract($file);
 
 				$fullpath = build_file_path($file_base_path,$filename);
 
@@ -45,14 +52,14 @@ function file_download_send($event, $step) {
 							$pretext['request_uri'] .= "#aborted-at-".floor($sent*100/$filesize)."%";
 							logit();
 						}
-					}      				
+					}
 				} else {
 					$file_error = 404;
 				}
-		}
+#		}
 
 		// deal with error
-		if (isset($file_error)) {
+		if ($file_error) {
 			switch($file_error) {
 			case 403:
 				header('HTTP/1.0 403 Forbidden');
