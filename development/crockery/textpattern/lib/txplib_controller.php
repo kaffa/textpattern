@@ -24,18 +24,9 @@ class ZemAdminController {
 	function event_handler($event, $step) {
 		// the generic event handler
 
-		$this->event = $event;
-		if (!$step)
-			$step = $this->default_step;
-		$this->_set_view($step);
-
-		if ($this->_method() == 'POST') {
-			// call $this->{$step}_post() if it exists
-			$step_post = "{$step}_post";
-			if (is_callable(array(&$this, $step_post))) {
-				$this->$step_post();
-			}
-		}
+		$this->init($event, $step);
+		
+		$this->post_handler($event, $step);
 
 		// now call $this->{$this->_step}_view()
 		$step_view = "{$this->_step}_view";
@@ -50,6 +41,24 @@ class ZemAdminController {
 		else {
 			txp_die('404 Not Found');
 		}
+
+	}
+
+	function post_handler($event, $step) {
+		if ($this->_method() == 'POST') {
+			// call $this->{$step}_post() if it exists
+			$step_post = "{$step}_post";
+			if (is_callable(array(&$this, $step_post))) {
+				$this->$step_post();
+			}
+		}
+	}
+
+	function init($event, $step) {
+		$this->event = $event;
+		if (!$step)
+			$step = $this->default_step;
+		$this->_set_view($step);
 
 	}
 
@@ -128,6 +137,17 @@ class ZemAdminController {
 		$this->_message($msg, 'error');
 	}
 
+	function get_last_message($type='message') {
+		foreach (array_reverse($this->_messages) as $m) {
+			if ($m[0] == $type)
+				return $m[1];
+		}
+	}
+
+	function get_last_error() {
+		return $this->get_last_message('error');
+	}
+
 	// GET/POST values
 
 	// GET or POST
@@ -161,6 +181,43 @@ class ZemAdminController {
 		trigger_error(gTxt('post_var_not_int', array('{name}' => $name, '{val}' => $i)));
 		return $default;
 	}
+	
+	function pageby_form()
+	{
+		global $prefs;
+
+		$vals = array(
+			15  => 15,
+			25  => 25,
+			50  => 50,
+			100 => 100
+		);
+
+		$val = @$prefs[$this->event.'_list_pageby'];
+
+		$select_page = selectInput('qty', $vals, $val,'', 1);
+
+		// proper localisation
+		$page = str_replace('{page}', $select_page, gTxt('view_per_page'));
+
+		return form(
+			$page.
+			eInput($this->event).
+			sInput('change_pageby').
+			'<noscript> <input type="submit" value="'.gTxt('go').'" class="smallerbox" /></noscript>'
+		, '', '', 'post', 'pageby-form');
+	}
+
+	
+// -------------------------------------------------------------
+// default post handler for pageby form
+	function change_pageby_post()
+	{
+		event_change_pageby($this->event);
+		$this->_set_view($this->default_step);
+	}
+
+
 }
 
 function register_controller($classname, $event) {
