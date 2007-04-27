@@ -132,15 +132,16 @@ $LastChangedRevision: $
 					else
 						$inside .= $chunk;
 
-					array_push($stack, $m[2]);
+					array_push($stack, $m);
 				}
 				elseif ($m[1] == '/' and $m[4] == '') {
 					// closing tag
-					if (@array_pop($stack) != $m[2])
+					$pop = @array_pop($stack);
+					if (!$pop or $pop[2] != $m[2])
 						trigger_error(gTxt('parse_tag_mismatch', array('code', $chunk)));
 					
 					if (empty($stack)) {
-						$out .= processTags(array('blah', $tag[2], $tag[3], '', $inside));
+						$out .= processTags(array($m[0], $tag[2], $tag[3], '', $inside));
 						$inside = '';
 					}
 					else
@@ -149,7 +150,7 @@ $LastChangedRevision: $
 				elseif ($m[1] == '' and $m[4] == '/') {
 					// self closing
 						if (empty($stack))
-							$out .= processTags(array('blah', $m[2], $m[3]));
+							$out .= processTags(array($m[0], $m[2], $m[3]));
 						else
 							$inside .= $chunk;
 				}
@@ -169,7 +170,7 @@ $LastChangedRevision: $
 			$out .= $inside;
 
 		foreach ($stack as $t)
-			trigger_error(gTxt('parse_tag_unclosed', array('tag', $t)));
+			trigger_error(gTxt('parse_tag_unclosed', array('tag', $t[2])));
 
 		return $out;
 	}
