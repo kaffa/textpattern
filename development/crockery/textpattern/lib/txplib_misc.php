@@ -941,17 +941,9 @@ $LastChangedRevision: 1127 $
  * events to multiedit forms.
  */
 
- 	function event_category_popup($name, $cat = '', $id = '')
+ 	function event_category_popup($type, $cat = '', $id = '')
 	{
-		$arr = array('');
-		$rs = getTree('root', $name);
-
-		if ($rs)
-		{
-			return treeSelectInput('category', $rs, $cat, $id);
-		}
-
-		return false;
+		return categorySelectInput($type, 'category', $cat, $id);
 	}
 
 // ------------------------------------------------------------- 	
