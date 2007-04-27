@@ -90,7 +90,7 @@ $LastChangedRevision: 952 $
 
 //-------------------------------------------------------------
 
-	function treeSelectInput($select_name = '', $array = '', $value = '', $select_id = '', $onchange = 0)
+	function treeSelectInput($select_name = '', $array = '', $value = '', $select_id = '', $onchange = 0, $allow_empty = 1, $key='id')
 	{
 		$out = array();
 
@@ -98,14 +98,14 @@ $LastChangedRevision: 952 $
 
 		foreach ($array as $a)
 		{
-			if ($a['name'] == 'root')
-			{
-				continue;
-			}
+#			if ($a['name'] == 'root')
+#			{
+#				continue;
+#			}
 
 			extract($a);
 
-			if ($name == $value)
+			if ($a[$key] == $value)
 			{
 				$sel = ' selected="selected"';
 				$selected = true;
@@ -118,24 +118,24 @@ $LastChangedRevision: 952 $
 
 			$sp = str_repeat(sp.sp, $level);
 
-			$out[] = n.t.'<option value="'.htmlspecialchars($name).'"'.$sel.'>'.$sp.htmlspecialchars($title).'</option>';
+			$out[] = n.t.'<option value="'.htmlspecialchars($a[$key]).'"'.$sel.'>'.$sp.htmlspecialchars($title).'</option>';
 		}
 
 		return n.'<select'.( $select_id ? ' id="'.$select_id.'" ' : '' ).' name="'.$select_name.'" class="list"'.
 			($onchange == 1 ? ' onchange="submit(this.form);"' : '').
 			'>'.
-			n.t.'<option value=""'.($selected == false ? ' selected="selected"' : '').'>&nbsp;</option>'.
+			($allow_empty ? n.t.'<option value=""'.($selected == false ? ' selected="selected"' : '').'>&nbsp;</option>' : ''). 
 			( $out ? join('', $out) : '').
 			n.'</select>';
 	}
 
 //-------------------------------------------------------------
-	function categorySelectInput($type, $name, $val, $id, $onchange=0, $parent='root')
+	function categorySelectInput($type, $name, $val, $id, $onchange=0, $parent_id=NULL)
 	{
-		$rs = getTree($parent, $type);
+		$rs = tree_get('txp_category', $parent_id, "parent > 0 and type='".doSlash($type)."'");
 
 		if ($rs) {
-			return treeSelectInput($name,$rs,$val, $id, $onchange);
+			return treeSelectInput($name,$rs,$val, $id, $onchange, 1, 'name');
 		}
 
 		return false;
@@ -150,7 +150,7 @@ $LastChangedRevision: 952 $
 					$onClick='',
 					$size='',
 					$tab='',
-					$id='') 
+					$id='')
 	{
 		$o  = '<input type="'.$type.'" name="'.$name.'"'; 
 		$o .= ' value="'.cleanfInput($value).'"';
