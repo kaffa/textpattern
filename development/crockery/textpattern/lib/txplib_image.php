@@ -57,7 +57,13 @@ function img_downsize($old_fn, $new_fn, $max_w, $max_h, $crop=0, $q=75, $interla
 		return false;
 	}
 
-	list($dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h) = img_newsize($old_w, $old_h, $max_w, $max_h, $crop);
+	$newsize = img_newsize($old_w, $old_h, $max_w, $max_h, $crop);
+	if (!$newsize) {
+		trigger_error('invalid_size', array('{w}' => $max_w, '{h}' => $max_h));
+		return false;
+	}
+
+	list($dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h) = $newsize;
 
 	$new_img = imagecreatetruecolor($dst_w, $dst_h);
 	if (imagecopyresampled($new_img, $old_img, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h)) {
@@ -97,7 +103,7 @@ function img_fit($old_w, $old_h, $max_w, $max_h) {
 
 function img_makethumb($id, $w, $h, $crop) {
 	$rs = safe_row("*", "txp_image", "id='".doSlash($id)."' limit 1");
-	if ($rs) {
+	if ($rs and intval($w) and intval($h)) {
 		if (img_downsize(IMPATH.$id.$rs['ext'], IMPATH.$id.'t'.$rs['ext'], $w, $h, $crop))
 			return safe_update("txp_image", "thumbnail='1'", "id='".doSlash($id)."'");
 	}
