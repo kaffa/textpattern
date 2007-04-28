@@ -52,9 +52,9 @@ $LastChangedRevision$
 
 	function link_list($message = '') 
 	{
-		global $step, $link_list_pageby;
+		global $step, $link_list_pageby, $prefs;
 
-		extract(get_prefs());
+		extract($prefs);
 
 		extract(gpsa(array('page', 'sort', 'dir', 'crit', 'search_method')));
 
@@ -403,7 +403,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function link_change_pageby() 
+	function link_change_pageby()
 	{
 		event_change_pageby('link');
 		link_edit();

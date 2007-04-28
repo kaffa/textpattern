@@ -34,11 +34,11 @@ $LastChangedRevision$
 
 	function list_list($message = '', $post = '')
 	{
-		global $statuses, $comments_disabled_after, $step, $txp_user;
+		global $statuses, $comments_disabled_after, $step, $txp_user, $prefs;
 
 		pagetop(gTxt('tab_list'), $message);
 
-		extract(get_prefs());
+		extract($prefs);
 
 		extract(gpsa(array('page', 'sort', 'dir', 'crit', 'search_method')));
 
