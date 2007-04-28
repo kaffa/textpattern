@@ -41,16 +41,17 @@ $LastChangedRevision$
 	@ini_set("display_errors","1");
 
 	include_once txpath.'/lib/constants.php';
-	include txpath.'/lib/mdb.php';
-	include txpath.'/lib/txplib_db.php';
-	include txpath.'/lib/txplib_prefs.php';
-	include txpath.'/lib/txplib_forms.php';
-	include txpath.'/lib/txplib_html.php';
+	include_once txpath.'/lib/mdb.php';
+	include_once txpath.'/lib/txplib_db.php';
+	include_once txpath.'/lib/txplib_prefs.php';
+	include_once txpath.'/lib/txplib_forms.php';
+	include_once txpath.'/lib/txplib_html.php';
 	include_once txpath.'/lib/txplib_misc.php';
-	include txpath.'/lib/txplib_element.php';
-	include txpath.'/lib/txplib_class.php';
-	include txpath.'/lib/admin_config.php';
-	include txpath.'/lib/txplib_controller.php';
+	include_once txpath.'/lib/txplib_element.php';
+	include_once txpath.'/lib/txplib_class.php';
+	include_once txpath.'/lib/admin_config.php';
+	include_once txpath.'/lib/txplib_controller.php';
+	include_once txpath.'/lib/txplib_section.php';
 
 	$microstart = getmicrotime();
 
@@ -58,6 +59,7 @@ $LastChangedRevision$
 
 		$dbversion = safe_field('val','txp_prefs',"name = 'version'");
 
+		// global site prefs
 		$prefs = get_prefs();
 		extract($prefs);
 
@@ -65,7 +67,7 @@ $LastChangedRevision$
 			$siteurl = $_SERVER['HTTP_HOST'] . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/');
 		if (empty($path_to_site))
 			updateSitePath(dirname(dirname(__FILE__)));
-	
+
 		define("LANG",$language);
 		//i18n: define("LANG","en-gb");
 		define('txp_version', $thisversion);
@@ -81,10 +83,14 @@ $LastChangedRevision$
 		include txpath.'/include/txp_auth.php';
 		doAuth();
 
+		// individual user prefs
+		$prefs = get_user_prefs() + $prefs;
+
 		build_element_list($elements_main);
 		if ($elements_aux)
 			build_element_list($elements_aux);
 		load_elements('init');
+		register_element_tabs();
 
 		$event = (gps('event') ? gps('event') : 'article');
 		$step = gps('step');
