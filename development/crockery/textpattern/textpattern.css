@@ -167,6 +167,10 @@ form.upload-form {
 text-align: center;
 }
 
+form.delete {
+display: inline;
+}
+
 input.cancel, input.delete,
 input.interbox, input.interbox2,
 input.navbox,
@@ -542,6 +546,20 @@ p#tagbuilder-output {
 margin-top: 10px;
 text-align: center;
 }
+
+/* view
+----------------------------------------------- */
+#main-view {
+	padding: 0 100px 0 100px;
+}
+#main-view fieldset {
+	width: 300px;
+	margin: 15px auto;
+}
+#main-view table {
+	margin: 10px;
+}
+
 
 /* preferences
 ----------------------------------------------- */
