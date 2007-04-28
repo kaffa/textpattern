@@ -31,7 +31,7 @@ class FileController extends ZemAdminController {
 	var $event = 'file';
 	var $default_step = 'list';
 	
-	var $file_statuses = array(
+	var $statuses = array(
 			2 => 'hidden',
 			3 => 'pending',
 			4 => 'live',
@@ -40,7 +40,7 @@ class FileController extends ZemAdminController {
 
 	function file_statuses() {
 		$out = array();
-		foreach ($this->file_statuses as $k=>$v)
+		foreach ($this->statuses as $k=>$v)
 			$out[$k] = gTxt($v);
 		return $out;
 	}
@@ -48,10 +48,10 @@ class FileController extends ZemAdminController {
 
 	function list_view($message = '')
 	{
-		global $txpcfg, $extensions, $file_base_path;
+		global $txpcfg, $extensions, $file_base_path, $prefs;
 
 		extract($txpcfg);
-		extract(get_prefs());
+		extract($prefs);
 
 		extract(gpsa(array('page', 'sort', 'dir', 'crit', 'search_method')));
 
@@ -264,10 +264,10 @@ class FileController extends ZemAdminController {
 
 			nav_form('file', $page, $numPages, $sort, $dir, $crit, $search_method).
 
-			pageby_form('file', $file_list_pageby);
+			$this->pageby_form();
 		}
 	}
-	
+
 // -------------------------------------------------------------
 
 	function file_search_form($crit, $method)
@@ -336,13 +336,15 @@ class FileController extends ZemAdminController {
 
 
 			$form = '';
+			#categorySelectInput($type, $name, $val, $id
 
 			if ($file_exists) {
 				$form =	tr(
 							td(
 								form(
-									graf(gTxt('file_category').br.treeSelectInput('category',
-									 		$categories,$category)) .
+									graf(gTxt('file_category').br.
+#										treeSelectInput('category',$categories,$category)) .
+										categorySelectInput('file', 'category', $category, 'file_category')).
 //									graf(gTxt('permissions').br.selectInput('perms',$levels,$permissions)).
 									graf(gTxt('description').br.text_area('description','100','400',$description)) .
 									fieldset(radio_list('status', $this->file_statuses(), $status, 4), gTxt('status'), 'file-status').
@@ -408,7 +410,7 @@ class FileController extends ZemAdminController {
 	}
 
 // -------------------------------------------------------------
-	function file_db_add($filename,$category,$permissions,$description,$size)
+	function file_db_add($filename,$category,$permissions,$description,$size='0')
 	{
 		$rs = safe_insert("txp_file",
 			"filename = '$filename',
@@ -738,17 +740,6 @@ class FileController extends ZemAdminController {
 		return upload_form($label, $pophelp, $step, 'file', $id, $max_file_size);
 	}
 
-// -------------------------------------------------------------
-	function change_pageby_post()
-	{
-		event_change_pageby('file');
-	}
-
-// -------------------------------------------------------------
-	function change_pageby_view()
-	{
-		$this->list_view();
-	}
 
 // -------------------------------------------------------------
 
