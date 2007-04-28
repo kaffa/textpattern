@@ -34,12 +34,12 @@ $LastChangedRevision$
 
 	function image_list($message = '')
 	{
-		global $txpcfg, $extensions, $img_dir, $file_max_upload_size;
+		global $txpcfg, $extensions, $img_dir, $file_max_upload_size, $prefs;
 
 		pagetop(gTxt('images'), $message);
 
 		extract($txpcfg);
-		extract(get_prefs());
+		extract($prefs);
 
 		extract(gpsa(array('page', 'sort', 'dir', 'crit', 'search_method')));
 
@@ -298,7 +298,7 @@ $LastChangedRevision$
 							fInput('text', 'name', $name, 'edit', '', '', '', '', 'image-name')).
 
 						graf('<label for="image-category">'.gTxt('image_category').'</label>'.br.
-							treeSelectInput('category', $categories, $category, 'image-category')).
+							categorySelectInput('image', 'category', $category, 'image-category')).
 
 						graf('<label for="alt-text">'.gTxt('alt_text').'</label>'.br.
 							fInput('text', 'alt', $alt, 'edit', '', '', 50, '', 'alt-text')).
