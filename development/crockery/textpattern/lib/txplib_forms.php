@@ -290,7 +290,7 @@ $LastChangedRevision: 952 $
 //--------------------------------------------------------------
 	function tsi($name,$datevar,$time,$tab='')
 	{
-		$size = ($name=='year') ? 4 : 2;
+		$size = ($name=='year' or $name=='exp_year') ? 4 : 2;
 
 		return n.'<input type="text" name="'.$name.'" value="'.
 			safe_strftime($datevar, $time)

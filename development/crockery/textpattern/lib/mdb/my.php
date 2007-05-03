@@ -5,7 +5,8 @@
  */
 
 	define('DB_AUTOINC', 'BIGINT NOT NULL AUTO_INCREMENT');
-	
+	define('NULLDATETIME', 0);
+
 class MDB_my extends MDB {
 
 	function connect($host, $user, $pass, $dbname='') {

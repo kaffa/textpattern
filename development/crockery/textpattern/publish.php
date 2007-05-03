@@ -635,7 +635,7 @@ $LastChangedRevision$
 			$pgoffset = $offset;
 		}
 
-		$rs = safe_rows_start("*, unix_timestamp(Posted) as uPosted".$match, 'textpattern', 
+		$rs = safe_rows_start("*, unix_timestamp(Posted) as uPosted, unix_timestamp(Expires) as uExpires".$match, 'textpattern', 
 		$where. ' order by '.doslash($sort).' '.$DB->limit(intval($limit),  intval($pgoffset)));
 		// alternative form override for search or list
 		if ($q and !$iscustom and !$issticky)
