@@ -104,7 +104,7 @@ register_callback('article_event', 'article', '', 1);
 
 		if ($expires != NULLDATETIME) {
 			if ($expires <= $when_ts) {
-				article_edit(gTxt('article_expires_before_postdate'));
+				article_edit(gTxt('article_expires_before_postdate'), 'error');
 				return;
 			}
 		}
@@ -219,7 +219,7 @@ register_callback('article_event', 'article', '', 1);
 
 		if ($expires != NULLDATETIME) {
 			if ($expires <= $when_ts) {
-				article_edit(gTxt('article_expires_before_postdate'));
+				article_edit(gTxt('article_expires_before_postdate'), 'error');
 				return;
 			}
 		}
@@ -286,7 +286,7 @@ register_callback('article_event', 'article', '', 1);
 	}
 
 //--------------------------------------------------------------
-	function article_edit($message="")
+	function article_edit($message="", $msgclass="")
 	{
 		global $txpcfg,$txp_user,$article_vars,$prefs;
 
@@ -343,7 +343,7 @@ register_callback('article_event', 'article', '', 1);
 
 		$GLOBALS['step'] = $step;
 
-		pagetop($article['Title'], $message);
+		pagetop($article['Title'], $message, $msgclass);
 		if ($step == 'create') {
 			$markup_body = $markup_default;
 			$markup_excerpt = $markup_default;
