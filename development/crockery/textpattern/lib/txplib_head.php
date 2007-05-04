@@ -6,7 +6,7 @@ $LastChangedRevision: 1098 $
 */
 
 // -------------------------------------------------------------
-	function pagetop($pagetitle,$message="")
+	function pagetop($pagetitle,$message="",$msgclass="")
 	{
 		global $css_mode,$siteurl,$sitename,$txp_user,$event;
 		$area = gps('area');
@@ -168,7 +168,7 @@ $LastChangedRevision: 1098 $
  		<?php
  		if (!$bm) {
 			echo '<table cellpadding="0" cellspacing="0" align="center"><tr>
-  <td valign="middle" style="width:368px">&nbsp;'.$message.'</td>';
+  <td id="messagepane" valign="middle" '.(empty($msgclass) ? '' : 'class="'.$msgclass.'"').'">&nbsp;'.$message.'</td>';
 
   			foreach (areas() as $a => $tabs) {
 				if ($tabs and has_privs("tab.{$a}"))
