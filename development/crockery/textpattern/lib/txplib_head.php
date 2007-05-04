@@ -168,7 +168,7 @@ $LastChangedRevision: 1098 $
  		<?php
  		if (!$bm) {
 			echo '<table cellpadding="0" cellspacing="0" align="center"><tr>
-  <td id="messagepane" valign="middle" '.(empty($msgclass) ? '' : 'class="'.$msgclass.'"').'">&nbsp;'.$message.'</td>';
+  <td id="messagepane" valign="middle" '.(empty($msgclass) ? '' : 'class="'.$msgclass.'"').'>&nbsp;'.$message.'</td>';
 
   			foreach (areas() as $a => $tabs) {
 				if ($tabs and has_privs("tab.{$a}"))
