@@ -5,6 +5,8 @@ $HeadURL: http://svn.textpattern.com/development/crockery/textpattern/lib/txplib
 $LastChangedRevision: 952 $
 */
 
+include_once(txpath.'/lib/txplib_tree.php');
+
 //-------------------------------------------------------------
 
 	function yesnoRadio($field, $var, $tabindex = '', $id = '')
