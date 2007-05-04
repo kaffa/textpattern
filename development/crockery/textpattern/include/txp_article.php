@@ -647,10 +647,9 @@ register_callback('article_event', 'article', '', 1);
 					n.n.graf(
 						'<label for="comment-invite">'.gTxt('comment_invitation').'</label>'.br.
 						fInput('text', 'AnnotateInvite', $AnnotateInvite, 'edit', '', '', '', '', 'comment-invite')
-					).
-
-				n.n.'</fieldset>';
+					);
 				}
+				echo n.n.'</fieldset>';
 			}
 
 			if ($step == "create" and empty($GLOBALS['ID']))
