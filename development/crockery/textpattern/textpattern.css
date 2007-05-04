@@ -412,6 +412,15 @@ td.tabup a {
 cursor: default;
 }
 
+td#messagepane {
+width: 368px;
+}
+
+td#messagepane.error {
+color: white;
+background-color: #f04040;
+}
+
 /* setup
 ----------------------------------------------- */
 
