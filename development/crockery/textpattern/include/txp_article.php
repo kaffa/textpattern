@@ -668,7 +668,7 @@ register_callback('article_event', 'article', '', 1);
 					n.graf(gTxt('or_publish_at').sp.popHelp('timestamp')).
 
 					n.graf(gtxt('date').sp.
-						tsi('year', '%Y', $persist_timestamp).' / '.
+						tsi('year', '%Y', $persist_timestamp, '', 4).' / '.
 						tsi('month', '%m', $persist_timestamp).' / '.
 						tsi('day', '%d', $persist_timestamp)
 					).
@@ -690,7 +690,7 @@ register_callback('article_event', 'article', '', 1);
 				echo n.n.fieldset(
 
 					n.graf(gtxt('date').sp.
-						tsi('exp_year', '%Y', $persist_timestamp).' / '.
+						tsi('exp_year', '%Y', $persist_timestamp, '', 4).' / '.
 						tsi('exp_month', '%m', $persist_timestamp).' / '.
 						tsi('exp_day', '%d', $persist_timestamp)
 					).
@@ -729,7 +729,7 @@ register_callback('article_event', 'article', '', 1);
 					n.graf(gTxt('published_at').sp.popHelp('timestamp')).
 
 					n.graf(gtxt('date').sp.
-						tsi('year', '%Y', $sPosted).' / '.
+						tsi('year', '%Y', $sPosted, '', 4).' / '.
 						tsi('month', '%m', $sPosted).' / '.
 						tsi('day', '%d', $sPosted)
 					).
@@ -762,7 +762,7 @@ register_callback('article_event', 'article', '', 1);
 				echo n.n.fieldset(
 
 					n.graf(gtxt('date').sp.
-						tsi('exp_year', '%Y', $sExpires).' / '.
+						tsi('exp_year', '%Y', $sExpires, '', 4).' / '.
 						tsi('exp_month', '%m', $sExpires).' / '.
 						tsi('exp_day', '%d', $sExpires)
 					).

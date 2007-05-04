@@ -290,13 +290,12 @@ include_once(txpath.'/lib/txplib_tree.php');
 	}
 
 //--------------------------------------------------------------
-	function tsi($name,$datevar,$time,$tab='')
+	function tsi($name,$datevar,$time,$tab='',$size=2)
 	{
-		$size = ($name=='year' or $name=='exp_year') ? 4 : 2;
-
+		$s = ($time == NULLDATETIME) ? '' : safe_strftime($datevar, $time);
 		return n.'<input type="text" name="'.$name.'" value="'.
-			safe_strftime($datevar, $time)
-		.'" size="'.$size.'" maxlength="'.$size.'" class="edit" tabindex="'.$tab.'" title="'.gTxt('article_'.$name).'" />';
+			$s
+		.'" size="'.$size.'" maxlength="'.$size.'" class="edit"'.(empty($tab) ? '' : ' tabindex="'.$tab.'"').' title="'.gTxt('article_'.$name).'" />';
 	}
 
 ?>
