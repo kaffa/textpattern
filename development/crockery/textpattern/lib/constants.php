@@ -24,6 +24,9 @@ if (defined('DIRECTORY_SEPARATOR'))
 else
 	define ('DS', (is_windows() ? '\\' : '/'));
 
+// used to allow a double quote in ini file values
+define('DQUOTE', '"');
+
 define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
 
 define('prefs_dir', 'prefs');
