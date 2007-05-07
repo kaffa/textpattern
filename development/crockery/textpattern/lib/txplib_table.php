@@ -302,6 +302,20 @@ class zem_table {
 		return false;
 	}
 
+// -------------------------------------------------------------
+// save a single row identified by a private key (or a zero value for insert)
+	function save($key, $row) {
+		if ($key)
+			return $this->update($row, array($this->_primary_key => $key));
+		else
+			return $this->insert($row);
+	}
+
+// -------------------------------------------------------------
+// get a single row identified by its primary key
+	function get($key) {
+		return $this->row(array($this->_primary_key => $key));
+	}
 
 }
 
