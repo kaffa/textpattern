@@ -32,6 +32,7 @@ class txp_article_table extends zem_table {
 	var $_cols = array(
 		'id' => ZEM_PRIMARY_KEY,
 		'posted' => ZEM_DATETIME,
+		'expires' => ZEM_DATETIME, // @todo NOT NULL default '0000-00-00 00:00:00'
 		'author_id' => ZEM_FOREIGN_KEY,
 		'lastmod' => ZEM_DATETIME,
 		'lastmod_id' => ZEM_FOREIGN_KEY,
@@ -74,6 +75,7 @@ class txp_article_table extends zem_table {
 		# to prefix or not prefix new/existing indexes?
 		unsafe_upgrade_index($this->_table_name,'categories_idx','','Category1,Category2');
 		unsafe_upgrade_index($this->_table_name,'Posted','','Posted');
+		unsafe_upgrade_index($this->_table_name,'expires_idx','','expires');
 		if (MDB_TYPE == 'my') unsafe_upgrade_index($this->_table_name,'searching','fulltext','Title,Body');
 	}
 
