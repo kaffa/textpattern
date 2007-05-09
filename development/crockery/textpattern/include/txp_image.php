@@ -55,14 +55,10 @@ $LastChangedRevision$
 			echo upload_form(gTxt('upload_image'), 'upload', 'image_insert', 'image', '', $file_max_upload_size);
 		}
 
-		$dir = ($dir == 'desc') ? 'desc' : 'asc';
+		$dir = ($dir == 'asc') ? 'asc' : 'desc';
 
 		switch ($sort)
 		{
-			case 'id':
-				$sort_sql = 'id '.$dir;
-			break;
-
 			case 'name':
 				$sort_sql = 'name '.$dir;
 			break;
@@ -84,7 +80,7 @@ $LastChangedRevision$
 			break;
 
 			default:
-				$dir = 'desc';
+				$sort = 'id';
 				$sort_sql = 'id '.$dir;
 			break;
 		}
@@ -154,14 +150,14 @@ $LastChangedRevision$
 		{
 			echo n.n.startTable('list').
 				n.tr(
-					column_head('ID', 'id', 'image', true, $switch_dir, $crit, $search_method).
+					column_head('ID', 'id', 'image', true, $switch_dir, $crit, $search_method, ('id' == $sort) ? $dir : '').
 					hCell().
-					column_head('date', 'date', 'image', true, $switch_dir, $crit, $search_method).
-					column_head('name', 'name', 'image', true, $switch_dir, $crit, $search_method).
-					column_head('thumbnail', 'thumbnail', 'image', true, $switch_dir, $crit, $search_method).
+					column_head('date', 'date', 'image', true, $switch_dir, $crit, $search_method, ('date' == $sort) ? $dir : '').
+					column_head('name', 'name', 'image', true, $switch_dir, $crit, $search_method, ('name' == $sort) ? $dir : '').
+					column_head('thumbnail', 'thumbnail', 'image', true, $switch_dir, $crit, $search_method, ('thumbnail' == $sort) ? $dir : '').
 					hCell(gTxt('tags')).
-					column_head('image_category', 'category', 'image', true, $switch_dir, $crit, $search_method).
-					column_head('author', 'author', 'image', true, $switch_dir, $crit, $search_method).
+					column_head('image_category', 'category', 'image', true, $switch_dir, $crit, $search_method, ('category' == $sort) ? $dir : '').
+					column_head('author', 'author', 'image', true, $switch_dir, $crit, $search_method, ('author' == $sort) ? $dir : '').
 					hCell()
 				);
 
@@ -267,7 +263,8 @@ $LastChangedRevision$
 			tr(
 				td(
 					'<img src="'.hu.$img_dir.
-						'/'.$id.$ext.'" height="'.$h.'" width="'.$w.'" alt="" />'.
+						'/'.$id.$ext.'" height="'.$h.'" width="'.$w.'" alt="" '.
+						"title='$id$ext ($w &#215; $h)' />".
 						br.upload_form(gTxt('replace_image'),'replace_image_form',
 							'image_replace','image',$id,$file_max_upload_size, 'image-replace', '')
 				)
@@ -287,8 +284,8 @@ $LastChangedRevision$
 				)
 			),
 
-			(function_exists("imagecreatefromjpeg"))
-			?	thumb_ui( $id )
+			(check_gd($ext))
+			?	thumb_ui($id, $thumbnail)
 			:	'',
 
 			tr(
@@ -353,11 +350,18 @@ $LastChangedRevision$
 	{	
 		global $txpcfg,$extensions,$txp_user;
 		extract($txpcfg);
-		$id = gps('id');
-		
-		$img_result = image_data($_FILES['thefile'], '', $id);
-		
 
+		$id = assert_int(gps('id'));
+		$rs = safe_row("*", "txp_image", "id = $id");
+		
+		if ($rs) {
+			$meta = array('category' => $rs['category'], 'caption' => $rs['caption'], 'alt' => $rs['alt']);
+		} else {
+			$meta = '';
+		} 
+
+		$img_result = image_data($_FILES['thefile'], $meta, $id);
+		
 		if(is_array($img_result))
 		{
 			list($message, $id) = $img_result;
@@ -460,7 +464,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function thumb_ui($id)
+	function thumb_ui($id,$thumbnail)
 	{		
 		global $prefs, $sort, $dir, $page, $search_method, $crit;
 		extract($prefs);
@@ -484,8 +488,8 @@ $LastChangedRevision$
 						, ' class="noline" style="vertical-align: top;"').
 
 						tda(
-							graf(fInput('submit', 'create', gTxt('create'), 'smallerbox').sp.
-								fInput('submit', 'remove', gTxt('remove'), 'smallerbox')).
+							graf(fInput('submit', 'create', gTxt('create'), 'smallerbox').
+							($thumbnail ? sp.fInput('submit', 'remove', gTxt('remove'), 'smallerbox') : '')).
 
 							graf(fInput('submit', 'clear_settings', gTxt('clear_settings'), 'smallerbox'))
 						, ' colspan="6" class="noline"')

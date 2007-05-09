@@ -103,11 +103,43 @@ function img_fit($old_w, $old_h, $max_w, $max_h) {
 
 function img_makethumb($id, $w, $h, $crop) {
 	$rs = safe_row("*", "txp_image", "id='".doSlash($id)."' limit 1");
-	if ($rs and intval($w) and intval($h)) {
+	if ($rs and (intval($w) or intval($h))) {
 		if (img_downsize(IMPATH.$id.$rs['ext'], IMPATH.$id.'t'.$rs['ext'], $w, $h, $crop))
 			return safe_update("txp_image", "thumbnail='1'", "id='".doSlash($id)."'");
 	}
 	return false;
+}
+
+// check GD info
+function check_gd($image_type) {
+	// GD is installed
+	if (function_exists('gd_info')) {
+		$gd_info = gd_info();
+
+		switch ($image_type) {
+			// check gif support
+			case '.gif':
+				return ($gd_info['GIF Create Support'] == 1) ? true : false;
+			break;
+
+			// check png support
+			case '.png':
+				return ($gd_info['PNG Support'] == 1) ? true : false;
+			break;
+
+			// check jpg support
+			case '.jpg':
+				return ($gd_info['JPG Support'] == 1) ? true : false;
+			break;
+
+			// unsupported format
+			default:
+				return false;
+			break;
+		}
+	} else { // GD isn't installed
+		return false;
+	}
 }
 
 ?>
