@@ -26,7 +26,7 @@ define('elements_dir', 'elements');
 		$file = secpath($name.'.php', $dir);
 		
 		if ($file == false)
-			trigger_error("$file path is invalid ($dir)", E_USER_ERROR);
+			trigger_error("path for element '$name' is invalid ($dir)", E_USER_ERROR);
 
 		if (!is_file($file) or !is_readable($file))
 			trigger_error("$file is inaccessible", E_USER_ERROR);
