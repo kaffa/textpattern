@@ -12,6 +12,7 @@ $LastChangedRevision: 1944 $
 
 class ZemAdminController {
 	var $event = NULL;
+	var $caption = '';	// human-readable, i18n-aware name
 	var $default_step = 'default';
 
 	var $_messages = array();
@@ -71,7 +72,7 @@ class ZemAdminController {
 	}
 
 	function _render($out) {
-		pagetop(gTxt('sections'));
+		pagetop(gTxt($this->caption));
 
 		$msg = '';
 		foreach ($this->_messages as $m) {

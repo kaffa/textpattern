@@ -29,6 +29,7 @@ register_controller('FileController', 'file');
 class FileController extends ZemAdminController {
 	var $area = 'file';
 	var $event = 'file';
+	var $caption = 'file';
 	var $default_step = 'list';
 	
 	var $statuses = array(
