@@ -40,7 +40,7 @@ class ZemAdminController {
 			$this->_render($out);
 		}
 		else {
-			txp_die('404 Not Found');
+			trigger_error("Unhandled event '$event', step '$step_view'", E_USER_ERROR);
 		}
 
 	}
