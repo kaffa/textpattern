@@ -605,4 +605,88 @@ EOF;
 		return tag(trim(tag($legend, 'legend').n.$content), 'fieldset', $a_id);
 	}
 
+// -------------------------------------------------------------
+	function doWrap($list, $wraptag, $break, $class = '', $breakclass = '', $atts = '', $breakatts = '', $id = '')
+	{
+		if (!$list)
+		{
+			return '';
+		}
+
+		if ($id)
+		{
+			$atts .= ' id="'.$id.'"';
+		}
+
+		if ($class)
+		{
+			$atts .= ' class="'.$class.'"';
+		}
+		
+		if ($breakclass) 
+		{
+			$breakatts.= ' class="'.$breakclass.'"';
+		}
+
+		// non-enclosing breaks
+		if (!preg_match('/^\w+$/', $break) or $break == 'br' or $break == 'hr')
+		{
+			if ($break == 'br' or $break == 'hr')
+			{
+				$break = "<$break $breakatts/>".n;
+			}
+
+			return ($wraptag) ?	tag(join($break, $list), $wraptag, $atts) :	join($break, $list);
+		}
+
+		// enclosing breaks should be specified by name only, no '<' or '>'
+		if (($wraptag == 'ul' or $wraptag == 'ol') and empty($break))
+		{
+			$break = 'li';
+		}
+
+		return ($wraptag) ?
+			tag(n.t.tag(join("</$break>".n.t."<{$break}{$breakatts}>", $list), $break, $breakatts).n, $wraptag, $atts) :
+			tag(n.join("</$break>".n."<{$break}{$breakatts}>".n, $list).n, $break, $breakatts);
+	}
+
+// -------------------------------------------------------------
+	function doTag($content, $tag, $class = '', $atts = '', $id = '')
+	{
+		if ($id)
+		{
+			$atts .= ' id="'.$id.'"';
+		}
+
+		if ($class)
+		{
+			$atts .= ' class="'.$class.'"';
+		}
+
+		if (!$tag)
+		{
+			return $content;
+		}
+
+		return ($content) ? tag($content, $tag, $atts) : "<$tag $atts />";
+	}
+
+// -------------------------------------------------------------
+	function doLabel($label='', $labeltag='')
+	{
+		if ($label) {
+			return (empty($labeltag)? $label.'<br />' : tag($label, $labeltag));
+		}
+		return '';
+	}
+	
+// -------------------------------------------------------------
+	function eE($txt) // convert email address into unicode entities
+	{
+		 for ($i=0;$i<strlen($txt);$i++) { 
+			  $ent[] = "&#".ord(substr($txt,$i,1)).";"; 
+		 } 
+		 if (!empty($ent)) return join('',$ent); 
+	}
+
 ?>
