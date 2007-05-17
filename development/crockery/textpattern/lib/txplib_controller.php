@@ -71,8 +71,17 @@ class ZemAdminController {
 		return strtoupper(serverSet('REQUEST_METHOD'));
 	}
 
-	function _render($out) {
+	function _pagetop()
+	{
 		pagetop(gTxt($this->caption));
+	}
+	
+	function _pagebottom()
+	{
+	}
+	
+	function _render($out) {
+		$this->_pagetop();
 
 		$msg = '';
 		foreach ($this->_messages as $m) {
@@ -85,6 +94,8 @@ class ZemAdminController {
 			.$msg
 			.$out.n
 			.'</div>';
+
+		$this->_pagebottom();
 	}
 
 	function _dLink($step, $thing, $value, $verify=1) {
