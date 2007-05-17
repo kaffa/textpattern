@@ -31,6 +31,10 @@ define('elements_dir', 'elements');
 		if (!is_file($file) or !is_readable($file))
 			trigger_error("$file is inaccessible", E_USER_ERROR);
 
+		$style = secpath($name.'.css', $dir);
+		if (is_file($style) && is_readable($style))
+			$elements[$name]['stylesheet'] = hu.'textpattern/'.elements_dir.'/'.$name.'.css';
+
 		$elements[$name]['loaded'] = 1;
 		return include_once($file);
 	}
@@ -148,5 +152,17 @@ define('elements_dir', 'elements');
 
 	}
 
-
+// -------------------------------------------------------------
+	function get_element_style($event)
+	{
+		global $elements;
+		if (is_array($elements) && !empty($event)) {
+			foreach ($elements as $e) {
+				if($e['event'] == $event && !empty($e['stylesheet'])) {
+					return '<link href="'.$e['stylesheet'].'" rel="stylesheet" type="text/css" />';
+				}
+			}
+		}	
+		return '';
+	}
 ?>

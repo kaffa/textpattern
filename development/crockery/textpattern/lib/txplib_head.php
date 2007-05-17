@@ -31,6 +31,7 @@ $LastChangedRevision: 1098 $
 	<meta name="robots" content="noindex, nofollow" />
 	<title>Txp &#8250; <?php echo $sitename ?> &#8250; <?php echo $pagetitle?></title>
 	<link href="textpattern.css" rel="stylesheet" type="text/css" />
+	<?php echo n.get_element_style($event).n;?>
 	<script type="text/javascript" src="js/textpattern.js"></script>
 	<script type="text/javascript">
 	<!--
