@@ -6,6 +6,10 @@ event = "init"
 [txp_element]
 event = "element"
 
+[txp_image]
+event = "image"
+tabarea = "content"
+
 [txp_file]
 event = "file"
 tabarea = "content"
@@ -18,5 +22,6 @@ event = "pub_page"
 
 [include/txp_section]
 event = "section"
+
 
 ; */ ?>

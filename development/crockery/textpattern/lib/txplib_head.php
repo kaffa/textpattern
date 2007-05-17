@@ -225,7 +225,6 @@ $LastChangedRevision: 1098 $
 			'tab_write'    => 'article',
 			'tab_list'    =>  'list',
 			'tab_organise' => 'category',
-			'tab_image'    => 'image',
 			'tab_link'     => 'link',
 			'tab_comments' => 'discuss'
 		);
