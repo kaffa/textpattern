@@ -17,6 +17,7 @@ $LastChangedRevision$
 if (!defined('txpinterface')) die('txpinterface is undefined.');
 
 include_once(txpath.'/lib/txplib_controller.php');
+include_once(txpath.'/lib/txplib_view.php');
 include_once(txpath.'/lib/txplib_image.php');
 
 register_controller('ImageController', 'image');
@@ -32,6 +33,15 @@ class ImageController extends ZemAdminController
 	var $caption = 'images';
 	var $default_step = 'list';
 	var $extensions = array(0,'.gif','.jpg','.png','.swf');
+	var $context = array();
+
+	function ImageController()
+	{
+		parent::ZemAdminController();
+		$this->context = gpsa(array('page', 'sort', 'dir', 'crit', 'search_method'));
+		if(empty($this->context['sort'])) $this->context['sort'] = 'id';	
+		if($this->context['dir'] != 'asc') $this->context['dir'] = 'desc';	
+	}
 
 // -------------------------------------------------------------
 
@@ -40,18 +50,15 @@ class ImageController extends ZemAdminController
 		global $prefs;
 		extract($prefs);
 
-		extract(gpsa(array('page', 'sort', 'dir', 'crit', 'search_method')));
-	
+		$out = array();
+
 		if (!is_dir(IMPATH) or !is_writeable(IMPATH)) {
-			echo graf(
-				gTxt('img_dir_not_writeable', array('{imgdir}' => IMPATH))
-			,' id="warning"');
+			$this->_error(gTxt('img_dir_not_writeable', array('{imgdir}' => IMPATH)));
 		} else {
-			echo upload_form(gTxt('upload_image'), 'upload', 'insert', $this->event, '', $file_max_upload_size);
+			$out[] = upload_form(gTxt('upload_image'), 'upload', 'insert', $this->event, '', $file_max_upload_size);
 		}
 	
-		$dir = ($dir == 'asc') ? 'asc' : 'desc';
-	
+		extract($this->context);	
 		switch ($sort) {
 			case 'name':
 				$sort_sql = 'name '.$dir;
@@ -108,101 +115,29 @@ class ImageController extends ZemAdminController
 	
 		if ($total < 1) {
 			if ($criteria != 1) {
-				echo n.$this->search_form($crit, $search_method);
+				$out[] = n.$this->search_form($crit, $search_method);
 				$this->_message(gTxt('no_results_found'));
 			} else {
 				$this->_message(gTxt('no_images_recorded'));
 			}	
-			return;
-		}
+		} else {
 	
-		$limit = max(@$image_list_pageby, 15);
-	
-		list($page, $offset, $numPages) = pager($total, $limit, $page);
-	
-		echo $this->search_form($crit, $search_method);
-	
-		$rs = safe_rows_start('*, unix_timestamp(date) as uDate', 'txp_image',
+			$limit = max(@$image_list_pageby, 15);
+		
+			list($page, $offset, $numPages) = pager($total, $limit, $page);
+		
+			$out[] = $this->search_form($crit, $search_method);
+		
+			$rs = safe_rows('*, unix_timestamp(date) as uDate', 'txp_image',
 			"$criteria order by $sort_sql limit $offset, $limit");
-	
-		if ($rs) {
-			echo n.n.startTable('list').
-				n.tr(
-					column_head('ID', 'id', $this->event, true, $switch_dir, $crit, $search_method, ('id' == $sort) ? $dir : '').
-					hCell().
-					column_head('date', 'date', $this->event, true, $switch_dir, $crit, $search_method, ('date' == $sort) ? $dir : '').
-					column_head('name', 'name', $this->event, true, $switch_dir, $crit, $search_method, ('name' == $sort) ? $dir : '').
-					column_head('thumbnail', 'thumbnail', $this->event, true, $switch_dir, $crit, $search_method, ('thumbnail' == $sort) ? $dir : '').
-					hCell(gTxt('tags')).
-					column_head('image_category', 'category', $this->event, true, $switch_dir, $crit, $search_method, ('category' == $sort) ? $dir : '').
-					column_head('author', 'author', $this->event, true, $switch_dir, $crit, $search_method, ('author' == $sort) ? $dir : '').
-					hCell()
-				);
-	
-			while ($a = nextRow($rs)) {
-				extract($a);
-	
-				$edit_url = "?event=$this->event".a.'step=edit'.a.'id='.$id.a.'sort='.$sort.
-					a.'dir='.$dir.a.'page='.$page.a.'search_method='.$search_method.a.'crit='.$crit;
-	
-				$name = empty($name) ? gTxt('unnamed') : $name;
-	
-				$thumbnail = ($thumbnail) ?
-					href('<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="" />', $edit_url) :
-					gTxt('no');
-	
-				$tag_url = '?event=tag'.a.'tag_name=image'.a.'id='.$id.a.'ext='.$ext.
-					a.'w='.$w.a.'h='.$h.a.'alt='.urlencode($alt).a.'caption='.urlencode($caption);
-	
-				$category = ($category) ? '<span title="'.fetch_category_title($category, 'image').'">'.$category.'</span>' : '';
-	
-				echo n.n.tr(
-	
-					n.td($id, 20).
-	
-					td(
-						n.'<ul>'.
-						n.t.'<li>'.href(gTxt('edit'), $edit_url).'</li>'.
-						n.t.'<li><a href="'.hu.$img_dir.'/'.$id.$ext.'">'.gTxt('view').'</a></li>'.
-						n.'</ul>'
-					, 35).
-	
-					td(
-						safe_strftime('%d %b %Y %X', $uDate)
-					, 75).
-	
-					td(
-						href($name, $edit_url)
-					, 75).
-	
-					td($thumbnail, 76).
-	
-					td(
-						'<ul>'.
-						'<li><a target="_blank" href="'.$tag_url.a.'type=textile" onclick="popWin(this.href); return false;">Textile</a></li>'.
-						'<li><a target="_blank" href="'.$tag_url.a.'type=textpattern" onclick="popWin(this.href); return false;">Textpattern</a></li>'.
-						'<li><a target="_blank" href="'.$tag_url.a.'type=xhtml" onclick="popWin(this.href); return false;">XHTML</a></li>'.
-						'</ul>'
-					, 85).
-	
-					td($category, 75).
-	
-					td(
-						'<span title="'.get_author_name($author).'">'.$author.'</span>'
-					, 75).
-	
-					td(
-						dLink($this->event, 'delete', 'id', $id)
-					, 10)
-				);
+			if ($rs) {
+				$v = new TxpImageTableView($rs, $this);
+				$out[] = $v->render();
+				$out[] = nav_form($this->event, $page, $numPages, $sort, $dir, $crit, $search_method);
+				$out[] = $this->pageby_form($this->event, $image_list_pageby);
 			}
-	
-			echo endTable().
-	
-			nav_form($this->event, $page, $numPages, $sort, $dir, $crit, $search_method).
-	
-			$this->pageby_form($this->event, $image_list_pageby);
 		}
+		return join('', $out);
 	}
 	
 	
@@ -211,18 +146,18 @@ class ImageController extends ZemAdminController
 	function edit_view($id='') 
 	{
 		global $txpcfg,$img_dir,$file_max_upload_size;
-
+		$out = array();
+		
 		if (!$id) $id = assert_int(gps('id'));
-
-		extract(gpsa(array('page', 'sort', 'dir', 'crit', 'search_method')));
-
+		extract($this->context);
+	
 		$categories = getTree("root", "image");
 		
 		$rs = safe_row("*", "txp_image", "id = $id");
 		
 		if ($rs) {
 			extract($rs);
-			echo startTable('edit'),
+			$out[] = startTable('edit').
 			tr(
 				td(
 					'<img src="'.hu.$img_dir.
@@ -231,7 +166,7 @@ class ImageController extends ZemAdminController
 						br.upload_form(gTxt('replace_image'),'replace_image_form',
 							'replace',$this->event,$id,$file_max_upload_size, 'image-replace', '')
 				)
-			),
+			).
 			tr(
 				td(
 					join('',
@@ -245,13 +180,13 @@ class ImageController extends ZemAdminController
 						)
 					)
 				)
-			),
+			);
 
-			(check_gd($ext))
+			$out[] = (check_gd($ext))
 			?	$this->thumb_ui($id, $thumbnail)
-			:	'',
+			:	'';
 
-			tr(
+			$out[] = tr(
 				td(
 					form(
 						graf('<label for="image-name">'.gTxt('image_name').'</label>'.br.
@@ -278,9 +213,10 @@ class ImageController extends ZemAdminController
 						n.hInput('crit', $crit)
 					)
 				)
-			),
+			).
 			endTable();
 		}
+		return join('', $out);
 	}
 	
 // -------------------------------------------------------------
@@ -541,5 +477,96 @@ class ImageController extends ZemAdminController
 		$this->_set_view('list');
 	}
 	
+}
+
+// -------------------------------------------------------------
+class TxpImageTableView extends TxpTableView
+{
+	var $controller = NULL;
+
+	function TxpImageTableView(&$rows, $controller, $caption='', $edit_actions=array())
+	{
+		parent::TxpTableView($rows, $caption, $edit_actions);
+		$this->controller = $controller;
+	}
+	
+	function head($cols)
+	{
+		if (!$this->controller) return;
+		extract($this->controller->context);
+		
+		$switch_dir = ($dir == 'asc') ? 'desc' : 'asc';
+		$e = $this->controller->event;
+		return 
+			'<col class="col-id" />'.n.
+			'<col class="col-actions" />'.n.
+			'<col class="col-date" />'.n.
+			'<col class="col-name" />'.n.
+			'<col class="col-thumbnail" />'.n.
+			'<col class="col-tags" />'.n.
+			'<col class="col-category" />'.n.
+			'<col class="col-author" />'.n.
+			'<col class="col-delete" />'.n.
+			n.'<thead>'.tr(
+			column_head('ID', 'id', $e, true, $switch_dir, $crit, $search_method, ('id' == $sort) ? $dir : '').
+			hCell().
+			column_head('date', 'date', $e, true, $switch_dir, $crit, $search_method, ('date' == $sort) ? $dir : '').
+			column_head('name', 'name', $e, true, $switch_dir, $crit, $search_method, ('name' == $sort) ? $dir : '').
+			column_head('thumbnail', 'thumbnail', $e, true, $switch_dir, $crit, $search_method, ('thumbnail' == $sort) ? $dir : '').
+			hCell(gTxt('tags')).
+			column_head('image_category', 'category', $e, true, $switch_dir, $crit, $search_method, ('category' == $sort) ? $dir : '').
+			column_head('author', 'author', $e, true, $switch_dir, $crit, $search_method, ('author' == $sort) ? $dir : '').
+			hCell()
+		).'</thead>';
+	}
+
+	function row($row) {		
+		global $prefs;
+		extract($prefs);
+
+		if (!$this->controller) return;
+		extract($this->controller->context);
+
+		extract($row);
+		$event = $this->controller->event;
+		
+		$edit_url = "?event=$event".a.'step=edit'.a.'id='.$id.a.'sort='.$sort.
+			a.'dir='.$dir.a.'page='.$page.a.'search_method='.$search_method.a.'crit='.$crit;
+
+		$name = empty($name) ? gTxt('unnamed') : $name;
+
+		$thumbnail = ($thumbnail) ?
+			href('<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="" />', $edit_url) :
+			gTxt('no');
+
+		$tag_url = '?event=tag'.a.'tag_name=image'.a.'id='.$id.a.'ext='.$ext.
+			a.'w='.$w.a.'h='.$h.a.'alt='.urlencode($alt).a.'caption='.urlencode($caption);
+
+		$category = ($category) ? '<span title="'.fetch_category_title($category, 'image').'">'.$category.'</span>' : '';
+
+		$tr = array();
+		$tr[] = $id;
+		$tr[] =	n.'<ul>'.
+				n.t.'<li>'.href(gTxt('edit'), $edit_url).'</li>'.
+				n.t.'<li><a href="'.hu.$img_dir.'/'.$id.$ext.'">'.gTxt('view').'</a></li>'.
+				n.'</ul>';
+
+		$tr[] = safe_strftime('%c' /*'%d %b %Y %X'*/, $uDate);
+		$tr[] =	href($name, $edit_url);
+		$tr[] = $thumbnail;
+		$tr[] = '<ul>'.
+				'<li><a target="_blank" href="'.$tag_url.a.'type=textile" onclick="popWin(this.href); return false;">Textile</a></li>'.
+				'<li><a target="_blank" href="'.$tag_url.a.'type=textpattern" onclick="popWin(this.href); return false;">Textpattern</a></li>'.
+				'<li><a target="_blank" href="'.$tag_url.a.'type=xhtml" onclick="popWin(this.href); return false;">XHTML</a></li>'.
+				'</ul>';
+		$tr[] = $category;
+		$tr[] = '<span title="'.get_author_name($author).'">'.$author.'</span>';
+		$tr[] = dLink($this->controller->event, 'delete', 'id', $id);
+
+		if ($this->edit_actions and isset($row['id']))
+			$tr[] = fInput('checkbox', 'selected[]', $row['id']);
+
+		return doWrap($tr, 'tr', 'td', 'row-'.(++$this->count % 2 ? 'odd' : 'even'));
+	}
 }
 ?>

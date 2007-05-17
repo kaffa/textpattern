@@ -1,0 +1,38 @@
+/* image element styles
+ @TODO: visually appealing styling
+----------------------------------------------- */
+
+/* list
+----------------------------------------------- */
+
+table.txpimagetableview col.col-id {
+}
+
+table.txpimagetableview col.col-actions {
+}
+
+table.txpimagetableview col.col-date {
+	width: 10em;
+}
+
+table.txpimagetableview col.col-name {
+}
+
+table.txpimagetableview col.col-thumbnail {
+	padding-left: 10px; 
+}
+
+table.txpimagetableview col.col-tags {
+}
+
+table.txpimagetableview col.col-category {
+}
+
+table.txpimagetableview col.col-author {
+}
+
+table.txpimagetableview col.col-delete {
+}
+
+/* edit
+----------------------------------------------- */

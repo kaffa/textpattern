@@ -1,18 +1,22 @@
 <?php
 
+include_once(txpath.'/lib/txplib_html.php');
+
 class TxpTableView {
 
 	var $class;
 	var $caption;
 	var $rows;
 	var $edit_actions = array();
+	var $type;
 	var $count = 0;
 
-	function TxpTableView(&$rows, $caption='', $edit_actions=array()) {
+	function TxpTableView(&$rows, $caption='', $edit_actions=array(), $type='list') {
 		$this->class = strtolower(get_class($this));
 		$this->caption = $caption;
 		$this->rows = $rows;
 		$this->edit_actions = $edit_actions;
+		$this->type = $type;
 	}
 
 	function head($cols) {
@@ -73,7 +77,7 @@ class TxpTableView {
 
 	function render() {
 		$out = array();
-		$out[] = '<table class="txp-tableview '.$this->class.'">';
+		$out[] = '<table class="txp-tableview '.$this->class." $this->type".'">';
 		if ($this->caption)
 			$out[] = '<caption>'.escape_output($this->caption).'</caption>';
 		$out[] = $this->table();

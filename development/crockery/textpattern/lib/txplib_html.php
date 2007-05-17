@@ -1,8 +1,8 @@
 <?php
 
 /*
-$HeadURL: http://svn.textpattern.com/development/crockery/textpattern/lib/txplib_html.php $
-$LastChangedRevision: 1008 $
+$HeadURL$
+$LastChangedRevision$
 */
 	
 	define("t","\t");

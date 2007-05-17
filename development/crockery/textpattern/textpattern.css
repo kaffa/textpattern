@@ -283,32 +283,52 @@ td.selector2 {
 font-size: 0.9em;
 }
 
+/* @TODO: eventually lose table#edit and table#list id's later, keep the .list and .edit classes? 
+	might affect plugins. */
 table#edit td.noline,
-table#list td.noline	{
+table#list td.noline,
+table.edit td.noline,
+table.list td.noline	{
 vertical-align: middle;
 border: none;
 }
 
-table#list th, table#list td {
+table#list th, table#list td, table.list th, table.list td {
 padding: 3px 5px;
 text-align: left;
 border-bottom: 1px solid #ddd;
 }
 
-table#list td.noline {
+table#list td.noline, table.list td.noline {
 height: 30px;
 }
 
-table#list th {
+table#list th, table.list th {
 vertical-align: bottom;
 }
 
-table#list ul {
+table.list th a {
+margin-right: 14px; 	
+}
+
+table.list th.asc a {
+background: url(txp_img/arrowupdn.gif) no-repeat right 2px;
+padding-right: 14px;
+margin-right: 0;
+}
+
+table.list th.desc a {
+background: url(txp_img/arrowupdn.gif) no-repeat right -18px;
+padding-right: 14px;	
+margin-right: 0;
+}
+
+table.list ul {
 margin-bottom: 0;
 list-style-type: none;
 }
 
-table#list li {
+table#list li, table.list li {
 margin: 0 0 2px 0;
 }
 
