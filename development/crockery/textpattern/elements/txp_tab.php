@@ -1,8 +1,8 @@
 <?php
 
 /*
-$HeadURL: $
-$LastChangedRevision: $
+$HeadURL$
+$LastChangedRevision$
 */
 
 // we can't call register_tab in the element itself, since that's not always

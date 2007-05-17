@@ -1,8 +1,8 @@
 <?php
 
 /*
-$HeadURL: $
-$LastChangedRevision: $
+$HeadURL$
+$LastChangedRevision$
 */
 
 register_callback('file_download_send', 'pub_file');

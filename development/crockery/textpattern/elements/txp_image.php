@@ -9,8 +9,8 @@
 
 	Use of this software indicates acceptance of the Textpattern license agreement 
 
-$HeadURL: http://svn.textpattern.com/development/crockery/textpattern/include/txp_image.php $
-$LastChangedRevision: 2335 $
+$HeadURL$
+$LastChangedRevision$
 
 */
 

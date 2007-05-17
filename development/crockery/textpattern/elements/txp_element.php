@@ -1,8 +1,8 @@
 <?php
 
 /*
-$HeadURL: $
-$LastChangedRevision: $
+$HeadURL$
+$LastChangedRevision$
 */
 
 register_callback('element_list', 'element');
