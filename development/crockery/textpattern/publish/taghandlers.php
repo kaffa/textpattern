@@ -516,12 +516,12 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function email($atts) // simple contact link
+	function email($atts, $thing='') // simple contact link
 	{
 		extract(lAtts(array(
 			'email'    => '',
 			'linktext' => gTxt('contact'),
-			'title'    => ''
+			'title'    => '',
 		),$atts));
 
 		if($email) {
@@ -529,12 +529,12 @@ $LastChangedRevision$
 				'<a href="'.eE('mailto:'.$email).'"',
 				($title) ? ' title="'.$title.'"' : '',
 				'>',
-				$linktext,
+				($thing) ? parse($thing) : $linktext,
 				'</a>'
 			);
 			return join('',$out);
 		}
-		return '<txp:notice message="malformed email tag />"';
+		return '';
 	}
 	
 // -------------------------------------------------------------
