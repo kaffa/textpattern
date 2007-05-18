@@ -13,10 +13,12 @@ if (!defined('TXP_INSTALL'))
 @set_time_limit(0);
 
 include_once(txpath.'/lib/mdb.php');
+global $DB;
 $DB =& mdb_factory($dhost,$ddb,$duser,$dpass,$dbcharset);
 
 if ($DB->table_exists(PFX.'textpattern')) die("Textpattern database table already exist. Can't run setup.");
 
+// FIXME: this stuff all belongs in mdb, if it's not there already
 if (MDB_TYPE == 'pg') {
 #	if (isset($dbcharset))
 #		$DB->query('SET NAMES '.$dbcharset);

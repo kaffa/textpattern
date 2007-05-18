@@ -55,7 +55,7 @@ $LastChangedRevision$
 
 	$microstart = getmicrotime();
 
-	 if ($connected && $DB->table_exists(PFX.'textpattern')) {
+	 if ($DB->connected && $DB->table_exists(PFX.'textpattern')) {
 
 		$dbversion = safe_field('val','txp_prefs',"name = 'version'");
 

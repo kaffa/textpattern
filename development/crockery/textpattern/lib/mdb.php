@@ -41,6 +41,8 @@ class MDB {
 	var $pass;
 	var $charset;
 	
+	var $connected = false;
+	var $selected = false;
 	var $debug = false;
 	var $qtime = 0;
 	var $qcount = 0;
@@ -60,10 +62,12 @@ class MDB {
 		if ($this->link === false)
 			return;
 
+		$this->connected = true;
+
 		if (!$this->selectdb($this->db))
 			return;
-			
-		$GLOBALS['connected'] = true;
+
+		$this->selected = true;
 
 		$this->set_charset();
 	}

@@ -1564,7 +1564,8 @@ $LastChangedRevision: 1127 $
 			$code = @$parts[0];
 		}
 
-		if ($GLOBALS['connected']) {
+		global $DB;
+		if ($DB and $DB->selected) {
 			$out = fetch_page_template('error_'.$code);
 			if (empty($out))
 				$out = fetch_page_template('error_default');

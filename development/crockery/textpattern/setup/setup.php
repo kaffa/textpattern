@@ -143,7 +143,10 @@
 			$carry['ddb'] = $ddb;
 		}
 		
-		if (!db_connect($dhost,$duser,$dpass,$ddb)){
+		global $DB;
+		$DB =& mdb_factory($dhost, $ddb, $duser, $dpass, 'utf8');
+
+		if (!$DB->connected){
 			exit(graf(gTxt('db_cant_connect')));
 		}
 
@@ -158,7 +161,7 @@
 			));
 		}
 
-		if (!db_selectdb($ddb))
+		if (!$DB->selected)
 		{
 			exit(graf(
 				gTxt('db_doesnt_exist', array(
@@ -167,17 +170,22 @@
 			));
 		}
 
+/*
 		// On 4.1 or greater use utf8-tables
 		if ($dbtype!='pdo_sqlite' && db_query("SET NAMES 'utf8'")) {
 			$carry['dbcharset'] = "utf8";
 			$carry['dbcollate'] = "utf8_general_ci";
 		}elseif ($dbtype == 'pdo_sqlite' && db_query('PRAGMA encoding="UTF-8"')){
-			$carry['dbcharset'] = "utf8";			
+			$carry['dbcharset'] = "utf8";
 		}
 		else {
 			$carry['dbcharset'] = "latin1";
 			$carry['dbcollate'] = '';
 		}
+*/
+
+		// the MDB driver should tell us what charset to use
+		$carry['dbcharset'] = $DB->charset;
 
 		echo graf(
 			gTxt('using_db', array('{dbname}' => strong($ddb)))
@@ -276,6 +284,7 @@
 		$dhost = $txpcfg['host'];
 		$dprefix = $txpcfg['table_prefix'];
 		$GLOBALS['txpcfg']['dbtype'] = $txpcfg['dbtype'];
+		$dbcharset = $txpcfg['dbcharset'];
 		include_once txpath.'/lib/mdb.php';
 
 		$GLOBALS['textarray'] = setup_load_lang($lang);
@@ -291,22 +300,18 @@
 		include_once txpath.'/lib/txplib_update.php';
  		include txpath.'/setup/txpsql.php';
 
-		// This has to come after txpsql.php, because otherwise we can't call mysql_real_escape_string
-		if (MDB_TYPE=='pdo_sqlite') {
-			extract(gpsa(array('name','pass','RealName','email')));
-		}else{
-			extract(sDoSlash(gpsa(array('name','pass','RealName','email'))));
-		}
-		
+		extract(gpsa(array('name','pass','RealName','email')));
 
  		$nonce = md5( uniqid( rand(), true ) );
 
-		db_query("INSERT INTO ".PFX."txp_users VALUES
-			(1,'$name',password(lower('$pass')),'$RealName','$email',1,now(),'$nonce')");
+		global $DB;
+		$DB =& mdb_factory($dhost,$ddb,$duser,$dpass,$dbcharset);
+		$DB->query("INSERT INTO ".PFX."txp_users VALUES
+			(1,'".$DB->escape($name)."',password(lower('".$DB->escape($pass)."')),'".$DB->escape($RealName)."','".$DB->escape($email)."',1,now(),'".$DB->escape($nonce)."')");
 
-		db_query("update ".PFX."txp_prefs set val = '$siteurl' where name='siteurl'");
-		db_query("update ".PFX."txp_prefs set val = '$lang' where name='language'");
-		db_query("update ".PFX."txp_prefs set val = '".getlocale($lang)."' where name='locale'");
+		$DB->query("update ".PFX."txp_prefs set val = '".$DB->escape($siteurl)."' where name='siteurl'");
+		$DB->query("update ".PFX."txp_prefs set val = '".$DB->escape($lang)."' where name='language'");
+		$DB->query("update ".PFX."txp_prefs set val = '".$DB->escape(getlocale($lang))."' where name='locale'");
 
  		echo fbCreate();
 	}
@@ -421,11 +426,6 @@
 		return $langs[LANG];
 	}
 
-// -------------------------------------------------------------
-	function sDoSlash($in)
-	{ 
-		return doArray($in,'db_escape');
-	}
 // -------------------------------------------------------------
 	function availableDBDrivers()
 	{
