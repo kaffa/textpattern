@@ -2,6 +2,7 @@
 
 include_once(txpath.'/lib/txplib_html.php');
 
+// A generic table list view for tabs like the article list, file list, image list
 class TxpTableView {
 
 	var $class;
@@ -82,9 +83,134 @@ class TxpTableView {
 			$out[] = '<caption>'.escape_output($this->caption).'</caption>';
 		$out[] = $this->table();
 		$out[] = '</table>';
-		
+
 		return join(n, $out);
 	}
+}
+
+// A base class detail view for things like the file edit view, link edit view
+class TxpDetailView {
+	var $class;
+	var $caption;
+	var $rows;
+	var $edit_actions = array();
+	var $type;
+	var $count = 0;
+	
+	var $event;
+	var $step;
+
+	var $headtag = 'h3';
+	var $listtag = 'dl';  // could be 'table'
+	var $rowtag = '';     // could be 'tr'
+	var $ltag = 'dt';     // could be 'td'
+	var $itag = 'dd';     // could be 'td'
+
+	function TxpTableView($event, $step, $caption='') {
+		$this->class = strtolower(get_class($this));
+		$this->caption = $caption;
+		$this->event = $event;
+		$this->step = $step;
+	}
+
+	// call these i_* functions from body() to create input fields
+
+	// text input box
+	function i_text($name, $value='') {
+		return tag(
+				tag('<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag)
+				.tag(fInput('text', $name, $value, 'edit', gTxt($name), '', 40, '', $name), $this->itag),
+			$this->rowtag
+		);
+	}
+
+	// textarea
+	function i_textarea($name, $value='') {
+		return tag(
+				tag('<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag)
+				.tag(fInput('text', $name, $value, 'edit', gTxt($name), '', 40, '', $name), $this->itag),
+			$this->rowtag
+		);
+	}
+
+	// checkbox
+	function i_checkbox($name, $checked=0) {
+		// there's no itag here, just ltag
+		return tag(
+				tag(checkbox($name, 1, $checked, '', $name).sp.
+				'<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag),
+			$this->rowtag
+		);
+	}
+
+	// select option list
+	function i_select($name, $choices, $value='') {
+		return
+			tag('<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag)
+			.tag(selectInput($name, $choices, $value, '', '', gTxt($name)), $this->itag);
+	}
+
+	// select option list implemented as a group of radio buttons
+	function i_select_radio($name, $choices, $value='') {
+		// FIXME: not sure what the itag/ltag markup should be here
+		$out = array();
+		foreach ($choices as $k=>$v) {
+			// each radio button goes inside an itag
+			$out[] = tag(radio($name, $k, ($k == $value), "{$name}_{$k}").sp.
+				'<label for="'.$name.'_'.$k.'">'.$v.'</label> ', $this->itag);
+		}
+
+		return tag(
+				fieldset(join(n, $out), gTxt($name), $name),
+			$this->rowtag
+		);
+	}
+
+	// submit button
+	function i_button($name, $value='1') {
+		return tag(
+				tag('<button type="submit" name="'.$name.'" value="'.$value.'" id="'.$name.'">'.gTxt($name).'</button>', $this->itag),
+			$this->rowtag
+		);
+	}
+
+	// hidden value
+	function i_hidden($name, $value='') {
+		return hInput($name, $value);
+	}
+
+	// html form with the event and step filled in
+	function form($contents) {
+		return form(
+			$contents.
+			eInput($this->event).
+			sInput($this->step)
+		);
+	}
+
+	function head() {
+		return tag(gTxt($this->caption), $this->headtag);
+	}
+
+	function body() {
+		// override me
+	}
+
+	function foot() {
+		// override me
+	}
+
+	function render() {
+		return
+			head().n.
+			form(
+				tag($this->body, $wraptag).n.
+				eInput($this->event).n.
+				sInput($this->step)
+			).n.
+			foot();
+	}
+
 }
 
 ?>
