@@ -335,7 +335,10 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function tag($content,$tag,$atts='')
 	{
-		return ($content) ? '<'.$tag.$atts.'>'.$content.'</'.$tag.'>' : '';
+		if ($tag)
+			return ($content) ? '<'.$tag.$atts.'>'.$content.'</'.$tag.'>' : '';
+		else
+			return $content;
 	}
 
 // -------------------------------------------------------------

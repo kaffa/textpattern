@@ -96,9 +96,11 @@ class TxpDetailView {
 	var $edit_actions = array();
 	var $type;
 	var $count = 0;
-	
+
 	var $event;
 	var $step;
+
+	var $data; // the thing being displayed
 
 	var $headtag = 'h3';
 	var $listtag = 'dl';  // could be 'table'
@@ -106,11 +108,15 @@ class TxpDetailView {
 	var $ltag = 'dt';     // could be 'td'
 	var $itag = 'dd';     // could be 'td'
 
-	function TxpTableView($event, $step, $caption='') {
+	function TxpDetailView($data, $event, $step, $caption='') {
 		$this->class = strtolower(get_class($this));
-		$this->caption = $caption;
+		if ($caption)
+			$this->caption = $caption;
+		else
+			$this->caption = $event;
 		$this->event = $event;
 		$this->step = $step;
+		$this->data = $data;
 	}
 
 	// call these i_* functions from body() to create input fields
@@ -202,13 +208,13 @@ class TxpDetailView {
 
 	function render() {
 		return
-			head().n.
+			$this->head().n.
 			form(
-				tag($this->body, $wraptag).n.
+				tag($this->body(), $this->listtag).n.
 				eInput($this->event).n.
 				sInput($this->step)
 			).n.
-			foot();
+			$this->foot();
 	}
 
 }
