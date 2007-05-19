@@ -122,42 +122,42 @@ class TxpDetailView {
 	// call these i_* functions from body() to create input fields
 
 	// text input box
-	function i_text($name, $value='') {
+	function i_text($name, $value='', $opts = array()) {
 		return tag(
-				tag('<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag)
-				.tag(fInput('text', $name, $value, 'edit', gTxt($name), '', 40, '', $name), $this->itag),
+				tag($this->label($name, $opts).' '.pophelp($name), $this->ltag)
+				.tag(fInput('text', $name, $value, $this->_class($opts), gTxt($name), '', 40, '', $name), $this->itag),
 			$this->rowtag
 		);
 	}
 
 	// textarea
-	function i_textarea($name, $value='') {
+	function i_textarea($name, $value='', $opts = array()) {
 		return tag(
-				tag('<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag)
-				.tag(fInput('text', $name, $value, 'edit', gTxt($name), '', 40, '', $name), $this->itag),
+				tag($this->label($name, $opts).' '.pophelp($name), $this->ltag)
+				.tag(fInput('text', $name, $value, $this->_class($opts), gTxt($name), '', 40, '', $name), $this->itag),
 			$this->rowtag
 		);
 	}
 
 	// checkbox
-	function i_checkbox($name, $checked=0) {
+	function i_checkbox($name, $checked=0, $opts = array()) {
 		// there's no itag here, just ltag
 		return tag(
 				tag(checkbox($name, 1, $checked, '', $name).sp.
-				'<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag),
+				$this->label($name, $opts).' '.pophelp($name), $this->ltag),
 			$this->rowtag
 		);
 	}
 
 	// select option list
-	function i_select($name, $choices, $value='') {
+	function i_select($name, $choices, $value='', $opts = array()) {
 		return
-			tag('<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag)
+			tag($this->label($name, $opts).' '.pophelp($name), $this->ltag)
 			.tag(selectInput($name, $choices, $value, '', '', gTxt($name)), $this->itag);
 	}
 
 	// select option list implemented as a group of radio buttons
-	function i_select_radio($name, $choices, $value='') {
+	function i_select_radio($name, $choices, $value='', $opts = array()) {
 		// FIXME: not sure what the itag/ltag markup should be here
 		$out = array();
 		foreach ($choices as $k=>$v) {
@@ -167,14 +167,14 @@ class TxpDetailView {
 		}
 
 		return tag(
-				tag('<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag)
+				tag($this->label($name, $opts).' '.pophelp($name), $this->ltag)
 				.tag(fieldset(join(br.n, $out), '', $name), $this->itag),
 			$this->rowtag
 		);
 	}
 
 	// submit button
-	function i_button($name, $value='1') {
+	function i_button($name, $value='1', $opts = array()) {
 		return tag(
 				tag('<button type="submit" name="'.$name.'" value="'.$value.'" id="'.$name.'">'.gTxt($name).'</button>', $this->itag),
 			$this->rowtag
@@ -184,6 +184,22 @@ class TxpDetailView {
 	// hidden value
 	function i_hidden($name, $value='') {
 		return hInput($name, $value);
+	}
+	
+	function label($name, $opts=array()) {
+		return '<label for="'.$name.'" class="'.$this->_class($opts).'">'.gTxt($name).'</label>';
+	}
+
+	function _class($opts) {
+		$class = '';
+		if (!empty($opts['class']))
+			$class = $opts['class'];
+		elseif (!empty($opts['readonly']))
+			$class = 'readonly';
+		else
+			$class = 'edit';
+
+		return $class;
 	}
 
 	// html form with the event and step filled in
