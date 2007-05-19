@@ -72,7 +72,7 @@ class PrefsView extends TxpDetailView {
 		$out[] = $this->i_select('dateformat', $this->dateformat_options(), $this->data['dateformat']);
 		$out[] = $this->i_select('archive_dateformat', $this->dateformat_options(), $this->data['archive_dateformat']);
 
-		$out[] = $this->i_select('permlink_mode', $this->permlinkmode_options(), $this->data['permlink_mode']);
+		$out[] = $this->i_select_radio('permlink_mode', $this->permlinkmode_options(), $this->data['permlink_mode']);
 		$out[] = $this->i_select('logging', $this->logging_options(), $this->data['logging']);
 		$out[] = $this->i_select('production_status', $this->prod_options(), $this->data['production_status']);
 

@@ -162,12 +162,13 @@ class TxpDetailView {
 		$out = array();
 		foreach ($choices as $k=>$v) {
 			// each radio button goes inside an itag
-			$out[] = tag(radio($name, $k, ($k == $value), "{$name}_{$k}").sp.
-				'<label for="'.$name.'_'.$k.'">'.$v.'</label> ', $this->itag);
+			$out[] = radio($name, $k, ($k == $value), "{$name}_{$k}").sp.
+				'<label for="'.$name.'_'.$k.'">'.$v.'</label>';
 		}
 
 		return tag(
-				fieldset(join(n, $out), gTxt($name), $name),
+				tag('<label for="'.$name.'">'.gTxt($name).'</label> '.pophelp($name), $this->ltag)
+				.tag(fieldset(join(br.n, $out), '', $name), $this->itag),
 			$this->rowtag
 		);
 	}
