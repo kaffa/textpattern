@@ -8,7 +8,34 @@ $LastChangedRevision: 1944 $
 */
 
 
-// This is a kind of hybrid view-controller.
+/* This is a kind of hybrid view-controller.
+
+Example usage:
+
+class FooController extends ZemAdminController {
+
+	// each 'step' has a pair of functions: one to handle the POST, and one to generate the HTML
+
+   function edit_view() {
+   	// return the html to display for the 'edit' step, following a GET or POST
+		return a_html_input_form();
+   }
+
+   function edit_post() {
+   	// handle a http POST for the 'edit' step, before the view function is displayed
+      if (save_something($this->ps('something'))) {
+      	$this->_message('something was saved ok');
+      }
+      else {
+      	$this->_error('invalid input');
+      }
+   }
+
+   // ..etc for other pairs of functions representing additions steps
+
+}
+
+*/
 
 class ZemAdminController {
 	var $event = NULL;
@@ -26,7 +53,7 @@ class ZemAdminController {
 		// the generic event handler
 
 		$this->init($event, $step);
-		
+
 		$this->post_handler($event, $step);
 
 		// now call $this->{$this->_step}_view()
@@ -98,47 +125,6 @@ class ZemAdminController {
 		$this->_pagebottom();
 	}
 
-	function _dLink($step, $thing, $value, $verify=1) {
-		return dLink($this->event, $step, $thing, $value, $verify);
-	}
-
-	function _set_view($step /*, $a, $b, ... */) {
-		// use this in a _post handler to switch to a different view
-		// additional args will be passed as parameters to the view function
-		$this->_step = $step;
-		$args = func_get_args();
-		$this->_view_args = array_slice($args, 1);
-	}
-
-	function _fieldset($contents, $name='') {
-		return '<fieldset id="'.$name.'">'.n
-			.($name ? '<legend>'.gTxt($name).'</legend>'.n : '')
-			.$contents.n
-			.'</fieldset>'.n;
-	}
-
-	function _tform($contents, $name='') {
-		return form(
-			$this->_fieldset(
-				startTable('list').
-				$contents.
-				endTable(),
-				$name
-			)
-		);
-	}
-
-	function _irow($name, $input) {
-
-		if ($name) $label = '<label for="'.$name.'">'.gTxt("{$this->event}_{$name}").'</label>';
-		else $label = '';
-
-		return tr(
-			td($label).
-			td($input)
-		);
-	}
-
 	// display a message to the user
 	// $type is used as the CSS class
 	function _message($msg, $type='message') {
@@ -193,7 +179,8 @@ class ZemAdminController {
 		trigger_error(gTxt('post_var_not_int', array('{name}' => $name, '{val}' => $i)));
 		return $default;
 	}
-	
+
+	// FIXME: this belongs in the table view class
 	function pageby_form()
 	{
 		global $prefs;
