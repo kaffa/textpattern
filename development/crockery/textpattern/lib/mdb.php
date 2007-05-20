@@ -27,9 +27,9 @@ define('MDB_TYPE', (empty($txpcfg['dbtype']) ? 'my' : $txpcfg['dbtype']));
 // get the driver specific functions
 require_once txpath.'/lib/mdb/'.MDB_TYPE.'.php';
 
-function &mdb_factory($host, $db, $user, $pass, $charset='') {
+function &mdb_factory($host, $db, $user, $pass, $charset='', $logfunc=NULL) {
 	$class = 'MDB_'.MDB_TYPE;
-	$obj = new $class($host, $db, $user, $pass, $charset);
+	$obj = new $class($host, $db, $user, $pass, $charset, $logfunc);
 	return $obj;
 }
 
@@ -47,7 +47,9 @@ class MDB {
 	var $qtime = 0;
 	var $qcount = 0;
 
-	function MDB($host, $db, $user, $pass, $charset='')
+	var $logfunc = NULL;
+
+	function MDB($host, $db, $user, $pass, $charset='', $logfunc=NULL)
 	{
 		$this->host = $host;
 		$this->db   = $db;
@@ -56,6 +58,8 @@ class MDB {
 
 		if (!$charset) $charset = 'utf8';
 		$this->charset = $charset;
+
+		$this->logfunc = $logfunc;
 
 		$this->link = $this->connect($this->host, $this->user, $this->pass, $this->db);
 		// PDO returns an object. Do strict comparison
@@ -66,7 +70,7 @@ class MDB {
 
 		if (!$this->selectdb($this->db))
 			return;
-
+			
 		$this->selected = true;
 
 		$this->set_charset();
@@ -162,6 +166,9 @@ class MDB {
 		$time = sprintf('%02.6f', getmicrotime() - $start);
 		$this->qtime += $time;
 		$this->qcount++;
+
+		if (is_callable($this->logfunc))
+			call_user_func($this->logfunc, "SQL[{$time}] $sql");
 
 		if ($result === false and ($this->debug or $debug)) {
 			trigger_error($this->lasterror() . n . $sql, E_USER_WARNING);
