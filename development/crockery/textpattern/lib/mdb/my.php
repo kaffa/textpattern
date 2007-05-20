@@ -107,7 +107,7 @@ class MDB_my extends MDB {
 		return 'rlike';
 	}
 
-	function affected_rows(){
+	function affected_rows($rs){
 		return mysql_affected_rows($this->link);
 	}
 

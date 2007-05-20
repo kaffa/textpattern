@@ -146,14 +146,14 @@ class MDB {
 		trigger_error(__FUNCTION__.' not implemented', E_USER_ERROR);
 	}
 
-	function affected_rows() {
+	function affected_rows($rs) {
 		trigger_error(__FUNCTION__.' not implemented', E_USER_ERROR);
 	}
 
 	// these needn't be overridden except in special cases
 	
 	function set_charset() {
-		$this->query('SET NAMES '.$this->charset);
+		$this->query("SET NAMES '".$this->charset."'");
 	}
 
 	function query($sql, $debug=false) {
@@ -176,8 +176,6 @@ class MDB {
 		return !empty($cols[$col]);
 	}
 
-
-	// FIXME: most of the remainder probably belongs elsewhere
 
 	function insert($table, $set) {
 		$set = 'SET '.$set;
@@ -221,87 +219,6 @@ class MDB {
 		return $this->query('UPDATE '.$table.' SET '.$sql.' WHERE '.$where);
 	}
 
-
-	function array_key_rename(&$array, $old, $new) {
-		if (isset($array[$old])) {
-			$array[$new] = $array[$old];
-			unset($array[$old]);
-		}
-	}
-
-	// Fix key case
-	function fixup_row($table, &$row) {
-		if ($table == PFX.'textpattern') {
-			$this->array_key_rename($row, 'id', 'ID');
-			$this->array_key_rename($row, 'posted', 'Posted');
-			$this->array_key_rename($row, 'authorid', 'AuthorID');
-			$this->array_key_rename($row, 'lastmod', 'LastMod');
-			$this->array_key_rename($row, 'lastmodid', 'LastModID');
-			$this->array_key_rename($row, 'title', 'Title');
-			$this->array_key_rename($row, 'title_html', 'Title_html');
-			$this->array_key_rename($row, 'body', 'Body');
-			$this->array_key_rename($row, 'body_html', 'Body_html');
-			$this->array_key_rename($row, 'excerpt', 'Excerpt');
-			$this->array_key_rename($row, 'excerpt_html', 'Excerpt_html');
-			$this->array_key_rename($row, 'image', 'Image');
-			$this->array_key_rename($row, 'category1', 'Category1');
-			$this->array_key_rename($row, 'category2', 'Category2');
-			$this->array_key_rename($row, 'annotate', 'Annotate');
-			$this->array_key_rename($row, 'annotateinvite', 'AnnotateInvite');
-			$this->array_key_rename($row, 'status', 'Status');
-			$this->array_key_rename($row, 'section', 'Section');
-			$this->array_key_rename($row, 'keywords', 'Keywords');
-			$this->array_key_rename($row, 'uposted', 'uPosted');
-			$this->array_key_rename($row, 'sposted', 'sPosted');
-			$this->array_key_rename($row, 'slastmod', 'sLastMod');
-		}
-		elseif ($table == PFX.'txp_users') {
-			$this->array_key_rename($row, 'realname', 'RealName');
-		}
-		elseif ($table == PFX.'txp_form') {
-			$this->array_key_rename($row, 'form', 'Form');
-		}
-	}
-
-
-	// Helper functions to convert mysql INSERT .. SET syntax to valid SQL
-	
-	function my_csv_explode($str, $delim = ',', $qual = "'", $esc = '\\') {
-		$len = strlen($str);
-		$inside = false;
-		$word = '';
-		for ($i = 0; $i < $len; ++$i) {
-			if ($str[$i]==$delim && !$inside) {
-				$out[] = $word;
-				$word = '';
-			} else if ($inside && $str[$i] == $esc && $i<($len-1)) {
-				$word .= ($esc.$str[$i+1]);
-				++$i;
-			} else if ($str[$i] == $qual) {
-				$inside = !$inside;
-				$word .= $str[$i];
-			} else {
-				$word .= $str[$i];
-			}
-		}
-		$out[] = $word;
-		return $out;
-	}
-	
-	function my_insert_to_values($ins) {
-		$items = my_csv_explode($ins, ',', "'");
-	
-		$cols = array();
-		$vals = array();
-		foreach ($items as $item) {
-			@list($k, $v) = split('=', $item, 2);
-			$cols[] = trim($k);
-			$vals[] = trim($v);
-		}
-	
-		return '('.join(',', $cols).')'.
-			' VALUES ('.join(',', $vals).')';
-	}
 }
 
 ?>
