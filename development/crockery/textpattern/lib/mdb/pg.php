@@ -1,5 +1,10 @@
 <?php
 
+/*
+$HeadURL$
+$LastChangedRevision$
+*/
+
 /**
  * PostgreSQL specific functions
  */

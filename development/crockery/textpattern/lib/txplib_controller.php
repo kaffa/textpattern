@@ -2,8 +2,8 @@
 
 /*
 
-$HeadURL: http://svn.textpattern.com/development/crockery/textpattern/elements/include/txp_section.php $
-$LastChangedRevision: 1944 $
+$HeadURL$
+$LastChangedRevision$
 
 */
 

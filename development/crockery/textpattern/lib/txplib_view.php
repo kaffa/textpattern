@@ -1,5 +1,10 @@
 <?php
 
+/*
+$HeadURL$
+$LastChangedRevision$
+*/
+
 include_once(txpath.'/lib/txplib_html.php');
 
 // A generic table list view for tabs like the article list, file list, image list

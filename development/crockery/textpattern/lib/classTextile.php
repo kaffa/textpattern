@@ -10,7 +10,7 @@
 
 /*
 $Id: classTextile.php 216 2006-10-17 22:31:53Z zem $
-$LastChangedRevision: 1998 $
+$LastChangedRevision$
 */
 
 /*
@@ -228,7 +228,7 @@ class Textile
     var $hu = '';
     
     var $ver = '2.0.0';
-    var $rev = '$Rev: 1998 $';
+    var $rev = '$Rev$';
     
     var $doc_root;
 

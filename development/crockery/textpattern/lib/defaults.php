@@ -1,7 +1,8 @@
 <?php
+
 /*
-$HeadURL: $
-$LastChangedRevision: $
+$HeadURL$
+$LastChangedRevision$
 */
 
 // Don't be tempted to edit this file.  Configuration lives elsewhere.

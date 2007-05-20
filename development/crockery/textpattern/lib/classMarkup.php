@@ -1,5 +1,10 @@
 <?php
 
+/*
+$HeadURL$
+$LastChangedRevision$
+*/
+
 include_once(txpath . '/lib/classTextile.php');
 include_once(txpath . '/lib/txplib_class.php');
 

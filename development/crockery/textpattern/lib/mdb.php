@@ -12,8 +12,8 @@
 	as published by the Free Software Foundation; either version 2
 	of the License, or (at your option) any later version.
 
-$HeadURL: http://svn.textpattern.com/stable/4.0/textpattern/setup/index.php $
-$LastChangedRevision: 820 $
+$HeadURL$
+$LastChangedRevision$
 
 */
 

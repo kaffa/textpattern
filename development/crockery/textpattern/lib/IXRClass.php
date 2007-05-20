@@ -7,8 +7,8 @@
    Manual: http://scripts.incutio.com/xmlrpc/manual.php
    Made available under the Artistic License: http://www.opensource.org/licenses/artistic-license.php
 
-$HeadURL: http://svn.textpattern.com/development/crockery/textpattern/lib/IXRClass.php $
-$LastChangedRevision: 765 $
+$HeadURL$
+$LastChangedRevision$
 */
 
 class IXR_Value {

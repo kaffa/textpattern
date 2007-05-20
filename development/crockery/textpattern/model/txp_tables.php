@@ -1,5 +1,10 @@
 <?php
 
+/*
+$HeadURL$
+$LastChangedRevision$
+*/
+
 require_once dirname(dirname(__FILE__)).'/lib/txplib_table.php';
 
 # These are due to unprefixed index for existing installs.

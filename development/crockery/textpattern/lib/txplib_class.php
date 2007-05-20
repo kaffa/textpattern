@@ -1,5 +1,10 @@
 <?php
 
+/*
+$HeadURL$
+$LastChangedRevision$
+*/
+
 // Copyright 2006 Alex Shiels http://thresholdstate.com/
 
 

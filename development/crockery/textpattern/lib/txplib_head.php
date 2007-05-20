@@ -1,8 +1,8 @@
 <?php
 
 /*
-$HeadURL: http://svn.textpattern.com/development/crockery/textpattern/lib/txplib_head.php $
-$LastChangedRevision: 1098 $
+$HeadURL$
+$LastChangedRevision$
 */
 
 // -------------------------------------------------------------
