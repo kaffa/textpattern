@@ -125,6 +125,14 @@ class ZemAdminController {
 		$this->_pagebottom();
 	}
 
+	function _set_view($step /*, $a, $b, ... */) {
+		// use this in a _post handler to switch to a different view
+		// additional args will be passed as parameters to the view function
+		$this->_step = $step;
+		$args = func_get_args();
+		$this->_view_args = array_slice($args, 1);
+	}
+
 	// display a message to the user
 	// $type is used as the CSS class
 	function _message($msg, $type='message') {
