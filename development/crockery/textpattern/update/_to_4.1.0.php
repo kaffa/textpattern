@@ -1,8 +1,8 @@
 <?php
 /*
 
-$HeadURL: $
-$LastChangedRevision: $
+$HeadURL$
+$LastChangedRevision$
 
 */
 
