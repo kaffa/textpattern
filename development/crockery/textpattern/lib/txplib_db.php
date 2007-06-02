@@ -153,7 +153,7 @@ if (empty($GLOBALS['DB']))
 		// FIXME: lock the table so this is atomic?
 		$wa = (is_array($where) ? join(' and ', $where) : $where);
 		$r = safe_update($table, $set, $wa, $debug);
-		if ($r and $DB->affected_rows())
+		if ($r and $DB->affected_rows($r))
 			return $r;
 		else {
 			$wc = (is_array($where) ? join(', ', $where) : $where);
