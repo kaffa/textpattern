@@ -42,7 +42,7 @@ $LastChangedRevision$
 			$query[] = $cfilter;
 
 			$rs = safe_rows_start(
-				"*, ID as thisid, unix_timestamp(Posted) as uPosted, unix_timestamp(LastMod) as uLastMod",
+				"*, ID as thisid, unix_timestamp(Posted) as uPosted, unix_timestamp(Expires) as uExpires, unix_timestamp(LastMod) as uLastMod",
 				"textpattern",
 				"Status=4 and Posted <= now() ".join(' ',$query).
 				"and Posted < now() and (now() <= Expires or Expires = ".NULLDATETIME.") ".
