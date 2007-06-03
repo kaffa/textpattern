@@ -45,7 +45,7 @@ class ImageController extends ZemAdminController
 
 // -------------------------------------------------------------
 
-	function list_view($message = '')
+	function list_view()
 	{
 		global $prefs;
 		extract($prefs);
