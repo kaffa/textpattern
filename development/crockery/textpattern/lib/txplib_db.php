@@ -42,7 +42,7 @@ class DB {
 global $txpcfg;
 
 if (empty($GLOBALS['DB']))
-	$GLOBALS['DB'] =& mdb_factory($txpcfg['host'], $txpcfg['db'], $txpcfg['user'], $txpcfg['pass'], @$txpcfg['dbcharset']);
+	$GLOBALS['DB'] =& mdb_factory($txpcfg['host'], $txpcfg['db'], $txpcfg['user'], $txpcfg['pass'], @$txpcfg['dbcharset'], 'trace_add');
 
 //-------------------------------------------------------------
 	function safe_pfx($table) {
