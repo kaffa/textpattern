@@ -60,6 +60,26 @@ safe_upgrade_table('textpattern', array(
 	'Expires' => "datetime NOT NULL default '0000-00-00 00:00:00' after `Posted`"
 ));
 
-safe_upgrade_index('textpattern', 'Expires_idx', '', 'Expires');
+// populate section_id values
+foreach (safe_rows('id, name', 'txp_section', '1=1') as $row) {
+	safe_update('textpattern', "section_id='".doSlash($row['id'])."'", "Section='".doSlash($row['name'])."'");
+}
+
+// <txp:message /> is dropped
+safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
+
+
+// fix up the parent field in txp_category
+safe_query("alter ignore table ".safe_pfx('txp_category')." modify parent INT not null");
+$types = safe_column('distinct type', 'txp_category', '1=1');
+foreach ($types as $type) {
+	$root = safe_field('id', 'txp_category', "type='".doSlash($type)."' and name='root' and parent=0");
+	if (!$root)
+		$root = safe_insert('txp_category', "name='root', type='".doSlash($type)."', parent=0");
+	safe_update('txp_category', "parent='".$root."'", "type='".doSlash($type)."' and parent=0 and id != '".$root."'");
+	tree_rebuild_full('txp_category', "type='".doSlash($type)."'");
+}
+
+
 
 ?>

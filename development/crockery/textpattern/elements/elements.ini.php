@@ -23,5 +23,9 @@ event = "pub_page"
 [txp_section/txp_section]
 event = "section"
 
+[txp_category/txp_category]
+event = "category"
+tabarea = "content"
+
 
 ; */ ?>
