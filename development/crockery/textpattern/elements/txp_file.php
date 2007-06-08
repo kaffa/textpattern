@@ -108,7 +108,7 @@ class FileController extends ZemAdminController {
 
 			default:
 				$dir = 'desc';
-				$sort_sql = 'filename '.$dir;
+				$sort_sql = 'created '.$dir;
 			break;
 		}
 
@@ -280,7 +280,7 @@ class FileController extends ZemAdminController {
 			'category'		=> gTxt('file_category')
 		);
 
-		return search_form('file', 'file_list', $crit, $methods, $method, 'filename');
+		return search_form('file', 'list', $crit, $methods, $method, 'filename');
 	}
 
 // -------------------------------------------------------------
@@ -296,7 +296,7 @@ class FileController extends ZemAdminController {
 			$id = gps('id');
 		}
 
-		$categories = getTree('root', 'file');
+		$categories = tree_get('txp_category', NULL, "type='file'");
 
 		$rs = safe_row('*, unix_timestamp(created) as created, unix_timestamp(modified) as modified', 'txp_file', "id = '$id'");
 
@@ -339,7 +339,6 @@ class FileController extends ZemAdminController {
 			$form = '';
 			#categorySelectInput($type, $name, $val, $id
 
-			if ($file_exists) {
 				$form =	tr(
 							td(
 								form(
@@ -347,6 +346,7 @@ class FileController extends ZemAdminController {
 #										treeSelectInput('category',$categories,$category)) .
 										categorySelectInput('file', 'category', $category, 'file_category')).
 //									graf(gTxt('permissions').br.selectInput('perms',$levels,$permissions)).
+									graf(gTxt('filename').br.fInput('text','filename',$filename,'edit')).
 									graf(gTxt('description').br.text_area('description','100','400',$description)) .
 									fieldset(radio_list('status', $this->file_statuses(), $status, 4), gTxt('status'), 'file-status').
 									fieldset($created, gTxt('timestamp'), 'file-created').
@@ -355,7 +355,6 @@ class FileController extends ZemAdminController {
 									eInput($this->event) .
 									sInput('save').
 
-									hInput('filename', $filename).
 									hInput('id', $id) .
 
 									hInput('sort', $sort).
@@ -366,37 +365,6 @@ class FileController extends ZemAdminController {
 								)
 							)
 						);
-			} else {
-
-				$form =	tr(
-							tda(
-								hed(gTxt('file_relink'),3).
-								file_upload_form(gTxt('upload_file'),'upload','file_replace',$id).
-								form(
-									graf(gTxt('existing_file').' '.
-									selectInput('filename',$existing_files,"",1).
-									fInput('submit','',gTxt('Save'),'smallerbox').
-
-									eInput($this->event).
-									sInput('save').
-
-									hInput('id',$id).
-									hInput('category',$category).
-									hInput('perms',($permissions=='-1')?'':$permissions).
-									hInput('description',$description).
-
-									hInput('sort', $sort).
-									hInput('dir', $dir).
-									hInput('page', $page).
-									hInput('crit', $crit).
-									hInput('method', $method)
-
-									)
-								),
-								' colspan="4" style="border:0"'
-							)
-						);
-			}
 			echo startTable('list'),
 			tr(
 				td(
@@ -406,6 +374,11 @@ class FileController extends ZemAdminController {
 				)
 			),
 			$form,
+			tr(
+				td(
+					$this->file_upload_form(gTxt('file_replace'),'file_replace','new_replace',$id)
+				)
+			),
 			endTable();
 		}
 	}
@@ -582,6 +555,47 @@ class FileController extends ZemAdminController {
 		$this->list_view();
 	}
 
+// -------------------------------------------------------------
+	function new_replace_post() {
+
+		$id = $this->psi('id');
+		$this->_set_view('edit', $id);
+
+		$name = $this->handle_upload();
+		if ($name) {
+			$path = $this->file_path($name);
+			$size = filesize($path);
+			$old_file = safe_field('filename', 'txp_file', "id='".doSlash($id)."'");
+			if (safe_update('txp_file', "filename='".doSlash($name)."', size='".doSlash($size)."', created=now(), modified=now()", "id='".doSlash($id)."'")) {
+				// if the filename has changed, remove the old one
+				if ($name != $old_file)
+					unlink($this->file_path($old_file));
+				$this->_message(gTxt('file_replaced', array('{name}'=>$name)));
+				$this->_set_view('list');
+			}
+			else {
+				global $DB;
+				$this->_error(gTxt('file_save_error', array('{error}' => $DB->lasterror())));
+			}
+
+		}
+		else {
+			$this->_error(gTxt('file_upload_failed'));
+		}
+
+	}
+
+// -------------------------------------------------------------
+	function handle_upload() {
+		if ($_FILES) {
+			$file = $this->file_get_uploaded();
+			$name = $this->file_get_uploaded_name();
+			$path = $this->file_path($name);
+			if (shift_uploaded_file($file, $path))
+				return $name;
+		}
+
+	}
 
 // -------------------------------------------------------------
 	function reset_count_post()
@@ -611,26 +625,17 @@ class FileController extends ZemAdminController {
 		global $file_base_path;
 		extract(doSlash(gpsa(array('id', 'filename', 'category', 'description', 'status', 'publish_now', 'year', 'month', 'day', 'hour', 'minute', 'second'))));
 
-		$permissions = "";
-		if (isset($_GET['perms'])) {
-			$permissions =  urldecode($_GET['perms']);
-		} elseif (isset($_POST['perms'])) {
-			$permissions = $_POST['perms'];
-		}
-		if (is_array($permissions)) {
-			asort($permissions);
-			$permissions = implode(",",$permissions);
-		}
+		$old_filename = safe_field('filename','txp_file',"id='$id'");
+		if ($old_filename and $old_filename != $filename) {
+			if (safe_field('id', 'txp_file',"filename='".doSlash($filename)."'")) {
+				$this->_error(gTxt('file_already_exists', array('{name}'=>$filename)));
+				return;
+			}
 
-		$perms = doSlash($permissions);
+			$old_path = $this->file_path($old_filename);
+			$new_path = $this->file_path($filename);
 
-		$old_filename = fetch('filename','txp_file','id','$id');
-
-		if ($old_filename != false && strcmp($old_filename,$filename)!=0) {
-			$old_path = build_file_path($file_base_path,$old_filename);
-			$new_path = build_file_path($file_base_path,$filename);
-
-			if (file_exists($old_path) && shift_uploaded_file($old_path,$new_path) === false) {
+			if (!shift_uploaded_file($old_path,$new_path)) {
 				$this->_error(messenger("file",$filename,"could not be renamed"));
 				return;
 			} else {
@@ -646,11 +651,10 @@ class FileController extends ZemAdminController {
 		else
 			$created = '';
 
-		$size = filesize(build_file_path($file_base_path,$filename));
+		$size = filesize($this->file_path($filename));
 		$rs = safe_update('txp_file', "
 			filename = '$filename',
 			category = '$category',
-			permissions = '$perms',
 			description = '$description',
 			status = '$status',
 			size = '$size',
@@ -727,6 +731,11 @@ class FileController extends ZemAdminController {
 	function file_set_perm($file)
 	{
 		return @chmod($file,0755);
+	}
+	
+	function file_path($filename) {
+		global $prefs;
+		return build_file_path($prefs['file_base_path'], $filename);
 	}
 
 // -------------------------------------------------------------
