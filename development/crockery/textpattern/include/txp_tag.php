@@ -251,7 +251,7 @@ begin generic functions
 
 	function article_category_pop($val)
 	{
-		$vals = getTree('root','article');
+		$vals = tree_get('txp_category', NULL, "type='article'");
 
 		if ($vals)
 		{
@@ -265,7 +265,7 @@ begin generic functions
 
 	function link_category_pop($val)
 	{
-		$vals = getTree('root','link');
+		$vals = tree_get('txp_category', NULL, "type='link'");
 
 		if ($vals)
 		{
@@ -279,7 +279,7 @@ begin generic functions
 
 	function file_category_pop($val)
 	{
-		$vals = getTree('root','file');
+		$vals = tree_get('txp_category', NULL, "type='file'");
 
 		if ($vals)
 		{

@@ -423,53 +423,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
- 	function getTree($root, $type, $where='1=1')
- 	{
-
-		$root = doSlash($root);
-		$type = doSlash($type);
-
-	   $rs = safe_row(
-	    	"lft as l, rgt as r",
-	    	"txp_category",
-			"name='$root' and type = '$type'"
-		);
-
-		if (!$rs) return array();
-		extract($rs);
-
-		$inc_root = ($root == 'root') ? " and name != 'root'" : '';
-
-		$out = array();
-		$right = array();
-
-	    $rs = safe_rows_start(
-	    	"id, name, lft, rgt, parent, title",
-	    	"txp_category",
-	    	"lft between $l and $r and type = '$type' and name != 'root' and $where order by lft asc"
-		);
-
-	    while ($rs and $row = nextRow($rs)) {
-	   		extract($row);
-			while (count($right) > 0 && $right[count($right)-1] < $rgt) {
-				array_pop($right);
-			}
-
-        	$out[] =
-        		array(
-        			'id' => $id,
-        			'name' => $name,
-        			'title' => $title,
-        			'level' => count($right),
-        			'children' => ($rgt - $lft - 1) / 2
-        		);
-
-	        $right[] = $rgt;
-	    }
-    	return($out);
- 	}
-
-// -------------------------------------------------------------
+// DEPRECATED: use tree_get_path instead
  	function getTreePath($target, $type)
  	{
 

@@ -61,7 +61,7 @@ $LastChangedRevision$
 		$category1 = '';
 		$category2 = '';
 
-		$rs = getTree('root', 'article');
+		$rs = tree_get('txp_category', NULL, "type='article'");
 
 		if ($rs)
 		{

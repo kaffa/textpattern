@@ -151,7 +151,7 @@ class ImageController extends ZemAdminController
 		if (!$id) $id = assert_int(gps('id'));
 		extract($this->context);
 	
-		$categories = getTree("root", "image");
+		$categories = tree_get('txp_category', NULL, "type='image'");
 		
 		$rs = safe_row("*", "txp_image", "id = $id");
 		
