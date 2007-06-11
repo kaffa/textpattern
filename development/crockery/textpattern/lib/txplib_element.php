@@ -33,7 +33,7 @@ define('elements_dir', 'elements');
 
 		$style = secpath($name.'.css', $dir);
 		if (is_file($style) && is_readable($style))
-			$elements[$name]['stylesheet'] = hu.'textpattern/'.elements_dir.'/'.$name.'.css';
+			$elements[$name]['stylesheet'] = elements_dir.'/'.$name.'.css';
 
 		$elements[$name]['loaded'] = 1;
 		return include_once($file);
