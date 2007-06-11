@@ -19,7 +19,7 @@ function element_list($event, $step) {
 	foreach ($rs as $row) {
 		extract($row);
 		if ($hash)
-			$checksum = (md5_file(txpath.'/elements/'.$name.'.php') == $hash ? gTxt('ok') : gTxt('modified'));
+			$checksum = (md5_file(txpath.'/elements/'.$name.$name.'.php') == $hash ? gTxt('ok') : gTxt('modified'));
 		else
 			$checksum = gTxt('unknown');
 
