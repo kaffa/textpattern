@@ -173,7 +173,7 @@ $LastChangedRevision$
 		$out =  makeOut('id','s','c','q','pg','p','month','author');
 
 			// some useful vars for taghandlers, plugins
-		$out['request_uri'] = serverSet('REQUEST_URI');
+		$out['request_uri'] = preg_replace("|^https?://[^/]+|i","",serverSet('REQUEST_URI'));
 		$out['qs'] = serverSet('QUERY_STRING');
 			// IIS fix 
 		if (!$out['request_uri'] and serverSet('SCRIPT_NAME'))
@@ -183,7 +183,9 @@ $LastChangedRevision$
 		{
 			$argv = serverSet('argv');
 			$out['request_uri'] = @substr($argv[0], strpos($argv[0], ';') + 1);
-		}			// define the useable url, minus any subdirectories.
+		}
+
+			// define the useable url, minus any subdirectories.
 			// this is pretty fugly, if anyone wants to have a go at it - dean
 		$out['subpath'] = $subpath = preg_quote(preg_replace("/https?:\/\/.*(\/.*)/Ui","$1",hu),"/");
 		$out['req'] = $req = preg_replace("/^$subpath/i","/",$out['request_uri']);
@@ -201,8 +203,8 @@ $LastChangedRevision$
 			extract(chopUrl($req));
 	
 				//first we sniff out some of the preset url schemes
-			if (!empty($u1)) {
-	
+			if (strlen($u1)) {
+
 				switch($u1) {
 	
 					case 'atom':
@@ -226,9 +228,6 @@ $LastChangedRevision$
 					case urldecode(strtolower(urlencode(gTxt('file_download')))):
 						$out['s'] = 'file_download';
 						$out['id'] = (!empty($u2)) ? $u2 : ''; break;
-					
-					case 'p':
-						$out['p'] = (is_numeric($u2)) ? $u2 : ''; break;
 					
 					default:
 						// then see if the prefs-defined permlink scheme is usable
@@ -343,6 +342,9 @@ $LastChangedRevision$
 
 		// Stats: found or not
 		$out['status'] = ($is_404 ? '404' : '200');
+
+		$out['pg'] = is_numeric($out['pg']) ? intval($out['pg']) : '';
+		$out['id'] = is_numeric($out['id']) ? intval($out['id']) : '';
 		
 		if ($out['s'] == 'file_download') {
 			// get id of potential filename
@@ -1002,11 +1004,11 @@ $LastChangedRevision$
 		if ($qs) $req = substr($req, 0, $qs);
 		$req = preg_replace('/index\.php$/', '', $req);
 		$r = array_map('urldecode', explode('/',$req));
-		$o['u0'] = (!empty($r[0])) ? $r[0] : '';
-		$o['u1'] = (!empty($r[1])) ? $r[1] : '';
-		$o['u2'] = (!empty($r[2])) ? $r[2] : '';
-		$o['u3'] = (!empty($r[3])) ? $r[3] : '';
-		$o['u4'] = (!empty($r[4])) ? $r[4] : '';
+		$o['u0'] = (isset($r[0])) ? $r[0] : '';
+		$o['u1'] = (isset($r[1])) ? $r[1] : '';
+		$o['u2'] = (isset($r[2])) ? $r[2] : '';
+		$o['u3'] = (isset($r[3])) ? $r[3] : '';
+		$o['u4'] = (isset($r[4])) ? $r[4] : '';
 
 		return $o;
 	}
