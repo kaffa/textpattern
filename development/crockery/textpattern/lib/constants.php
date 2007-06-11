@@ -30,8 +30,17 @@ define('DQUOTE', '"');
 
 define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc());
 
+define('REGEXP_UTF8', @preg_match('@\pL@u', 'q'));
+
 define('prefs_dir', 'prefs');
 
-error_reporting($old_level);unset($old_level);
+define('EXTRA_MEMORY', '32M');
+
+define('IS_CGI', substr(PHP_SAPI, 0, 3) == 'cgi' );
+define('IS_FASTCGI', IS_CGI and empty($_SERVER['FCGI_ROLE']) and empty($_ENV['FCGI_ROLE']) );
+define('IS_APACHE', !IS_CGI and substr(PHP_SAPI, 0, 6) == 'apache' );
+
+error_reporting($old_level);
+unset($old_level);
 
 ?>

@@ -55,8 +55,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 	function doSpecial($in)
-	{ 
-		return doArray($in,'htmlspecialchars'); 
+	{
+		return doArray($in,'htmlspecialchars');
 	}
 
 // -------------------------------------------------------------
@@ -99,7 +99,17 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
+	function escape_tags($str)
+	{
+		return strtr($str,
+			array(
+				'<' => '&#60;',
+				'>' => '&#62;',
+			)
+		);
+	}
 
+// -------------------------------------------------------------
 	function escape_cdata($str)
 	{
 		return '<![CDATA['.str_replace(']]>', ']]]><![CDATA[]>', $str).']]>';
@@ -401,7 +411,10 @@ $LastChangedRevision$
 		}
 
 		if (!empty($prefs['plugin_cache_dir'])) {
-			$dir = rtrim(abspath($prefs['plugin_cache_dir']), '/') . '/';
+			$dir = rtrim($prefs['plugin_cache_dir'], '/') . '/';
+			# in case it's a relative path
+			if (!is_dir($dir))
+				$dir = rtrim(realpath(txpath.'/'.$dir), '/') . '/';
 			if (is_file($dir . $name . '.php')) {
 				$plugins[] = $name;
 				set_error_handler("pluginErrorHandler");
@@ -485,7 +498,10 @@ $LastChangedRevision$
 		if (!is_array($plugins)) $plugins = array();
 
 		if (!empty($prefs['plugin_cache_dir'])) {
-			$dir = rtrim(abspath($prefs['plugin_cache_dir']), '/') . '/';
+			$dir = rtrim($prefs['plugin_cache_dir'], '/') . '/';
+			# allow a relative path
+			if (!is_dir($dir))
+				$dir = rtrim(realpath(txpath.'/'.$dir), '/') . '/';
 			$dh = @opendir($dir);
 			while ($dh and false !== ($f = @readdir($dh))) {
 				if ($f{0} != '.')
@@ -506,7 +522,7 @@ $LastChangedRevision$
 					$plugins_ver[$a['name']] = $a['version'];
 					$GLOBALS['txp_current_plugin'] = $a['name'];
 					$eval_ok = eval($a['code']);
-					if ($eval_ok === FALSE)
+					if ($eval_ok === FALSE) 
 						echo gTxt('plugin_load_error_above').strong($a['name']).n.br;
 					unset($GLOBALS['txp_current_plugin']);
 				}
@@ -537,7 +553,6 @@ $LastChangedRevision$
 
 		if (!is_array($plugin_callback))
 			return;
-
 		$return_value = '';
 		foreach ($plugin_callback as $c) {
 			if ($c['event'] == $event and (empty($c['step']) or $c['step'] == $step) and $c['pre'] == $pre) {
@@ -550,7 +565,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function register_tab($area, $event, $title)
+	function register_tab($area, $event, $title) 
 	{
 		global $plugin_areas;
 		
@@ -738,7 +753,9 @@ $LastChangedRevision$
 	function noWidow($str)
 	{
 		// replace the last space with a nbsp
-		return preg_replace('@[ ]+(\w+[[:punct:]]?)$@', '&#160;$1', rtrim($str));
+		if (REGEXP_UTF8 == 1)
+			return preg_replace('@[ ]+([[:punct:]]?\pL+[[:punct:]]?)$@u', '&#160;$1', rtrim($str));
+		return preg_replace('@[ ]+([[:punct:]]?\w+[[:punct:]]?)$@', '&#160;$1', rtrim($str));
 	}
 
 // -------------------------------------------------------------
@@ -756,7 +773,7 @@ $LastChangedRevision$
 					$codes[] = strpos($code, '.') ? $code : '127.0.0.'.$code;
 				}
 			}
-			$hosts = @gethostbynamel($rip.'.'.$rbl);
+			$hosts = @gethostbynamel($rip.'.'.trim($rbl,'. ').'.');
 			if ($hosts and (!isset($codes) or array_intersect($hosts, $codes))) {
 				$listed[] = $rbl;
 			}
@@ -823,7 +840,7 @@ $LastChangedRevision$
 
 	function is_valid_email($address)
 	{
-		return preg_match('/^[\w._-]+@([\w-]+\.)+[\w-]+$/', $address);
+		return preg_match('/^[a-z0-9](\.?[a-z0-9_+%-])*@([a-z0-9](-*[a-z0-9])*\.)+[a-z]{2,6}$/i', $address);
 	}
 
 // -------------------------------------------------------------
@@ -844,22 +861,13 @@ $LastChangedRevision$
 			extract(safe_row('RealName, email', 'txp_users', "email = '".doSlash($to_address)."'"));
 		}
 
-		if ($prefs['override_emailcharset'])
+		if ($prefs['override_emailcharset'] and is_callable('utf8_decode'))
 		{
 			$charset = 'ISO-8599-1';
 
-			if (is_callable('utf8_decode'))
-			{
-				$RealName		= utf8_decode($RealName);
-				$subject		= utf8_decode($subject);
-				$body				= utf8_decode($body);
-				$to_address = utf8_decode($to_address);
-
-				if (!is_null($reply_to))
-				{
-					$reply_to = utf8_decode($reply_to);
-				}
-			}
+			$RealName = utf8_decode($RealName);
+			$subject = utf8_decode($subject);
+			$body = utf8_decode($body);
 		}
 
 		else
@@ -916,7 +924,7 @@ $LastChangedRevision$
 			}
 			return $string;
 		}
-		if ($prefs['override_emailcharset']) {
+		if ($prefs['override_emailcharset'] and is_callable('utf8_decode')) {
 			$start = '=?ISO-8859-1?B?';
 			$pcre  = '/.{1,42}/s';
 		}
@@ -1256,13 +1264,13 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function is_cgi()
 	{
-		return (preg_match('/^cgi/i', php_sapi_name()) == 1);
+		return IS_CGI;
 	}
 
 // -------------------------------------------------------------
 	function is_mod_php()
 	{
-		return (php_sapi_name() == 'apache');
+		return IS_APACHE;
 	}
 
 // --------------------------------------------------------------
@@ -1520,8 +1528,10 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function txp_status_header($status='200 OK')
 	{
-		if (substr(php_sapi_name(), 0, 3) == 'cgi' and empty($_SERVER['FCGI_ROLE']) and empty($_ENV['FCGI_ROLE']))
+		if (IS_FASTCGI)
 			header("Status: $status");
+		elseif ($_SERVER['SERVER_PROTOCOL'] == 'HTTP/1.0')
+			header("HTTP/1.0 $status");
 		else
 			header("HTTP/1.1 $status");
 	}
@@ -1949,14 +1959,28 @@ eod;
 	function assert_article() {
 		global $thisarticle;
 		if (empty($thisarticle))
-         trigger_error(gTxt('error_article_context'));
+			trigger_error(gTxt('error_article_context'));
 	}
 
 //-------------------------------------------------------------
 	function assert_comment() {
 		global $thiscomment;
 		if (empty($thiscomment))
-         trigger_error(gTxt('error_comment_context'));
+			trigger_error(gTxt('error_comment_context'));
+	}
+
+//-------------------------------------------------------------
+	function assert_file() {
+		global $thisfile;
+		if (empty($thisfile))
+			trigger_error(gTxt('error_file_context'));
+	}
+
+//-------------------------------------------------------------
+	function assert_link() {
+		global $thislink;
+		if (empty($thislink))
+			trigger_error(gTxt('error_link_context'));
 	}
 
 //-------------------------------------------------------------
@@ -1995,17 +2019,21 @@ eod;
 	}
 //-------------------------------------------------------------
 	function show_clean_test($pretext) {
-		echo @$pretext['req'].n;
-		var_export($pretext);
+		echo md5(@$pretext['req']).n;
+		if (serverSet('SERVER_ADDR') == serverSet('REMOTE_ADDR'))
+		{
+			var_export($pretext);
+		}
 	}
 
 //-------------------------------------------------------------
 
-	function pager($total, $limit, $page)
-	{
-		$num_pages = ceil($total / $limit);
+	function pager($total, $limit, $page) {
+		$total = (int) $total;
+		$limit = (int) $limit;
+		$page = (int) $page;
 
-		$page = $page ? (int) $page : 1;
+		$num_pages = ceil($total / $limit);
 
 		$page = min(max($page, 1), $num_pages);
 
