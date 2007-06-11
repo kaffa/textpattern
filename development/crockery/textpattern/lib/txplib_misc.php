@@ -1984,6 +1984,13 @@ eod;
 	}
 
 //-------------------------------------------------------------
+	function assert_section() {
+		global $thissection;
+		if (empty($thissection))
+			trigger_error(gTxt('error_section_context'));
+	}
+
+//-------------------------------------------------------------
 	function assert_int($myvar) {
 		global $production_status;
 

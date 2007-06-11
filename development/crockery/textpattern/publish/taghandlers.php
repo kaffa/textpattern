@@ -28,7 +28,7 @@ $LastChangedRevision$
 		} elseif ($q) {
 			$out = $sitename.$separator.gTxt('search_results')."$separator $q";
 		} elseif ($c) {
-			$out = fetch_category_title($c);
+			$out = $sitename.$separator.fetch_category_title($c);
 		} elseif ($s and $s != 'default') {
 			$out = $sitename.$separator.fetch_section_title($s);
 		} elseif ($pg) {
@@ -371,6 +371,7 @@ $LastChangedRevision$
 				extract($a);
 
 				$thislink = array(
+					'id'          => $id,
 					'linkname'    => $linkname,
 					'url'         => $url,
 					'description' => $description,
@@ -379,6 +380,8 @@ $LastChangedRevision$
 				);
 
 				$out[] = parse_form($form);
+
+				$thislink = '';
 			}
 
 			if ($out)
@@ -395,6 +398,7 @@ $LastChangedRevision$
 	function tpt_link($atts)
 	{
 		global $thislink;
+		assert_link();
 
 		extract(lAtts(array(
 			'rel' => '',
@@ -412,6 +416,7 @@ $LastChangedRevision$
 	function linkdesctitle($atts)
 	{
 		global $thislink;
+		assert_link();
 
 		extract(lAtts(array(
 			'rel' => '',
@@ -433,6 +438,7 @@ $LastChangedRevision$
 	function link_name($atts)
 	{
 		global $thislink;
+		assert_link();
 
 		extract(lAtts(array(
 			'escape'	 => ''
@@ -448,6 +454,7 @@ $LastChangedRevision$
 	function link_url($atts)
 	{
 		global $thislink;
+		assert_link();
 
 		return $thislink['url'];
 	}
@@ -457,6 +464,7 @@ $LastChangedRevision$
 	function link_description($atts)
 	{
 		global $thislink;
+		assert_link();
 
 		extract(lAtts(array(
 			'class'		 => '',
@@ -481,6 +489,7 @@ $LastChangedRevision$
 	function link_date($atts)
 	{
 		global $thislink, $dateformat;
+		assert_link();
 
 		extract(lAtts(array(
 			'format' => $dateformat,
@@ -496,6 +505,7 @@ $LastChangedRevision$
 	function link_category($atts)
 	{
 		global $thislink;
+		assert_link();
 
 		extract(lAtts(array(
 			'class'		 => '',
@@ -653,7 +663,7 @@ $LastChangedRevision$
 
 	function related_articles($atts)
 	{
-		global $thisarticle;
+		global $thisarticle, $prefs;
 
 		assert_article();
 
@@ -664,6 +674,7 @@ $LastChangedRevision$
 			'labeltag' => '',
 			'limit'    => 10,
 			'match'    => 'Category1,Category2',
+			'no_widow' => @$prefs['title_no_widow'],
 			'section'  => '',
 			'sort'     => 'Posted desc',
 			'wraptag'  => '',
@@ -722,7 +733,9 @@ $LastChangedRevision$
 
 			while ($a = nextRow($rs))
 			{
-				$out[] = href(escape_title($a['Title']), permlinkurl($a));
+				$a['Title'] = ($no_widow) ? noWidow(escape_title($a['Title'])) : escape_title($a['Title']);
+
+				$out[] = href($a['Title'], permlinkurl($a));
 			}
 
 			if ($out)
@@ -902,66 +915,73 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-// output href list of site sections
+// output list of site sections
 
-	function section_list($atts) 
+	function section_list($atts, $thing='') 
 	{
-		global $sitename, $s;
+		global $sitename, $s, $thissection;
 
 		extract(lAtts(array(
-			'active_class'    => '',
-			'break'           => br,
-			'class'           => __FUNCTION__,
-			'default_title'   => $sitename,
-			'exclude'         => '',
-			'include_default' => '',
-			'label'           => '',
-			'labeltag'        => '',
-			'sections'        => '',
-			'wraptag'         => ''
+			'active_class'		=> '',
+			'break'				=> br,
+			'class'				=> __FUNCTION__,
+			'default_title'   	=> $sitename,
+			'exclude'			=> '',
+			'form'				=> '',
+			'include_default'	=> '',
+			'label'				=> '',
+			'labeltag'			=> '',
+			'parents'			=> '', // @todo
+			'sections'			=> '',
+			'sort'				=> '',
+			'wraptag'			=> ''
 		), $atts));
 
-		if ($sections)
-		{
+		if ($sections) {
 			$sections = do_list($sections);
 			$sections = join("','", doSlash($sections));
 
-			$rs = safe_rows_start('name, title', 'txp_section', "name in ('$sections') order by field(name, '$sections')");
-		}
-
-		else
-		{
-			if ($exclude)
-			{
+			$rs = safe_rows_start('*', 'txp_section', "name in ('$sections') order by ".($sort ? $sort : "field(name, '$sections')"));
+		} else {
+			if ($exclude) {
 				$exclude = do_list($exclude);
 				$exclude = join("','", doSlash($exclude));
 
 				$exclude = "and name not in('$exclude')";
 			}
 
-			$rs = safe_rows_start('name, title', 'txp_section', "name != 'default' $exclude order by name");
+			$rs = safe_rows_start('*', 'txp_section', "name != 'default' $exclude order by ".($sort ? $sort : 'name ASC'));
 		}
 
-		if ($rs)
-		{
+		if ($rs) {
 			$out = array();
 
-			while ($a = nextRow($rs))
-			{
+			$old_section = $thissection;
+			while ($a = nextRow($rs)) {
 				extract($a);
 
-				$url = pagelinkurl(array('s' => $name));
-
-				$out[] = tag($title, 'a', 
-					( ($active_class and ($s == $name)) ? ' class="'.$active_class.'"' : '' ).
-					' href="'.$url.'"'
+				$thissection = array(
+					'id'          	=> $id,
+					'name'			=> $name,
+					'title'         => $title,
+					'url' 			=> pagelinkurl(array('s' => $name)),
+					'parent'        => $parent
 				);
-			}
 
-			if ($out)
-			{
-				if ($include_default)
-				{
+				if(empty($form) && empty($thing)) {
+					$out[] = tag($title, 'a', 
+						( ($active_class and ($s == $name)) ? ' class="'.$active_class.'"' : '' ).
+						' href="'.$thissection['url'].'"');	
+				} elseif (empty($form)) {
+					$out[] = parse($thing);
+				} else {
+					$out[] = parse_form($form);
+				}
+			}
+			$thissection = $old_section;
+
+			if ($out) {
+				if ($include_default) {
 					$out = array_merge(array(
 						tag($default_title,'a', 
 							( ($active_class and ($s == 'default')) ? ' class="'.$active_class.'"' : '' ).
@@ -975,6 +995,66 @@ $LastChangedRevision$
 		}
 
 		return '';
+	}
+
+// -------------------------------------------------------------
+
+	function section_id($atts)
+	{
+		global $thissection;
+		assert_section();
+		return $thissection['id'];
+	}
+
+// -------------------------------------------------------------
+
+	function section_name($atts)
+	{
+		global $thissection;
+		assert_section();
+		extract(lAtts(array(
+			'escape'	=> ''
+		), $atts));
+		return ($escape == 'html') ? escape_output($thissection['name']) : $thissection['name'];
+	}
+
+// -------------------------------------------------------------
+
+	function section_title($atts)
+	{
+		global $thissection;
+		assert_section();
+		extract(lAtts(array(
+			'escape'	=> ''
+		), $atts));
+		return ($escape == 'html') ? escape_output($thissection['title']) : $thissection['title'];
+	}
+
+// -------------------------------------------------------------
+
+	function section_url($atts)
+	{
+		global $thissection;
+		assert_section();
+		return $thissection['url'];
+	}
+
+// -------------------------------------------------------------
+
+	function section_parent($atts)
+	{
+		global $thissection;
+		assert_section();
+		return $thissection['parent'];
+	}
+
+// -------------------------------------------------------------
+
+	function if_active_section($atts, $thing)
+	{
+		global $thissection, $s;
+		assert_section();
+		return parse(EvalElse($thing, $thissection['name'] == $s));
 	}
 
 // -------------------------------------------------------------
@@ -1107,6 +1187,12 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
+	function site_name() {
+		return $GLOBALS['sitename'];
+	}
+
+// -------------------------------------------------------------
+
 	function site_slogan()
 	{
 		return $GLOBALS['site_slogan'];
@@ -1142,7 +1228,7 @@ $LastChangedRevision$
 		$numPages = $thispage['numPages'];
 		$pg				= $thispage['pg'];
 
-		if ($numPages > 1 and $pg > 1)
+		if ($numPages > 1 and $pg > 1 and $pg <= $numPages)
 		{
 			$nextpg = ($pg - 1 == 1) ? 0 : ($pg - 1);
 
@@ -1154,6 +1240,7 @@ $LastChangedRevision$
 			}
 
 			$url = pagelinkurl(array(
+				'month'  => @$pretext['month'],
 				'pg'		 => $nextpg,
 				's'			 => @$pretext['s'],
 				'c'			 => @$pretext['c'],
@@ -1187,7 +1274,7 @@ $LastChangedRevision$
 		$numPages = $thispage['numPages'];
 		$pg				= $thispage['pg'];
 
-		if ($numPages > 1 and $pg != $numPages)
+		if ($numPages > 1 and $pg > 0 and $pg < $numPages)
 		{
 			$nextpg = $pg + 1;
 
@@ -1199,6 +1286,7 @@ $LastChangedRevision$
 			}
 
 			$url = pagelinkurl(array(
+				'month'  => @$pretext['month'],
 				'pg'		 => $nextpg,
 				's'			 => @$pretext['s'],
 				'c'			 => @$pretext['c'],
@@ -1222,7 +1310,9 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function text($atts) 
 	{
-		extract(lAtts(array('item' => ''),$atts));
+		extract(lAtts(array(
+			'item' => '',
+		),$atts));
 		return ($item) ? gTxt($item) : '';
 	}
 
