@@ -510,9 +510,10 @@ $LastChangedRevision$
 			'frontpage' => '',
 			'id'        => '',
 			'time'      => 'past',
-			'status'    => '',
+			'status'    => '4',
 			'pgonly'    => 0,
 			'searchall' => 1,
+			'searchsticky' => 0,
 			'allowoverride' => (!$q and !$iscustom),
 			'offset'    => 0,
 		)+$customlAtts,$atts);
@@ -536,26 +537,21 @@ $LastChangedRevision$
 		$pageby = (empty($pageby) ? $limit : $pageby);
 
 		// treat sticky articles differently wrt search filtering, etc
-		if ($status and !is_numeric($status))
+		if (!is_numeric($status))
 			$status = getStatusNum($status);
 		$issticky = ($status == 5);
 			
 		//give control to search, if necesary
-		if($q && !$iscustom) {
-			$q = urldecode($q);
+		if($q && !$iscustom && !$issticky) {
 			include_once txpath.'/publish/search.php';
 			$s_filter = ($searchall ? filterSearch() : '');
-			$match = ", ".$DB->match('Title,Body', doSlash($q));
-
-			$words = preg_split('/\s+/', $q);
-			foreach ($words as $w) {
-				$rlike[] = "(Title ".$DB->rlike()." '".doSlash(preg_quote($w))."' or Body ".$DB->rlike()." '".doSlash(preg_quote($w))."')";
-			}
-			$search = " and " . join(' and ', $rlike) . " $s_filter";
+			$q = doSlash($q);
+			$match = ", match (Title,Body) against ('$q') as score";
+			$search = " and (Title rlike '$q' or Body rlike '$q') $s_filter";
 
 			// searchall=0 can be used to show search results for the current section only
 			if ($searchall) $section = '';
-			if (!$sort) $sort='score';
+			if (!$sort) $sort='score desc';
 		}
 		else {
 			$match = $search = '';
@@ -576,7 +572,7 @@ $LastChangedRevision$
 			case 'future':
 				$time = " and Posted > now()"; break;
 			default:
-				$time = " and Posted < now()";
+				$time = " and Posted <= now()";
 		}
 		$time .= " and (now() <= Expires or Expires = ".NULLDATETIME.")";
 		
@@ -597,17 +593,19 @@ $LastChangedRevision$
 
 		//Allow keywords for no-custom articles. That tagging mode, you know
 		if ($keywords) {
-			$keys = split(',',$keywords);
+			$keys = doSlash(array_map('trim', split(',' ,$keywords)));
 			foreach ($keys as $key) {
-				$keyparts[] = " Keywords like '%".doSlash(trim($key))."%'";
+				$keyparts[] = "FIND_IN_SET('".$key."',Keywords)";
 			}
 			$keywords = " and (" . join(' or ',$keyparts) . ")"; 
 		}
 
-		if ($status)
-			$statusq = ' and Status = '.intval($status);
-		else
+		if ($q and $searchsticky)
 			$statusq = ' and Status >= 4';
+		elseif ($id)
+			$statusq = ' and Status >= 4';
+		else
+			$statusq = ' and Status = '.intval($status);
 
 		$where = "1=1" . $statusq. $time.
 			$search . $id . $category . $section . $excerpted . $month . $author . $keywords . $custom . $frontpage;
@@ -668,7 +666,6 @@ $LastChangedRevision$
 
 				// sending these to paging_link(); Required?
 				$uPosted = $a['uPosted'];
-				$limit = $limit;
 
 				unset($GLOBALS['thisarticle']);
 				unset($GLOBALS['theseatts']);//Required?				
@@ -721,6 +718,7 @@ $LastChangedRevision$
 		),$atts, 0));		
 
 		if ($status or empty($thisarticle) or $thisarticle['thisid'] != $id) {
+			$thisarticle = NULL;
 			if ($status and !is_numeric($status))
 				$status = getStatusNum($status);
 
@@ -877,7 +875,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function lastMod() 
 	{
-		$last = safe_field("unix_timestamp(val)", "txp_prefs", "name='lastmod' and prefs_id=1");
+		$last = safe_field("unix_timestamp(val)", "txp_prefs", "`name`='lastmod' and prefs_id=1");
 		return gmdate("D, d M Y H:i:s \G\M\T",$last);	
 	}
 
@@ -945,7 +943,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function ckEx($table,$val,$debug='') 
 	{
-		return safe_field("name",'txp_'.$table,"name like '".doSlash($val)."' limit 1",$debug);
+		return safe_field("name",'txp_'.$table,"`name` like '".doSlash($val)."' limit 1",$debug);
 	}
 
 // -------------------------------------------------------------
@@ -990,7 +988,7 @@ $LastChangedRevision$
 	function makeOut() 
 	{
 		foreach(func_get_args() as $a) {
-			$array[$a] = gps($a);
+			$array[$a] = strval(gps($a));
 		}
 		return $array;
 	}
