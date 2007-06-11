@@ -37,7 +37,7 @@ safe_upgrade_table('txp_section', array(
 
 safe_update('txp_section', 'path=name', "path=''");
 
-	// shortname has to be unique within a parent
+// shortname has to be unique within a parent
 if (!safe_index_exists('txp_section', 'parent_idx')) 
 	safe_upgrade_index('txp_section', 'parent_idx', 'unique', 'parent,name');
 
@@ -55,15 +55,18 @@ safe_insert('txp_prefs', "prefs_id = 1, event='publish', name = 'markup_default'
 // <txp:message /> is dropped
 safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
 
-	// Expiry datetime for articles
+// Expiry datetime for articles
 safe_upgrade_table('textpattern', array(
 	'Expires' => "datetime NOT NULL default '0000-00-00 00:00:00' after `Posted`"
 ));
 
+/*
+ * @todo determine section:article relation key 
+ */ 
 // populate section_id values
-foreach (safe_rows('id, name', 'txp_section', '1=1') as $row) {
-	safe_update('textpattern', "section_id='".doSlash($row['id'])."'", "Section='".doSlash($row['name'])."'");
-}
+// foreach (safe_rows('id, name', 'txp_section', '1=1') as $row) {
+//	safe_update('textpattern', "section_id='".doSlash($row['id'])."'", "Section='".doSlash($row['name'])."'");
+//}
 
 // <txp:message /> is dropped
 safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
