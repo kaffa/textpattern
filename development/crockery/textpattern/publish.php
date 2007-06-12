@@ -546,8 +546,13 @@ $LastChangedRevision$
 			include_once txpath.'/publish/search.php';
 			$s_filter = ($searchall ? filterSearch() : '');
 			$q = doSlash($q);
-			$match = ", match (Title,Body) against ('$q') as score";
-			$search = " and (Title rlike '$q' or Body rlike '$q') $s_filter";
+			$match = ", ".$DB->match('Title,Body', $q);
+
+			$words = preg_split('/\s+/', $q);
+			foreach ($words as $w) {
+				$rlike[] = "(Title ".$DB->rlike()." '".doSlash(preg_quote($w))."' or Body ".$DB->rlike()." '".doSlash(preg_quote($w))."')";
+			}
+			$search = " and " . join(' and ', $rlike) . " $s_filter";
 
 			// searchall=0 can be used to show search results for the current section only
 			if ($searchall) $section = '';
