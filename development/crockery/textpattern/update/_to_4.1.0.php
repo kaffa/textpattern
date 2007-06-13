@@ -83,6 +83,7 @@ foreach ($types as $type) {
 	tree_rebuild_full('txp_category', "type='".doSlash($type)."'");
 }
 
-
+// index on form type
+safe_upgrade_index('txp_form', 'type_idx', '', 'type');
 
 ?>

@@ -19,6 +19,7 @@ $LastChangedRevision$
 	global $vars;
 	$vars = array('Form','type','name','savenew','oldname');
 	$essential_forms = array('comments','comments_display','comment_form','default','Links','files');
+	$essential_form_types = array('article','comment','file','link','section');
 
 	if ($event == 'form') {
 		require_privs('form');
@@ -51,7 +52,7 @@ $LastChangedRevision$
 					$modbox = (!in_array($name, $essential_forms))
 					?	'<input type="checkbox" name="selected_forms[]" value="'.$name.'" />'
 					:	sp;
-				$out[] = tr(td($editlink).td(small($type)).td($modbox));
+				$out[] = tr(td($editlink).td(small(gTxt($type))).td($modbox));
 			}
 
 			$out[] = endTable();
@@ -204,7 +205,7 @@ $LastChangedRevision$
 			return form_edit($message);
 		}
 
-		if (!in_array($type, array('article','comment','link','misc','file')))
+		if (!in_array($type, valid_form_types()))
 		{
 			$step = 'form_create';
 			$message = gTxt('form_type_missing');
@@ -257,8 +258,23 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function formTypes($type) 
 	{
-	 	$types = array(''=>'','article'=>'article','comment'=>'comment','link'=>'link','misc'=>'misc','file'=>'file'); 
+	 	$valid = valid_form_types();
+	 	foreach($valid as $v) {
+	 		$types[$v] = gTxt($v);
+	 	}
+	 	asort($types, SORT_LOCALE_STRING);	 	
 		return selectInput('type',$types,$type);
+	}
+
+// -------------------------------------------------------------
+	function valid_form_types() 
+	{
+	 	global $essential_form_types;
+	 	// pull in third-party form types
+	 	$out = safe_column('distinct type', 'txp_form', '1=1');
+	 	// collect all available form types
+	 	$out = array_merge($out,$essential_form_types,array('','misc'));
+	 	return $out;
 	}
 
 ?>
