@@ -789,10 +789,13 @@ begin tag builder functions
 			'class',
 			'default_title',
 			'exclude',
+			'form',
 			'include_default',
 			'label',
 			'labeltag',
+			'parents',
 			'sections',
+			'sort',
 			'wraptag'
 		));
 
@@ -827,6 +830,12 @@ begin tag builder functions
 
 			tagRow('wraptag',
 				input_tag('wraptag', $wraptag)).
+
+			tagRow('form',
+				form_pop('form', 'section', $form)).
+
+			tagRow('parents',
+				fInput('text', 'parents', $parents, 'edit', '', '', 20)).
 
 			tagRow('class',
 				fInput('text', 'class', $class, 'edit', '', '', 14)).
