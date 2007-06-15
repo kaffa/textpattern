@@ -268,8 +268,8 @@ $LastChangedRevision$
 		$url = pagelinkurl(array(
 			$flavor    => '1',
 			'section'  => $section,
-			'category' => $category, 
-			'limit'    => $limit 
+			'category' => $category,
+			'limit'    => $limit
 		));
 
 		if ($flavor == 'atom')
@@ -2760,6 +2760,12 @@ function body($atts)
 		),$atts));	
 
 		return parse(EvalElse($thing, @in_array($name, $plugins) and (!$ver or version_compare($plugins_ver[$name], $ver) >= 0)));
+	}
+
+// -------------------------------------------------------------
+	function nop($atts, $thing) 
+	{
+		return '';
 	}
 
 ?>
