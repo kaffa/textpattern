@@ -88,7 +88,7 @@ register_callback('article_event', 'article', '', 1);
 
 		if (empty($exp_year)) {
 			$expires =  NULLDATETIME;
-			$whenexpires = "from_unixtime(0)";
+			$whenexpires = NULLDATETIME;
 		}
 		else {			
 			if(empty($exp_month)) $exp_month=1;
