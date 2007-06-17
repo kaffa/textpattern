@@ -2763,7 +2763,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function nop($atts, $thing) 
+	function hide($atts, $thing) 
 	{
 		return '';
 	}
