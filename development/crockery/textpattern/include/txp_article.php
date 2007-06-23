@@ -301,15 +301,18 @@ register_callback('article_event', 'article', '', 1);
 			$ID = gps('ID');
 		}
 
-		if (!$view) $view = "text";
+		// switch to 'text' view upon page load and after article post
+		if(!$view || gps('save') || gps('publish')) {
+			$view = $from_view = 'text';
+		}
 		if (!$step) $step = "create";
 
 		$article = getFreshArticle();
 
-		if ($step == "edit"
-			&& $view == "text"
+		if ($step == 'edit'
+			&& $view == 'text'
 			&& !empty($ID)
-			&& $from_view != "preview"
+			&& $from_view != 'preview'
 			&& $from_view != 'html') {
 
 			$ID = assert_int($ID);
@@ -805,6 +808,12 @@ register_callback('article_event', 'article', '', 1);
 // -------------------------------------------------------------
 	function checkIfNeighbour($whichway,$sPosted)
 	{
+		// transient article, not yet saved?
+		if(empty($sPosted)) {
+			return NULL;
+		}
+		
+		// persistent article
 		$sPosted = assert_int($sPosted);
 		$dir = ($whichway == 'prev') ? '<' : '>'; 
 		$ord = ($whichway == 'prev') ? 'desc' : 'asc'; 
@@ -887,7 +896,7 @@ register_callback('article_event', 'article', '', 1);
 		$img = 'txp_img/'.$tabevent.$state.'.gif';
 		$out = '<img src="'.$img.'"';
 		$out.=($tabevent!=$view) ? ' onclick="document.article.view.value=\''.$tabevent.'\'; document.article.submit(); return false;"' : "";
-		$out.= ' height="100" width="19" alt="" />';
+		$out.= ' height="100" width="19" alt="" id="article-tab-'.$tabevent.'" />';
       	return $out;
 	}
 
