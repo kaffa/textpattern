@@ -152,16 +152,18 @@ include_once(txpath.'/lib/txplib_tree.php');
 					$onClick='',
 					$size='',
 					$tab='',
-					$id='')
+					$id='',
+					$disabled = false) 
 	{
 		$o  = '<input type="'.$type.'" name="'.$name.'"'; 
 		$o .= ' value="'.cleanfInput($value).'"';
-		$o .= ($size)    ? ' size="'.$size.'"' : '';
-		$o .= ($class)   ? ' class="'.$class.'"' : '';
-		$o .= ($title)   ? ' title="'.$title.'"' : '';
-		$o .= ($onClick) ? ' onclick="'.$onClick.'"' : '';
-		$o .= ($tab)     ? ' tabindex="'.$tab.'"' : '';
-		$o .= ($id)      ? ' id="'.$id.'"' : '';
+		$o .= ($size)     ? ' size="'.$size.'"' : '';
+		$o .= ($class)    ? ' class="'.$class.'"' : '';
+		$o .= ($title)    ? ' title="'.$title.'"' : '';
+		$o .= ($onClick)  ? ' onclick="'.$onClick.'"' : '';
+		$o .= ($tab)      ? ' tabindex="'.$tab.'"' : '';
+		$o .= ($id)       ? ' id="'.$id.'"' : '';
+		$o .= ($disabled) ? ' disabled="disabled"' : '';
 		$o .= " />";
 		return $o;
 	}
@@ -234,12 +236,23 @@ include_once(txpath.'/lib/txplib_tree.php');
 	}
 
 //-------------------------------------------------------------
-	function form($contents, $style = '', $onsubmit = '', $method = 'post', $class = '') {
+	function form($contents, $style = '', $onsubmit = '', $method = 'post', $class = '') 
+	{
+		return start_form($style, $onsubmit, $method, $class).$contents.end_form();
+	}
 
+//-------------------------------------------------------------
+	function start_form($style = '', $onsubmit = '', $method = 'post', $class = '') 
+	{
 		return n.'<form method="'.$method.'" action="index.php"'.
 			($class ? ' class="'.$class.'"' : '').
-			($onsubmit ? ' onsubmit="return '.$onsubmit.'"' : '').
-			'>'.n.$contents.n.'</form>';
+			($onsubmit ? ' onsubmit="return '.$onsubmit.'"' : '').'>';
+	}
+
+//-------------------------------------------------------------
+	function end_form() 
+	{
+		return n.'</form>';
 	}
 
 // -------------------------------------------------------------

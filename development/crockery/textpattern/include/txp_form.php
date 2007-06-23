@@ -260,7 +260,7 @@ $LastChangedRevision$
 	{
 	 	$valid = valid_form_types();
 	 	foreach($valid as $v) {
-	 		$types[$v] = gTxt($v);
+	 		$types[$v] = htmlspecialchars(gTxt($v));
 	 	}
 	 	asort($types, SORT_LOCALE_STRING);	 	
 		return selectInput('type',$types,$type);

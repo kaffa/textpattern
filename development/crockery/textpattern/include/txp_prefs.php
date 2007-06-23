@@ -37,6 +37,11 @@ class PrefsController extends ZemAdminController {
 		echo $view->render();
 	}
 
+	function list_languages_view() {
+	//@todo: a stub
+		echo graf('not_implemented');
+	}
+
 	function edit_post() {
 		// save all the prefs values
 		update_pref('markup_default', $this->ps('markup_default', 'txptextile'));

@@ -156,7 +156,13 @@ $LastChangedRevision$
 			' class="txpCommentInputMessage'.(($commentwarn) ? ' comments_error"' : '"').
 			'>'.htmlspecialchars($message).'</textarea>';
 
-		$comment_submit_button = ($preview) ?	fInput('submit', 'submit', gTxt('submit'), 'button') :	'';
+		// by default, the submit button is visible but disabled
+		$comment_submit_button = fInput('submit', 'submit', gTxt('submit'), 'button disabled', '', '', '', '', 'txpCommentSubmit', true);
+
+		// if all fields checkout, the submit button is active/clickable
+		if ($preview and ($evaluator->get_result() != RELOAD) ) {
+			$comment_submit_button = fInput('submit', 'submit', gTxt('submit'), 'button', '', '', '', '', 'txpCommentSubmit', false);
+		}
 
 		if ($checkbox_type == 'forget')
 		{

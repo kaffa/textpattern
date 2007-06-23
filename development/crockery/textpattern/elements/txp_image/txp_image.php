@@ -551,7 +551,7 @@ class TxpImageTableView extends TxpTableView
 				n.t.'<li><a href="'.hu.$img_dir.'/'.$id.$ext.'">'.gTxt('view').'</a></li>'.
 				n.'</ul>';
 
-		$tr[] = safe_strftime('%c' /*'%d %b %Y %X'*/, $uDate);
+		$tr[] = gTime($uDate);
 		$tr[] =	href($name, $edit_url);
 		$tr[] = $thumbnail;
 		$tr[] = '<ul>'.

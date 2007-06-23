@@ -88,6 +88,10 @@ $LastChangedRevision$
 				$sort_sql = 'comments_count '.$dir.', Posted desc';
 			break;
 
+			case 'lastmod':
+				$sort_sql = 'LastMod '.$dir.', Posted desc';
+			break;
+
 			default:
 				$dir = 'desc';
 				$sort_sql = 'Posted '.$dir;
@@ -105,10 +109,12 @@ $LastChangedRevision$
 			$critsql = array(
 				'id'         => "ID = '$crit_escaped'",
 				'title_body' => "Title rlike '$crit_escaped' or Body rlike '$crit_escaped'",
-				'section'		 => "Section rlike '$crit_escaped'",
+				'section'	 => "Section rlike '$crit_escaped'",
 				'categories' => "Category1 rlike '$crit_escaped' or Category2 rlike '$crit_escaped'",
-				'status'		 => "Status = '".(@$sesutats[gTxt($crit_escaped)])."'",
-				'author'		 => "AuthorID rlike '$crit_escaped'",
+				'status'	 => "Status = '".(@$sesutats[gTxt($crit_escaped)])."'",
+				'author'	 => "AuthorID rlike '$crit_escaped'",
+				'posted' 	 => "Posted like '$crit_escaped%'",
+				'lastmod' 	 => "LastMod like '$crit_escaped%'" 
 			);
 
 			if (array_key_exists($search_method, $critsql))
@@ -154,7 +160,7 @@ $LastChangedRevision$
 
 		echo n.list_search_form($crit, $search_method);
 
-		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted, unix_timestamp(Expires) as expires', 'textpattern',
+		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted, unix_timestamp(Expires) as expires, unix_timestamp(LastMod) as lastmod', 'textpattern',
 			"$criteria order by $sort_sql limit $offset, $limit"
 		);
 
@@ -183,6 +189,7 @@ $LastChangedRevision$
 				n.tr(
 					n.column_head('ID', 'id', 'list', true, $switch_dir, $crit, $search_method).
 					column_head('posted', 'posted', 'list', true, $switch_dir, $crit, $search_method).
+					column_head('article_modified', 'lastmod', 'list', true, $switch_dir, $crit, $search_method, (('lastmod' == $sort) ? "$dir " : '').'articles_detail'). 
 					column_head('expires', 'expires', 'list', true, $switch_dir, $crit, $search_method, 'articles_detail').
 					column_head('title', 'title', 'list', true, $switch_dir, $crit, $search_method).
 					column_head('section', 'section', 'list', true, $switch_dir, $crit, $search_method).
@@ -251,13 +258,17 @@ $LastChangedRevision$
 					n.td(eLink('article', 'edit', 'ID', $ID, $ID).$manage).
 
 					td(
-						safe_strftime('%d %b %Y %X', $posted)
+						gTime($posted)
 					).
 
 					td(
-						($expires != NULLDATETIME) ? safe_strftime('%d %b %Y %X', $expires) : '', '' ,'articles_detail'
+						gTime($lastmod), '', "articles_detail"
 					).
-					
+
+					td(
+						($expires != NULLDATETIME) ? gTime($expires) : '', '' ,'articles_detail'
+					).
+
 					td($Title).
 
 					td(
@@ -322,10 +333,12 @@ $LastChangedRevision$
 		$methods =	array(
 			'id'				 => gTxt('ID'),
 			'title_body' => gTxt('title_body'),
-			'section'		 => gTxt('section'),
+			'section'	 => gTxt('section'),
 			'categories' => gTxt('categories'),
-			'status'		 => gTxt('status'),
-			'author'		 => gTxt('author')
+			'status'	 => gTxt('status'),
+			'author'	 => gTxt('author'),
+			'posted'	 => gTxt('posted'),
+			'lastmod'	 => gTxt('article_modified')
 		);
 
 		return search_form('list', 'list', $crit, $methods, $method, 'title_body');
