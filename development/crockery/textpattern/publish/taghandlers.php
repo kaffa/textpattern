@@ -42,9 +42,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function css($atts)
-	{
-		global $txp_error_code, $s;
+	function css($atts) {
+		global $s;
 
 		extract(lAtts(array(
 			'format' => 'url',
@@ -54,29 +53,15 @@ $LastChangedRevision$
 			'title'  => '',
 		), $atts));
 
-		if ($txp_error_code == '404')
-		{
-			$url = hu.'textpattern/css.php?n=default';
-		}
-	
-		elseif ($n)
-		{
+		if ($n) {
 			$url = hu.'textpattern/css.php?n='.$n;
-		}
-
-		elseif ($s)
-		{
-			$sn = safe_field('css','txp_section',"name='".doSlash($s)."'");
-			$url = hu.'textpattern/css.php?n='.$sn;
-		}
-
-		else
-		{
+		} elseif ($s) {
+			$url = hu.'textpattern/css.php?s='.$s;
+		} else {
 			$url = hu.'textpattern/css.php?n=default';
 		}
 
-		if ($format == 'link')
-		{
+		if ($format == 'link') {
 			return '<link rel="'.$rel.'" type="text/css"'.
 				($media ? ' media="'.$media.'"' : '').
 				($title ? ' title="'.$title.'"' : '').
@@ -279,11 +264,10 @@ $LastChangedRevision$
 
 		$title = escape_output($title);
 
-		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
-
 		if ($format == 'link')
 		{
-			
+			$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+
 			return '<link rel="alternate" type="'.$type.'" title="'.$title.'" href="'.$url.'" />';
 		}
 
@@ -308,7 +292,7 @@ $LastChangedRevision$
 			'title'    => gTxt('rss_feed_title'),
 			'wraptag'  => '',
 		), $atts));
-	
+
 		$url = pagelinkurl(array(
 			$flavor => '1',
 			'area'  =>'link',
@@ -322,10 +306,10 @@ $LastChangedRevision$
 
 		$title = escape_output($title);
 
-		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
-
 		if ($format == 'link')
 		{
+			$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+
 			return '<link rel="alternate" type="'.$type.'" title="'.$title.'" href="'.$url.'" />';
 		}
 
@@ -441,7 +425,7 @@ $LastChangedRevision$
 		assert_link();
 
 		extract(lAtts(array(
-			'escape'	 => ''
+			'escape'	 => '',
 		), $atts));
 
 		return ($escape == 'html') ? 
@@ -550,20 +534,20 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function password_protect($atts)
 	{
-		if (!is_mod_php()) {
-			trigger_error(gTxt('http_auth_requires_mod_php'));
-			return;
-		}
-
 		ob_start();
 
 		extract(lAtts(array(
 			'login' => '',
-			'pass'  => ''
+			'pass'  => '',
 		),$atts));
 
 		$au = serverSet('PHP_AUTH_USER');
 		$ap = serverSet('PHP_AUTH_PW');
+		//For php as (f)cgi, two rules in htaccess often allow this workaround
+		$ru = serverSet('REDIRECT_REMOTE_USER');
+		if ($ru && !$au && !$ap && substr( $ru,0,5) == 'Basic' ) {
+			list ( $au, $ap ) = explode( ':', base64_decode( substr( $ru,6)));
+		}
 		if ($login && $pass) {
 			if (!$au || !$ap || $au!= $login || $ap!= $pass) {
 				header('WWW-Authenticate: Basic realm="Private"');
@@ -626,7 +610,7 @@ $LastChangedRevision$
 			'labeltag' => '',
 			'limit'		 => 10,
 			'sort'     => 'posted desc',
-			'wraptag'	 => ''
+			'wraptag'  => '',
 		), $atts));
 
 		$rs = safe_rows_start('parentid, name, discussid', 'txp_discuss', 
@@ -758,7 +742,7 @@ $LastChangedRevision$
 			'wraptag'      => '',
 			'section'      => '',
 			'this_section' => 0,
-			'type'         => 'c'
+			'type'         => 'c',
 		), $atts));
 
 		if ($type == 's')
@@ -842,10 +826,13 @@ $LastChangedRevision$
 			'labeltag'     => '',
 			'parent'       => '',
 			'section'      => '',
+			'sort'         => '',
 			'this_section' => 0,
 			'type'         => 'article',
-			'wraptag'      => ''
+			'wraptag'      => '',
 		), $atts));
+
+		$sort = doSlash($sort);
 
 		if ($categories)
 		{
@@ -853,7 +840,7 @@ $LastChangedRevision$
 			$categories = join("','", doSlash($categories));
 
 			$rs = safe_rows_start('name, title', 'txp_category', 
-				"type = '".doSlash($type)."' and name in ('$categories') order by field(name, '$categories')");
+				"type = '".doSlash($type)."' and name in ('$categories') order by ".($sort ? $sort : "field(name, '$categories')"));
 		}
 
 		else
@@ -861,6 +848,7 @@ $LastChangedRevision$
 			if ($exclude)
 			{
 				$exclude = do_list($exclude);
+
 				$exclude = join("','", doSlash($exclude));
 
 				$exclude = "and name not in('$exclude')";
@@ -875,14 +863,14 @@ $LastChangedRevision$
 					extract($qs);
 
 					$rs = safe_rows_start('name, title', 'txp_category', 
-						"(lft between $lft and $rgt) and type = '".doSlash($type)."' and name != 'default' $exclude order by lft asc");
+						"(lft between $lft and $rgt) and type = '".doSlash($type)."' and name != 'default' $exclude order by ".($sort ? $sort : 'lft ASC'));
 				}
 			}
 
 			else
 			{
 				$rs = safe_rows_start('name, title', 'txp_category', 
-					"type = '$type' and name not in('default','root') $exclude order by name");
+					"type = '$type' and name not in('default','root') $exclude order by ".($sort ? $sort : 'name ASC'));
 			}
 		}
 
@@ -899,7 +887,7 @@ $LastChangedRevision$
 					$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
 
 					$out[] = tag(str_replace('& ', '&#38; ', $title), 'a', 
-						( ($active_class and ($c == $name)) ? ' class="'.$active_class.'"' : '' ).
+						( ($active_class and ($c == strtolower($name))) ? ' class="'.$active_class.'"' : '' ).
 						' href="'.pagelinkurl(array('s' => $section, 'c' => $name)).'"'
 					);
 				}
@@ -915,7 +903,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-// output list of site sections
+// output href list of site sections
 
 	function section_list($atts, $thing='') 
 	{
@@ -937,20 +925,28 @@ $LastChangedRevision$
 			'wraptag'			=> ''
 		), $atts));
 
+		$sort = doSlash($sort);
+
 		if ($sections) {
 			$sections = do_list($sections);
+
 			$sections = join("','", doSlash($sections));
 
-			$rs = safe_rows_start('*', 'txp_section', "name in ('$sections') order by ".($sort ? $sort : "field(name, '$sections')"));
-		} else {
-			if ($exclude) {
-				$exclude = do_list($exclude);
-				$exclude = join("','", doSlash($exclude));
+			$rs = safe_rows_start('name, title', 'txp_section', "name in ('$sections') order by ".($sort ? $sort : "field(name, '$sections')"));
+		}
 
+		else
+		{
+			if ($exclude)
+			{
+				$exclude = do_list($exclude);
+
+				$exclude = join("','", doSlash($exclude));
+				
 				$exclude = "and name not in('$exclude')";
 			}
 
-			$rs = safe_rows_start('*', 'txp_section', "name != 'default' $exclude order by ".($sort ? $sort : 'name ASC'));
+			$rs = safe_rows_start('name, title', 'txp_section', "name != 'default' $exclude order by ".($sort ? $sort : 'name ASC'));
 		}
 
 		if ($rs) {
@@ -1346,7 +1342,7 @@ $LastChangedRevision$
 		assert_article();
 
 		extract(lAtts(array(
-			'id' => ''
+			'id' => '',
 		), $atts));
 
 		if ($id)
@@ -1554,7 +1550,7 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'break'		=> 'br',
 			'class'		=> __FUNCTION__,
-			'wraptag'	=> 'div'
+			'wraptag'	=> 'div',
 		), $atts));
 
 		$evaluator =& get_comment_evaluator();
@@ -1587,6 +1583,7 @@ $LastChangedRevision$
 			'break'		=> ($comments_are_ol ? 'li' : 'div'),
 			'class'		=> __FUNCTION__,
 			'breakclass'=> '',
+			'sort'		=> 'posted ASC',
 		),$atts));	
 
 		assert_article();
@@ -1596,7 +1593,7 @@ $LastChangedRevision$
 		if (@$thisid) $id = $thisid;
 
 		$rs = safe_rows_start("*, unix_timestamp(posted) as time", "txp_discuss",
-			'parentid='.intval($id).' and visible='.VISIBLE.' order by posted asc');
+			'parentid='.intval($id).' and visible='.VISIBLE.' order by '.doSlash($sort));
 
 		$out = '';
 
@@ -1647,6 +1644,7 @@ $LastChangedRevision$
 
 		}
 		$preview['message'] = markup_comment($preview['message']);
+		$preview['web'] = clean_url($preview['web']);
 
 		$GLOBALS['thiscomment'] = $preview;
 		$comments = parse_form($form).n;
@@ -1815,7 +1813,7 @@ $LastChangedRevision$
 		global $author;		
 
 		extract(lAtts(array(
-			'name' => ''
+			'name' => '',
 		), $atts));
 
 		if ($name)
@@ -1833,7 +1831,7 @@ $LastChangedRevision$
 		global $thisarticle;
 
 		extract(lAtts(array(
-			'name' => ''
+			'name' => '',
 		), $atts));
 
 		$author = $thisarticle['authorid'];
@@ -1895,12 +1893,12 @@ function body($atts)
 		assert_article();
 
 		extract(lAtts(array(
-			'class'				 => '',
-			'link'				 => 1,
-			'title'				 => 1,
-			'section'			 => '',
+			'class'        => '',
+			'link'         => 1,
+			'title'        => 1,
+			'section'      => '',
 			'this_section' => 0,
-			'wraptag'			 => ''
+			'wraptag'      => '',
 		), $atts));
 
 		if ($thisarticle['category1'])
@@ -1914,6 +1912,7 @@ function body($atts)
 			{
 				$out = '<a'.
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
+					( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 					' href="'.pagelinkurl(array('s' => $section, 'c' => $category)).'"'.
 					($title ? ' title="'.$label.'"' : '').
 					'>'.parse($thing).'</a>';
@@ -1944,12 +1943,12 @@ function body($atts)
 		assert_article();
 
 		extract(lAtts(array(
-			'class'				 => '',
-			'link'				 => 1,
-			'title'				 => 1,
-			'section'			 => '',
+			'class'        => '',
+			'link'         => 1,
+			'title'        => 1,
+			'section'      => '',
 			'this_section' => 0,
-			'wraptag'			 => ''
+			'wraptag'      => '',
 		), $atts));
 
 		if ($thisarticle['category2'])
@@ -1963,6 +1962,7 @@ function body($atts)
 			{
 				$out = '<a'.
 					($permlink_mode != 'messy' ? ' rel="tag"' : '').
+					( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 					' href="'.pagelinkurl(array('s' => $section, 'c' => $category)).'"'.
 					($title ? ' title="'.$label.'"' : '').
 					'>'.parse($thing).'</a>';
@@ -2011,6 +2011,7 @@ function body($atts)
 			if ($thing)
 			{
 				$out = '<a href="'.pagelinkurl(array('s' => $section, 'c' => $category,)).'"'.
+					( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 					($title ? ' title="'.$label.'"' : '').
 					'>'.parse($thing).'</a>';
 			}
@@ -2067,6 +2068,7 @@ function body($atts)
 			if ($thing)
 			{
 				$out = '<a href="'.pagelinkurl(array('s' => $sec)).'"'.
+					( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 					($title ? ' title="'.$label.'"' : '').
 					'>'.parse($thing).'</a>';
 			}
@@ -2292,10 +2294,11 @@ function body($atts)
 			'class'    => __FUNCTION__,
 			'labeltag' => '',
 			'c' => $c, // Keep the option to override categories due to backward compatiblity
+			'sort'     => 'name ASC',
 		),$atts));
 		$c = doSlash($c);
 		
-		$rs = safe_rows_start("*", "txp_image","category='$c' and thumbnail=1 order by name");
+		$rs = safe_rows_start("*", "txp_image","category='$c' and thumbnail=1 order by ".doSlash($sort));
 
 		if ($rs) {
 			$out = array();
@@ -2498,6 +2501,8 @@ function body($atts)
 	}
 
 //--------------------------------------------------------------------------
+// Searches use default page. This tag allows you to use different templates if searching
+//--------------------------------------------------------------------------
 
 	function if_search($atts, $thing)
 	{
@@ -2535,26 +2540,40 @@ function body($atts)
 	}
 
 //--------------------------------------------------------------------------
-	function if_article_category($atts, $thing)
-	{
+
+	function if_article_category($atts, $thing) {
 		global $thisarticle;
+
 		assert_article();
 
 		extract(lAtts(array(
-			'name' => '',
+			'name'   => '',
 			'number' => '',
-		),$atts));
+		), $atts));
 
-		if ($number)
-			$cats = array($thisarticle['category' . $number]);
-		else
-			$cats = array_unique(array($thisarticle['category1'], $thisarticle['category2']));
+		$cats = array();
 
-		sort($cats);
-		if ($name)
-			return parse(EvalElse($thing, (in_array($name, $cats))));
+		if ($number) {
+			if (!empty($thisarticle['category'.$number])) {
+				$cats = array($thisarticle['category'.$number]);
+			}
+		} else {
+			if (!empty($thisarticle['category1'])) {
+				$cats[] = $thisarticle['category1'];
+			}
 
-		return parse(EvalElse($thing, (array_shift($cats) != '')));
+			if (!empty($thisarticle['category2'])) {
+				$cats[] = $thisarticle['category2'];
+			}
+
+			$cats = array_unique($cats);
+		}
+
+		if ($name) {
+			return parse(EvalElse($thing, array_intersect(do_list($name), $cats)));
+		} else {
+			return parse(EvalElse($thing, ($cats)));
+		}
 	}
 
 //--------------------------------------------------------------------------
