@@ -264,10 +264,10 @@ $LastChangedRevision$
 
 		$title = escape_output($title);
 
+		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+
 		if ($format == 'link')
 		{
-			$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
-
 			return '<link rel="alternate" type="'.$type.'" title="'.$title.'" href="'.$url.'" />';
 		}
 
@@ -306,10 +306,10 @@ $LastChangedRevision$
 
 		$title = escape_output($title);
 
+		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+
 		if ($format == 'link')
 		{
-			$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
-
 			return '<link rel="alternate" type="'.$type.'" title="'.$title.'" href="'.$url.'" />';
 		}
 
