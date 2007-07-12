@@ -194,7 +194,7 @@ $LastChangedRevision$
 			'comment_web_input'			=> fInput('text', 'web', htmlspecialchars($web)	, 'comment_web_input', '', '', $isize, '', 'comment_web_input'),
 			'comment_message_input' 	=> $textarea.'<!-- plugin-place-holder -->',
 			'comment_remember'			=> $checkbox,
-			'comment_preview'			=> fInput('submit', 'preview', gTxt('preview'), 'button'),
+			'comment_preview'			=> fInput('submit', 'preview', gTxt('preview'), 'button', '', '', '', '', 'txpCommentPreview', false),
 			'comment_submit'			=> $comment_submit_button
 		);
 
@@ -402,6 +402,7 @@ $LastChangedRevision$
 		var $status;
 		var $message;
 		var $txpspamtrace = array();
+		var $status_text = array();
 
 		function comment_evaluation() {
 			global $prefs;
@@ -410,6 +411,11 @@ $LastChangedRevision$
 								   MODERATE => array(),
 								   VISIBLE  => array(),
 								   RELOAD  => array()
+								);
+			$this->status_text = array(	SPAM => gTxt('spam'), 
+									MODERATE => gTxt('unmoderated'), 
+									VISIBLE  => gTxt('visible'), 
+									RELOAD  => gTxt('reload')
 								);
 			$this->message = $this->status;
 			$this -> txpspamtrace[] = "Comment on $parentid by $name (".safe_strftime($prefs['archive_dateformat'],time()).")";
@@ -432,13 +438,13 @@ $LastChangedRevision$
 			if (trim($msg)) $this->message[$type][] = $msg;
 		}
 
-		function get_result() {
+		function get_result($result_type='numeric') {
 			$result = array();
 			foreach ($this->status as $key => $value)
 				$result[$key] = array_sum($value)/max(1,count($value));
 			arsort($result, SORT_NUMERIC);
 			reset($result);
-			return key($result);
+			return (($result_type == 'numeric') ? key($result) : $this->status_text[key($result)]);
 		}
 		function get_result_message() {
 			return $this->message[$this->get_result()];
@@ -543,11 +549,14 @@ function checkNonce($nonce)
 		extract($article);
 		extract(safe_row("RealName, email", "txp_users", "name = '".doSlash($AuthorID)."'"));
 
+		$evaluator =& get_comment_evaluator();
+	
 		$out = gTxt('greeting')." $RealName,\r\n\r\n";
 		$out .= str_replace('{title}',$Title,gTxt('comment_recorded'))."\r\n";
 		$out .= permlinkurl_id($parentid)."\r\n";
 		if (has_privs('discuss', $AuthorID))
 			$out .= hu.'textpattern/index.php?event=discuss&step=discuss_edit&discussid='.$discussid."\r\n";
+		$out .= gTxt('status').": ".$evaluator->get_result('text').'. '.implode(',',$evaluator->get_result_message())."\r\n";
 		$out .= "\r\n";
 		$out .= gTxt('comment_name').": $cname\r\n";
 		$out .= gTxt('comment_email').": $cemail\r\n";
