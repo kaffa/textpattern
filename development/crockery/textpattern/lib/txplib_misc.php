@@ -260,17 +260,22 @@ $LastChangedRevision$
 	function has_privs($res, $user='')
 	{
 		global $txp_user, $txp_permissions;
+		static $privs;
 
 		// If no user name is supplied, assume the current login name
 		if (empty($user))
 			$user = $txp_user;
 
-		$privs = safe_field("privs", "txp_users", "name='".doSlash($user)."'");
+		if (!isset($privs[$user]))
+		{
+			$privs[$user] = safe_field("privs", "txp_users", "name='".doSlash($user)."'");
+		}
+
 		if (@$txp_permissions[$res])
 			$req = explode(',', $txp_permissions[$res]);
 		else
 			$req = array('1'); // The Publisher gets prived for anything
-		return in_array($privs, $req);
+		return in_array($privs[$user], $req);
 	}
 
 // -------------------------------------------------------------
@@ -1429,7 +1434,8 @@ $LastChangedRevision$
 	{
 		global $prefs;
 
-		$disallow_images = !empty($prefs['comments_disallow_images']) ? true : false;
+		$disallow_images = !empty($prefs['comments_disallow_images']);
+		$lite = empty($prefs['comments_use_fat_textile']);
 
 		$rel = !empty($prefs['comment_nofollow']) ? 'nofollow' : '';
 
@@ -1437,7 +1443,7 @@ $LastChangedRevision$
 
 		$textile = new Textile();
 
-		return $textile->TextileRestricted($msg, true, $disallow_images, $rel);
+		return $textile->TextileRestricted($msg, $lite, $disallow_images, $rel);
 	}
 
 //-------------------------------------------------------------
@@ -2069,7 +2075,19 @@ eod;
 // word-wrap a string using a zero width space
 	function soft_wrap($text, $width, $break='&#8203;')
 	{
-		return chunk_split($text, $width, $break);
+		$wbr = chr(226).chr(128).chr(139);
+		$words = explode(' ', $text);
+		foreach($words as $wordnr => $word) {
+			$word = preg_replace('|([,./\\>?!:;@-]+)(?=.)|', '$1 ', $word);
+			$parts = explode(' ', $word);
+			foreach($parts as $partnr => $part) {
+				$len = strlen(utf8_decode($part));
+				if (!$len) continue;
+				$parts[$partnr] = preg_replace('/(.{'.ceil($len/ceil($len/$width)).'})(?=.)/u', '$1'.$wbr, $part);
+			}
+			$words[$wordnr] = join($wbr, $parts);
+		}
+		return join(' ', $words);
 	}
 
 //-------------------------------------------------------------
