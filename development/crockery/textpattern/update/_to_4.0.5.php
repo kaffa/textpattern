@@ -10,6 +10,8 @@ $LastChangedRevision: 711 $
 		exit("Nothing here. You can't access this file directly.");
 	}
 
+	safe_alter('txp_lang', 'DELAY_KEY_WRITE = 0');
+
 	if (!safe_field('name', 'txp_prefs', "name = 'lastmod_keepalive'"))
 		safe_insert('txp_prefs', "prefs_id = 1, name = 'lastmod_keepalive', val = '0', type = '1', html='yesnoradio'");
 		
@@ -22,18 +24,24 @@ $LastChangedRevision: 711 $
 	$update_files = 0;
 	if (!in_array('modified',$txpfile)) {
 		safe_alter('txp_file',
-			"add modified timestamp NOT NULL");
+			"add modified datetime NOT NULL default '0000-00-00 00:00:00'");
 		$update_files = 1;
 	}
 	if (!in_array('created',$txpfile)) {
 		safe_alter('txp_file',
-			"add created timestamp NOT NULL");
+			"add created datetime NOT NULL default '0000-00-00 00:00:00'");
 		$update_files = 1;
 	}
 	if (!in_array('size',$txpfile)) {
 		safe_alter('txp_file',
 			"add size bigint");
 		$update_files = 1;
+	}
+	if (!in_array('downloads',$txpfile)) {
+		safe_alter('txp_file', "ADD downloads INT DEFAULT '0' NOT NULL");
+	}
+	if (array_intersect(array('modified', 'created'), $txpfile)) {
+		safe_alter('txp_file', "MODIFY modified datetime NOT NULL default '0000-00-00 00:00:00', MODIFY created datetime NOT NULL default '0000-00-00 00:00:00'");
 	}
 
 	// copy existing file timestamps into the new database columns
@@ -42,11 +50,17 @@ $LastChangedRevision: 711 $
 		$rs = safe_rows('*', 'txp_file', '1=1');
 		foreach ($rs as $row) {
 			$path = build_file_path(@$prefs['file_base_path'], @$row['filename']);
-			if ($path and ($stat = stat($path))) {
+			if ($path and ($stat = @stat($path))) {
 				safe_update('txp_file', "created='".strftime('%Y-%m-%d %H:%M:%S', $stat['ctime'])."', modified='".strftime('%Y-%m-%d %H:%M:%S', $stat['mtime'])."', size='".doSlash(sprintf('%u', $stat['size']))."'", "id='".doSlash($row['id'])."'");
 			}
 		}
 
 	}
 
+	safe_update('textpattern', "Keywords=TRIM(BOTH ',' FROM REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(Keywords,'\n',','),'\r',','),'\t',','),'    ',' '),'  ',' '),'  ',' '),' ,',','),', ',','),',,,,',','),',,',','),',,',','))", "Keywords != ''");
+	# 'Textile links' feature removed due to unclear specs.
+	safe_delete('txp_prefs', "event='link' and name='textile_links'");
+	#  Use TextileRestricted lite/fat in comments?
+	if (!safe_field('name', 'txp_prefs', "name = 'comments_use_fat_textile'"))
+		safe_insert('txp_prefs', "prefs_id = 1, name = 'comments_use_fat_textile', val = '0', type = '1', event='comments', html='yesnoradio', position='130'");
 ?>
