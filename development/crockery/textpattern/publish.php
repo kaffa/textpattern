@@ -65,9 +65,19 @@ $LastChangedRevision$
 	if (empty($path_to_site))
 		updateSitePath(dirname(dirname(__FILE__)));
 
-	if (!defined( 'PROTOCOL'))
-		define( 'PROTOCOL', ( ( serverSet('HTTPS') != '' and strtolower(serverSet('HTTPS')) != 'off' ) ? 'https://' : 'http://') );
-		
+	if (!defined('PROTOCOL')) {
+		switch (serverSet('HTTPS')) {
+			case '':
+			case 'off': // ISAPI with IIS
+				define('PROTOCOL', 'http://');
+			break;
+
+			default:
+				define('PROTOCOL', 'https://');
+			break;
+		}
+	}
+
 		// v1.0: this should be the definitive http address of the site	
 	if (!defined('hu'))
 		define("hu",PROTOCOL.$siteurl.'/');
@@ -592,8 +602,8 @@ $LastChangedRevision$
 					$customPairs[$cField] = $atts[$cField];
 			}
 			if(!empty($customPairs)) {
-				$custom =  buildCustomSql($customFields,$customPairs);
-			} else $custom = '';
+				$custom = buildCustomSql($customFields,$customPairs);
+			}
 		}
 
 		//Allow keywords for no-custom articles. That tagging mode, you know
