@@ -58,9 +58,5 @@ $LastChangedRevision: 711 $
 	}
 
 	safe_update('textpattern', "Keywords=TRIM(BOTH ',' FROM REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(Keywords,'\n',','),'\r',','),'\t',','),'    ',' '),'  ',' '),'  ',' '),' ,',','),', ',','),',,,,',','),',,',','),',,',','))", "Keywords != ''");
-	# 'Textile links' feature removed due to unclear specs.
-	safe_delete('txp_prefs', "event='link' and name='textile_links'");
-	#  Use TextileRestricted lite/fat in comments?
-	if (!safe_field('name', 'txp_prefs', "name = 'comments_use_fat_textile'"))
-		safe_insert('txp_prefs', "prefs_id = 1, name = 'comments_use_fat_textile', val = '0', type = '1', event='comments', html='yesnoradio', position='130'");
+
 ?>
