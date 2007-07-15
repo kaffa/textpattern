@@ -7,4 +7,3 @@ Changes from the 4.0.x branch:
 * Per-user preferences table
 * Nested sections (partial)
 * Simple XML backup and export (partial)
-
