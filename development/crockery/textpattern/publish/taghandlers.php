@@ -887,7 +887,7 @@ $LastChangedRevision$
 					$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
 
 					$out[] = tag(str_replace('& ', '&#38; ', $title), 'a', 
-						( ($active_class and ($c == strtolower($name))) ? ' class="'.$active_class.'"' : '' ).
+						( ($active_class and (0 == strcasecmp($c, $name))) ? ' class="'.$active_class.'"' : '' ).
 						' href="'.pagelinkurl(array('s' => $section, 'c' => $name)).'"'
 					);
 				}
@@ -966,7 +966,7 @@ $LastChangedRevision$
 
 				if(empty($form) && empty($thing)) {
 					$out[] = tag($title, 'a', 
-						( ($active_class and ($s == $name)) ? ' class="'.$active_class.'"' : '' ).
+						( ($active_class and (0 == strcasecmp($s, $name))) ? ' class="'.$active_class.'"' : '' ).
 						' href="'.$thissection['url'].'"');	
 				} elseif (empty($form)) {
 					$out[] = parse($thing);
