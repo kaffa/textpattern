@@ -307,6 +307,8 @@ $LastChangedRevision$
 			endTable().
 			'</form>'.
 
+			n.cookie_box('show_spam').
+
 			nav_form('discuss', $page, $numPages, $sort, $dir, $crit, $search_method).
 
 			pageby_form('discuss', $comment_list_pageby);

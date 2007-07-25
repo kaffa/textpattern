@@ -603,6 +603,26 @@ EOF;
 	}
 	
 //-------------------------------------------------------------
+	function cookie_box($classname, $form=1) {
+
+		$name = 'cb_'.$classname;
+		$val = cs('toggle_'.$classname) ? 1 : 0;
+
+		$i =
+			'<input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.
+			($val ? 'checked="checked" ' : '').
+			'class="checkbox" onclick="setClassRemember(\''.$classname.'\','.(1-$val).');submit(this.form);" />'.
+			' <label for="'.$name.'">'.gTxt($classname).'</label> ';
+
+		if ($form) {
+			$args = empty($_SERVER['QUERY_STRING']) ? '' : '?'.htmlspecialchars($_SERVER['QUERY_STRING']);
+			return '<form class="'.$name.'" method="post" action="index.php'.$args.'">'.$i.eInput(gps('event')).n.'<noscript><div><input type="submit" value="'.gTxt('go').'" /></div></noscript></form>';
+		} else {
+			return n.$i;
+		}
+	}
+
+//-------------------------------------------------------------
 	function fieldset($content, $legend='', $id='') {
 		$a_id = ($id ? ' id="'.$id.'"' : '');
 		return tag(trim(tag($legend, 'legend').n.$content), 'fieldset', $a_id);
