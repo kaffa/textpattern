@@ -1054,35 +1054,58 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function search_input($atts) // input form for search queries
-	{
-		global $q, $permlink_mode;
+// input form for search queries
+
+	function search_input($atts) {
+		global $pretext, $prefs;
+
 		extract(lAtts(array(
-			'form'    => 'search_input',
-			'wraptag' => 'p',
-			'size'    => '15',
-			'label'   => gTxt('search'),
 			'button'  => '',
+			'form'    => 'search_input',
+			'label'   => gTxt('search'),
 			'section' => '',
-		),$atts));	
+			'size'    => '15',
+			'wraptag' => 'p',
+		), $atts));
 
 		if ($form) {
-			$rs = fetch('form','txp_form','name',$form);
+			$rs = fetch('form', 'txp_form', 'name', $form);
+
 			if ($rs) {
 				return $rs;
 			}
 		}
 
-		$sub = (!empty($button)) ? '<input type="submit" value="'.$button.'" />' : '';
-		$out = fInput('text','q',$q,'','','',$size);
-		$out = (!empty($label)) ? $label.br.$out.$sub : $out.$sub;
-		$out = ($wraptag) ? tag($out,$wraptag) : $out;
-	
-		if (!$section)
-			return '<form action="'.hu.'" method="get">'.$out.'</form>';
+		$out = fInput('text', 'q', $pretext['q'], '', '', '', $size);
 
-		$url = pagelinkurl(array('s'=>$section));	
-		return '<form action="'.$url.'" method="get">'.$out.'</form>';
+		if ($label) {
+			$out = $label.br.$out;
+		}
+
+		if ($button) {
+			$out .= '<input type="submit" value="'.$button.'" />';
+		}
+
+		if ($wraptag) {
+			$out = tag($out, $wraptag);
+		}
+
+		if (!$section) {
+			return '<form method="get" action="'.hu.'">'.
+				n.$out.
+				n.'</form>';
+		}
+
+		if ($prefs['permlink_mode'] != 'messy') {
+			return '<form method="get" action="'.pagelinkurl(array('s' => $section)).'">'.
+				n.$out.
+				n.'</form>';
+		}
+
+		return '<form method="get" action="'.hu.'">'.
+			n.hInput('s', $section).
+			n.$out.
+			n.'</form>';
 	}
 
 // -------------------------------------------------------------
