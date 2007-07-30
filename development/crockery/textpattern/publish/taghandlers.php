@@ -928,78 +928,66 @@ $LastChangedRevision$
 		$sort = doSlash($sort);
 
 		if ($sections) {
+			if ($include_default) {
+				$sections = 'default,'.$sections;
+			}
 			$sections = do_list($sections);
-
 			$sections = join("','", doSlash($sections));
-
-			$rs = safe_rows_start('name, title', 'txp_section', "name in ('$sections') order by ".($sort ? $sort : "field(name, '$sections')"));
-		}
-
-		else
-		{
+			$rs = safe_rows('*', 'txp_section', "name in ('$sections') order by ".($sort ? $sort : "field(name, '$sections')"));
+		} else {
 			if ($exclude)
 			{
-				$exclude = do_list($exclude);
-
-				$exclude = join("','", doSlash($exclude));
-				
-				$exclude = "and name not in('$exclude')";
+				$exclude = do_list($exclude.',default');
+				$exclude = join("','", doSlash($exclude));				
+				$exclude = "name not in('$exclude')";
+			} else {
+				$exclude = "name != 'default'";
 			}
 
-			$rs = safe_rows_start('name, title', 'txp_section', "name != 'default' $exclude order by ".($sort ? $sort : 'name ASC'));
+			$rs = safe_rows('*', 'txp_section', "$exclude order by ".($sort ? $sort : 'name ASC'));
+			if ($include_default) {
+				array_unshift($rs, array('name' => 'default',
+										'title' => $default_title,
+										'parent' => 0,
+										'url' => pagelinkurl(array('s' => 'default'))));
+			}
+
 		}
 
 		if ($rs) {
 			$out = array();
 
 			$old_section = $thissection;
-			while ($a = nextRow($rs)) {
+			foreach ($rs as $a) {
 				extract($a);
 
-				$thissection = array(
-					'id'          	=> $id,
-					'name'			=> $name,
-					'title'         => $title,
-					'url' 			=> pagelinkurl(array('s' => $name)),
-					'parent'        => $parent
-				);
-
-				if(empty($form) && empty($thing)) {
+				if (empty($form) && empty($thing)) {
 					$out[] = tag($title, 'a', 
 						( ($active_class and (0 == strcasecmp($s, $name))) ? ' class="'.$active_class.'"' : '' ).
-						' href="'.$thissection['url'].'"');	
-				} elseif (empty($form)) {
-					$out[] = parse($thing);
-				} else {
-					$out[] = parse_form($form);
+						' href="'.pagelinkurl(array('s' => $name)).'"');	
+				} else {					
+					$thissection = array(
+						'name'		=> $name,
+						'title'		=> ($name == 'default') ? $default_title : $title,
+						'url' 		=> pagelinkurl(array('s' => $name)),
+						'parent'	=> $parent
+					);
+	
+					if (empty($form)) {
+						$out[] = parse($thing);
+					} else {
+						$out[] = parse_form($form);
+					}
 				}
 			}
 			$thissection = $old_section;
 
 			if ($out) {
-				if ($include_default) {
-					$out = array_merge(array(
-						tag($default_title,'a', 
-							( ($active_class and ($s == 'default')) ? ' class="'.$active_class.'"' : '' ).
-							' href="'.hu.'"'
-						)
-					), $out);
-				}
-
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}
 		}
 
 		return '';
-	}
-
-// -------------------------------------------------------------
-
-	function section_id($atts)
-	{
-		global $thissection;
-		assert_section();
-		return $thissection['id'];
 	}
 
 // -------------------------------------------------------------
