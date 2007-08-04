@@ -191,7 +191,7 @@ class FileController extends ZemAdminController {
 
 				$file_exists = file_exists(build_file_path($file_base_path, $filename));
 
-				$download_link = ($file_exists) ? '<li>'.$this->make_download_link($id).'</li>' : '';
+				$download_link = ($file_exists) ? '<li>'.$this->make_download_link($id, '', $filename).'</li>' : '';
 
 				$category = ($category) ? '<span title="'.fetch_category_title($category, 'file').'">'.$category.'</span>' : '';
 
@@ -316,7 +316,7 @@ class FileController extends ZemAdminController {
 			$condition .= ($file_exists)?gTxt('file_status_ok'):gTxt('file_status_missing');
 			$condition .= '</span>';
 
-			$downloadlink = ($file_exists) ? $this->make_download_link($id, $filename) : $filename;
+			$downloadlink = ($file_exists) ? $this->make_download_link($id, htmlspecialchars($filename),$filename) : htmlspecialchars($filename);
 			
 			$created =
 					n.graf(checkbox('publish_now', '1', $publish_now, '', 'publish_now').'<label for="publish_now">'.gTxt('set_to_now').'</label>').
@@ -753,19 +753,13 @@ class FileController extends ZemAdminController {
 
 // -------------------------------------------------------------
 
-	function make_download_link($id, $label = '')
+	function make_download_link($id, $label = '', $filename = '')
 	{
-		global $permlink_mode;
-
 		$label = ($label) ? $label : gTxt('download');
-
-		$url = ($permlink_mode == 'messy') ?
-			hu.'index.php?s=file_download'.a.'id='.$id :
-			hu.''.gTxt('file_download').'/'.$id;
-
+		$url = filedownloadurl($id, $filename);
 		return '<a href="'.$url.'">'.$label.'</a>';
 	}
-
+	
 // -------------------------------------------------------------
 	function get_filenames()
 	{
