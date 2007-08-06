@@ -60,6 +60,9 @@ safe_upgrade_table('textpattern', array(
 	'Expires' => "datetime NOT NULL default '0000-00-00 00:00:00' after `Posted`"
 ));
 
+if (!safe_field('name', 'txp_prefs', "name = 'publish_expired_articles'"))
+	safe_insert('txp_prefs', "prefs_id = 1, name = 'publish_expired_articles', val = '0', type = '1', event='publish', html='yesnoradio', position='130'");
+
 /*
  * @todo determine section:article relation key 
  */ 
@@ -67,10 +70,6 @@ safe_upgrade_table('textpattern', array(
 // foreach (safe_rows('id, name', 'txp_section', '1=1') as $row) {
 //	safe_update('textpattern', "section_id='".doSlash($row['id'])."'", "Section='".doSlash($row['name'])."'");
 //}
-
-// <txp:message /> is dropped
-safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
-
 
 // fix up the parent field in txp_category
 safe_query("alter ignore table ".safe_pfx('txp_category')." modify parent INT not null");

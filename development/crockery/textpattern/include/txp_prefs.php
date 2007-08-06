@@ -39,7 +39,7 @@ class PrefsController extends ZemAdminController {
 
 	function list_languages_view() {
 	//@todo: a stub
-		echo graf('not_implemented');
+		echo graf('list_languages_view is not_implemented');
 	}
 
 	function edit_post() {
@@ -56,6 +56,8 @@ class PrefsController extends ZemAdminController {
 		update_pref('logging', $this->ps('logging'));
 		update_pref('use_comments', $this->ps('use_comments'));
 		update_pref('production_status', $this->ps('production_status'));
+
+		update_pref('publish_expired_articles', $this->ps('publish_expired_articles'));
 
 		update_lastmod();
 
@@ -82,6 +84,8 @@ class PrefsView extends TxpDetailView {
 		$out[] = $this->i_select('production_status', $this->prod_options(), $this->data['production_status']);
 
 		$out[] = $this->i_checkbox('use_comments', $this->data['use_comments']);
+		
+		$out[] = $this->i_checkbox('publish_expired_articles', $this->data['publish_expired_articles']);
 		
 		$out[] = $this->i_button('save');
 

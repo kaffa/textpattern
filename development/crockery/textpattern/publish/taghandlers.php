@@ -576,9 +576,10 @@ $LastChangedRevision$
 
 		$categories = ($category) ? "and (Category1 = '".doSlash($category)."' or Category2 = '".doSlash($category)."')" : '';
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';
+		$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.') ';
 
 		$rs = safe_rows_start('*, id as thisid, unix_timestamp(Posted) as posted', 'textpattern', 
-			"Status = 4 $section $categories and Posted <= now() and (now() <= Expires or Expires = ".NULLDATETIME.") order by ".doSlash($sort).' limit 0,'.intval($limit));
+			"Status = 4 $section $categories and Posted <= now()$expired order by ".doSlash($sort).' limit 0,'.intval($limit));
 
 		if ($rs)
 		{
@@ -603,6 +604,7 @@ $LastChangedRevision$
 
 	function recent_comments($atts)
 	{
+		global $prefs;
 		extract(lAtts(array(
 			'break'		 => br,
 			'class'		 => __FUNCTION__,
@@ -625,7 +627,7 @@ $LastChangedRevision$
 				$a = safe_row('*, ID as thisid, unix_timestamp(Posted) as posted, unix_timestamp(Expires) as expires', 
 					'textpattern', 'ID = '.intval($c['parentid']));
 
-				If ($a['Status'] >= 4 and (time() <= $a['expires'] or $a['expires'] == NULLDATETIME))
+				If ($a['Status'] >= 4 and (!empty($prefs['publish_expired_articles']) or time() <= $a['expires'] or $a['expires'] == NULLDATETIME))
 				{
 					$out[] = href(
 						$c['name'].' ('.escape_title($a['Title']).')', 
@@ -705,11 +707,11 @@ $LastChangedRevision$
 		}
 
 		$categories = 'and ('.join(' or ', $categories).')';
-
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';
+		$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.') ';
 
 		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted', 'textpattern', 
-			'ID != '.intval($id)." and Status = 4 and Posted <= now() and (now() <= Expires or Expires = ".NULLDATETIME.") $categories $section order by ".doSlash($sort).' limit 0,'.intval($limit));
+			'ID != '.intval($id)." and Status = 4 $expired $categories $section order by ".doSlash($sort).' limit 0,'.intval($limit));
 	
 		if ($rs)
 		{
@@ -1415,16 +1417,24 @@ $LastChangedRevision$
 		}
 	}
 
+// -------------------------------------------------------------
+
+	function if_expires($atts, $thing)
+	{
+		global $thisarticle;
+		assert_article();
+		return parse(EvalElse($thing, $thisarticle['expires'] != NULLDATETIME));
+	}
 
 // -------------------------------------------------------------
 
-	function if_expires($atts, $thing)	{
+	function if_expired($atts, $thing)
+	{
 		global $thisarticle;
-
 		assert_article();	
-		return parse(EvalElse($thing, !empty($thisarticle['expires'])));
+		return parse(EvalElse($thing, 
+			($thisarticle['expires'] != NULLDATETIME) && ($thisarticle['expires'] <= time() )));
 	}
-
 
 // -------------------------------------------------------------
 

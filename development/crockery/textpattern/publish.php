@@ -390,7 +390,7 @@ $LastChangedRevision$
 				populateArticleData($a);
 
 				$uExpires = $a['uExpires'];
-				if ($uExpires != NULLDATETIME and time() > $uExpires) {
+				if ($uExpires != NULLDATETIME and time() > $uExpires and !$publish_expired_articles) {
 					$out['status'] = '410';
 				}
 
@@ -589,7 +589,9 @@ $LastChangedRevision$
 			default:
 				$time = " and Posted <= now()";
 		}
-		$time .= " and (now() <= Expires or Expires = ".NULLDATETIME.")";
+		if (!$publish_expired_articles) {
+			$time .= " and (now() <= Expires or Expires = ".NULLDATETIME.")";
+		}
 		
 		if (!is_numeric($status))
 			$status = getStatusNum($status);
@@ -829,14 +831,16 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function getNeighbour($Posted, $s, $type) 
 	{
+		global $prefs;
+		extract($prefs);
+		$expired = ($publish_expired_articles) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.')';
 		$type = ($type == '>') ? '>' : '<';
 		$safe_name = safe_pfx('textpattern');
 		$q = array(
 			"select ID, Title, url_title, unix_timestamp(Posted) as uposted
 			from ".$safe_name." where Posted $type '".doSlash($Posted)."'",
 			($s!='' && $s!='default') ? "and Section = '".doSlash($s)."'" : filterFrontPage(),
-			'and (now() <= Expires or Expires = '.NULLDATETIME.')',
-			'and Status=4 and Posted < now() order by Posted',
+			'and Status=4 and Posted < now()'.$expired.' order by Posted',
 			($type=='<') ? 'desc' : 'asc',
 			'limit 1'
 		);
@@ -849,14 +853,18 @@ $LastChangedRevision$
 	function getNextPrev($id, $Posted, $s)
 	{
 		static $next, $cache;
+		global $prefs;
 
 		// If next/prev tags are placed before an article tag on a list page, we
 		// have to guess what the current article is
 		if (!$id) {
+			extract($prefs);
+			$expired = ($publish_expired_articles) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.')';
+
 			$current = safe_row('ID, Posted', 'textpattern', 
 				'1=1 '.
 				(($s!='' && $s!='default') ? "and Section = '".doSlash($s)."'" : filterFrontPage()).
-				'and Status=4 and Posted < now() and (now() <= Expires or Expires = '.NULLDATETIME.') order by Posted desc limit 1');
+				'and Status=4 and Posted < now()'.$expired.' order by Posted desc limit 1');
 			if ($current) {
 				$id = $current['ID'];
 				$Posted = $current['Posted'];
