@@ -25,21 +25,30 @@ class PrefsController extends ZemAdminController {
 	var $area = 'admin';
 	var $event = 'prefs';
 	var $caption = 'prefs';
-	var $default_step = 'edit';
+	var $default_step = 'prefs_list';
 
 	function PrefsController() {
 		parent::ZemAdminController();
 	}
 
-	function edit_view() {
+	function prefs_list_view() {
 		global $prefs;
-		$view = new PrefsView($prefs, $this->event, 'edit');
+		$view = new PrefsView($prefs, $this->event, 'prefs_list', gTxt('site_prefs'));
+		$view->type = '0';
+		echo $view->render();
+	}
+
+	function advanced_prefs_view() {
+		global $prefs;
+		$view = new PrefsView($prefs, $this->event, 'advanced_prefs', gTxt('advanced_preferences'));
+		$view->type = '1';
 		echo $view->render();
 	}
 
 	function list_languages_view() {
-	//@todo: a stub
-		echo graf('list_languages_view is not_implemented');
+		global $prefs;
+		$view = new LanguagesPrefsView($prefs, $this->event, 'list_languages', gTxt('manage_languages'));
+		echo $view->render();
 	}
 
 	function edit_post() {
@@ -68,8 +77,57 @@ class PrefsController extends ZemAdminController {
 // -------------------------------------------------------------
 class PrefsView extends TxpDetailView {
 
+	var $type = 0;
+
+	function PrefsView($data, $event, $step, $caption='') {
+		parent::TxpDetailView($data, $event, $step, $caption);
+		$this->listtag = '';
+		$this->rowtag = '';		
+	 	$this->ltag = 'td';
+		$this->itag = 'td';
+	}
+	
+	function head()
+	{
+		return TxpDetailView::head().
+			tag(
+					tag(sLink('prefs', 'prefs_list', gTxt('site_prefs'), ('prefs_list' == $this->step) ? 'navlink-active' : 'navlink'), 'li').n.
+					tag(sLink('prefs', 'advanced_prefs', gTxt('advanced_preferences'), ('advanced_prefs' == $this->step) ? 'navlink-active' : 'navlink'),'li').n.
+					tag(sLink('prefs', 'list_languages', gTxt('manage_languages'), ('list_languages' == $this->step) ? 'navlink-active' : 'navlink'),'li'), 
+			'ul', ' id="nav-prefs"');
+	}
+	
 	function body() {
-		$out[] = $this->i_text('sitename', $this->data['sitename']);
+		
+		extract(get_prefs());
+
+		$locale = setlocale(LC_ALL, $locale);
+		$textarray = load_lang($language);
+		$evt_list =  safe_column('distinct event', 'txp_prefs', "type = $this->type and prefs_id = 1 order by event desc");
+		if (!$use_comments) {
+			unset($evt_list['comments']);
+		}
+
+		foreach ($evt_list as $event) {
+			$rs = safe_rows_start('*', 'txp_prefs', "type = $this->type and prefs_id = 1 and event = '".doSlash($event)."' order by position");
+			$out = array();
+			while ($a = nextRow($rs)) {	
+				$name = $a['name'];
+				$widget = array($this, $this->widget($a['html']));
+				if(empty($a['choices'])) {
+					$thing = call_user_func( $widget, $name, $this->data[$name]);
+				} else {
+					$thing = call_user_func( $widget, $name, call_user_func( array($this, $a['choices'])), $this->data[$name]);					
+				}			
+				$out[] = tag($thing, 'tr');
+			}
+			$set[] = fieldset(
+						tag(join(n, $out), 'table'), 
+						gTxt($event)
+					 );
+		}
+/*
+
 		$out[] = $this->i_text('siteurl', $this->data['siteurl']);
 		$out[] = $this->i_text('site_slogan', $this->data['site_slogan']);
 
@@ -86,18 +144,49 @@ class PrefsView extends TxpDetailView {
 		$out[] = $this->i_checkbox('use_comments', $this->data['use_comments']);
 		
 		$out[] = $this->i_checkbox('publish_expired_articles', $this->data['publish_expired_articles']);
-		
-		$out[] = $this->i_button('save');
-
-		return join(n, $out);
+ */
+ 		
+		return join(n, $set).$this->i_button('save');
 	}
 
 
+	function widget($widget)
+	{
+		/* map prefs UI widgets to code
+		 * use Zend's nomenclature whereever available
+		 * @see: http://framework.zend.com/manual/en/zend.view.helpers.html
+		 */ 
+		$map = array (
+			'checkbox' => 'i_checkbox',
+			'select' => 'i_select',
+			'text' => 'i_text',
+			'radio' => 'i_select_radio',
+			// deprecated
+			'text_input' => 'i_text',
+			'yesnoradio' => 'i_checkbox',
+		);
 
+		$widget = strtolower($widget);
+		if (is_callable( array($this, @$map[$widget]) )) {
+			return $map[$widget];
+		} else {
+			return 'i_awol';
+		}		
+	}
+	
+	function i_awol($name, $value='', $opts = array())
+	{
+		return tag(
+				tag($this->label($name, $opts).' '.pophelp($name), $this->ltag).
+				tag(gTxt('no_widget_for_pref', array('pref' => $name)), $this->itag),
+			$this->rowtag
+		);
+		
+	}
 
 //-------------------------------------------------------------
 
-	function gmtoffset_options()
+	function gmtoffsets()
 	{
 		// Standard time zones as compiled by H.M. Nautical Almanac Office, June 2004
 		// http://aa.usno.navy.mil/faq/docs/world_tzones.html
@@ -123,21 +212,19 @@ class PrefsView extends TxpDetailView {
 
 //-------------------------------------------------------------
 
-	function logging_options()
+	function logging()
 	{
 		$vals = array(
 			'all'		=> gTxt('all_hits'),
 			'refer' => gTxt('referrers_only'),
 			'none'	=> gTxt('none')
 		);
-
-		#return selectInput($name, $vals, $val, '', '', $name);
 		return $vals;
 	}
 
 //-------------------------------------------------------------
 
-	function permlinkmode_options()
+	function permlinkmodes()
 	{
 		$vals = array(
 			'messy'										=> gTxt('messy'),
@@ -148,8 +235,6 @@ class PrefsView extends TxpDetailView {
 			'title_only'							=> gTxt('title_only'),
 			// 'category_subcategory' => gTxt('category_subcategory')
 		);
-
-		#return selectInput($name, $vals, $val, '', '', $name);
 		return $vals;
 	}
 
@@ -162,12 +247,12 @@ class PrefsView extends TxpDetailView {
 			'1' => gTxt('popup')
 		);
 
-		return selectInput($name, $vals, $val, '', '', $name);
+		return $vals;
 	}
 
 //-------------------------------------------------------------
 
-	function weeks($name, $val)
+	function weeks()
 	{
 		$weeks = gTxt('weeks');
 
@@ -181,12 +266,12 @@ class PrefsView extends TxpDetailView {
 			42	=> '6 '.$weeks
 		);
 
-		return selectInput($name, $vals, $val, '', '', $name);
+		return $vals;
 	}
 
 //-------------------------------------------------------------
 
-	function languages($name, $val) 
+	function languages() 
 	{
 		$installed_langs = safe_column('lang', 'txp_lang', "1 = 1 GROUP BY lang");
 		
@@ -204,8 +289,8 @@ class PrefsView extends TxpDetailView {
 
 		asort($vals);
 		reset($vals);
-
-		$out = array();
+		return $vals;
+/*		$out = array();
 
 		foreach ($vals as $avalue => $alabel) {
 			$out[] = n.t.'<option value="'.htmlspecialchars($avalue).'"'.
@@ -216,10 +301,11 @@ class PrefsView extends TxpDetailView {
 		return n.'<select id="'.$name.'" name="'.$name.'" class="list">'.
 			join('', $out).
 			n.'</select>';			
+*/
 	}
 
 // -------------------------------------------------------------
-	function dateformat_options() {
+	function dateformats() {
 
 		$dayname = '%A';
 		$dayshort = '%a';
@@ -269,7 +355,21 @@ class PrefsView extends TxpDetailView {
 	}
 //-------------------------------------------------------------
 
-	function prod_options()
+	function markups()
+	{
+		// @todo: retrieve this list from classMarkup.php
+		$vals = array(
+			'txptextile'          => gTxt('use_textile'),
+			# 'txpmarkup'         => gTxt('use_markup'),
+			'txpnl2br'   => gTxt('convert_linebreaks'),
+			'txprawxhtml' => gTxt('leave_text_untouched')
+		);
+		return $vals;
+	}
+
+//-------------------------------------------------------------
+
+	function production_stati()
 	{
 		$vals = array(
 			'debug'		=> gTxt('production_debug'),
@@ -307,7 +407,14 @@ class PrefsView extends TxpDetailView {
 		}
 		return $real_max;
 	}
-
 }
 
+class LanguagesPrefsView extends PrefsView {
+	
+	function body() 
+	{
+		return 'TODO: list_languages_view';
+	}
+
+}
 ?>

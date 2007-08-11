@@ -50,8 +50,6 @@ safe_update('txp_section', "parent='".$root_id."'", "parent IS NULL");
 include_once(txpath.'/lib/txplib_tree.php');
 tree_rebuild('txp_section', $root_id, 1);
 
-safe_insert('txp_prefs', "prefs_id = 1, event='publish', name = 'markup_default', val = 'txptextile', type = '0', html='pref_markup'");
-
 // <txp:message /> is dropped
 safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
 
@@ -84,5 +82,36 @@ foreach ($types as $type) {
 
 // index on form type
 safe_upgrade_index('txp_form', 'type_idx', '', 'type');
+
+// dropdown ui for certain prefs
+safe_upgrade_table('txp_prefs', array(
+	'choices' => 'varchar(64)'
+));
+
+safe_update('txp_prefs', "html='checkbox'", "html='yesnoradio'");
+safe_update('txp_prefs', "html='text'", "html='text_input'");
+
+safe_update('txp_prefs', "choices='commentmode', html='select'", "html='commentmode'");
+safe_update('txp_prefs', "choices='logging', html='select'", "html='logging'");
+safe_update('txp_prefs', "choices='production_stati', html='radio'", "html='prod_levels'");
+safe_update('txp_prefs', "choices='gmtoffsets', html='select'", "html='gmtoffset_select'");
+
+safe_update('txp_prefs', "choices='weeks', html='select'", "html='weeks'");
+safe_update('txp_prefs', "choices='languages', html='select'", "html='languages'");
+safe_update('txp_prefs', "choices='permlinkmodes', html='radio'", "html='permlinkmodes'");
+safe_update('txp_prefs', "choices='dateformats', html='select'", "html='dateformats'");
+
+// change previous Textile prefs into matching markup class names from classMarkup.php
+$use_textile = safe_field('val', 'txp_prefs', "name='use_textile'");
+$markups = array (
+'txprawxhtml',
+'txptextile',
+'txpnl2br'
+);
+
+if(!empty($markups[$use_textile])) {
+	safe_insert('txp_prefs', "prefs_id = 1, event='publish', name = 'markup_default', val = '$markups[$use_textile]', type = '0', html='select', choices='markups'");
+	safe_delete('txp_prefs', "name='use_textile'");
+}
 
 ?>
