@@ -158,7 +158,7 @@ class TxpDetailView {
 	function i_select($name, $choices, $value='', $opts = array()) {
 		return
 			tag($this->label($name, $opts).' '.pophelp($name), $this->ltag)
-			.tag(selectInput($name, $choices, $value, '', '', gTxt($name)), $this->itag);
+			.tag(selectInput($name, $choices, $value, '', '', $name), $this->itag);
 	}
 
 	// select option list implemented as a group of radio buttons
