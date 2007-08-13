@@ -83,7 +83,7 @@ class TxpTableView {
 
 	function render() {
 		$out = array();
-		$out[] = '<table class="txp-tableview '.$this->class." $this->type".'">';
+		$out[] = '<table class="txptableview '.$this->class." $this->type\">";
 		if ($this->caption)
 			$out[] = '<caption>'.escape_output($this->caption).'</caption>';
 		$out[] = $this->table();
@@ -156,9 +156,11 @@ class TxpDetailView {
 
 	// select option list
 	function i_select($name, $choices, $value='', $opts = array()) {
-		return
+		return tag(
 			tag($this->label($name, $opts).' '.pophelp($name), $this->ltag)
-			.tag(selectInput($name, $choices, $value, '', '', $name), $this->itag);
+			.tag(selectInput($name, $choices, $value, '', '', $name), $this->itag),
+			$this->rowtag
+		);
 	}
 
 	// select option list implemented as a group of radio buttons
@@ -230,13 +232,15 @@ class TxpDetailView {
 
 	function render() {
 		return
+			'<div class="txpdetailview '.$this->class.'">'.n.
 			$this->head().n.
 			form(
 				tag($this->body(), $this->listtag).n.
 				eInput($this->event).n.
 				sInput($this->step)
 			).n.
-			$this->foot();
+			$this->foot().n.
+			'</div>';
 	}
 
 }
