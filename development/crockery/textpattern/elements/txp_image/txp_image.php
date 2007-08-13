@@ -131,7 +131,7 @@ class ImageController extends ZemAdminController
 			$rs = safe_rows('*, unix_timestamp(date) as uDate', 'txp_image',
 			"$criteria order by $sort_sql limit $offset, $limit");
 			if ($rs) {
-				$v = new TxpImageTableView($rs, $this);
+				$v = new ImageListView($rs, $this);
 				$out[] = $v->render();
 				$out[] = nav_form($this->event, $page, $numPages, $sort, $dir, $crit, $search_method);
 				$out[] = $this->pageby_form($this->event, $image_list_pageby);
@@ -480,11 +480,11 @@ class ImageController extends ZemAdminController
 }
 
 // -------------------------------------------------------------
-class TxpImageTableView extends TxpTableView
+class ImageListView extends TxpTableView
 {
 	var $controller = NULL;
 
-	function TxpImageTableView(&$rows, $controller, $caption='', $edit_actions=array())
+	function ImageListView(&$rows, $controller, $caption='', $edit_actions=array())
 	{
 		parent::TxpTableView($rows, $caption, $edit_actions);
 		$this->controller = $controller;
