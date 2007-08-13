@@ -150,9 +150,9 @@ $LastChangedRevision$
 	{
 		// TEMPORARY code: load en-gb data from ini file
 
-		return parse_ini_file(txpath.'/lang/en-gb.ini', false);
+		// return parse_ini_file(txpath.'/lang/en-gb.ini', false);
 
-		// FIXME: unused code, needs to be updated to separate data from the 4.0.x rpc server
+		// FIXME: needs to be updated to separate data from the 4.0.x rpc server
 		global $txpcfg, $DB;
 
 		$installed = safe_field('name', 'txp_lang',"lang='".doSlash($lang)."' limit 1");
