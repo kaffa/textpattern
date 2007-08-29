@@ -571,7 +571,6 @@ $en_gb_lang = array(
 		'no_popup' => 'current window',
 		'override_emailcharset' => 'Use ISO-8859-1 encoding in e-mails sent (default is UTF-8)?',
 		'page_mode' => 'Page mode',
-		'path_from_root' => 'Sub-directory (if any)',
 		'path_to_site_missing' => '$path_to_site is not set (update index.php)',
 		'permalink_title_format' => 'Permalink title-like-this (default is TitleLikeThis)?',
 		'permlink_mode' => 'Permanent link mode',

@@ -348,7 +348,6 @@ $create_sql[] = "INSERT INTO ".PFX."txp_prefs VALUES (1, 'use_comments', '1', 0,
 $create_sql[] = "INSERT INTO ".PFX."txp_prefs VALUES (1, 'use_categories', '1', 2, 'publish', 'text_input', 0)";
 $create_sql[] = "INSERT INTO ".PFX."txp_prefs VALUES (1, 'use_sections', '1', 2, 'publish', 'text_input', 0)";
 $create_sql[] = "INSERT INTO ".PFX."txp_prefs VALUES (1, 'send_lastmod', '0', 1, 'admin', 'yesnoradio', 0)";
-$create_sql[] = "INSERT INTO ".PFX."txp_prefs VALUES (1, 'path_from_root', '/', 2, 'publish', 'text_input', 0)";
 $create_sql[] = "INSERT INTO ".PFX."txp_prefs VALUES (1, 'lastmod', '2005-07-23 16:24:10', 2, 'publish', 'text_input', 0)";
 $create_sql[] = "INSERT INTO ".PFX."txp_prefs VALUES (1, 'comments_dateformat', '%b %d, %I:%M %p', 0, 'comments', 'dateformats', 190)";
 $create_sql[] = "INSERT INTO ".PFX."txp_prefs VALUES (1, 'dateformat', 'since', 0, 'publish', 'dateformats', 70)";

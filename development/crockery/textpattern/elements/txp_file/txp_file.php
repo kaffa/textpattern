@@ -287,7 +287,7 @@ class FileController extends ZemAdminController {
 
 	function edit_view($id = '')
 	{
-		global $txpcfg, $file_base_path, $levels, $path_from_root;
+		global $txpcfg, $file_base_path, $levels;
 
 		extract(gpsa(array('name', 'category', 'permissions', 'description', 'sort', 'dir', 'page', 'crit', 'method','publish_now')));
 

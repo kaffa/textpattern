@@ -316,7 +316,6 @@ class textpattern_setup_rows
 		$preferences[] = array('name' => 'prefs_id', 'val' => '1', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
 		$preferences[] = array('name' => 'use_categories', 'val' => '1', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
 		$preferences[] = array('name' => 'use_sections', 'val' => '1', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
-		$preferences[] = array('name' => 'path_from_root', 'val' => '/', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
 		$preferences[] = array('name' => 'language', 'val' => 'en-gb', 'type' => 2, 'event' => 'publish', 'html' => 'languages', 'position' => 40);
 		$preferences[] = array('name' => 'url_mode', 'val' => '1', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
 		$preferences[] = array('name' => 'timeoffset', 'val' => '0', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);

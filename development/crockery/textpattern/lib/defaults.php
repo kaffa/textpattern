@@ -38,7 +38,6 @@ function txp_default_prefs() {
 		#'use_categories'              => '1',
 		#'use_sections'                => '1',
 		'send_lastmod'                => '0',
-		'path_from_root'              => '/',
 		#'lastmod'                     => '2006-01-03 22:38:37',
 		'comments_dateformat'         => '%b %Oe, %I:%M %p',
 		'dateformat'                  => 'since',

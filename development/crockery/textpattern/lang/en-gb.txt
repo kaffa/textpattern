@@ -383,7 +383,6 @@ norwegian => Norwegian
 no_popup => current window
 override_emailcharset => Use ISO-8859-1 for e-mails? (default is utf-8)
 page_mode => Page mode
-path_from_root => Subdirectory (if any)
 path_to_site_missing => $path_to_site is not set (update index.php)
 permalink_title_format => Permalink title-like-this (default is TitleLikeThis)
 permlink_mode => Permanent link mode
