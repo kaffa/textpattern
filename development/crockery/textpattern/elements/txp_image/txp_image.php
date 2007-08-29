@@ -32,7 +32,7 @@ class ImageController extends ZemAdminController
 	var $event = 'image';
 	var $caption = 'images';
 	var $default_step = 'list';
-	var $extensions = array(0,'.gif','.jpg','.png','.swf');
+	var $extensions = array(0,'.gif','.jpg','.png','.swf',0,0,0,0,0,0,0,0,'.swf');
 	var $context = array();
 
 	function ImageController()
@@ -315,7 +315,7 @@ class ImageController extends ZemAdminController
 		
 		list(,,$extension) = @getimagesize($file);
 	
-		if (($file !== false) && @$this->extensions[$extension]) {
+		if (($file !== false) && $this->extensions[$extension]) {
 			$ext = $this->extensions[$extension];
 			$newpath = IMPATH.$id.'t'.$ext;
 
