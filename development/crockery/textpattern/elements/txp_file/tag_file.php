@@ -47,11 +47,11 @@ $LastChangedRevision$
 
 			while ($a = nextRow($rs))
 			{
-				$GLOBALS['thisfile'] = file_download_format_info($a);
+				$thisfile = file_download_format_info($a);
 
 				$out[] = parse_form($form);
 
-				$GLOBALS['thisfile'] = '';
+				$thisfile = '';
 			}
 
 			if ($out)
@@ -91,8 +91,10 @@ $LastChangedRevision$
 			$thisfile = fileDownloadFetchInfo("filename = '".doSlash($filename)."'");
 		}
 
-		elseif ($thisfile)
+		else
 		{
+			assert_file();
+
 			$from_form = true;
 		}
 
@@ -104,7 +106,7 @@ $LastChangedRevision$
 			// so we don't want this value remaining
 			if (!$from_form)
 			{
-				$GLOBALS['thisfile'] = '';
+				$thisfile = '';
 			}
 
 			return $out;
@@ -134,8 +136,10 @@ $LastChangedRevision$
 			$thisfile = fileDownloadFetchInfo("filename = '".doSlash($filename)."'");
 		}
 
-		elseif ($thisfile)
+		else
 		{
+			assert_file();
+
 			$from_form = true;
 		}
 
@@ -149,7 +153,7 @@ $LastChangedRevision$
 			// so we don't want this value remaining
 			if (!$from_form)
 			{
-				$GLOBALS['thisfile'] = '';
+				$thisfile = '';
 			}
 
 			return $out;
@@ -187,6 +191,7 @@ $LastChangedRevision$
 	function file_download_size($atts)
 	{
 		global $thisfile;
+		assert_file();
 
 		extract(lAtts(array(
 			'decimals' => 2,
@@ -282,6 +287,7 @@ $LastChangedRevision$
 	function file_download_created($atts)
 	{
 		global $thisfile;
+		assert_file();
 
 		extract(lAtts(array(
 			'format' => '',
@@ -300,6 +306,7 @@ $LastChangedRevision$
 	function file_download_modified($atts)
 	{
 		global $thisfile;
+		assert_file();
 
 		extract(lAtts(array(
 			'format' => '',
@@ -336,6 +343,7 @@ $LastChangedRevision$
 	function file_download_id($atts)
 	{
 		global $thisfile;
+		assert_file();
 		return $thisfile['id'];
 	}
 
@@ -344,6 +352,7 @@ $LastChangedRevision$
 	function file_download_name($atts)
 	{
 		global $thisfile;
+		assert_file();
 		return $thisfile['filename'];
 	}
 
@@ -352,6 +361,7 @@ $LastChangedRevision$
 	function file_download_category($atts)
 	{
 		global $thisfile;
+		assert_file();
 
 		extract(lAtts(array(
 			'class'   => '',
@@ -373,6 +383,7 @@ $LastChangedRevision$
 	function file_download_downloads($atts)
 	{
 		global $thisfile;
+		assert_file();
 		return $thisfile['downloads'];
 	}
 
@@ -381,6 +392,7 @@ $LastChangedRevision$
 	function file_download_description($atts)
 	{
 		global $thisfile;
+		assert_file();
 
 		extract(lAtts(array(
 			'class'   => '',
