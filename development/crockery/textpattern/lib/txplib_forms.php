@@ -267,7 +267,7 @@ include_once(txpath.'/lib/txplib_tree.php');
 	function text_area($name, $h, $w, $thing = '', $id = '')
 	{
 		$id = ($id) ? ' id="'.$id.'"' : '';
-		return '<textarea'.$id.' name="'.$name.'" cols="40" rows="5" style="width:'.$w.'px; height:'.$h.'px;">'.$thing.'</textarea>';
+		return '<textarea'.$id.' name="'.$name.'" cols="40" rows="5" style="width:'.$w.'px; height:'.$h.'px;">'.htmlspecialchars($thing).'</textarea>';
 	}
 
 //-------------------------------------------------------------

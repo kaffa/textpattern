@@ -533,7 +533,7 @@ class ImageListView extends TxpTableView
 		$edit_url = "?event=$event".a.'step=edit'.a.'id='.$id.a.'sort='.$sort.
 			a.'dir='.$dir.a.'page='.$page.a.'search_method='.$search_method.a.'crit='.$crit;
 
-		$name = empty($name) ? gTxt('unnamed') : $name;
+		$name = empty($name) ? gTxt('unnamed') : htmlspecialchars($name);
 
 		$thumbnail = ($thumbnail) ?
 			href('<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="" />', $edit_url) :
@@ -542,7 +542,7 @@ class ImageListView extends TxpTableView
 		$tag_url = '?event=tag'.a.'tag_name=image'.a.'id='.$id.a.'ext='.$ext.
 			a.'w='.$w.a.'h='.$h.a.'alt='.urlencode($alt).a.'caption='.urlencode($caption);
 
-		$category = ($category) ? '<span title="'.fetch_category_title($category, 'image').'">'.$category.'</span>' : '';
+		$category = ($category) ? '<span title="'.htmlspecialchars(fetch_category_title($category, 'image')).'">'.$category.'</span>' : '';
 
 		$tr = array();
 		$tr[] = $id;
@@ -560,7 +560,7 @@ class ImageListView extends TxpTableView
 				'<li><a target="_blank" href="'.$tag_url.a.'type=xhtml" onclick="popWin(this.href); return false;">XHTML</a></li>'.
 				'</ul>';
 		$tr[] = $category;
-		$tr[] = '<span title="'.get_author_name($author).'">'.$author.'</span>';
+		$tr[] = '<span title="'.htmlspecialchars(get_author_name($author)).'">'.$author.'</span>';
 		$tr[] = dLink($this->controller->event, 'delete', 'id', $id);
 
 		if ($this->edit_actions and isset($row['id']))

@@ -193,7 +193,7 @@ class FileController extends ZemAdminController {
 
 				$download_link = ($file_exists) ? '<li>'.$this->make_download_link($id, '', $filename).'</li>' : '';
 
-				$category = ($category) ? '<span title="'.fetch_category_title($category, 'file').'">'.$category.'</span>' : '';
+				$category = ($category) ? '<span title="'.htmlspecialchars(fetch_category_title($category, 'file')).'">'.$category.'</span>' : '';
 
 				$tag_url = '?event=tag'.a.'tag_name=file_download_link'.a.'id='.$id.a.'description='.urlencode($description).
 					a.'filename='.urlencode($filename);
@@ -216,10 +216,10 @@ class FileController extends ZemAdminController {
 					, 65).
 
 					td(
-						href($filename, $edit_url)
+						href(htmlspecialchars($filename), $edit_url)
 					, 125).
 
-					td($description, 150).
+					td(htmlspecialchars($description), 150).
 					td($category, 90).
 
 					/*

@@ -29,7 +29,7 @@ $LastChangedRevision$
 	<head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="noindex, nofollow" />
-	<title>Txp &#8250; <?php echo $sitename ?> &#8250; <?php echo $pagetitle?></title>
+	<title>Txp &#8250; <?php echo htmlspecialchars($sitename) ?> &#8250; <?php echo escape_title($pagetitle) ?></title>
 	<link href="textpattern.css" rel="stylesheet" type="text/css" />
 	<?php echo n.get_element_style($event).n;?>
 	<script type="text/javascript" src="js/textpattern.js"></script>

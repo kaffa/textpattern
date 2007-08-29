@@ -438,7 +438,7 @@ register_callback('article_event', 'article', '', 1);
 						$recent['Title'] = gTxt('untitled').sp.$recent['ID'];
 					}
 
-					echo n.t.'<li><a href="?event=article'.a.'step=edit'.a.'ID='.$recent['ID'].'">'.$recent['Title'].'</a></li>';
+					echo n.t.'<li><a href="?event=article'.a.'step=edit'.a.'ID='.$recent['ID'].'">'.escape_title($recent['Title']).'</a></li>';
 				}
 
 				echo '</ul>';
@@ -524,7 +524,7 @@ register_callback('article_event', 'article', '', 1);
 
 		if ($view == 'text') {
 			echo n.graf('<label for="keywords">'.gTxt('keywords').'</label>'.sp.popHelp('keywords').br.
-				'<textarea id="keywords" name="Keywords" cols="55" rows="5">'.$Keywords.'</textarea>');
+				'<textarea id="keywords" name="Keywords" cols="55" rows="5">'.htmlspecialchars(str_replace(',' ,', ', $Keywords)).'</textarea>');
 
 	//-- custom fields --------------
 
@@ -543,9 +543,9 @@ register_callback('article_event', 'article', '', 1);
 	//-- author --------------
 	
 		if ($view=="text" && $step != "create") {
-			echo '<p class="small">'.gTxt('posted_by').": $AuthorID &#183; ".safe_strftime('%d %b %Y &#183; %X',$sPosted);
+			echo '<p class="small">'.gTxt('posted_by').': '.htmlspecialchars($AuthorID).' &#183; '.safe_strftime('%d %b %Y &#183; %X',$sPosted);
 			if($sPosted != $sLastMod) {
-				echo br.gTxt('modified_by').": $LastModID &#183; ".safe_strftime('%d %b %Y &#183; %X',$sLastMod);
+				echo br.gTxt('modified_by').': '.htmlspecialchars($LastModID).' &#183; '.safe_strftime('%d %b %Y &#183; %X',$sLastMod);
 			}
 				echo '</p>';
 			}
