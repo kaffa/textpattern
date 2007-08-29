@@ -136,14 +136,14 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-    function dmp() 
-    {
+	function dmp() 
+	{
 		$a = func_get_args();
 		echo "<pre>".n;
 		foreach ($a as $thing)
 			echo htmlspecialchars(is_scalar($thing) ? strval($thing) : var_export($thing, true)), n;
 		echo "</pre>".n;
-    }
+	}
 
 // -------------------------------------------------------------
 	function load_lang($lang)
@@ -407,10 +407,11 @@ $LastChangedRevision$
 	}
 	
 // -------------------------------------------------------------
-	function getmicrotime() { 
-    	list($usec, $sec) = explode(" ",microtime()); 
-    	return ((float)$usec + (float)$sec); 
-    }
+	function getmicrotime()
+	{
+		list($usec, $sec) = explode(" ",microtime());
+		return ((float)$usec + (float)$sec);
+	}
 
 // -------------------------------------------------------------
 	function load_plugin($name)
@@ -502,8 +503,8 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-   function load_plugins($type=NULL)
-   {
+	function load_plugins($type=NULL)
+	{
 		global $prefs,$plugins, $plugins_ver;
 
 		if (!is_array($plugins)) $plugins = array();
@@ -540,10 +541,10 @@ $LastChangedRevision$
 			}
 			restore_error_handler();
 		}
-   }
+	}
 
 // -------------------------------------------------------------
-   function register_callback($func, $event, $step='', $pre=0)
+	function register_callback($func, $event, $step='', $pre=0)
 	{
 		global $plugin_callback;
 
@@ -551,14 +552,14 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-   function register_page_extension($func, $event, $step='', $top=0)
+	function register_page_extension($func, $event, $step='', $top=0)
 	{
 		# For now this just does the same as register_callback
 		register_callback($func, $event, $step, $top);
 	}
 
 // -------------------------------------------------------------
-   function callback_event($event, $step='', $pre=0)
+	function callback_event($event, $step='', $pre=0)
 	{
 		global $plugin_callback;
 
@@ -584,18 +585,11 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function getAtt($name, $default=NULL) { // thanks zem!
-		global $theseatts;
-		return isset($theseatts[$name]) ? $theseatts[$name] : $default;
-	}
-	
-// -------------------------------------------------------------
 		function gAtt(&$atts, $name, $default=NULL) {
 			return isset($atts[$name]) ? $atts[$name] : $default;
 		}
 
 // -------------------------------------------------------------
-
 	function lAtts($pairs, $atts, $warn = 1)
 	{
 		global $production_status;
@@ -844,7 +838,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function strip_rn($str)
 	{
-      return preg_replace('/[\r\n]/', ' ', $str);
+		return preg_replace('/[\r\n]/', ' ', $str);
 	}
 
 // -------------------------------------------------------------
@@ -1429,7 +1423,6 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-
 	function markup_comment($msg)
 	{
 		global $prefs;
@@ -1698,7 +1691,6 @@ eod;
 	}
 
 // -------------------------------------------------------------
-
 	function pagelinkurl($parts, $inherit = array())
 	{
 		global $permlink_mode;
@@ -1783,7 +1775,6 @@ eod;
 	}
 
 // -------------------------------------------------------------
-
 	function in_list($val, $list, $delim = ',')
 	{
 		$args = do_list($list, $delim);
@@ -1792,7 +1783,6 @@ eod;
 	}
 
 // -------------------------------------------------------------
-
 	function do_list($list, $delim = ',')
 	{
 		$list = explode($delim, $list);

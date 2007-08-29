@@ -590,9 +590,6 @@ $LastChangedRevision$
 			$time .= " and (now() <= Expires or Expires = ".NULLDATETIME.")";
 		}
 		
-		if (!is_numeric($status))
-			$status = getStatusNum($status);
-			
 		$custom = '';
 
 		if ($customFields) {
@@ -682,7 +679,6 @@ $LastChangedRevision$
 				$uPosted = $a['uPosted'];
 
 				unset($GLOBALS['thisarticle']);
-				unset($GLOBALS['theseatts']);//Required?				
 			}
 
 			return join('',$articles);
