@@ -204,19 +204,6 @@ class FileController extends ZemAdminController {
 				$status .= ($file_exists) ? gTxt('file_status_ok') : gTxt('file_status_missing');
 				$status .= '</span>';
 
-				// does the downloads column exist?
-				if (!isset($downloads))
-				{
-					// nope, add it
-					safe_alter('txp_file', "ADD downloads INT DEFAULT '0' NOT NULL");
-					$downloads = 0;
-				}
-
-				elseif (empty($downloads))
-				{
-					$downloads = '0';
-				}
-
 				echo tr(
 
 					n.td($id).
@@ -370,7 +357,7 @@ class FileController extends ZemAdminController {
 				td(
 					graf(gTxt('file_status').br.$condition) .
 					graf(gTxt('file_name').br.$downloadlink) .
-					graf(gTxt('file_download_count').br.(isset($downloads)?$downloads:0))					
+					graf(gTxt('file_download_count').br.$downloads)					
 				)
 			),
 			$form,
@@ -538,7 +525,7 @@ class FileController extends ZemAdminController {
 			} else {
 				$this->file_set_perm($newpath);
 				if ($size = filesize($newpath))
-					safe_update('txp_file', "size='".doSlash($size)."'", "id='".doSlash($id)."'");
+					safe_update('txp_file', 'size = '.$size.', modified = now()', 'id = '.$id);
 
 				$this->_message(messenger('file',$name,'uploaded'));
 				$this->_set_view('edit', $id);
