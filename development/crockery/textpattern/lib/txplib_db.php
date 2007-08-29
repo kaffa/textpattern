@@ -147,17 +147,18 @@ if (empty($GLOBALS['DB']))
 
 // -------------------------------------------------------------
 // insert or update
+// NOTE: avoid using this fugly, inefficient function if at all possible
 	function safe_upsert($table,$set,$where,$debug='') 
 	{
 		global $DB;
 		// FIXME: lock the table so this is atomic?
 		$wa = (is_array($where) ? join(' and ', $where) : $where);
 		$r = safe_update($table, $set, $wa, $debug);
-		if ($r and $DB->affected_rows($r))
+		if ($r and ($DB->affected_rows($r) or safe_count($table, $wa, $debug)))
 			return $r;
 		else {
 			$wc = (is_array($where) ? join(', ', $where) : $where);
-			@safe_insert($table, join(', ', array($wc, $set)), $debug);
+			safe_insert($table, join(', ', array($wc, $set)), $debug);
 			return true;
 		}
 	}
