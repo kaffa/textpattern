@@ -432,7 +432,7 @@ class FileController extends ZemAdminController {
 
 		if ($file === false) {
 			// could not get uploaded file
-			$this->_error(gTxt('file_upload_failed') ." $name - ".upload_get_errormsg(@$_FILES['file']['error']));
+			$this->_error(gTxt('file_upload_failed') ." $name - ".upload_get_errormsg($_FILES['thefile']['error']));
 			return;
 		}
 
@@ -500,7 +500,7 @@ class FileController extends ZemAdminController {
 
 		if ($file === false) {
 			// could not get uploaded file
-			$this->_error(gTxt('file_upload_failed') ." $name ".upload_get_errormsg($_FILES['file']['error']));
+			$this->_error(gTxt('file_upload_failed') ." $name ".upload_get_errormsg($_FILES['thefile']['error']));
 			return;
 		}
 
