@@ -272,23 +272,17 @@ $LastChangedRevision$
 						n.'</ul>'
 					, 50).
 
-					td(
-						gTime($uPosted), 140
-					).
-
-					td(htmlspecialchars($name), 75).
-
-					td(
-						short_preview($dmessage)
-					).
-
-					td("<ul><li>".htmlspecialchars(soft_wrap($email, 30))."</li><li>".htmlspecialchars(soft_wrap($web, 30))."</li><li>$ip</li></ul>", 100, 'discuss_detail').
-					td($comment_status, 75, 'discuss_detail').
-					td($parent, 75).
-
-					td(
-						fInput('checkbox', 'selected[]', $discussid)
-					, 20)
+					td(gTime($uPosted)).
+					td(htmlspecialchars(soft_wrap($name, 15))).
+					td(short_preview($dmessage)).
+					td('<ul>'.
+						'<li>'.htmlspecialchars(soft_wrap($email, 30)).'</li>'.
+						'<li>'.htmlspecialchars(soft_wrap($web, 30)).'</li>'.
+						'<li>'.$ip.'</li>'.
+					   '</ul>', 100, 'discuss_detail').
+					td($comment_status, '', 'discuss_detail').
+					td($parent).
+					td(fInput('checkbox', 'selected[]', $discussid))
 
 				, ' class="'.$row_class.'"');
 			}

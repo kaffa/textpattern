@@ -73,8 +73,8 @@ register_callback('article_event', 'article', '', 1);
 		$incoming = markup_main_fields($incoming);
 
 		extract(doSlash($incoming));
-		$Status = assert_int(ps('Status'));  
-		extract(psa(array('markup_body', 'markup_excerpt')));  
+		$Status = assert_int(ps('Status'));
+		extract(psa(array('markup_body', 'markup_excerpt')));
 
 		$Annotate = ( ps( 'Annotate')) ? assert_int( ps( 'Annotate')) : 0;
 
@@ -112,8 +112,8 @@ register_callback('article_event', 'article', '', 1);
 		if ($Title or $Body or $Excerpt) {
 			
 			if (!has_privs('article.publish') && $Status>=4) $Status = 3;
-			if (empty($url_title)) $url_title = stripSpace($Title_plain, 1);  	
-			if (!$Annotate) $Annotate = 0; 
+			if (empty($url_title)) $url_title = stripSpace($Title_plain, 1); 	
+			if (!$Annotate) $Annotate = 0;
 
 			$ID = safe_insert(
 			   "textpattern",
@@ -148,8 +148,8 @@ register_callback('article_event', 'article', '', 1);
 				custom_8        = '$custom_8',
 				custom_9        = '$custom_9',
 				custom_10       = '$custom_10',
-				uid				= '".md5(uniqid(rand(),true))."',
-				feed_time		= now()"
+				uid             = '".md5(uniqid(rand(),true))."',
+				feed_time       = now()"
 			);
 			
 			if ($Status>=4) {
@@ -180,7 +180,7 @@ register_callback('article_event', 'article', '', 1);
 		    	or ($oldArticle['Status'] < 4 and has_privs('article.edit'))
 				or ($oldArticle['Status'] < 4 and $incoming['AuthorID']==$txp_user and has_privs('article.edit.own'))))
 		{
-				// Not allowed, you silly rabbit, you shouldn't even be here. 
+				// Not allowed, you silly rabbit, you shouldn't even be here.
 				// Show default editing screen.
 			article_edit();
 			return;
@@ -189,8 +189,8 @@ register_callback('article_event', 'article', '', 1);
 		$incoming = markup_main_fields($incoming);
 
 		extract(doSlash($incoming));
-		extract(array_map('assert_int', psa(array('ID', 'Status'))));  
-		extract(psa(array('markup_body', 'markup_excerpt')));  
+		extract(array_map('assert_int', psa(array('ID', 'Status'))));
+		extract(psa(array('markup_body', 'markup_excerpt')));
 		$Annotate = ( ps( 'Annotate')) ? assert_int( ps( 'Annotate')) : 0;
 
 		if (!has_privs('article.publish') && $Status>=4) $Status = 3;
@@ -226,8 +226,8 @@ register_callback('article_event', 'article', '', 1);
 
 		//Auto-Update custom-titles according to Title, as long as unpublished and NOT customized
 		if ( empty($url_title)
-			  || ( ($oldArticle['Status'] < 4) 
-					&& ($oldArticle['url_title'] == $url_title ) 
+			  || ( ($oldArticle['Status'] < 4)
+					&& ($oldArticle['url_title'] == $url_title )
 					&& ($oldArticle['url_title'] == stripSpace($oldArticle['Title'],1))
 					&& ($oldArticle['Title'] != $Title)
 				 )
@@ -235,9 +235,9 @@ register_callback('article_event', 'article', '', 1);
 		{
 			$url_title = stripSpace($Title_plain, 1);
 		}
-		if (!$Annotate) $Annotate = 0; 
+		if (!$Annotate) $Annotate = 0;
 
-		safe_update("textpattern", 
+		safe_update("textpattern",
 		   "Title           = '$Title',
 			Body            = '$Body',
 			Body_html       = '$Body_html',
@@ -297,7 +297,7 @@ register_callback('article_event', 'article', '', 1);
 		if(!empty($GLOBALS['ID'])) { // newly-saved article
 			$ID = $GLOBALS['ID'];
 			$step = 'edit';
-		} else {  
+		} else {
 			$ID = gps('ID');
 		}
 
@@ -461,7 +461,7 @@ register_callback('article_event', 'article', '', 1);
 
 		echo '</td>'.n.'<td id="article-main">';
 
-	//-- title input -------------- 
+	//-- title input --------------
 
 		if ($view == 'preview')
 		{
@@ -490,7 +490,7 @@ register_callback('article_event', 'article', '', 1);
 	//-- body --------------------
 
 		if ($view == 'preview')
-		{ 
+		{
 			echo do_markup($markup_body, $Body);
 		}
 
@@ -583,7 +583,7 @@ register_callback('article_event', 'article', '', 1);
 				echo n.graf(href(gtxt('create_new'), 'index.php?event=article'));
 			}
 
-		//-- prev/next article links -- 
+		//-- prev/next article links --
 
 			if ($step!='create' and ($prev_id or $next_id)) {
 				echo '<p>',
@@ -602,7 +602,7 @@ register_callback('article_event', 'article', '', 1);
 
 			echo n.n.fieldset(
 				status_radio($Status)
-			, gTxt('status'), 'write-status').
+				, gTxt('status'), 'write-status').
 
 		//-- sort and dispplay --------------
 
@@ -622,7 +622,7 @@ register_callback('article_event', 'article', '', 1);
 
 		//-- "More" section --------------
 				n.n.'<h3 class="plain"><a href="#more" onclick="toggleDisplay(\'more\'); return false;">'.gTxt('more').'</a></h3>',
-			'<div id="more" style="display: none;">';
+				'<div id="more" style="display: none;">';
 
 		//-- comments stuff --------------
 
@@ -672,7 +672,7 @@ register_callback('article_event', 'article', '', 1);
 			if ($step == "create" and empty($GLOBALS['ID']))
 			{
 
-		//-- timestamp ------------------- 
+		//-- timestamp -------------------
 
 				//Avoiding modified date to disappear
 				$persist_timestamp = (!empty($store_out['year']))?
@@ -699,7 +699,7 @@ register_callback('article_event', 'article', '', 1);
 
 				, gTxt('timestamp'), 'write-timestamp');
 
-		//-- expires ------------------- 
+		//-- expires -------------------
 
 				$persist_timestamp = (!empty($store_out['exp_year']))?
 					safe_strtotime($store_out['exp_year'].'-'.$store_out['exp_month'].'-'.$store_out['exp_day'].' '.$store_out['exp_hour'].':'.$store_out['exp_minute'].':'.$store_out['second'])
@@ -734,7 +734,7 @@ register_callback('article_event', 'article', '', 1);
 			else
 			{
 
-			//-- timestamp ------------------- 
+			//-- timestamp -------------------
 
 				if (!empty($year)) {
 					$sPosted = safe_strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second);					
@@ -813,7 +813,7 @@ register_callback('article_event', 'article', '', 1);
 
 // -------------------------------------------------------------
 
-	function custField($num, $field, $content) 
+	function custField($num, $field, $content)
 	{
 		return n.n.graf('<label for="custom-'.$num.'">'.$field.'</label>'.br.
 			n.fInput('text', 'custom_'.$num, $content, 'edit', '', '', 30, '', 'custom-'.$num)
@@ -824,11 +824,11 @@ register_callback('article_event', 'article', '', 1);
 	function checkIfNeighbour($whichway,$sPosted)
 	{
 		$sPosted = assert_int($sPosted);
-		$dir = ($whichway == 'prev') ? '<' : '>'; 
-		$ord = ($whichway == 'prev') ? 'desc' : 'asc'; 
+		$dir = ($whichway == 'prev') ? '<' : '>';
+		$ord = ($whichway == 'prev') ? 'desc' : 'asc';
 
 		if ($sPosted)
-			return safe_field("ID", "textpattern", 
+			return safe_field("ID", "textpattern",
 				"Posted $dir from_unixtime('$sPosted') order by Posted $ord limit 1");
 	}
 
@@ -899,7 +899,7 @@ register_callback('article_event', 'article', '', 1);
 	}
 
 //--------------------------------------------------------------
-	function tab($tabevent,$view) 
+	function tab($tabevent,$view)
 	{
 		$state = ($view==$tabevent) ? 'up' : 'down';
 		$img = 'txp_img/'.$tabevent.$state.'.gif';
@@ -910,7 +910,7 @@ register_callback('article_event', 'article', '', 1);
 	}
 
 //--------------------------------------------------------------
-	function getDefaultSection() 
+	function getDefaultSection()
 	{
 		return safe_field("name", "txp_section","is_default=1");
 	}
