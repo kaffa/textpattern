@@ -221,6 +221,8 @@ function image_data($file , $meta = '', $id = '', $uploaded = true)
 					img_makethumb($id, $prefs['thumb_w'], $prefs['thumb_h'], $prefs['thumb_crop']);
 				}
 
+				update_lastmod();
+
 				$message = gTxt('image_uploaded', array('{name}' => $name));
 				return array($message, $id);
 			}

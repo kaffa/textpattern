@@ -234,6 +234,9 @@ class ImageController extends ZemAdminController
 			caption  = '$caption'",
 			"id = $id"
 		);
+
+		update_lastmod();
+
 		$this->_message(gTxt('image_updated', array('{name}' => $name)));
 		$this->_set_view('list');
 	}
@@ -271,6 +274,8 @@ class ImageController extends ZemAdminController
 			}
 
 			if ($rsd && $ul) {
+				update_lastmod();
+
 				$this->_message(gTxt('image_deleted', array('{name}' => $name)));
 			}
 		}
@@ -325,6 +330,8 @@ class ImageController extends ZemAdminController
 				chmod($newpath,0644);
 				safe_update("txp_image", "thumbnail = 1", "id = $id");
 
+				update_lastmod();
+
 				$this->_message(gTxt('image_uploaded', array('{name}' => $name)));
 				$this->_set_view('edit', $id);
 			}
@@ -367,6 +374,8 @@ class ImageController extends ZemAdminController
 					set_pref('thumb_w', $width, 'image',	2);
 					set_pref('thumb_h', $height, 'image',	 2);
 					set_pref('thumb_crop', $crop, 'image',	2);
+
+					update_lastmod();
 		
 					$message = gTxt('thumbnail_saved', array('{id}' => $id));
 				} else {
