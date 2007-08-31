@@ -242,7 +242,7 @@ class ImageController extends ZemAdminController
 
 	function insert_post()
 	{
-		$meta = doSlash(gpsa(array('caption', 'alt', 'category')));
+		$meta = gpsa(array('caption', 'alt', 'category'));
 		$img_result = image_data($_FILES['thefile'], '');
 
 		if (is_array($img_result)) {

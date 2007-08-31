@@ -177,7 +177,7 @@ function image_data($file , $meta = '', $id = '', $uploaded = true)
 			$meta = array('category' => '', 'caption' => '', 'alt' => '');
 		}
 
-		extract($meta);
+		extract(doSlash($meta));
 
 		$q = "
 			name = '$name',
