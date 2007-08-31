@@ -224,14 +224,14 @@ $LastChangedRevision$
 
 	function link_search_form($crit, $method)
 	{
-		$methods =	array(
-			'id'					=> gTxt('ID'),
-			'name'				=> gTxt('link_name'),
+		$methods = array(
+			'id'          => gTxt('ID'),
+			'name'        => gTxt('link_name'),
 			'description' => gTxt('description'),
-			'category'		=> gTxt('link_category')
+			'category'    => gTxt('link_category')
 		);
 
-		return search_form('link', 'link_edit', $crit, $methods, $method, 'name');
+		return search_form('link', 'link_post', $crit, $methods, $method, 'name');
 	}
 
 // -------------------------------------------------------------
