@@ -48,12 +48,10 @@ function article_event($event, $step) {
 		
 	switch(strtolower($step)) {
 		case "":         article_edit();    break;
-		case "list":     article_list();    break;
 		case "create":   article_edit();    break;
 		case "publish":  article_post();    break;
 		case "edit":     article_edit();    break;
 		case "save":     article_save();    break;
-		case "delete":   article_delete();
 	}
 }
 
@@ -833,15 +831,6 @@ register_callback('article_event', 'article', '', 1);
 	}
 
 //--------------------------------------------------------------
-	function article_delete()
-	{
-		$dID = ps('dID');
-		$rs = safe_delete("textpattern","ID=$dID");
-		if ($rs) article_list(messenger('article',$dID,'deleted'),1);
-	}
-
-//--------------------------------------------------------------
-
 	function side_help($markup_body, $markup_excerpt)
 	{
 		if ($markup_body != $markup_excerpt)
