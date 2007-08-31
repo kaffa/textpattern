@@ -155,13 +155,14 @@ $LastChangedRevision$
 		// FIXME: needs to be updated to separate data from the 4.0.x rpc server
 		global $txpcfg, $DB;
 
-		$installed = safe_field('name', 'txp_lang',"lang='".doSlash($lang)."' limit 1");
-
-		$lang_code = ($installed)? $lang : 'en-gb';
-
-		$rs = (txpinterface == 'admin')
+		foreach(array($lang, 'en-gb') as $lang_code)
+		{
+			$rs = (txpinterface == 'admin')
 				? safe_rows_start('name, data','txp_lang',"lang='".doSlash($lang_code)."'")
 				: safe_rows_start('name, data','txp_lang',"lang='".doSlash($lang_code)."' AND ( event='public' OR event='common')");
+
+			if ($DB->num_rows($rs)) break;
+		}
 
 		$out = array();
 
