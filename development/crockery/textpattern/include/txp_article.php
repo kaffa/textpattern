@@ -2,7 +2,7 @@
 /*
 	This is Textpattern
 	Copyright 2005 by Dean Allen
- 	All rights reserved.
+	All rights reserved.
 
 	Use of this software indicates acceptance of the Textpattern license agreement
 
@@ -303,7 +303,7 @@ register_callback('article_event', 'article', '', 1);
 
 		// switch to 'text' view upon page load and after article post
 		if(!$view || gps('save') || gps('publish')) {
-			$view = $from_view = 'text';
+			$view = 'text';
 		}
 		if (!$step) $step = "create";
 
@@ -330,15 +330,22 @@ register_callback('article_event', 'article', '', 1);
 
 		} else {
 
-			if (!$from_view or $from_view=='text') {
-				if ($step != 'create') {
-					$article = gpsa($article_vars);
+			if ($from_view=='preview' or $from_view=='html')
+			{
+				$article = array();
+				$store   = unserialize(base64_decode(ps('store')));
+
+				foreach($article_vars as $var)
+				{
+					if (isset($store[$var])) $article[$var] = $store[$var];
 				}
-			} elseif($from_view=='preview' or $from_view=='html') {
-					// coming from either html or preview
-				if (isset($_POST['store'])) {
-					$article = unserialize(base64_decode($_POST['store']));
-				}
+
+				unset ($store);
+			}
+			
+			elseif ($step != 'create')
+			{
+				$article = gpsa($article_vars);
 			}
 
 			$store_out = $article;
@@ -386,7 +393,7 @@ register_callback('article_event', 'article', '', 1);
 
 			startTable('edit').
 
-  		'<tr>'.n.
+			'<tr>'.n.
 				'<td id="article-col-1">';
 
 		if ($view == 'text')
@@ -452,7 +459,7 @@ register_callback('article_event', 'article', '', 1);
 			echo sp;
 		}
 
-  	echo '</td>'.n.'<td id="article-main">';
+		echo '</td>'.n.'<td id="article-main">';
 
 	//-- title input -------------- 
 
@@ -461,12 +468,13 @@ register_callback('article_event', 'article', '', 1);
 			echo hed(gTxt('preview'), 2).graf($Title);
 		}
 
-		if ($view == 'html')
+		elseif ($view == 'html')
 		{
 			echo hed('XHTML',2).graf($Title);
 		}
 
-		if ($view == 'text') {
+		else
+		{
 			echo '<p><label for="title">'.gTxt('title').'</label>';
 
 			if ( ($Status == 4 or $Status == 5) and $step != 'create') {
@@ -479,13 +487,15 @@ register_callback('article_event', 'article', '', 1);
 				n.'<input type="text" id="title" name="Title" value="'.cleanfInput($Title).'" class="edit" size="65" tabindex="1" /></p>';
 		}
 
-    if ($view == 'preview')
-    { 
-			echo do_markup($markup_body, $Body);
-    }
+	//-- body --------------------
 
-    elseif ($view == 'html')
-    {
+		if ($view == 'preview')
+		{ 
+			echo do_markup($markup_body, $Body);
+		}
+
+		elseif ($view == 'html')
+		{
 			$bod = do_markup($markup_body, $Body);
 			echo tag(str_replace(array(n,t), array(br,sp.sp.sp.sp), htmlspecialchars($bod)), 'code');
 		}
@@ -542,25 +552,29 @@ register_callback('article_event', 'article', '', 1);
 
 	//-- author --------------
 	
-		if ($view=="text" && $step != "create") {
+		if ($view=="text" && $step != "create")
+		{
 			echo '<p class="small">'.gTxt('posted_by').': '.htmlspecialchars($AuthorID).' &#183; '.safe_strftime('%d %b %Y &#183; %X',$sPosted);
-			if($sPosted != $sLastMod) {
+
+			if($sPosted != $sLastMod)
+			{
 				echo br.gTxt('modified_by').': '.htmlspecialchars($LastModID).' &#183; '.safe_strftime('%d %b %Y &#183; %X',$sLastMod);
 			}
-				echo '</p>';
-			}
 
-	echo hInput('from_view',$view),
-	'</td>';
-	echo '<td id="article-tabs">';
+			echo '</p>';
+		}
 
-  	//-- layer tabs -------------------
+		echo hInput('from_view',$view);
+		echo '</td>';
+
+		echo '<td id="article-tabs">';
+
+		//-- layer tabs -------------------
 
 		echo graf(tab('text',$view).br.tab('html',$view).br.tab('preview',$view));
-	echo '</td>';
-?>	
-<td id="article-col-2">
-<?php 
+		echo '</td>';
+
+		echo '<td id="article-col-2">';
 
 		if ($view == 'text')
 		{
@@ -606,7 +620,7 @@ register_callback('article_event', 'article', '', 1);
 
 				, gTxt('sort_display'), 'write-sort').
 
-		//-- "More" section
+		//-- "More" section --------------
 				n.n.'<h3 class="plain"><a href="#more" onclick="toggleDisplay(\'more\'); return false;">'.gTxt('more').'</a></h3>',
 			'<div id="more" style="display: none;">';
 
@@ -657,6 +671,7 @@ register_callback('article_event', 'article', '', 1);
 
 			if ($step == "create" and empty($GLOBALS['ID']))
 			{
+
 		//-- timestamp ------------------- 
 
 				//Avoiding modified date to disappear
@@ -792,7 +807,7 @@ register_callback('article_event', 'article', '', 1);
 			}
 		}
 
-    echo '</td></tr></table></form>';
+		echo '</td></tr></table></form>';
 	
 	}
 
@@ -808,12 +823,6 @@ register_callback('article_event', 'article', '', 1);
 // -------------------------------------------------------------
 	function checkIfNeighbour($whichway,$sPosted)
 	{
-		// transient article, not yet saved?
-		if(empty($sPosted)) {
-			return NULL;
-		}
-		
-		// persistent article
 		$sPosted = assert_int($sPosted);
 		$dir = ($whichway == 'prev') ? '<' : '>'; 
 		$ord = ($whichway == 'prev') ? 'desc' : 'asc'; 
@@ -897,7 +906,7 @@ register_callback('article_event', 'article', '', 1);
 		$out = '<img src="'.$img.'"';
 		$out.=($tabevent!=$view) ? ' onclick="document.article.view.value=\''.$tabevent.'\'; document.article.submit(); return false;"' : "";
 		$out.= ' height="100" width="19" alt="" id="article-tab-'.$tabevent.'" />';
-      	return $out;
+		return $out;
 	}
 
 //--------------------------------------------------------------
