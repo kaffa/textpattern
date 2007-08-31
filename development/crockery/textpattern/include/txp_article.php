@@ -351,10 +351,13 @@ register_callback('article_event', 'article', '', 1);
 
 		$GLOBALS['step'] = $step;
 
-		pagetop($article['Title'], $message, $msgclass);
+		$page_title = ($article['Title']) ? $article['Title'] : gTxt('write');
+
+		pagetop($page_title, $message, $msgclass);
+
 		if ($step == 'create') {
-			$markup_body = $markup_default;
-			$markup_excerpt = $markup_default;
+			$article['markup_body']    = $markup_default;
+			$article['markup_excerpt'] = $markup_default;
 		}
 
 		article_edit_form($step, $view, $from_view, $article);
