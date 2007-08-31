@@ -1519,12 +1519,11 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function comments_form($atts)
 	{
-		global $thisarticle, $comment_preview, $pretext;
+		global $thisarticle, $comment_preview;
 
 		extract(lAtts(array(
 			'class'        => __FUNCTION__,
 			'form'         => 'comment_form',
-			'id'           => @$pretext['id'],
 			'isize'        => '25',
 			'msgcols'      => '25',
 			'msgrows'      => '5',
@@ -1540,32 +1539,28 @@ $LastChangedRevision$
 
 		assert_article();
 		
-		if (is_array($thisarticle)) extract($thisarticle);
+		extract($thisarticle);
 
-		if (@$thisid) $id = $thisid;
+		$ip = serverset('REMOTE_ADDR');
 
-		if ($id) {
-			$ip = serverset('REMOTE_ADDR');
+		$blacklisted = is_blacklisted($ip);
 
-			$blacklisted = is_blacklisted($ip);
-
-			if (!checkCommentsAllowed($id)) {
-				$out = graf(gTxt("comments_closed"), ' id="comments_closed"');
-			} elseif (!checkBan($ip)) {
-				$out = graf(gTxt('you_have_been_banned'), ' id="comments_banned"');
-			} elseif ($blacklisted) {
-				$out = graf(gTxt('your_ip_is_blacklisted_by'.' '.$blacklisted), ' id="comments_blacklisted"');
-			} elseif (gps('commented')!=='') {
-				$out = gTxt("comment_posted");
-				if (gps('commented')==='0')
-					$out .= " ". gTxt("comment_moderated");
-				$out = graf($out, ' id="txpCommentInputForm"');
-			} else {
-				$out = commentForm($id,$atts);
-			}
-
-			return (!$wraptag ? $out : doTag($out,$wraptag,$class) );
+		if (!checkCommentsAllowed($thisid)) {
+			$out = graf(gTxt("comments_closed"), ' id="comments_closed"');
+		} elseif (!checkBan($ip)) {
+			$out = graf(gTxt('you_have_been_banned'), ' id="comments_banned"');
+		} elseif ($blacklisted) {
+			$out = graf(gTxt('your_ip_is_blacklisted_by'.' '.$blacklisted), ' id="comments_blacklisted"');
+		} elseif (gps('commented')!=='') {
+			$out = gTxt("comment_posted");
+			if (gps('commented')==='0')
+				$out .= " ". gTxt("comment_moderated");
+			$out = graf($out, ' id="txpCommentInputForm"');
+		} else {
+			$out = commentForm($thisid,$atts);
 		}
+
+		return (!$wraptag ? $out : doTag($out,$wraptag,$class) );
 	}
 
 // -------------------------------------------------------------
@@ -1598,11 +1593,10 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function comments($atts)
 	{
-		global $thisarticle, $prefs, $pretext;
+		global $thisarticle, $prefs;
 		extract($prefs);
 
 		extract(lAtts(array(
-			'id'		   => @$pretext['id'],
 			'form'		=> 'comments',
 			'wraptag'	=> ($comments_are_ol ? 'ol' : ''),
 			'break'		=> ($comments_are_ol ? 'li' : 'div'),
@@ -1613,12 +1607,10 @@ $LastChangedRevision$
 
 		assert_article();
 		
-		if (is_array($thisarticle)) extract($thisarticle);
-
-		if (@$thisid) $id = $thisid;
+		extract($thisarticle);
 
 		$rs = safe_rows_start("*, unix_timestamp(posted) as time", "txp_discuss",
-			'parentid='.intval($id).' and visible='.VISIBLE.' order by '.doSlash($sort));
+			'parentid='.intval($thisid).' and visible='.VISIBLE.' order by '.doSlash($sort));
 
 		$out = '';
 
@@ -1640,25 +1632,19 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function comments_preview($atts, $thing='', $me='')
 	{
-		global $thisarticle, $has_comments_preview;
+		global $has_comments_preview;
+
 		if (!ps('preview'))
 			return;
 
-
 		extract(lAtts(array(
-			'id'		   => @$pretext['id'],
-			'form'		=> 'comments',
-			'wraptag'	=> '',
-			'class'		=> __FUNCTION__,
+			'form'    => 'comments',
+			'wraptag' => '',
+			'class'   => __FUNCTION__,
 		),$atts));
-
 
 		assert_article();
 		
-		if (is_array($thisarticle)) extract($thisarticle);
-
-		if (@$thisid) $id = $thisid;
-
 		$preview = psa(array('name','email','web','message','parentid','remember'));
 		$preview['time'] = time();
 		$preview['discussid'] = 0;
@@ -1694,6 +1680,7 @@ $LastChangedRevision$
 		global $thisarticle, $thiscomment;
 
 		assert_article();
+		assert_comment();
 		
 		extract($thiscomment);
 		extract(lAtts(array(
@@ -2374,23 +2361,19 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function if_comments_allowed($atts, $thing)
 	{
-		global $thisarticle, $pretext;
+		global $thisarticle;
+		assert_article();
 
-		$id = gAtt($atts,'id',gps('id'));
-		if ($thisarticle['thisid']) $id = $thisarticle['thisid'];
-		if (!$id && @$pretext['id']) $id = $pretext['id'];
-		return parse(EvalElse($thing, checkCommentsAllowed($id)));
+		return parse(EvalElse($thing, checkCommentsAllowed($thisarticle['thisid'])));
 	}
 
 // -------------------------------------------------------------
 	function if_comments_disallowed($atts, $thing)
 	{
-		global $thisarticle, $pretext;
+		global $thisarticle;
+		assert_article();
 
-		$id = gAtt($atts,'id',gps('id'));
-		if ($thisarticle['thisid']) $id = $thisarticle['thisid'];
-		if (!$id && @$pretext['id']) $id = $pretext['id'];
-		return parse(EvalElse($thing, !checkCommentsAllowed($id)));
+		return parse(EvalElse($thing, !checkCommentsAllowed($thisarticle['thisid'])));
 	}
 
 // -------------------------------------------------------------
