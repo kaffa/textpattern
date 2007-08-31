@@ -422,7 +422,7 @@ eod;
 						'{num}' => sizeof($GLOBALS['txp_error_messages'])
 					))
 				,' style="margin-top: 3em;"').
-				'<div id="error" style="text-align:left;"><pre>'.join("</pre>\r\n<pre>",$GLOBALS['txp_error_messages']).'</pre></div>'.
+				'<div id="error" style="text-align:left;"><pre>'.join("</pre>\n<pre>",$GLOBALS['txp_error_messages']).'</pre></div>'.
 				'</div>';
 		}
 
