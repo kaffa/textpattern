@@ -4,7 +4,7 @@
 	This is Textpattern
 	Copyright 2005 by Dean Allen - all rights reserved.
 
-	Use of this software denotes acceptance of the Textpattern license agreement 
+	Use of this software denotes acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -220,7 +220,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function output_form($atts) 
+	function output_form($atts)
 	{
 		extract(lAtts(array(
 			'form' => '',
@@ -406,8 +406,8 @@ $LastChangedRevision$
 			'rel' => '',
 		), $atts));
 
-		$description = ($thislink['description']) ? 
-			' title="'.escape_output($thislink['description']).'"' : 
+		$description = ($thislink['description']) ?
+			' title="'.escape_output($thislink['description']).'"' :
 			'';
 
 		return tag(
@@ -428,8 +428,8 @@ $LastChangedRevision$
 			'escape'	 => '',
 		), $atts));
 
-		return ($escape == 'html') ? 
-			escape_output($thislink['linkname']) : 
+		return ($escape == 'html') ?
+			escape_output($thislink['linkname']) :
 			$thislink['linkname'];
 	}
 
@@ -578,7 +578,7 @@ $LastChangedRevision$
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';
 		$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.') ';
 
-		$rs = safe_rows_start('*, id as thisid, unix_timestamp(Posted) as posted', 'textpattern', 
+		$rs = safe_rows_start('*, id as thisid, unix_timestamp(Posted) as posted', 'textpattern',
 			"Status = 4 $section $categories and Posted <= now()$expired order by ".doSlash($sort).' limit 0,'.intval($limit));
 
 		if ($rs)
@@ -615,7 +615,7 @@ $LastChangedRevision$
 			'wraptag'  => '',
 		), $atts));
 
-		$rs = safe_rows_start('parentid, name, discussid', 'txp_discuss', 
+		$rs = safe_rows_start('parentid, name, discussid', 'txp_discuss',
 			'visible = '.VISIBLE.' order by '.doSlash($sort).' limit 0,'.intval($limit));
 
 		if ($rs)
@@ -624,13 +624,13 @@ $LastChangedRevision$
 
 			while ($c = nextRow($rs))
 			{
-				$a = safe_row('*, ID as thisid, unix_timestamp(Posted) as posted, unix_timestamp(Expires) as expires', 
+				$a = safe_row('*, ID as thisid, unix_timestamp(Posted) as posted, unix_timestamp(Expires) as expires',
 					'textpattern', 'ID = '.intval($c['parentid']));
 
 				If ($a['Status'] >= 4 and (!empty($prefs['publish_expired_articles']) or time() <= $a['expires'] or $a['expires'] == NULLDATETIME))
 				{
 					$out[] = href(
-						$c['name'].' ('.escape_title($a['Title']).')', 
+						$c['name'].' ('.escape_title($a['Title']).')',
 						permlinkurl($a).'#c'.$c['discussid']
 					);
 				}
@@ -710,7 +710,7 @@ $LastChangedRevision$
 		$section = ($section) ? " and Section = '".doSlash($section)."'" : '';
 		$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.') ';
 
-		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted', 'textpattern', 
+		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted', 'textpattern',
 			'ID != '.intval($id)." and Status = 4 $expired $categories $section order by ".doSlash($sort).' limit 0,'.intval($limit));
 	
 		if ($rs)
@@ -841,7 +841,7 @@ $LastChangedRevision$
 			$categories = do_list($categories);
 			$categories = join("','", doSlash($categories));
 
-			$rs = safe_rows_start('name, title', 'txp_category', 
+			$rs = safe_rows_start('name, title', 'txp_category',
 				"type = '".doSlash($type)."' and name in ('$categories') order by ".($sort ? $sort : "field(name, '$categories')"));
 		}
 
@@ -864,14 +864,14 @@ $LastChangedRevision$
 				{
 					extract($qs);
 
-					$rs = safe_rows_start('name, title', 'txp_category', 
+					$rs = safe_rows_start('name, title', 'txp_category',
 						"(lft between $lft and $rgt) and type = '".doSlash($type)."' and name != 'default' $exclude order by ".($sort ? $sort : 'lft ASC'));
 				}
 			}
 
 			else
 			{
-				$rs = safe_rows_start('name, title', 'txp_category', 
+				$rs = safe_rows_start('name, title', 'txp_category',
 					"type = '$type' and name not in('default','root') $exclude order by ".($sort ? $sort : 'name ASC'));
 			}
 		}
@@ -888,7 +888,7 @@ $LastChangedRevision$
 				{
 					$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
 
-					$out[] = tag(str_replace('& ', '&#38; ', $title), 'a', 
+					$out[] = tag(str_replace('& ', '&#38; ', $title), 'a',
 						( ($active_class and (0 == strcasecmp($c, $name))) ? ' class="'.$active_class.'"' : '' ).
 						' href="'.pagelinkurl(array('s' => $section, 'c' => $name)).'"'
 					);
@@ -907,7 +907,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 // output href list of site sections
 
-	function section_list($atts, $thing='') 
+	function section_list($atts, $thing='')
 	{
 		global $sitename, $s, $thissection;
 
@@ -964,7 +964,7 @@ $LastChangedRevision$
 				extract($a);
 
 				if (empty($form) && empty($thing)) {
-					$out[] = tag($title, 'a', 
+					$out[] = tag($title, 'a',
 						( ($active_class and (0 == strcasecmp($s, $name))) ? ' class="'.$active_class.'"' : '' ).
 						' href="'.pagelinkurl(array('s' => $name)).'"');	
 				} else {					
@@ -1113,6 +1113,8 @@ $LastChangedRevision$
 		{
 			global $thisarticle, $s;
 
+			assert_article();
+
 			extract(getNextPrev(
 				@$thisarticle['thisid'],
 				@strftime('%Y-%m-%d %H:%M:%S', $thisarticle['posted']),
@@ -1142,7 +1144,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 // link to next article, if it exists
 
-	function link_to_prev($atts, $thing) 
+	function link_to_prev($atts, $thing)
 	{
 		global $id, $prev_id, $prev_title;
 
@@ -1154,9 +1156,11 @@ $LastChangedRevision$
 		{
 			global $thisarticle, $s;
 
+			assert_article();
+
 			extract(getNextPrev(
 				$thisarticle['thisid'],
-				@strftime('%Y-%m-%d %H:%M:%S', $thisarticle['posted']), 
+				@strftime('%Y-%m-%d %H:%M:%S', $thisarticle['posted']),
 				@$s
 			));
 		}
@@ -1209,7 +1213,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 	
-	function link_to_home($atts, $thing = false) 
+	function link_to_home($atts, $thing = false)
 	{
 		extract(lAtts(array(
 			'class' => false
@@ -1317,7 +1321,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function text($atts) 
+	function text($atts)
 	{
 		extract(lAtts(array(
 			'item' => '',
@@ -1432,7 +1436,7 @@ $LastChangedRevision$
 	{
 		global $thisarticle;
 		assert_article();	
-		return parse(EvalElse($thing, 
+		return parse(EvalElse($thing,
 			($thisarticle['expires'] != NULLDATETIME) && ($thisarticle['expires'] <= time() )));
 	}
 
@@ -1462,7 +1466,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function comments_count($atts) 
+	function comments_count($atts)
 	{
 		global $thisarticle;
 
@@ -1473,7 +1477,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 	// This whole function is a FIXME. Still need to rethink comments_invite for crockery
-	function comments_invite($atts) 
+	function comments_invite($atts)
 	{
 		global $thisarticle,$is_article_list;
 
@@ -1685,7 +1689,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function comment_permlink($atts,$thing) 
+	function comment_permlink($atts,$thing)
 	{
 		global $thisarticle, $thiscomment;
 
@@ -1706,7 +1710,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function comment_id($atts) 
+	function comment_id($atts)
 	{
 		global $thiscomment;
 
@@ -1750,7 +1754,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function comment_email($atts) 
+	function comment_email($atts)
 	{
 		global $thiscomment;
 
@@ -1760,7 +1764,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function comment_web($atts) 
+	function comment_web($atts)
 	{
 		global $thiscomment;
 		assert_comment();
@@ -1786,7 +1790,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function comment_message($atts) 
+	function comment_message($atts)
 	{
 		global $thiscomment;
 		assert_comment();
@@ -1795,7 +1799,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function comment_anchor($atts) 
+	function comment_anchor($atts)
 	{
 		global $thiscomment;
 
@@ -1851,6 +1855,8 @@ $LastChangedRevision$
 	{
 		global $thisarticle;
 
+		assert_article();
+
 		extract(lAtts(array(
 			'name' => '',
 		), $atts));
@@ -1867,7 +1873,7 @@ $LastChangedRevision$
 	
 // -------------------------------------------------------------
 
-function body($atts) 
+	function body($atts)
 	{
 		global $thisarticle, $is_article_body;
 		assert_article();
@@ -1879,7 +1885,7 @@ function body($atts)
 	}	
 	
 // -------------------------------------------------------------
-	function title($atts) 
+	function title($atts)
 	{
 		global $thisarticle, $prefs;
 		assert_article();
@@ -1894,7 +1900,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function excerpt($atts) 
+	function excerpt($atts)
 	{
 		global $thisarticle, $is_article_body;
 		assert_article();
@@ -2123,7 +2129,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function keywords($atts) 
+	function keywords($atts)
 	{
 		global $thisarticle;
 		assert_article();
@@ -2286,7 +2292,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function search_result_date($atts) 
+	function search_result_date($atts)
 	{
 		assert_article();
 		return posted($atts);
@@ -2330,7 +2336,7 @@ function body($atts)
 				$dims = (!empty($imginfo[3])) ? ' '.$imginfo[3] : '';
 				$url = pagelinkurl(array('c'=>$c, 's'=>$s, 'p'=>$id));
 				$out[] = '<a href="'.$url.'">'.
-               '<img src="'.hu.$impath.'"'.$dims.' alt="'.$alt.'" />'.'</a>';
+					'<img src="'.hu.$impath.'"'.$dims.' alt="'.$alt.'" />'.'</a>';
 
 			}
 			if (count($out)) {
@@ -2341,7 +2347,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function image_display($atts) 
+	function image_display($atts)
 	{
 		if (is_array($atts)) extract($atts);
 		global $s,$c,$p,$img_dir;
@@ -2402,7 +2408,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function meta_keywords() 
+	function meta_keywords()
 	{
 		global $id_keywords;
 		return ($id_keywords)
@@ -2411,7 +2417,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function meta_author() 
+	function meta_author()
 	{
 		global $id_author;
 		return ($id_author)
@@ -2463,7 +2469,7 @@ function body($atts)
 
 	function breadcrumb($atts)
 	{
-		global $pretext,$thisarticle,$sitename;
+		global $pretext,$sitename;
 		
 		extract(lAtts(array(
 			'wraptag' => 'p',
@@ -2480,7 +2486,7 @@ function body($atts)
 		$content = array();
 		extract($pretext);
 		if(!empty($s) && $s!= 'default')
-		{ 
+		{
 			$section_title = ($title) ? fetch_section_title($s) : $s;
 			$section_title_html = escape_title($section_title);
 			$content[] = ($link)? (
@@ -2493,9 +2499,9 @@ function body($atts)
 		foreach (getTreePath($category, 'article') as $cat) {
 			if ($cat['name'] != 'root') {
 				$category_title_html = $title ? escape_title($cat['title']) : $cat['name'];
-				$content[] = ($link)? 
-					doTag($category_title_html,'a',$linkclass,' href="'.pagelinkurl(array('c'=>$cat['name'])).'"')
-						:$category_title_html;
+				$content[] = ($link) 
+					? doTag($category_title_html,'a',$linkclass,' href="'.pagelinkurl(array('c'=>$cat['name'])).'"')
+					: $category_title_html;
 			}
 		}
 
@@ -2513,12 +2519,12 @@ function body($atts)
 
 	function if_excerpt($atts, $thing)
 	{
-	        global $thisarticle;
-           assert_article();
-	        # eval condition here. example for article excerpt
-	        $excerpt = trim($thisarticle['excerpt']);
-	        $condition = (!empty($excerpt))? true : false;
-	        return parse(EvalElse($thing, $condition));
+		global $thisarticle;
+		assert_article();
+		# eval condition here. example for article excerpt
+		$excerpt = trim($thisarticle['excerpt']);
+		$condition = (!empty($excerpt))? true : false;
+		return parse(EvalElse($thing, $condition));
 	}
 
 //--------------------------------------------------------------------------
@@ -2718,19 +2724,19 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function error_message($atts) 
+	function error_message($atts)
 	{
 		return @$GLOBALS['txp_error_message'];
 	}
 
 // -------------------------------------------------------------
-	function error_status($atts) 
+	function error_status($atts)
 	{
 		return @$GLOBALS['txp_error_status'];
 	}
 
 // -------------------------------------------------------------
-	function if_status($atts, $thing='') 
+	function if_status($atts, $thing='')
 	{
 		global $pretext;
 
@@ -2738,15 +2744,15 @@ function body($atts)
 			'status' => '200',
 		), $atts));
 
-		$page_status = !empty($GLOBALS['txp_error_code']) 
-			? $GLOBALS['txp_error_code'] 
+		$page_status = !empty($GLOBALS['txp_error_code'])
+			? $GLOBALS['txp_error_code']
 			: $pretext['status'];
 
 		return parse(EvalElse($thing, $status == $page_status));
 	}
 
 // -------------------------------------------------------------
-	function page_url($atts) 
+	function page_url($atts)
 	{
 		global $pretext;
 
@@ -2758,7 +2764,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function if_different($atts, $thing) 
+	function if_different($atts, $thing)
 	{
 		static $last;
 
@@ -2775,7 +2781,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function if_first_article($atts, $thing) 
+	function if_first_article($atts, $thing)
 	{
 		global $thisarticle;
 		assert_article();
@@ -2783,7 +2789,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function if_last_article($atts, $thing) 
+	function if_last_article($atts, $thing)
 	{
 		global $thisarticle;
 		assert_article();
@@ -2791,7 +2797,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function if_plugin($atts, $thing) 
+	function if_plugin($atts, $thing)
 	{
 		global $plugins, $plugins_ver;
 		extract(lAtts(array(
@@ -2803,7 +2809,7 @@ function body($atts)
 	}
 
 // -------------------------------------------------------------
-	function hide($atts, $thing) 
+	function hide($atts, $thing)
 	{
 		return '';
 	}
