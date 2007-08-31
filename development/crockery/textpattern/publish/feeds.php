@@ -71,7 +71,9 @@ $LastChangedRevision$
 		global $prefs, $thisarticle;
 		extract($prefs);
 		
-		if ($type == 'atom') {
+		$atom = ($type == 'atom');
+
+		if ($atom) {
 			define("t_texthtml", ' type="text/html"');
 			define("t_text", ' type="text"');
 			define("t_html", ' type="html"');
@@ -94,7 +96,8 @@ $LastChangedRevision$
 		$mail_or_domain = ($use_mail_on_feeds_id)? eE($blog_mail_uid):$dn[0];
 
 		$last = fetch('unix_timestamp(val)','txp_prefs','name','lastmod');
-		if ($type == 'atom') {
+
+		if ($atom) {
 			$out[] = tag('Textpattern','generator', ' uri="http://textpattern.com/" version="'.$version.'"');
 			$out[] = tag(escape_output($feedtitle),'title',t_text);
 			$out[] = tag(escape_output($site_slogan),'subtitle',t_text);
@@ -117,9 +120,9 @@ $LastChangedRevision$
 			$out[] = tag(hu,'link');
 		}
 
-		$articles = array();
+		$out[] = callback_event($atom ? 'atom_head' : 'rss_head');
 
-		$atom = ($type == 'atom');
+		$articles = array();
 
 		if (!$area or $area=='article') {
 
