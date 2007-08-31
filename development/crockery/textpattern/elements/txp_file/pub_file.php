@@ -33,8 +33,9 @@ function file_download_send($event, $step) {
 					$filesize = filesize($fullpath); $sent = 0;
 					header('Content-Description: File Download');
 					header('Content-Type: application/octet-stream');
-					header('Content-Length: ' . $filesize);
-					header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
+					header('Content-Disposition: attachment; filename="' . basename($filename) . '"; size = "'.$filesize.'"');
+					// Fix for lame IE 6 pdf bug on servers configured to send cache headers
+					header('Cache-Control: private');
 					@ini_set("zlib.output_compression", "Off");
 					@set_time_limit(0);
 					@ignore_user_abort(true);
