@@ -107,10 +107,12 @@ register_callback('article_event', 'article', '', 1);
 			}
 		}
 
+		$Keywords = doSlash(trim(preg_replace('/( ?[\r\n\t,])+ ?/s', ',', preg_replace('/ +/', ' ', ps('Keywords'))), ','));
+
 		if ($Title or $Body or $Excerpt) {
-			
+
 			if (!has_privs('article.publish') && $Status>=4) $Status = 3;
-			if (empty($url_title)) $url_title = stripSpace($Title_plain, 1); 	
+			if (empty($url_title)) $url_title = stripSpace($Title_plain, 1);
 
 			$ID = safe_insert(
 			   "textpattern",
@@ -233,6 +235,8 @@ register_callback('article_event', 'article', '', 1);
 		{
 			$url_title = stripSpace($Title_plain, 1);
 		}
+
+		$Keywords = doSlash(trim(preg_replace('/( ?[\r\n\t,])+ ?/s', ',', preg_replace('/ +/', ' ', ps('Keywords'))), ','));
 
 		safe_update("textpattern",
 		   "Title           = '$Title',
@@ -465,12 +469,12 @@ register_callback('article_event', 'article', '', 1);
 
 		if ($view == 'preview')
 		{
-			echo hed(gTxt('preview'), 2).graf($Title);
+			echo hed(gTxt('preview'), 2).hed($Title, 1);
 		}
 
 		elseif ($view == 'html')
 		{
-			echo hed('XHTML',2).graf($Title);
+			echo hed('XHTML', 2).hed($Title, 1);
 		}
 
 		else

@@ -2121,7 +2121,7 @@ $LastChangedRevision$
 		global $thisarticle;
 		assert_article();
 
-		return ($thisarticle['keywords']) ? $thisarticle['keywords'] : '';
+		return $thisarticle['keywords'];
 	}
 
 // -------------------------------------------------------------
