@@ -39,16 +39,14 @@ $LastChangedRevision$
 			($limit) ? 'limit '.intval($offset).', '.intval($limit) : '',
 		);
 
-		$rs = safe_rows_start('*', 'txp_file', join(' and ', $where).' '.join(' ', $qparts));
+		$rs = safe_rows_start('*, unix_timestamp(created) as created, unix_timestamp(modified) as modified', 'txp_file', join(' and ', $where).' '.join(' ', $qparts));
 
 		if ($rs)
 		{
 			$out = array();
 
-			while ($a = nextRow($rs))
+			while ($thisfile = nextRow($rs))
 			{
-				$thisfile = file_download_format_info($a);
-
 				$out[] = parse_form($form);
 
 				$thisfile = '';
@@ -164,26 +162,9 @@ $LastChangedRevision$
 
 	function fileDownloadFetchInfo($where)
 	{
-		$rs = safe_row('*', 'txp_file', $where);
+		$rs = safe_row('*, unix_timestamp(created) as created, unix_timestamp(modified) as modified', 'txp_file', $where);
 
-		if ($rs)
-		{
-			return file_download_format_info($rs);
-		}
-
-		return false;
-	}
-
-//--------------------------------------------------------------------------
-
-	function file_download_format_info($file)
-	{
-		if (($unix_ts = @strtotime($file['created'])) > 0)
-			$file['created'] = $unix_ts;
-		if (($unix_ts = @strtotime($file['modified'])) > 0)
-			$file['modified'] = $unix_ts;
-
-		return $file;
+		return ($rs ? $rs : false);
 	}
 
 //--------------------------------------------------------------------------
