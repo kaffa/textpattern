@@ -259,14 +259,18 @@ function toggleClassRemember(className)
 	setCookie('toggle_' + className, v, 365);
 
 	setClassDisplay(className, v);
+	setClassDisplay(className+'_neg', 1-v);
 }
 
 // -------------------------------------------------------------
 // show/hide matching elements based on cookie value
 
-function setClassRemember(className)
+function setClassRemember(className, force)
 {
+	if (typeof(force) != 'undefined')
+		setCookie('toggle_' + className, force, 365);
 	var v = getCookie('toggle_' + className);
 
 	setClassDisplay(className, v);
+	setClassDisplay(className+'_neg', 1-v);
 }
