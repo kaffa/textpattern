@@ -346,14 +346,15 @@ $LastChangedRevision$
 
 		extract(lAtts(array(
 			'class'   => '',
-			'escape'  => '',
+			'title'   => '0',
 			'wraptag' => '',
 		), $atts));
 
 		if ($thisfile['category'])
 		{
-			$category = ($escape == 'html') ? 
-				escape_output($thisfile['category']) : $thisfile['category'];
+			$category = ($title)
+				? fetch_category_title($thisfile['category'], 'file')
+				: $thisfile['category'];
 
 			return ($wraptag) ? doTag($category, $wraptag, $class) : $category;
 		}
