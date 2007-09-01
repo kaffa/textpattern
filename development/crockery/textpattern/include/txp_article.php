@@ -74,7 +74,7 @@ register_callback('article_event', 'article', '', 1);
 		$Status = assert_int(ps('Status'));
 		extract(psa(array('markup_body', 'markup_excerpt')));
 
-		$Annotate = ( ps( 'Annotate')) ? assert_int( ps( 'Annotate')) : 0;
+		$Annotate = (int) $Annotate;
 
 		if ($publish_now == 1) {
 			$when = 'now()';
@@ -111,7 +111,6 @@ register_callback('article_event', 'article', '', 1);
 			
 			if (!has_privs('article.publish') && $Status>=4) $Status = 3;
 			if (empty($url_title)) $url_title = stripSpace($Title_plain, 1); 	
-			if (!$Annotate) $Annotate = 0;
 
 			$ID = safe_insert(
 			   "textpattern",
@@ -189,7 +188,8 @@ register_callback('article_event', 'article', '', 1);
 		extract(doSlash($incoming));
 		extract(array_map('assert_int', psa(array('ID', 'Status'))));
 		extract(psa(array('markup_body', 'markup_excerpt')));
-		$Annotate = ( ps( 'Annotate')) ? assert_int( ps( 'Annotate')) : 0;
+
+		$Annotate = (int) $Annotate;
 
 		if (!has_privs('article.publish') && $Status>=4) $Status = 3;
 
@@ -233,7 +233,6 @@ register_callback('article_event', 'article', '', 1);
 		{
 			$url_title = stripSpace($Title_plain, 1);
 		}
-		if (!$Annotate) $Annotate = 0;
 
 		safe_update("textpattern",
 		   "Title           = '$Title',
