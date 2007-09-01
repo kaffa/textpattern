@@ -301,7 +301,8 @@ $LastChangedRevision$
 
 			echo tr(
 				tda(
-					toggle_box('discuss_detail'),
+					toggle_box('discuss_detail').br.
+					cookie_box('show_spam'),
 					' colspan="2" style="text-align: left; border: none;"'
 				).
 				tda(
