@@ -1078,7 +1078,7 @@ $LastChangedRevision$
 			$gmt = 1;
 		}
 		elseif ($format == 'rfc822') {
-			$format = '%a, %d %b %Y %T GMT';
+			$format = '%a, %d %b %Y %H:%M:%S GMT';
 			$gmt = 1;
 			$override_locale = 'en-gb';
 		}
@@ -1271,18 +1271,6 @@ $LastChangedRevision$
 		return (PHP_OS == 'WINNT' or PHP_OS == 'WIN32' or PHP_OS == 'Windows');
 	}
 
-// -------------------------------------------------------------
-	function is_cgi()
-	{
-		return IS_CGI;
-	}
-
-// -------------------------------------------------------------
-	function is_mod_php()
-	{
-		return IS_APACHE;
-	}
-
 // --------------------------------------------------------------
 	function build_file_path($base,$path)
 	{
@@ -1446,7 +1434,7 @@ $LastChangedRevision$
 
 //-------------------------------------------------------------
 	function update_lastmod() {
-		safe_upsert("txp_prefs", "val = now()", "name = 'lastmod'");
+		safe_update("txp_prefs", "val = now()", "name = 'lastmod'");
 	}
 
 //-------------------------------------------------------------
@@ -1504,12 +1492,12 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function set_pref($name, $val, $event,  $type, $html='text_input') 
+	function set_pref($name, $val, $event='publish',  $type=0, $html='text_input') 
 	{
 		extract(doSlash(func_get_args()));
 
-    	if (!safe_row("*", 'txp_prefs', "name = '$name'") ) {
-        	return safe_insert('txp_prefs', "
+		if (!safe_row("*", 'txp_prefs', "name = '$name'") ) {
+			return safe_insert('txp_prefs', "
 				name  = '$name',
 				val   = '$val',
 				event = '$event',
@@ -1517,10 +1505,10 @@ $LastChangedRevision$
 				type  = '$type',
 				prefs_id = 1"
 			);
-    	} else {
-        	return safe_update('txp_prefs', "val = '$val'","name like '$name'");    	
-    	}
-    	return false;
+		} else {
+			return safe_update('txp_prefs', "val = '$val'","name like '$name'");    	
+		}
+		return false;
 	}
 
 // -------------------------------------------------------------
@@ -1886,15 +1874,8 @@ eod;
 					$t .= $bt[$i]['class'];
 				if (!empty($bt[$i]['type']))
 					$t .= $bt[$i]['type'];
-				if (!empty($bt[$i]['function'])) {
-					$t .= $bt[$i]['function'];
-
-					if (!empty($bt[$i]['args']))
-						$t .= '('.@join(', ', $bt[$i]['args']).')';
-					else 
-						$t .= '()';
-				}
-				
+				if (!empty($bt[$i]['function']))
+					$t .= $bt[$i]['function'].'()';
 
 				$out[] = $t;
 			}

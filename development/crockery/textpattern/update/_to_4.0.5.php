@@ -163,5 +163,8 @@ $LastChangedRevision$
 	if (!safe_field('name', 'txp_prefs', "name = 'comments_use_fat_textile'"))
 		safe_insert('txp_prefs', "prefs_id = 1, name = 'comments_use_fat_textile', val = '0', type = '1', event='comments', html='yesnoradio', position='130'");
 
-
+	# Make sure the 'lastmod' preference exists and update lastmod
+	if (!safe_field('name', 'txp_prefs', "name = 'lastmod'"))
+		safe_insert('txp_prefs', "prefs_id = 1, name = 'lastmod', 'val = now()");
+	update_lastmod();
 ?>
