@@ -70,6 +70,8 @@ $LastChangedRevision$
 	{
 		global $prefs, $thisarticle;
 		extract($prefs);
+
+		set_error_handler('tagErrorHandler');
 		
 		$atom = ($type == 'atom');
 
@@ -235,6 +237,14 @@ $LastChangedRevision$
 
 			//turn on compression if we aren't using it already
 			if (extension_loaded('zlib') && ini_get("zlib.output_compression") == 0 && ini_get('output_handler') != 'ob_gzhandler' && !headers_sent()) {
+				// make sure notices/warnings/errors don't 
+				// fudge up the feed when compression is used
+				$buf = '';
+				while ($b = @ob_get_clean())
+					$buf .= $b;
+				@ob_start('ob_gzhandler');
+				echo $buf;
+
 				@ob_start("ob_gzhandler");
 			}
 
