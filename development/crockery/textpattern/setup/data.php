@@ -144,7 +144,7 @@ class textpattern_setup_rows
 				'web' => 'example.com',
 				'ip' => '127.0.0.1',
 				'posted' => '2005-07-22 14:11:32',
-				'message' => 'I enjoy your site very much.',
+				'message' => '<p>I enjoy your site very much.</p>',
 				'visible' => 1
 			));
 		}

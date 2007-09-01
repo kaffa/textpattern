@@ -182,7 +182,7 @@ $create_sql[] = "CREATE TABLE ".PFX."txp_discuss (
 
 $create_sql[] = 'CREATE INDEX '.PFX.'parentid ON '.PFX.'txp_discuss (parentid)';
 
-$create_sql[] = "INSERT INTO ".PFX."txp_discuss VALUES (000001, 1, 'Donald Swain', 'me@here.com', 'example.com', '127.0.0.1', '2005-07-22 14:11:32', 'I enjoy your site very much.', 1)";
+$create_sql[] = "INSERT INTO ".PFX."txp_discuss VALUES (000001, 1, 'Donald Swain', 'me@here.com', 'example.com', '127.0.0.1', '2005-07-22 14:11:32', '<p>I enjoy your site very much.</p>', 1)";
 
 $create_sql[] = "CREATE TABLE ".PFX."txp_discuss_ipban (
   ip varchar(255) NOT NULL default '',
