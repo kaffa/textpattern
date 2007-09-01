@@ -198,7 +198,7 @@ class textpattern_setup_rows
 		}
 		
 		if (!$table->row(array('name' => 'comments_display'))) {
-			$table->insert(array('name' => 'comments_display', 'type' => 'article', 'Form' => "<h3 id=\"comment\"><txp:comments_invite textonly=\"1\" showalways=\"1\" showcount=\"0\" /></h3>\n\n<txp:comments />\n\n<txp:if_comments_preview>\n<div id=\"cpreview\">\n<txp:comments_preview />\n</div>\n</txp:if_comments_preview>\n\n<txp:if_comments_allowed>\n<txp:comments_form preview=\"1\" />\n<txp:else />\n<p><txp:text item=\"comments_closed\" /></p>\n</txp:if_comments_allowed>"));
+			$table->insert(array('name' => 'comments_display', 'type' => 'article', 'Form' => "<h3 id=\"<txp:text item=\"comment\" />\"><txp:comments_invite textonly=\"1\" showalways=\"1\" showcount=\"0\" /></h3>\n\n<txp:comments />\n\n<txp:if_comments_preview>\n<div id=\"cpreview\">\n<txp:comments_preview />\n</div>\n</txp:if_comments_preview>\n\n<txp:if_comments_allowed>\n<txp:comments_form preview=\"1\" />\n<txp:else />\n<p><txp:text item=\"comments_closed\" /></p>\n</txp:if_comments_allowed>"));
 		}
 	}
 	
