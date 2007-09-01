@@ -512,10 +512,8 @@ register_callback('article_event', 'article', '', 1);
 		{
 			if ($view == 'text')
 			{
-				$Excerpt = str_replace('&amp;', '&', htmlspecialchars($Excerpt));
-
 				echo n.graf('<label for="excerpt">'.gTxt('excerpt').'</label>'.sp.popHelp('excerpt').br.
-					'<textarea id="excerpt" name="Excerpt" cols="55" rows="10" tabindex="3">'.$Excerpt.'</textarea>');
+					'<textarea id="excerpt" name="Excerpt" cols="55" rows="10" tabindex="3">'.htmlspecialchars($Excerpt).'</textarea>');
 			}
 
 			else
