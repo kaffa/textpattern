@@ -371,7 +371,7 @@ class FileController extends ZemAdminController {
 	}
 
 // -------------------------------------------------------------
-	function file_db_add($filename,$category,$permissions,$description,$size='0')
+	function file_db_add($filename,$category,$permissions,$description,$size)
 	{
 		$rs = safe_insert("txp_file",
 			"filename = '$filename',
@@ -398,7 +398,8 @@ class FileController extends ZemAdminController {
 		extract($txpcfg);
 		extract(doSlash(gpsa(array('filename','category','permissions','description'))));
 
-		$id = $this->file_db_add($filename,$category,$permissions,$description);
+		$size = filesize(build_file_path($file_base_path,$filename));
+		$id = $this->file_db_add($filename,$category,$permissions,$description,$size);
 
 		if($id === false){
 			$this->_error(gTxt('file_upload_failed').' (db_add)');

@@ -3403,11 +3403,11 @@ begin tag builder functions
 		$desc = ' ('.gTxt('descending').')';
 
 		$sorts = array(
-			'filename asc'	 => gTxt('name').$asc,
-			'filename desc'	 => gTxt('name').$desc,
-			'downloads asc'	 => gTxt('download_count').$asc,
-			'downloads desc' => gTxt('download_count').$desc,
-			'rand()'				 => 'Random'
+			'filename asc'   => gTxt('file_name').$asc,
+			'filename desc'  => gTxt('file_name').$desc,
+			'downloads asc'  => gTxt('downloads').$asc,
+			'downloads desc' => gTxt('downloads').$desc,
+			'rand()'         => gTxt('random')
 		);
 
 		extract($atts);
