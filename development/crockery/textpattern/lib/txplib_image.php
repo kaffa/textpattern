@@ -44,6 +44,11 @@ function img_newsize($old_w, $old_h, $max_w, $max_h, $crop=0) {
 function img_downsize($old_fn, $new_fn, $max_w, $max_h, $crop=0, $q=75, $interlace=0) {
 	list($old_w, $old_h, $type) = getimagesize($old_fn);
 
+	// Make sure we have enough memory if the image is large 
+	if (max($old_w, $old_h) > 1024)
+		// this won't work on all servers but it's worth a try 
+		ini_set('memory_limit', EXTRA_MEMORY);
+
 	$old_img = null;
 	if ($type == 1)
 		$old_img = imagecreatefromgif($old_fn);
