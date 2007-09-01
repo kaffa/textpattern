@@ -170,7 +170,7 @@ class textpattern_setup_rows
 		}
 		
 		if (!$table->row(array('name' => 'comments'))) {
-			$table->insert(array('name' => 'comments', 'type' => 'comment', 'Form' => "<txp:message />\n\n<p class=\"small\">&#8212; <txp:comment_name /> &#183; <txp:comment_time /> &#183; <txp:comment_permlink>#</txp:comment_permlink></p>"));
+			$table->insert(array('name' => 'comments', 'type' => 'comment', 'Form' => "<txp:comment_message />\n\n<p class=\"small\">&#8212; <txp:comment_name /> &#183; <txp:comment_time /> &#183; <txp:comment_permlink>#</txp:comment_permlink></p>"));
 		}
 		
 		if (!$table->row(array('name' => 'default'))) {
