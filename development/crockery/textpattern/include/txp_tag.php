@@ -1920,7 +1920,7 @@ begin tag builder functions
 
 // -------------------------------------------------------------
 
-	function tag_sitename()
+	function tag_site_name()
 	{
 		global $step, $endform, $tag_name;
 
