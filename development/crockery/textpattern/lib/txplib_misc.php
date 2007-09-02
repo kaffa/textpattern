@@ -586,18 +586,13 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-		function gAtt(&$atts, $name, $default=NULL) {
-			return isset($atts[$name]) ? $atts[$name] : $default;
-		}
-
-// -------------------------------------------------------------
 	function lAtts($pairs, $atts, $warn = 1)
 	{
 		global $production_status;
 
 		foreach($pairs as $name => $default)
 		{
-			$out[$name] = gAtt($atts, $name, $default);
+			$out[$name] = isset($atts[$name]) ? $atts[$name] : $default;
 		}
 
 		if ($warn and ($production_status == 'debug' or $production_status == 'testing'))
