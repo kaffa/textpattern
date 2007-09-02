@@ -263,13 +263,21 @@ class ImageController extends ZemAdminController
 	function delete_post() 
 	{
 		$id = assert_int(ps('id'));
-		
-		$rs = safe_row("*", "txp_image", "id = $id");
+
+		$rs = safe_row('*', 'txp_image', "id = $id");
+
 		if ($rs) {
 			extract($rs);
-			$rsd = safe_delete("txp_image","id = $id");
-			$ul = unlink(IMPATH.$id.$ext);
-			if(is_file(IMPATH.$id.'t'.$ext)) {
+
+			$rsd = safe_delete('txp_image', "id = $id");
+
+			$ul = false;
+
+			if (is_file(IMPATH.$id.$ext)) {
+				$ul = unlink(IMPATH.$id.$ext);
+			}
+
+			if (is_file(IMPATH.$id.'t'.$ext)) {
 				$ult = unlink(IMPATH.$id.'t'.$ext);
 			}
 
@@ -277,6 +285,9 @@ class ImageController extends ZemAdminController
 				update_lastmod();
 
 				$this->_message(gTxt('image_deleted', array('{name}' => $name)));
+			}
+			else {
+				$this->_message(gTxt('image_deleted_failed', array('{name}' => $name)));
 			}
 		}
 		$this->_set_view('list');
