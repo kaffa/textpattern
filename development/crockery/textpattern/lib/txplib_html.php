@@ -419,11 +419,8 @@ $LastChangedRevision$
 
 	function popHelp($help_var, $width = '', $height = '') 
 	{
-		$lang = (LANG == 'cs-cz' || LANG == 'el-gr' || LANG == 'ja-jp') ? 
-			substr(LANG, 3, 2): substr(LANG, 0, 2);
-
 		return '<a target="_blank"'.
-			' href="http://rpc.textpattern.com/help/?item='.$help_var.a.'lang='.$lang.'"'.
+			' href="http://rpc.textpattern.com/help/?item='.$help_var.a.'language='.LANG.'"'.
 			' onclick="popWin(this.href'.
 			($width ? ', '.$width : '').
 			($height ? ', '.$height : '').
@@ -434,11 +431,8 @@ $LastChangedRevision$
 
 	function popHelpSubtle($help_var, $width = '', $height = '') 
 	{
-		$lang = (LANG == 'cs-cz' || LANG == 'el-gr' || LANG == 'ja-jp') ? 
-			substr(LANG, 3, 2): substr(LANG, 0, 2);
-
 		return '<a target="_blank"'.
-			' href="http://rpc.textpattern.com/help/?item='.$help_var.a.'lang='.$lang.'"'.
+			' href="http://rpc.textpattern.com/help/?item='.$help_var.a.'language='.LANG.'"'.
 			' onclick="popWin(this.href'.
 			($width ? ', '.$width : '').
 			($height ? ', '.$height : '').
