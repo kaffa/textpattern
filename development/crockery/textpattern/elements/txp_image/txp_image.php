@@ -570,7 +570,7 @@ class ImageListView extends TxpTableView
 				'</ul>';
 		$tr[] = $category;
 		$tr[] = '<span title="'.htmlspecialchars(get_author_name($author)).'">'.$author.'</span>';
-		$tr[] = dLink($this->controller->event, 'delete', 'id', $id);
+		$tr[] = dLink($this->controller->event, 'delete', 'id', $id, '', '', '', false, array($page, $sort, $dir, $crit, $search_method));
 
 		if ($this->edit_actions and isset($row['id']))
 			$tr[] = fInput('checkbox', 'selected[]', $row['id']);

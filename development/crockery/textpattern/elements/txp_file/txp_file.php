@@ -239,7 +239,7 @@ class FileController extends ZemAdminController {
 					, 25).
 
 					td(
-						dLink('file', 'delete', 'id', $id)
+						dLink('file', 'delete', 'id', $id, '', '', '', false, array($page, $sort, $dir, $crit, $search_method))
 					, 10)
 				);
 			}
