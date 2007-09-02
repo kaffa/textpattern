@@ -1620,12 +1620,12 @@ eod;
 	}
 	
 // -------------------------------------------------------------
-	function permlinkurl_id($ID)
+	function permlinkurl_id($id)
 	{
 		$article = safe_row(
-			"*,ID as thisid, unix_timestamp(Posted) as posted",
-			"textpattern",
-			'ID='.intval($ID));
+			'ID as thisid, Section as section, Title as title, url_title, unix_timestamp(Posted) as posted',
+			'textpattern',
+			'ID='.intval($id));
 		
 		return permlinkurl($article);
 	}
