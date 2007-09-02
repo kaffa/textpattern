@@ -23,7 +23,7 @@ include_once(txpath.'/lib/txplib_image.php');
 register_controller('ImageController', 'image');
 
 global $path_to_site, $img_dir;
-define("IMPATH",$path_to_site.'/'.$img_dir.'/');
+define("IMPATH",$path_to_site.DS.$img_dir.DS);
 
 // -------------------------------------------------------------
 class ImageController extends ZemAdminController
