@@ -33,9 +33,9 @@ Eternal, and eternal I endure.
 == Getting Started ==
 
 * FAQ is available at http://textpattern.com/faq
-* In-Depth Documentation and tag-index is available in the TextBook-Project
-  at http://textpattern.net
-* You can get support in our forums at http://forum.textpattern.com
+* In-Depth Documentation and tag-index is available in the TextBook Project
+  at http://textbook.textpattern.net/
+* You can get support in our forums at http://forum.textpattern.com/
 
 * IMPORTANT: Regularly check back at textpattern.com to see if updates are 
   available. 4.0.x is in maintenance mode which means updates are as painless 
