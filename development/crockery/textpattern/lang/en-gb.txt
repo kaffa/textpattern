@@ -255,6 +255,8 @@ thumb_width => Width
 upload_category => Category
 upload_dir_perms => directory permissions must be 777
 upload_thumbnail => Upload thumbnail
+thumbnail_removed => Thumbnail deleted
+thumbnail_not_removed => Failed to delete thumbnail
 #@import
 continue => Continue
 database_stuff => Database Data
