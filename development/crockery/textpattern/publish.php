@@ -853,7 +853,6 @@ $LastChangedRevision$
 		// If next/prev tags are placed before an article tag on a list page, we
 		// have to guess what the current article is
 		if (!$id) {
-			extract($prefs);
 			$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.')';
 
 			$current = safe_row('ID, Posted', 'textpattern',
@@ -869,14 +868,15 @@ $LastChangedRevision$
 		if (@isset($cache[$next[$id]]))
 			$thenext = $cache[$next[$id]];
 		else
-			$thenext            = getNeighbour($Posted,$s,'>');
+			$thenext = getNeighbour($Posted,$s,'>');
 
 		$out['next_id']     = ($thenext) ? $thenext['ID'] : '';
 		$out['next_title']  = ($thenext) ? $thenext['Title'] : '';
 		$out['next_utitle'] = ($thenext) ? $thenext['url_title'] : '';
 		$out['next_posted'] = ($thenext) ? $thenext['uposted'] : '';
 
-		$theprev            = getNeighbour($Posted,$s,'<');
+		$theprev = getNeighbour($Posted,$s,'<');
+
 		$out['prev_id']     = ($theprev) ? $theprev['ID'] : '';
 		$out['prev_title']  = ($theprev) ? $theprev['Title'] : '';
 		$out['prev_utitle'] = ($theprev) ? $theprev['url_title'] : '';
