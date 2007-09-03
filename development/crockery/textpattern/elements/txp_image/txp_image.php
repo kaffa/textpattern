@@ -555,12 +555,32 @@ class ImageListView extends TxpTableView
 
 		$name = empty($name) ? gTxt('unnamed') : htmlspecialchars($name);
 
-		$thumbnail = ($thumbnail) ?
-			href('<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="" />', $edit_url) :
-			gTxt('no');
+		if ($thumbnail)
+		{
+			if ($ext != '.swf')
+			{
+				$thumbnail = '<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="" />';
+			}
+			
+			else
+			{
+				$thumbnail = '';
+			}
+		}
 
-		$tag_url = '?event=tag'.a.'tag_name=image'.a.'id='.$id.a.'ext='.$ext.
-			a.'w='.$w.a.'h='.$h.a.'alt='.urlencode($alt).a.'caption='.urlencode($caption);
+		if ($ext != '.swf')
+		{
+			$tag_url = '?event=tag'.a.'tag_name=image'.a.'id='.$id.a.'ext='.$ext.a.'w='.$w.a.'h='.$h.a.'alt='.urlencode($alt).a.'caption='.urlencode($caption);
+			$tagbuilder = '<ul>'.
+				'<li><a target="_blank" href="'.$tag_url.a.'type=textile" onclick="popWin(this.href); return false;">Textile</a></li>'.
+				'<li><a target="_blank" href="'.$tag_url.a.'type=textpattern" onclick="popWin(this.href); return false;">Textpattern</a></li>'.
+				'<li><a target="_blank" href="'.$tag_url.a.'type=xhtml" onclick="popWin(this.href); return false;">XHTML</a></li>'.
+				'</ul>';
+			}
+		else
+		{
+			$tagbuilder = sp;
+		}
 
 		$category = ($category) ? '<span title="'.htmlspecialchars(fetch_category_title($category, 'image')).'">'.$category.'</span>' : '';
 
@@ -574,11 +594,7 @@ class ImageListView extends TxpTableView
 		$tr[] = gTime($uDate);
 		$tr[] =	href($name, $edit_url);
 		$tr[] = $thumbnail;
-		$tr[] = '<ul>'.
-				'<li><a target="_blank" href="'.$tag_url.a.'type=textile" onclick="popWin(this.href); return false;">Textile</a></li>'.
-				'<li><a target="_blank" href="'.$tag_url.a.'type=textpattern" onclick="popWin(this.href); return false;">Textpattern</a></li>'.
-				'<li><a target="_blank" href="'.$tag_url.a.'type=xhtml" onclick="popWin(this.href); return false;">XHTML</a></li>'.
-				'</ul>';
+		$tr[] = $tagbuilder;
 		$tr[] = $category;
 		$tr[] = '<span title="'.htmlspecialchars(get_author_name($author)).'">'.$author.'</span>';
 		$tr[] = dLink($this->controller->event, 'delete', 'id', $id, '', '', '', false, array($page, $sort, $dir, $crit, $search_method));
