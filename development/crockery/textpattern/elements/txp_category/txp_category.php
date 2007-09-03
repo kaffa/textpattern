@@ -212,9 +212,9 @@ class CategoryController extends ZemAdminController {
 					$count = isset($total_count[$name]) ? '('.href($total_count[$name], $url).')' : '(0)';
 
 				if (empty($title)) {
-					$edit_link = '<em>'.eLink('category', 'cat_'.$event.'_edit', 'id', $id, gTxt('untitled')).'</em>';
+					$edit_link = '<em>'.eLink('category', 'edit', 'id', $id, gTxt('untitled'), 'type', $type).'</em>';
 				} else {
-					$edit_link = eLink('category', 'cat_'.$event.'_edit', 'id', $id, $title);
+					$edit_link = eLink('category', 'edit', 'id', $id, $title, 'type', $type);
 				}
 
 				$items[] = graf(
