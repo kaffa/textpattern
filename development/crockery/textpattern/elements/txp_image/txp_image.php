@@ -157,14 +157,32 @@ class ImageController extends ZemAdminController
 		
 		if ($rs) {
 			extract($rs);
+
+			if ($ext != '.swf')
+			{
+				$img = '<img src="'.hu.$img_dir.'/'.$id.$ext.'" height="'.$h.'" width="'.$w.'" alt="" "title="'.$id.$ext.' ('.$w.' &#215; '.$h.')" />';
+			}
+
+			else
+			{
+				$img = '';
+			}
+
+			if ($thumbnail and ($ext != '.swf'))
+			{
+				$thumb = '<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="" />';
+			}
+
+			else
+			{
+				$thumb = '';
+			}
+
 			$out[] = startTable('edit').
 			tr(
 				td(
-					'<img src="'.hu.$img_dir.
-						'/'.$id.$ext.'" height="'.$h.'" width="'.$w.'" alt="" '.
-						"title='$id$ext ($w &#215; $h)' />".
-						br.upload_form(gTxt('replace_image'),'replace_image_form',
-							'replace',$this->event,$id,$file_max_upload_size, 'image-replace', '')
+					$img.br.
+					upload_form(gTxt('replace_image'), 'replace_image_form', 'replace', $this->event, $id, $file_max_upload_size, 'image-replace', '')
 				)
 			).
 			tr(
@@ -172,8 +190,7 @@ class ImageController extends ZemAdminController
 					join('',
 						array(
 							($thumbnail)
-							?	'<img src="'.hu.$img_dir.
-								'/'.$id.'t'.$ext.'" alt="" />'.br
+							?	$thumb.br
 							:	'',
 							upload_form(gTxt('upload_thumbnail'),'upload_thumbnail',
 								'thumbnail_insert',$this->event,$id,$file_max_upload_size, 'upload-thumbnail', '')
