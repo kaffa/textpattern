@@ -207,14 +207,6 @@ $LastChangedRevision$
 					column_head('email', 'email', 'discuss', true, $switch_dir, $crit, $search_method, (('email' == $sort) ? "$dir " : '').'discuss_detail').
 					column_head('website', 'website', 'discuss', true, $switch_dir, $crit, $search_method, (('website' == $sort) ? "$dir " : '').'discuss_detail').
 					column_head('IP', 'ip', 'discuss', true, $switch_dir, $crit, $search_method, (('ip' == $sort) ? "$dir " : '').'discuss_detail').
-					column_multi_head( array(
-						array ('value' => 'email', 'sort' => 'email', 'event' => 'discuss','is_link' => true,
-							    'dir' => $switch_dir, 'crit' => $crit, 'method' => $search_method),
-						array ('value' => 'website', 'sort' => 'website', 'event' => 'discuss','is_link' => true,
-							    'dir' => $switch_dir, 'crit' => $crit, 'method' => $search_method),
-						array ('value' => 'IP', 'sort' => 'ip', 'event' => 'discuss','is_link' => true,
-							    'dir' => $switch_dir, 'crit' => $crit, 'method' => $search_method)
-					), 'discuss_detail').
 					column_head('status', 'status', 'discuss', true, $switch_dir, $crit, $search_method, (('status' == $sort) ? "$dir " : '').'discuss_detail').
 					column_head('parent', 'parent', 'discuss', true, $switch_dir, $crit, $search_method, ('parent' == $sort) ? $dir : '').
 					hCell()
