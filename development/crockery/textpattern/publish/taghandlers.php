@@ -13,7 +13,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function page_title($atts) {
+	function page_title($atts)
+	{
 		global $parentid, $thisarticle, $id, $q, $c, $s, $pg, $sitename;
 
 		extract(lAtts(array(
@@ -42,7 +43,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function css($atts) {
+	function css($atts)
+	{
 		global $s;
 
 		extract(lAtts(array(
@@ -327,15 +329,15 @@ $LastChangedRevision$
 		global $thislink;
 
 		extract(lAtts(array(
-			'break'		 => '',
+			'break'    => '',
 			'category' => '',
-			'class'		 => __FUNCTION__,
-			'form'		 => 'plainlinks',
-			'label'		 => '',
+			'class'    => __FUNCTION__,
+			'form'     => 'plainlinks',
+			'label'    => '',
 			'labeltag' => '',
-			'limit'		 => '',
-			'sort'		 => 'linksort asc',
-			'wraptag'	 => '',
+			'limit'    => '',
+			'sort'     => 'linksort asc',
+			'wraptag'  => '',
 		), $atts));
 
 		$qparts = array(
@@ -425,7 +427,7 @@ $LastChangedRevision$
 		assert_link();
 
 		extract(lAtts(array(
-			'escape'	 => '',
+			'escape' => '',
 		), $atts));
 
 		return ($escape == 'html') ?
@@ -451,11 +453,11 @@ $LastChangedRevision$
 		assert_link();
 
 		extract(lAtts(array(
-			'class'		 => '',
-			'escape'	 => '',
-			'label'		 => '',
+			'class'    => '',
+			'escape'   => '',
+			'label'    => '',
 			'labeltag' => '',
-			'wraptag'	 => '',
+			'wraptag'  => '',
 		), $atts));
 
 		if ($thislink['description'])
@@ -477,8 +479,8 @@ $LastChangedRevision$
 
 		extract(lAtts(array(
 			'format' => $dateformat,
-			'gmt'		 => '',
-			'lang'	 => '',
+			'gmt'    => '',
+			'lang'   => '',
 		), $atts));
 
 		return safe_strftime($format, $thislink['date'], $gmt, $lang);
@@ -492,11 +494,11 @@ $LastChangedRevision$
 		assert_link();
 
 		extract(lAtts(array(
-			'class'		 => '',
-			'label'		 => '',
+			'class'    => '',
+			'label'    => '',
 			'labeltag' => '',
-			'title'		 => 1,
-			'wraptag'	 => '',
+			'title'    => 1,
+			'wraptag'  => '',
 		), $atts));
 
 		if ($thislink['category'])
@@ -530,7 +532,7 @@ $LastChangedRevision$
 		}
 		return '';
 	}
-	
+
 // -------------------------------------------------------------
 	function password_protect($atts)
 	{
@@ -606,11 +608,11 @@ $LastChangedRevision$
 	{
 		global $prefs;
 		extract(lAtts(array(
-			'break'		 => br,
-			'class'		 => __FUNCTION__,
-			'label'		 => '',
+			'break'    => br,
+			'class'    => __FUNCTION__,
+			'label'    => '',
 			'labeltag' => '',
-			'limit'		 => 10,
+			'limit'    => 10,
 			'sort'     => 'posted desc',
 			'wraptag'  => '',
 		), $atts));
@@ -711,8 +713,8 @@ $LastChangedRevision$
 		$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.') ';
 
 		$rs = safe_rows_start('*, unix_timestamp(Posted) as posted', 'textpattern',
-			'ID != '.intval($id)." and Status = 4 $expired $categories $section order by ".doSlash($sort).' limit 0,'.intval($limit));
-	
+			'ID != '.intval($id)." and Status = 4 and Posted <= now() $expired $categories $section order by ".doSlash($sort).' limit 0,'.intval($limit));
+
 		if ($rs)
 		{
 			$out = array();
@@ -898,7 +900,7 @@ $LastChangedRevision$
 			if ($out)
 			{
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
-			}			
+			}
 		}
 
 		return '';
@@ -912,19 +914,19 @@ $LastChangedRevision$
 		global $sitename, $s, $thissection;
 
 		extract(lAtts(array(
-			'active_class'		=> '',
-			'break'				=> br,
-			'class'				=> __FUNCTION__,
-			'default_title'   	=> $sitename,
-			'exclude'			=> '',
-			'form'				=> '',
-			'include_default'	=> '',
-			'label'				=> '',
-			'labeltag'			=> '',
-			'parents'			=> '', // @todo
-			'sections'			=> '',
-			'sort'				=> '',
-			'wraptag'			=> ''
+			'active_class'    => '',
+			'break'           => br,
+			'class'           => __FUNCTION__,
+			'default_title'   => $sitename,
+			'exclude'         => '',
+			'form'            => '',
+			'include_default' => '',
+			'label'           => '',
+			'labeltag'        => '',
+			'parents'         => '', // @todo
+			'sections'        => '',
+			'sort'            => '',
+			'wraptag'         => ''
 		), $atts));
 
 		$sort = doSlash($sort);
@@ -940,7 +942,7 @@ $LastChangedRevision$
 			if ($exclude)
 			{
 				$exclude = do_list($exclude.',default');
-				$exclude = join("','", doSlash($exclude));				
+				$exclude = join("','", doSlash($exclude));
 				$exclude = "name not in('$exclude')";
 			} else {
 				$exclude = "name != 'default'";
@@ -966,15 +968,15 @@ $LastChangedRevision$
 				if (empty($form) && empty($thing)) {
 					$out[] = tag($title, 'a',
 						( ($active_class and (0 == strcasecmp($s, $name))) ? ' class="'.$active_class.'"' : '' ).
-						' href="'.pagelinkurl(array('s' => $name)).'"');	
-				} else {					
+						' href="'.pagelinkurl(array('s' => $name)).'"');
+				} else {
 					$thissection = array(
-						'name'		=> $name,
-						'title'		=> ($name == 'default') ? $default_title : $title,
-						'url' 		=> pagelinkurl(array('s' => $name)),
-						'parent'	=> $parent
+						'name'   => $name,
+						'title'  => ($name == 'default') ? $default_title : $title,
+						'url'    => pagelinkurl(array('s' => $name)),
+						'parent' => $parent
 					);
-	
+
 					if (empty($form)) {
 						$out[] = parse($thing);
 					} else {
@@ -1046,7 +1048,8 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 // input form for search queries
 
-	function search_input($atts) {
+	function search_input($atts)
+	{
 		global $pretext, $prefs;
 
 		extract(lAtts(array(
@@ -1200,7 +1203,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function site_name() {
+	function site_name()
+	{
 		return $GLOBALS['sitename'];
 	}
 
@@ -1212,7 +1216,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	
+
 	function link_to_home($atts, $thing = false)
 	{
 		extract(lAtts(array(
@@ -1254,10 +1258,10 @@ $LastChangedRevision$
 
 			$url = pagelinkurl(array(
 				'month'  => @$pretext['month'],
-				'pg'		 => $nextpg,
-				's'			 => @$pretext['s'],
-				'c'			 => @$pretext['c'],
-				'q'			 => @$pretext['q'],
+				'pg'     => $nextpg,
+				's'      => @$pretext['s'],
+				'c'      => @$pretext['c'],
+				'q'      => @$pretext['q'],
 				'author' => $author
 			));
 
@@ -1300,10 +1304,10 @@ $LastChangedRevision$
 
 			$url = pagelinkurl(array(
 				'month'  => @$pretext['month'],
-				'pg'		 => $nextpg,
-				's'			 => @$pretext['s'],
-				'c'			 => @$pretext['c'],
-				'q'			 => @$pretext['q'],
+				'pg'     => $nextpg,
+				's'      => @$pretext['s'],
+				'c'      => @$pretext['c'],
+				'q'      => @$pretext['q'],
 				'author' => $author
 			));
 
@@ -1342,7 +1346,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function article_url_title() {
+	function article_url_title()
+	{
 		global $thisarticle;
 
 		assert_article();
@@ -1370,7 +1375,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function posted($atts) {
+	function posted($atts)
+	{
 		global $thisarticle, $pretext, $prefs;
 
 		assert_article();
@@ -1395,11 +1401,12 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function expires($atts)	{
+	function expires($atts)
+	{
 		global $thisarticle, $pretext, $prefs;
 
 		assert_article();
-		
+
 		if($thisarticle['expires'] == NULLDATETIME)	{
 			return;
 		}
@@ -1435,14 +1442,15 @@ $LastChangedRevision$
 	function if_expired($atts, $thing)
 	{
 		global $thisarticle;
-		assert_article();	
+		assert_article();
 		return parse(EvalElse($thing,
 			($thisarticle['expires'] != NULLDATETIME) && ($thisarticle['expires'] <= time() )));
 	}
 
 // -------------------------------------------------------------
 
-	function modified($atts) {
+	function modified($atts)
+	{
 		global $thisarticle, $pretext, $prefs;
 
 		assert_article();
@@ -1482,7 +1490,7 @@ $LastChangedRevision$
 		global $thisarticle,$is_article_list;
 
 		assert_article();
-		
+
 		extract($thisarticle);
 		global $comments_mode;
 
@@ -1538,7 +1546,7 @@ $LastChangedRevision$
 			return '';
 
 		assert_article();
-		
+
 		extract($thisarticle);
 
 		$ip = serverset('REMOTE_ADDR');
@@ -1603,11 +1611,13 @@ $LastChangedRevision$
 			'class'		=> __FUNCTION__,
 			'breakclass'=> '',
 			'sort'		=> 'posted ASC',
-		),$atts));	
+		),$atts));
 
 		assert_article();
-		
+
 		extract($thisarticle);
+
+		if (!$comments_count) return '';
 
 		$rs = safe_rows_start("*, unix_timestamp(posted) as time", "txp_discuss",
 			'parentid='.intval($thisid).' and visible='.VISIBLE.' order by '.doSlash($sort));
@@ -1628,7 +1638,7 @@ $LastChangedRevision$
 
 		return $out;
 	}
-	
+
 // -------------------------------------------------------------
 	function comments_preview($atts, $thing='', $me='')
 	{
@@ -1644,7 +1654,7 @@ $LastChangedRevision$
 		),$atts));
 
 		assert_article();
-		
+
 		$preview = psa(array('name','email','web','message','parentid','remember'));
 		$preview['time'] = time();
 		$preview['discussid'] = 0;
@@ -1661,15 +1671,15 @@ $LastChangedRevision$
 		$comments = parse_form($form).n;
 		unset($GLOBALS['thiscomment']);
 		$out = doTag($comments,$wraptag,$class);
-		
+
 		# set a flag, to tell the comments_form tag that it doesn't have to show a preview
 		$has_comments_preview = true;
 
 		return $out;
 	}
-	
+
 // -------------------------------------------------------------
-	function if_comments_preview($atts, $thing)	
+	function if_comments_preview($atts, $thing)
 	{
 		return parse(EvalElse($thing, ps('preview') && checkCommentsAllowed(gps('parentid')) ));
 	}
@@ -1681,18 +1691,18 @@ $LastChangedRevision$
 
 		assert_article();
 		assert_comment();
-		
+
 		extract($thiscomment);
 		extract(lAtts(array(
 			'anchor' => empty($thiscomment['has_anchor_tag']),
 		),$atts));
 
 		$dlink = permlinkurl($thisarticle).'#c'.$discussid;
-		
+
 		$thing = parse($thing);
 
 		$name = ($anchor ? ' id="c'.$discussid.'"' : '');
-	
+
 		return tag($thing,'a',' href="'.$dlink.'"'.$name);
 	}
 
@@ -1702,7 +1712,7 @@ $LastChangedRevision$
 		global $thiscomment;
 
 		assert_comment();
-		
+
 		return $thiscomment['discussid'];
 	}
 
@@ -1746,7 +1756,7 @@ $LastChangedRevision$
 		global $thiscomment;
 
 		assert_comment();
-		
+
 		return $thiscomment['email'];
 	}
 
@@ -1755,7 +1765,7 @@ $LastChangedRevision$
 	{
 		global $thiscomment;
 		assert_comment();
-		
+
 		return $thiscomment['web'];
 	}
 
@@ -1769,8 +1779,8 @@ $LastChangedRevision$
 
 		extract(lAtts(array(
 			'format' => $comments_dateformat,
-			'gmt'		 => '',
-			'lang'	 => '',
+			'gmt'    => '',
+			'lang'   => '',
 		), $atts));
 
 		return safe_strftime($format, $thiscomment['time'], $gmt, $lang);
@@ -1781,7 +1791,7 @@ $LastChangedRevision$
 	{
 		global $thiscomment;
 		assert_comment();
-		
+
 		return $thiscomment['message'];
 	}
 
@@ -1791,7 +1801,7 @@ $LastChangedRevision$
 		global $thiscomment;
 
 		assert_comment();
-		
+
 		$thiscomment['has_anchor_tag'] = 1;
 		return '<a id="c'.$thiscomment['discussid'].'"></a>';
 	}
@@ -1805,8 +1815,8 @@ $LastChangedRevision$
 		assert_article();
 
 		extract(lAtts(array(
-			'link'				 => 1,
-			'section'			 => '',
+			'link'         => 1,
+			'section'      => '',
 			'this_section' => 0
 		), $atts));
 
@@ -1822,7 +1832,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function if_author($atts, $thing)
 	{
-		global $author;		
+		global $author;
 
 		extract(lAtts(array(
 			'name' => '',
@@ -1857,20 +1867,20 @@ $LastChangedRevision$
 
 		return parse(EvalElse($thing, !empty($author)));
 	}
-	
+
 // -------------------------------------------------------------
 
 	function body($atts)
 	{
 		global $thisarticle, $is_article_body;
 		assert_article();
-		
-		$is_article_body = 1;		
+
+		$is_article_body = 1;
 		$out = parse($thisarticle['body']);
 		$is_article_body = 0;
 		return $out;
-	}	
-	
+	}
+
 // -------------------------------------------------------------
 	function title($atts)
 	{
@@ -1879,7 +1889,7 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'no_widow' => @$prefs['title_no_widow'],
 		), $atts));
-		
+
 		$t = escape_title($thisarticle['title']);
 		if ($no_widow)
 			$t = noWidow($t);
@@ -1891,8 +1901,8 @@ $LastChangedRevision$
 	{
 		global $thisarticle, $is_article_body;
 		assert_article();
-		
-		$is_article_body = 1;		
+
+		$is_article_body = 1;
 		$out = parse($thisarticle['excerpt']);
 		$is_article_body = 0;
 		return $out;
@@ -2005,14 +2015,14 @@ $LastChangedRevision$
 		global $s, $c;
 
 		extract(lAtts(array(
-			'class'				 => '',
-			'link'				 => 1,
-			'name'				 => '',
-			'section'			 => '',
+			'class'        => '',
+			'link'         => 1,
+			'name'         => '',
+			'section'      => '',
 			'this_section' => 0,
-			'title'				 => 1,
-			'type'				 => 'article',
-			'wraptag'			 => '',
+			'title'        => 1,
+			'type'         => 'article',
+			'wraptag'      => '',
 		), $atts));
 
 		$category = ($name) ? $name : $c;
@@ -2105,7 +2115,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function if_keywords($atts, $thing = NULL) {
+	function if_keywords($atts, $thing = NULL)
+	{
 		global $thisarticle;
 
 		assert_article();
@@ -2126,7 +2137,8 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function if_article_image($atts, $thing = NULL) {
+	function if_article_image($atts, $thing = NULL)
+	{
 		global $thisarticle;
 
 		assert_article();
@@ -2231,41 +2243,42 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function search_result_title($atts) {
+	function search_result_title($atts)
+	{
 		return title($atts);
 	}
 
 // -------------------------------------------------------------
 
-	function search_result_excerpt($atts) {
+	function search_result_excerpt($atts)
+	{
 		global $thisarticle, $pretext;
 
 		assert_article();
 
 		extract(lAtts(array(
-			'break'		=> ' &#8230;',
+			'break'   => ' &#8230;',
 			'hilight' => 'strong',
-			'limit'		=> 5,
+			'limit'   => 5,
 		), $atts));
 
-		$q = @$pretext['q'];
-		
-		$result = preg_replace("/>\s*</", "> <", strip_tags($thisarticle['body']));
-		preg_match_all("/\b.{1,50}".preg_quote($q).".{1,50}\b/i",$result,$concat);
+		$q = $pretext['q'];
 
-		if ($concat) {
-			$r = array();
+		$result = preg_replace('/\s+/', ' ', strip_tags(str_replace('><', '> <', $thisarticle['body'])));
+		preg_match_all("/\b.{1,50}".preg_quote($q).".{1,50}\b/iu", $result, $concat);
 
-			for ($i = 0; $i < min($limit, count($concat[0])); $i++) {
+		if ($concat)
+		{
+			for ($i = 0, $r = array(); $i < min($limit, count($concat[0])); $i++)
+			{
 				$r[] = trim($concat[0][$i]);
 			}
 
-			if ($r) {
+			if ($r)
+			{
 				$concat = join($break.n, $r);
-				$concat = strip_tags($concat);
-
 				$concat = preg_replace('/^[^>]+>/U', '', $concat);
-				$concat = preg_replace("/(".preg_quote($q).")/i", "<$hilight>$1</$hilight>", $concat);
+				$concat = preg_replace('/('.preg_quote($q).')/i', "<$hilight>$1</$hilight>", $concat);
 
 				return trim($break.$concat.$break);
 			}
@@ -2274,8 +2287,9 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function search_result_permlink($atts, $thing = NULL) {
-		return ($thing) ? permlink($atts, $thing) : permlink($atts, NULL);
+	function search_result_permlink($atts, $thing = NULL)
+	{
+		return permlink($atts, $thing);
 	}
 
 // -------------------------------------------------------------
@@ -2293,7 +2307,7 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'text'     => ($t == 1 ? gTxt('article_found') : gTxt('articles_found')),
 		),$atts));
-		
+
 		return $t . ($text ? ' ' . $text : '');
 	}
 
@@ -2311,7 +2325,7 @@ $LastChangedRevision$
 			'sort'     => 'name ASC',
 		),$atts));
 		$c = doSlash($c);
-		
+
 		$rs = safe_rows_start("*", "txp_image","category='$c' and thumbnail=1 order by ".doSlash($sort));
 
 		if ($rs) {
@@ -2328,7 +2342,7 @@ $LastChangedRevision$
 			}
 			if (count($out)) {
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
-			}	
+			}
 		}
 		return '';
 	}
@@ -2350,7 +2364,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function if_comments($atts, $thing)	
+	function if_comments($atts, $thing)
 	{
 		global $thisarticle;
 		assert_article();
@@ -2377,14 +2391,14 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function if_individual_article($atts, $thing)	
+	function if_individual_article($atts, $thing)
 	{
 		global $is_article_list;
 		return parse(EvalElse($thing, ($is_article_list == false)));
 	}
 
 // -------------------------------------------------------------
-	function if_article_list($atts, $thing)	
+	function if_article_list($atts, $thing)
 	{
 		global $is_article_list;
 		return parse(EvalElse($thing, ($is_article_list == true)));
@@ -2442,7 +2456,7 @@ $LastChangedRevision$
 	}
 
 
-// -------------------------------------------------------------	
+// -------------------------------------------------------------
 	function lang($atts)
 	{
 		return LANG;
@@ -2453,7 +2467,7 @@ $LastChangedRevision$
 	function breadcrumb($atts)
 	{
 		global $pretext,$sitename;
-		
+
 		extract(lAtts(array(
 			'wraptag' => 'p',
 			'sep' => '&#160;&#187;&#160;',
@@ -2465,7 +2479,7 @@ $LastChangedRevision$
 		),$atts));
 
 		if ($link) $label = doTag($label,'a',$linkclass,' href="'.hu.'"');
-		
+
 		$content = array();
 		extract($pretext);
 		if(!empty($s) && $s!= 'default')
@@ -2476,13 +2490,13 @@ $LastChangedRevision$
 					doTag($section_title_html,'a',$linkclass,' href="'.pagelinkurl(array('s'=>$s)).'"')
 				):$section_title_html;
 		}
-		
+
 		$category = empty($c)? '': $c;
 
 		foreach (getTreePath($category, 'article') as $cat) {
 			if ($cat['name'] != 'root') {
 				$category_title_html = $title ? escape_title($cat['title']) : $cat['name'];
-				$content[] = ($link) 
+				$content[] = ($link)
 					? doTag($category_title_html,'a',$linkclass,' href="'.pagelinkurl(array('c'=>$cat['name'])).'"')
 					: $category_title_html;
 			}
@@ -2523,7 +2537,8 @@ $LastChangedRevision$
 
 //--------------------------------------------------------------------------
 
-	function if_search_results($atts, $thing) {
+	function if_search_results($atts, $thing)
+	{
 		global $thispage, $pretext;
 
 		$total = (int) $thispage['grand_total'];
@@ -2551,7 +2566,8 @@ $LastChangedRevision$
 
 //--------------------------------------------------------------------------
 
-	function if_article_category($atts, $thing) {
+	function if_article_category($atts, $thing)
+	{
 		global $thisarticle;
 
 		assert_article();
@@ -2644,13 +2660,13 @@ $LastChangedRevision$
 		}
 		return ob_get_clean();
 	}
-	
+
 //--------------------------------------------------------------------------
 	function custom_field($atts)
 	{
 		global $thisarticle, $prefs;
 		assert_article();
-		
+
 		extract(lAtts(array(
 			'name' => @$prefs['custom_1_set'],
 			'escape' => '',
@@ -2743,7 +2759,7 @@ $LastChangedRevision$
 			'type' => 'request_uri',
 		), $atts));
 
-		return @htmlspecialchars($pretext[$type]);	
+		return @htmlspecialchars($pretext[$type]);
 	}
 
 // -------------------------------------------------------------
@@ -2786,7 +2802,7 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'name'    => '',
 			'ver'     => '',
-		),$atts));	
+		),$atts));
 
 		return parse(EvalElse($thing, @in_array($name, $plugins) and (!$ver or version_compare($plugins_ver[$name], $ver) >= 0)));
 	}
