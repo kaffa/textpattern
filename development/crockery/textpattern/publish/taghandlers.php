@@ -816,7 +816,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 // output href list of site categories
 
-	function category_list($atts)
+	function category_list($atts, $thing='')
 	{
 		global $s, $c;
 
@@ -826,6 +826,7 @@ $LastChangedRevision$
 			'categories'   => '',
 			'class'        => __FUNCTION__,
 			'exclude'      => '',
+			'form'         => '',	// @TODO, $thing
 			'label'        => '',
 			'labeltag'     => '',
 			'parent'       => '',
@@ -838,19 +839,14 @@ $LastChangedRevision$
 
 		$sort = doSlash($sort);
 
-		if ($categories)
-		{
+		if ($categories) {
 			$categories = do_list($categories);
 			$categories = join("','", doSlash($categories));
 
 			$rs = safe_rows_start('name, title', 'txp_category',
 				"type = '".doSlash($type)."' and name in ('$categories') order by ".($sort ? $sort : "field(name, '$categories')"));
-		}
-
-		else
-		{
-			if ($exclude)
-			{
+		} else {
+			if ($exclude) {
 				$exclude = do_list($exclude);
 
 				$exclude = join("','", doSlash($exclude));
@@ -858,36 +854,28 @@ $LastChangedRevision$
 				$exclude = "and name not in('$exclude')";
 			}
 
-			if ($parent)
-			{
+			if ($parent) {
 				$qs = safe_row('lft, rgt', 'txp_category', "name = '".doSlash($parent)."'");
 
-				if ($qs)
-				{
+				if ($qs) {
 					extract($qs);
 
 					$rs = safe_rows_start('name, title', 'txp_category',
 						"(lft between $lft and $rgt) and type = '".doSlash($type)."' and name != 'default' $exclude order by ".($sort ? $sort : 'lft ASC'));
 				}
-			}
-
-			else
-			{
+			} else {
 				$rs = safe_rows_start('name, title', 'txp_category',
 					"type = '$type' and name not in('default','root') $exclude order by ".($sort ? $sort : 'name ASC'));
 			}
 		}
 
-		if ($rs)
-		{
+		if ($rs) {
 			$out = array();
 
-			while ($a = nextRow($rs))
-			{
+			while ($a = nextRow($rs)) {
 				extract($a);
 
-				if ($name)
-				{
+				if ($name) {
 					$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
 
 					$out[] = tag(str_replace('& ', '&#38; ', $title), 'a',
@@ -897,8 +885,7 @@ $LastChangedRevision$
 				}
 			}
 
-			if ($out)
-			{
+			if ($out) {
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}
 		}
@@ -2541,11 +2528,13 @@ $LastChangedRevision$
 	{
 		global $thispage, $pretext;
 
-		$total = (int) $thispage['grand_total'];
+		if(empty($pretext['q'])) return '';
 
-		$condition = ( $pretext['q'] and ($total > 0) );
+		extract(lAtts(array(
+			'limit' => 0,
+		),$atts));
 
-		return parse(EvalElse($thing, $condition));
+		return parse(EvalElse($thing, (int)$thispage['grand_total'] > $limit));
 	}
 
 //--------------------------------------------------------------------------
@@ -2689,13 +2678,14 @@ $LastChangedRevision$
 		assert_article();
 
 		extract(lAtts(array(
+			'like' => 0,
 			'name' => @$prefs['custom_1_set'],
 			'val' => NULL,
 		),$atts));
 
 		$name = strtolower($name);
 		if ($val !== NULL)
-			$cond = (@$thisarticle[$name] == $val);
+			$cond =  preg_match( ($like ? "/$val/i" : "/^$val\$/i"), @$thisarticle[$name]);
 		else
 			$cond = !empty($thisarticle[$name]);
 
