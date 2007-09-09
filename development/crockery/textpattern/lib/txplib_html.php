@@ -267,8 +267,10 @@ $LastChangedRevision$
 	}
 	
 // -------------------------------------------------------------
-	function stackRows() {
-		foreach (func_get_args() as $a) {
+	function stackRows()
+	{
+		foreach (func_get_args() as $a)
+		{
 			$o[] = n.tr($a.n);
 		}
 		return join('', $o);
@@ -551,7 +553,7 @@ $LastChangedRevision$
 				sInput($step).
 				fInput('submit', 'search', gTxt('go'), 'smallerbox')
 			)
-		, '', 'get', 'search-form');
+		, '', '', 'get', 'search-form');
 	}
 
 //-------------------------------------------------------------
@@ -598,8 +600,8 @@ EOF;
 	}
 
 //-------------------------------------------------------------
-	function toggle_box($classname, $form=0) {
-
+	function toggle_box($classname, $form=0)
+	{
 		$name = 'cb_toggle_'.$classname;
 		$i = 
 			'<input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.
@@ -614,8 +616,8 @@ EOF;
 	}
 	
 //-------------------------------------------------------------
-	function cookie_box($classname, $form=1) {
-
+	function cookie_box($classname, $form=1)
+	{
 		$name = 'cb_'.$classname;
 		$val = cs('toggle_'.$classname) ? 1 : 0;
 
@@ -634,7 +636,8 @@ EOF;
 	}
 
 //-------------------------------------------------------------
-	function fieldset($content, $legend='', $id='') {
+	function fieldset($content, $legend='', $id='')
+	{
 		$a_id = ($id ? ' id="'.$id.'"' : '');
 		return tag(trim(tag($legend, 'legend').n.$content), 'fieldset', $a_id);
 	}
