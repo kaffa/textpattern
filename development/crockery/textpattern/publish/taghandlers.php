@@ -2517,9 +2517,8 @@ $LastChangedRevision$
 
 	function if_search($atts, $thing)
 	{
-		$searching = gps('q');
-		$condition = (!empty($searching))? true : false;
-		return parse(EvalElse($thing, $condition));
+		global $pretext;
+		return parse(EvalElse($thing, !empty($pretext['q'])));
 	}
 
 //--------------------------------------------------------------------------
@@ -2531,10 +2530,12 @@ $LastChangedRevision$
 		if(empty($pretext['q'])) return '';
 
 		extract(lAtts(array(
-			'limit' => 0,
+			'min' => 0,
+			'max' => 0,
 		),$atts));
 
-		return parse(EvalElse($thing, (int)$thispage['grand_total'] > $limit));
+		$results = (int)$thispage['grand_total'];
+		return parse(EvalElse($thing, $results >= $min and (!$max || $results <= $max)));
 	}
 
 //--------------------------------------------------------------------------
