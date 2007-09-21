@@ -620,7 +620,8 @@ $LastChangedRevision$
 		$pattern = '/\s*(parentid|name|discussid|web|email|ip|posted|message|visible)/';
 		$replace = 'd.\\1';
 		$sort = preg_replace($pattern, $replace, $sort);
-
+		$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= t.Expires or t.Expires = '.NULLDATETIME.') ';
+		
 		$fields = 'd.name, d.discussid, t.ID as thisid, unix_timestamp(t.Posted) as posted, unix_timestamp(t.Expires) as expires,'.
 			't.AuthorID, t.LastMod, t.LastModID, t.Title, t.Image, t.Category1, t.Category2, '.
 			't.Annotate, t.AnnotateInvite, t.comments_count, t.Status, t.Section, t.override_form, t.Keywords, t.url_title,'.
@@ -628,7 +629,7 @@ $LastChangedRevision$
 
 		$rs = startRows('select '. $fields .
 				' from '. safe_pfx('txp_discuss') .' as d inner join '. safe_pfx('textpattern') .' as t on d.parentid = t.ID '.
-				'where t.Status >= 4 and d.visible = '.VISIBLE.' order by '.doSlash($sort).' limit 0,'.intval($limit));	
+				'where t.Status >= 4'.$expired.' and d.visible = '.VISIBLE.' order by '.doSlash($sort).' limit 0,'.intval($limit));	
 		if ($rs) {
 			while ($c = nextRow($rs)) {
 				$out[] = href(
