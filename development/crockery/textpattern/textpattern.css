@@ -459,6 +459,11 @@ color: white;
 background-color: #f04040;
 }
 
+div#end_page {
+text-align: center;
+margin: 4em;
+}
+
 /* setup
 ----------------------------------------------- */
 
