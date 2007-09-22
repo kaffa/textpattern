@@ -14,24 +14,24 @@ $LastChangedRevision$
 		global $thisfile;
 
 		extract(lAtts(array(
-			'break'		 => br,
+			'break'    => br,
 			'category' => '',
-			'class'		 => __FUNCTION__,
-			'form'		 => 'files',
-			'label'		 => '',
+			'class'    => __FUNCTION__,
+			'form'     => 'files',
+			'label'    => '',
 			'labeltag' => '',
-			'limit'		 => '10',
-			'offset'	 => '0',
-			'sort'		 => 'filename asc',
-			'wraptag'	 => '',
-			'status'     => '4',
+			'limit'    => '10',
+			'offset'   => '0',
+			'sort'     => 'filename asc',
+			'wraptag'  => '',
+			'status'   => '4',
 		), $atts));
 		
 		if (!is_numeric($status))
 			$status = getStatusNum($status);
 
 		$where = array('1=1');
-		if ($category) $where[] = "category = '".doSlash($category)."'";
+		if ($category) $where[] = "category IN '".join("','", doSlash(do_list($category)))."')";
 		if ($status) $where[] = "status = '".doSlash($status)."'";
 
 		$qparts = array(
