@@ -2527,7 +2527,7 @@ $LastChangedRevision$
 		if(empty($pretext['q'])) return '';
 
 		extract(lAtts(array(
-			'min' => 0,
+			'min' => 1,
 			'max' => 0,
 		),$atts));
 
