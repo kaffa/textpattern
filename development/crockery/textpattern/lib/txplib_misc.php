@@ -1968,6 +1968,13 @@ eod;
 	}
 
 //-------------------------------------------------------------
+	function assert_category() {
+		global $thiscategory;
+		if (empty($thiscategory))
+			trigger_error(gTxt('error_category_context'));
+	}
+
+//-------------------------------------------------------------
 	function assert_int($myvar) {
 		global $production_status;
 
