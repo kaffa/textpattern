@@ -630,7 +630,7 @@ $LastChangedRevision$
 			while ($c = nextRow($rs))
 			{
 				$out[] = href(
-					$c['name'].' ('.escape_title($c['Title']).')', 
+					$c['name'].' ('.escape_title($c['title']).')', 
 					permlinkurl($c).'#c'.$c['discussid']
 				);
 			}
@@ -815,7 +815,7 @@ $LastChangedRevision$
 
 	function category_list($atts, $thing='')
 	{
-		global $s, $c;
+		global $s, $c, $thiscategory;
 
 		extract(lAtts(array(
 			'active_class' => '',
@@ -823,7 +823,7 @@ $LastChangedRevision$
 			'categories'   => '',
 			'class'        => __FUNCTION__,
 			'exclude'      => '',
-			'form'         => '',	// @TODO, $thing
+			'form'         => '',
 			'label'        => '',
 			'labeltag'     => '',
 			'parent'       => '',
@@ -869,24 +869,95 @@ $LastChangedRevision$
 		if ($rs) {
 			$out = array();
 
+			$old_category = $thiscategory;
 			while ($a = nextRow($rs)) {
 				extract($a);
 
 				if ($name) {
 					$section = ($this_section) ? ( $s == 'default' ? '' : $s ) : $section;
 
-					$out[] = tag(str_replace('& ', '&#38; ', $title), 'a',
-						( ($active_class and (0 == strcasecmp($c, $name))) ? ' class="'.$active_class.'"' : '' ).
-						' href="'.pagelinkurl(array('s' => $section, 'c' => $name)).'"'
-					);
+					if (empty($form) && empty($thing)) {
+						$out[] = tag(str_replace('& ', '&#38; ', $title), 'a',
+							( ($active_class and (0 == strcasecmp($c, $name))) ? ' class="'.$active_class.'"' : '' ).
+							' href="'.pagelinkurl(array('s' => $section, 'c' => $name)).'"'
+						);
+					} else {
+						$thiscategory = array(
+							'name'   => $name,
+							'title'  => $title,
+							'url'    => pagelinkurl(array('s' => $section, 'c' => $name)),
+						);
+	
+						if (empty($form)) {
+							$out[] = parse($thing);
+						} else {
+							$out[] = parse_form($form);
+						}						
+					}
 				}
 			}
+			$thiscategory = $old_category;
 
 			if ($out) {
 				return doLabel($label, $labeltag).doWrap($out, $wraptag, $break, $class);
 			}
 		}
 
+		return '';
+	}
+
+// -------------------------------------------------------------
+
+	function category_name($atts)
+	{
+		global $thiscategory;
+		assert_category();
+		extract(lAtts(array(
+			'escape'	=> ''
+		), $atts));
+		return ($escape == 'html') ? escape_output($thiscategory['name']) : $thiscategory['name'];
+	}
+
+// -------------------------------------------------------------
+
+	function category_title($atts)
+	{
+		global $thiscategory;
+		assert_category();
+		extract(lAtts(array(
+			'escape'	=> ''
+		), $atts));
+		return ($escape == 'html') ? escape_output($thiscategory['title']) : $thiscategory['title'];
+	}
+
+// -------------------------------------------------------------
+
+	function category_url()
+	{
+		global $thiscategory;
+		assert_category();
+		return $thiscategory['url'];
+	}
+
+// -------------------------------------------------------------
+
+	function if_active_category($atts, $thing)
+	{
+		global $thiscategory, $c;
+		assert_category();
+		extract(lAtts(array(
+			'dir' => 'none'
+		), $atts));
+
+		switch ($dir) {
+			case 'none':
+				return parse(EvalElse($thing, $thiscategory['name'] == $c));
+			case 'trunk':
+			case 'leaf':
+			case 'both':
+				// FIXME: Check for any active descendant/ancestor in cat tree
+				return parse(EvalElse($thing, $thiscategory['name'] == $c));
+		}
 		return '';
 	}
 
@@ -907,7 +978,7 @@ $LastChangedRevision$
 			'include_default' => '',
 			'label'           => '',
 			'labeltag'        => '',
-			'parents'         => '', // @todo
+			'parents'         => '', // FIXME: not implemented 
 			'sections'        => '',
 			'sort'            => '',
 			'wraptag'         => ''
