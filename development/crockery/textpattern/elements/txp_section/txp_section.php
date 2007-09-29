@@ -56,10 +56,11 @@ class SectionController extends ZemAdminController
 					)
 				, ' colspan="3"')
 			).
+		endTable();
+			
 
 		/*
 		 *  edit 'default' section
-		 */
 			n.n.tr(
 				td(gTxt('default')).
 
@@ -96,11 +97,19 @@ class SectionController extends ZemAdminController
 
 				td()
 			);
+		 */
 
 		/*
 		 * edit any other section
 		 */
-		$rs = safe_rows_start('*', 'txp_section', "name != 'default' order by name");
+		# $rs = safe_rows_start('*', 'txp_section', "name != 'default' order by name");
+		$rs = safe_rows('*', 'txp_section', "1=1 order by name");
+
+		if($rs) {
+			$v = new SectionListView($rs, $this);
+			echo $v->render();
+		}
+return;
 
 		if ($rs)
 		{
@@ -251,15 +260,12 @@ class SectionController extends ZemAdminController
 	function save_post()
 	{
 		global $txpcfg;
-
 		extract(doSlash(psa(array('page','css','old_name'))));
 		extract(psa(array('name', 'title')));
 		$parent = $this->psi('parent', 0);
-
 		if (empty($title)) {
 			$title = $name;
 		}
-
 		// Prevent non url chars on section names
 		include_once txpath.'/lib/classTextile.php';
 
@@ -348,8 +354,84 @@ class SectionController extends ZemAdminController
 
 	function adopters_dropdown($child_id, $parent_id=0)
 	{
-		return selectInput('parent', $this->adopters($child_id), $parent_id);
+		return selectInput('parent', SectionController::adopters($child_id), $parent_id);
 	}
 } // SectionController
+
+class SectionListView extends TxpTableView
+{
+	var $controller = NULL;
+
+	function SectionListView(&$rows, $controller, $caption='', $edit_actions=array())
+	{
+		parent::TxpTableView($rows, $caption, $edit_actions);
+		$this->controller = $controller;
+		$this->pages = safe_column('name', 'txp_page', "1 = 1");
+		$this->styles = safe_column('name', 'txp_css', "1 = 1");
+	}
+	
+	function head($cols)
+	{
+		if (!$this->controller) return;
+		extract($this->controller->context);
+		
+		$switch_dir = ($dir == 'asc') ? 'desc' : 'asc';
+		$e = $this->controller->event;
+		return 
+			'<col class="col-id" />'.n.
+			'<col class="col-name" />'.n.
+			'<col class="col-title" />'.n.
+			'<col class="col-page" />'.n.
+			'<col class="col-css" />'.n.
+			'<col class="col-parent" />'.n.
+			'<col class="col-on_front_page" />'.n.
+			'<col class="col-in_rss" />'.n.
+			'<col class="col-delete" />'.n.
+			n.'<thead>'.tr(
+			column_head('ID', 'id', $e, true, $switch_dir, $crit, $search_method, ('id' == $sort) ? $dir : '').
+			column_head('section_name', 'name', $e, true, $switch_dir, $crit, $search_method, ('name' == $sort) ? $dir : '').
+			column_head('section_longtitle', 'title', $e, true, $switch_dir, $crit, $search_method, ('title' == $sort) ? $dir : '').
+			column_head('uses_page', 'page', $e, true, $switch_dir, $crit, $search_method, ('page' == $sort) ? $dir : '').
+			column_head('uses_style', 'css', $e, true, $switch_dir, $crit, $search_method, ('css' == $sort) ? $dir : '').
+			column_head('parent_section', 'parent', $e, true, $switch_dir, $crit, $search_method, ('parent' == $sort) ? $dir : '').
+			column_head('selected_by_default', 'is_default', $e, true, $switch_dir, $crit, $search_method, ('is_default' == $sort) ? $dir : '').
+			column_head('on_front_page', 'on_front_page', $e, true, $switch_dir, $crit, $search_method, ('on_fornt_page' == $sort) ? $dir : '').
+			column_head('syndicate', 'in_rss', $e, true, $switch_dir, $crit, $search_method, ('in_rss' == $sort) ? $dir : '').
+			column_head('include_in_search', 'searchable', $e, true, $switch_dir, $crit, $search_method, ('searchable' == $sort) ? $dir : '').
+			hCell()
+		).'</thead>';
+	}
+
+	function row($row) {		
+		if (!$this->controller) return;
+		extract($this->controller->context);
+
+		extract($row);
+		$event = $this->controller->event;
+
+		$tr = array();
+		$tr[] = $id;
+		$tr[] = fInput('text', 'name', $name, '', '', '', 20);
+		$tr[] =	fInput('text', 'title', $title, '', '', '', 20);
+		$tr[] = selectInput('page', $this->pages, $page);//.sp.popHelp('section_uses_page');
+		$tr[] = selectInput('css', $this->styles, $css);//.sp.popHelp('section_uses_css');
+		$tr[] = SectionController::adopters_dropdown($id, $parent);//.sp.popHelp('section_parent_section');
+		$tr[] = yesnoradio('is_default', $is_default, '', $name);//.sp.popHelp('section_is_default');
+		$tr[] = yesnoradio('on_frontpage', $on_frontpage, '', $name);//.sp.popHelp('section_on_frontpage');
+		$tr[] = yesnoradio('in_rss', $in_rss, '', $name);//.sp.popHelp('section_syndicate');
+		$tr[] = yesnoradio('searchable', $searchable, '', $name);//.sp.popHelp('section_searchable');
+		$tr[] = fInput('submit', '', gTxt('save_button'), 'smallerbox').
+									eInput('section').
+									sInput('save').
+									hInput('old_name', $name);
+
+		$tr = doWrap($tr, 'tr', 'td', 'row-'.(++$this->count % 2 ? 'odd' : 'even'));
+		#echo "<pre>".htmlspecialchars($tr)."</pre><br />===<br />";
+		$tr = preg_replace('/<tr.*>/', '\\0'.start_form(), $tr);
+		$tr = preg_replace('/<\/tr>/', end_form().'</tr>', $tr);
+		return $tr;
+		
+	}
+} // SectionListView
 
 ?>
