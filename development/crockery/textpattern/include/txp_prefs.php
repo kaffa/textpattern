@@ -101,7 +101,7 @@ class PrefsController extends ZemAdminController {
 		// Select and save active language
 		$language = $this->ps('active_language');
 		$locale = doSlash(getlocale($language));
-		update_pref('language', $this->ps('active_language'));
+		update_pref('language', $language);
 		update_pref('locale', $locale);
 		$textarray = load_lang($language);
 		$locale = setlocale(LC_ALL, $locale);
