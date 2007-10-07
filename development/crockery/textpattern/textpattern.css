@@ -283,7 +283,7 @@ td.selector2 {
 font-size: 0.9em;
 }
 
-/* @TODO: eventually lose table#edit and table#list id's later, keep the .list and .edit classes? 
+/* @TODO: eventually lose table#edit and table#list id's later, keep the .list and .edit classes?
 	might affect plugins. */
 table#edit td.noline,
 table#list td.noline,
@@ -308,7 +308,7 @@ vertical-align: bottom;
 }
 
 table.list th a {
-margin-right: 14px; 	
+margin-right: 14px;
 }
 
 table.list th.asc a {
@@ -319,7 +319,7 @@ margin-right: 0;
 
 table.list th.desc a {
 background: url(txp_img/arrowupdn.gif) no-repeat right -18px;
-padding-right: 14px;	
+padding-right: 14px;
 margin-right: 0;
 }
 
@@ -433,14 +433,14 @@ tr#branding {
 background-color: #FFCC33;
 }
 
-tr#branding img { 
-width: 368px; 
-height: 15px; 
-} 
+tr#branding img {
+width: 368px;
+height: 15px;
+}
 
-tr#branding td#navpop { 
-text-align: right; 
-} 
+tr#branding td#navpop {
+text-align: right;
+}
 
 td.tabup, td.tabup2 {
 background: transparent url(txp_img/up.gif) no-repeat top left;
@@ -489,8 +489,12 @@ p.custom-field {
 float: left;
 }
 
+p.custom-field input {
+width: 240px;
+}
+
 p.custom-field.even {
-margin-left: 15px;
+margin-left: 20px;
 }
 
 td#article-col-1 {
@@ -499,7 +503,7 @@ width: 165px;
 
 td#article-main {
 padding-left: 20px;
-width: 400px;
+width: 500px;
 }
 
 td#article-tabs {
@@ -513,18 +517,24 @@ width: 200px;
 }
 
 textarea#body {
-width: 400px;
+width: 500px;
 height: 420px;
+line-height: 1.6em;
 }
 
 textarea#excerpt {
-width: 400px;
-height: 145px;
+width: 500px;
+height: 100px;
+line-height: 1.6em;
 }
 
 textarea#keywords {
-width: 400px;
+width: 500px;
 height: 85px;
+}
+
+input#title {
+width: 420px;
 }
 
 /* comments
@@ -548,7 +558,7 @@ font-weight: bold;
 
 form.cb_show_spam {
 margin: 0 auto;
-padding: 0 0 0 10px; 
+padding: 0 0 0 10px;
 width: 90%;
 }
 
