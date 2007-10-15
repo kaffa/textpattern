@@ -620,7 +620,7 @@ $LastChangedRevision$
 
 		$sort    = preg_replace('/\bposted\b/', 'd.posted', $sort);
 		$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= t.Expires or t.Expires = '.NULLDATETIME.') ';
-		
+
 		$rs = startRows('select d.name, d.discussid, t.ID as thisid, unix_timestamp(t.Posted) as posted, t.Title as title, t.Section as section, t.url_title '.
 				'from '. safe_pfx('txp_discuss') .' as d inner join '. safe_pfx('textpattern') .' as t on d.parentid = t.ID '.
 				'where t.Status >= 4'.$expired.' and d.visible = '.VISIBLE.' order by '.doSlash($sort).' limit 0,'.intval($limit));
@@ -630,7 +630,7 @@ $LastChangedRevision$
 			while ($c = nextRow($rs))
 			{
 				$out[] = href(
-					$c['name'].' ('.escape_title($c['title']).')', 
+					$c['name'].' ('.escape_title($c['title']).')',
 					permlinkurl($c).'#c'.$c['discussid']
 				);
 			}
@@ -887,12 +887,12 @@ $LastChangedRevision$
 							'title'  => $title,
 							'url'    => pagelinkurl(array('s' => $section, 'c' => $name)),
 						);
-	
+
 						if (empty($form)) {
 							$out[] = parse($thing);
 						} else {
 							$out[] = parse_form($form);
-						}						
+						}
 					}
 				}
 			}
@@ -978,7 +978,7 @@ $LastChangedRevision$
 			'include_default' => '',
 			'label'           => '',
 			'labeltag'        => '',
-			'parents'         => '', // FIXME: not implemented 
+			'parents'         => '', // FIXME: not implemented
 			'sections'        => '',
 			'sort'            => '',
 			'wraptag'         => ''
@@ -1155,6 +1155,20 @@ $LastChangedRevision$
 			n.$out.
 			n.'</form>';
 	}
+
+// -------------------------------------------------------------
+	function search_term($atts)
+	{
+		global $q;
+		if(empty($q)) return '';
+
+		extract(lAtts(array(
+			'escape'	=> 'html'
+		),$atts));
+
+		return ($escape == 'html' ? escape_output($q) : $q);
+	}
+
 
 // -------------------------------------------------------------
 // link to next article, if it exists
