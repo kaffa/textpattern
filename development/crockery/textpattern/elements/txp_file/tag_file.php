@@ -31,7 +31,7 @@ $LastChangedRevision$
 			$status = getStatusNum($status);
 
 		$where = array('1=1');
-		if ($category) $where[] = "category IN '".join("','", doSlash(do_list($category)))."')";
+		if ($category) $where[] = "category IN ('".join("','", doSlash(do_list($category)))."')";
 		if ($status) $where[] = "status = '".doSlash($status)."'";
 
 		$qparts = array(

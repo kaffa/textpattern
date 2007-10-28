@@ -852,7 +852,7 @@ $LastChangedRevision$
 			}
 
 			if ($parent) {
-				$qs = safe_row('lft, rgt', 'txp_category', "type='".doSlash($type)."' and name = '".doSlash($parent)."'");
+				$qs = safe_row('lft, rgt', 'txp_category', "type = '".doSlash($type)."' and name = '".doSlash($parent)."'");
 
 				if ($qs) {
 					extract($qs);
