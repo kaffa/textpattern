@@ -107,7 +107,7 @@ register_callback('article_event', 'article', '', 1);
 			}
 		}
 
-		$Keywords = doSlash(trim(preg_replace('/( ?[\r\n\t,])+ ?/s', ',', preg_replace('/ +/', ' ', ps('Keywords'))), ','));
+		$Keywords = doSlash(trim(preg_replace('/( ?[\r\n\t,])+ ?/s', ',', preg_replace('/ +/', ' ', ps('Keywords'))), ', '));
 
 		if ($Title or $Body or $Excerpt) {
 
@@ -236,7 +236,7 @@ register_callback('article_event', 'article', '', 1);
 			$url_title = stripSpace($Title_plain, 1);
 		}
 
-		$Keywords = doSlash(trim(preg_replace('/( ?[\r\n\t,])+ ?/s', ',', preg_replace('/ +/', ' ', ps('Keywords'))), ','));
+		$Keywords = doSlash(trim(preg_replace('/( ?[\r\n\t,])+ ?/s', ',', preg_replace('/ +/', ' ', ps('Keywords'))), ', '));
 
 		safe_update("textpattern",
 		   "Title           = '$Title',
