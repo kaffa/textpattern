@@ -406,13 +406,20 @@
 			}
 		}
 
-		$out = '<select name="lang">';
+		ksort($things);
+
+		$default	= 'en-gb';
+
+		$out = n.'<select name="lang">';
 
 		foreach ($things as $a=>$b) {
-			$out .= '<option value="'.$a.'">'.$b.'</option>'.n;
+			$out .= n.t.'<option value="'.$a.'"'.
+				( ($a == $default) ? ' selected="selected"' : '').
+				'>'.$b.'</option>';
 		}		
 
-		$out .= '</select>';
+		$out .= n.'</select>';
+
 		return $out;
 	}
 	
