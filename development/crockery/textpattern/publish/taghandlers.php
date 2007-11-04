@@ -159,13 +159,13 @@ $LastChangedRevision$
 		global $img_dir;
 
 		extract(lAtts(array(
-			'class'			=> '',
-			'escape'		=> '',
-			'html_id'		=> '',
-			'id'				=> '',
-			'name'			=> '',
-			'poplink'		=> '',
-			'wraptag'		=> ''
+			'class'   => '',
+			'escape'  => '',
+			'html_id' => '',
+			'id'      => '',
+			'link'    => 0,
+			'name'    => '',
+			'wraptag' => ''
 		), $atts));
 
 		if ($name)
@@ -206,11 +206,9 @@ $LastChangedRevision$
 					( ($class and !$wraptag) ? ' class="'.$class.'"' : '' ).
 					' />';
 
-				if ($poplink)
+				if ($link)
 				{
-					$out = '<a href="'.hu.$img_dir.'/'.$id.$ext.'"'.
-						' onclick="window.open(this.href, \'popupwindow\', '.
-						'\'width='.$w.', height='.$h.', scrollbars, resizable\'); return false;">'.$out.'</a>';
+					$out = href($out, hu.$img_dir.'/'.$id.$ext);
 				}
 
 				return ($wraptag) ? doTag($out, $wraptag, $class, '', $html_id) : $out;
