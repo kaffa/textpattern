@@ -208,7 +208,7 @@ $LastChangedRevision$
 
 				if ($link)
 				{
-					$out = href($out, hu.$img_dir.'/'.$id.$ext);
+					$out = href($out, hu.$img_dir.'/'.$id.$ext, (!empty($link_rel) ? " rel='$link_rel'" : '')." title='$caption'");
 				}
 
 				return ($wraptag) ? doTag($out, $wraptag, $class, '', $html_id) : $out;
