@@ -7,7 +7,7 @@
 	www.textpattern.com
 	All rights reserved
 
-	Use of this software indicates acceptance of the Textpattern license agreement 
+	Use of this software indicates acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -192,15 +192,13 @@ $LastChangedRevision$
 		if ($name && is_valid_email($email))
 		{
 			$password = doSlash(generate_password(6));
-			$nonce = doSlash(md5(uniqid(rand(), true)));
 
 			$rs = safe_insert('txp_users', "
-				privs		 = $privs,
-				name		 = '$name',
-				email		 = '$email',
+				privs    = $privs,
+				name     = '$name',
+				email    = '$email',
 				RealName = '$RealName',
-				pass		 =	password(lower('$password')),
-				nonce		 = '$nonce'
+				pass     = password(lower('$password'))
 			");
 
 			if ($rs)
