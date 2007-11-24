@@ -63,13 +63,13 @@ function file_download_send($event, $step) {
 		if ($file_error) {
 			switch($file_error) {
 			case 403:
-				header('HTTP/1.0 403 Forbidden');
+				txp_status_header('403 Forbidden');
 				break;
 			case 404:
-				header('HTTP/1.0 404 File Not Found');
+				txp_status_header('404 File Not Found');
 				break;
 			default:
-				header('HTTP/1.0 500 Internal Server Error');
+				txp_status_header('500 Internal Server Error');
 				break;
 			}
 		}

@@ -535,7 +535,7 @@ if (empty($GLOBALS['DB']))
 	function db_down()
 	{
 		// 503 status might discourage search engines from indexing or caching the error message
-		header('Status: 503 Service Unavailable');
+		txp_status_header('503 Service Unavailable');
 		global $DB;
 		$error = $DB->lasterror();
 		return <<<eod
