@@ -253,10 +253,15 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_field($thing, $table, $where, $debug='') 
+	function safe_field($thing, $table, $where = '', $debug='') 
 	{
 		global $DB;
-		$q = "select $thing from ".safe_pfx_j($table)." where $where";
+		$q = "select $thing from ".safe_pfx_j($table);
+
+		if ($where) {
+			$q .= " where $where";
+		}
+
 		$r = safe_query($q,$debug);
 		if (@$DB->num_rows($r) > 0) {
 			$f = $DB->fetch_result($r,0);
@@ -267,9 +272,14 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_column($thing, $table, $where, $debug='') 
+	function safe_column($thing, $table, $where = '', $debug='') 
 	{
-		$q = "select $thing from ".safe_pfx_j($table)." where $where";
+		$q = "select $thing from ".safe_pfx_j($table);
+
+		if ($where) {
+			$q .= " where $where";
+		}
+
 		$rs = getRows($q,$debug);
 		if ($rs) {
 			foreach($rs as $a) {
@@ -282,9 +292,14 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_row($things, $table, $where, $debug='') 
+	function safe_row($things, $table, $where = '', $debug='') 
 	{
-		$q = "select $things from ".safe_pfx_j($table)." where $where";
+		$q = "select $things from ".safe_pfx_j($table);
+
+		if ($where) {
+			$q .= " where $where";
+		}
+
 		$rs = getRow($q,$debug);
 		if ($rs) {
 			return $rs;
@@ -294,9 +309,14 @@ if (empty($GLOBALS['DB']))
 
 
 // -------------------------------------------------------------
-	function safe_rows($things, $table, $where, $debug='') 
+	function safe_rows($things, $table, $where = '', $debug='') 
 	{
-		$q = "select $things from ".safe_pfx_j($table)." where $where";
+		$q = "select $things from ".safe_pfx_j($table);
+
+		if ($where) {
+			$q .= " where $where";
+		}
+
 		$rs = getRows($q,$debug);
 		if ($rs) {
 			return $rs;
@@ -305,16 +325,28 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_rows_start($things, $table, $where, $debug='') 
+	function safe_rows_start($things, $table, $where = '', $debug='') 
 	{
-		$q = "select $things from ".safe_pfx_j($table)." where $where";
+		$q = "select $things from ".safe_pfx_j($table);
+
+		if ($where) {
+			$q .= " where $where";
+		}
+
 		return startRows($q,$debug);
 	}
 
 //-------------------------------------------------------------
-	function safe_count($table, $where, $debug='') 
+
+	function safe_count($table, $where = '', $debug='') 
 	{
-		return getThing("select count(*) from ".safe_pfx_j($table)." where $where",$debug);
+		$q = "select count(*) from ".safe_pfx_j($table);
+
+		if ($where) {
+			$q .= " where $where";
+		}
+
+		return getThing($q, $debug);
 	}
 
 // -------------------------------------------------------------
