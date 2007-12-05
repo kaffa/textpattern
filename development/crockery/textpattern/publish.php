@@ -359,9 +359,9 @@ $LastChangedRevision$
 		if ($out['s'] == 'file_download') {
 			// get id of potential filename
 			if (!is_numeric($out['id'])) {
-				$rs = safe_row("*", "txp_file", "filename='".doSlash($out['id'])."'");
+				$rs = safe_row("*", "txp_file", "filename='".doSlash($out['id'])."' and status = 4");
 			} else {
-				$rs = safe_row("*", "txp_file", 'id='.intval($out['id']));
+				$rs = safe_row("*", "txp_file", 'id='.intval($out['id']).' and status = 4');
 			}
 
 			$out = ($rs)? array_merge($out, $rs) : array('s'=>'file_download','file_error'=> 404);
