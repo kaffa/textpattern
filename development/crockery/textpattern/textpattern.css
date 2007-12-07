@@ -303,6 +303,10 @@ table#list td.noline, table.list td.noline {
 height: 30px;
 }
 
+table#list td.unpublished, table.list td.unpublished {
+color: #ccc;
+}
+
 table#list th, table.list th {
 vertical-align: bottom;
 }
