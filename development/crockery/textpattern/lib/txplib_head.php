@@ -178,7 +178,7 @@ $LastChangedRevision$
 			}
 
 			echo
-			'<td class="tabdown"><a href="'.hu.'" class="plain" target="blank">'.gTxt('tab_view_site').'</a></td>',
+			'<td class="tabdown"><a href="'.hu.'" class="plain" target="_blank">'.gTxt('tab_view_site').'</a></td>',
 		 '</tr></table>',
 
 		'</td></tr><tr id="nav-secondary"><td align="center" class="tabs" colspan="2">
