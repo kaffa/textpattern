@@ -16,9 +16,10 @@ $LastChangedRevision$
 
 	function feed($type) {
 		global $prefs;
+		while(@ob_end_clean());
 		extract($prefs);
 		extract(doSlash(gpsa(array('category','section','limit','area'))));
-		
+
 		if ($area != 'link')
 			$area = 'article';
 
@@ -72,7 +73,7 @@ $LastChangedRevision$
 		extract($prefs);
 
 		set_error_handler('tagErrorHandler');
-		
+
 		$atom = ($type == 'atom');
 
 		if ($atom) {
@@ -201,11 +202,11 @@ $LastChangedRevision$
 			}
 
 		} elseif ($area=='link') {
-		
+
 			if ($rs) {
 				while ($a = nextRow($rs)) {
 					extract($a);
- 
+
 					$e['title'] = tag(doSpecial($linkname),'title',t_html);
 
 					if ($atom) {
@@ -257,7 +258,7 @@ $LastChangedRevision$
 		} else {
 			//turn on compression if we aren't using it already
 			if (extension_loaded('zlib') && ini_get("zlib.output_compression") == 0 && ini_get('output_handler') != 'ob_gzhandler' && !headers_sent()) {
-				// make sure notices/warnings/errors don't 
+				// make sure notices/warnings/errors don't
 				// fudge up the feed when compression is used
 				$buf = '';
 				while ($b = @ob_get_clean())
@@ -266,7 +267,7 @@ $LastChangedRevision$
 				echo $buf;
 			}
 
-			handle_lastmod();		  
+			handle_lastmod();
 			$hims = serverset('HTTP_IF_MODIFIED_SINCE');
 			$imsd = ($hims) ? strtotime($hims) : 0;
 
@@ -280,11 +281,11 @@ $LastChangedRevision$
 			} else {
 				$canaim = false;
 			}
-		  
+
 			$hinm = stripslashes(serverset('HTTP_IF_NONE_MATCH'));
 
 			$cutarticles = false;
-		
+
 			if ($canaim !== false) {
 				foreach($articles as $id=>$thing) {
 					if (strpos($hinm, $etags[$id]) !== false) {
@@ -319,7 +320,7 @@ $LastChangedRevision$
 			if ($etag) header('ETag: "'.$etag.'"');
 
 			if ($cutarticles) {
-				//header("HTTP/1.1 226 IM Used"); 
+				//header("HTTP/1.1 226 IM Used");
 				//This should be used as opposed to 200, but Apache doesn't like it.
 				//http://intertwingly.net/blog/2004/09/11/Vary-ETag/ says that the status code should be 200.
 				header("Cache-Control: no-store, im");
