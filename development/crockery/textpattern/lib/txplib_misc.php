@@ -499,8 +499,14 @@ $LastChangedRevision$
 		$errline = ($errstr === 'unknown_tag') ? '' : " on line $errline";
 		printf ("<pre>".gTxt('tag_error').' <b>%s</b> -> <b> %s: %s %s</b></pre>',
 				htmlspecialchars($txp_current_tag), $error[$errno], $errstr, $errline );
+
 		if ($production_status == 'debug')
+		{
 			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".escape_output(join("\n", get_caller(10)))."</code></pre>";
+
+			$trace_msg = gTxt('tag_error').' '.$txp_current_tag.' -> '.$error[$errno].': '.$errstr.' '.$errline;
+			trace_add( $trace_msg );
+		}
 	}
 
 // -------------------------------------------------------------
