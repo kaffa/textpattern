@@ -1,5 +1,5 @@
 Textpattern Crockery
-Released under the Gnu General Public License
+Released under the BSD License
 
 == WARNING ==
 
@@ -32,11 +32,9 @@ Eternal, and eternal I endure.
 
 == Getting Started ==
 
-* FAQ is available at http://textpattern.com/faq
-* In-Depth Documentation and tag-index is available in the TextBook Project
-  at http://textbook.textpattern.net/
-* You can get support in our forums at http://forum.textpattern.com/
-
-* IMPORTANT: Regularly check back at textpattern.com to see if updates are 
-  available. 4.0.x is in maintenance mode which means updates are as painless 
-  as possible, and often fix important bugs or security-related issues.
+* FAQ
+		http://textpattern.com/faq
+* Documentation
+		http://textbook.textpattern.net/
+* Support Forum
+		http://forum.textpattern.com/
