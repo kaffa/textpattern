@@ -16,7 +16,7 @@ $LastChangedRevision$
 
 	function feed($type) {
 		global $prefs;
-		while(@ob_end_clean());
+		ob_clean();
 		extract($prefs);
 		extract(doSlash(gpsa(array('category','section','limit','area'))));
 
