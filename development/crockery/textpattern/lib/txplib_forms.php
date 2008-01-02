@@ -126,7 +126,7 @@ include_once(txpath.'/lib/txplib_tree.php');
 		return n.'<select'.( $select_id ? ' id="'.$select_id.'" ' : '' ).' name="'.$select_name.'" class="list"'.
 			($onchange == 1 ? ' onchange="submit(this.form);"' : '').
 			'>'.
-			($allow_empty ? n.t.'<option value=""'.($selected == false ? ' selected="selected"' : '').'>&nbsp;</option>' : ''). 
+			($allow_empty ? n.t.'<option value=""'.($selected == false ? ' selected="selected"' : '').'>&nbsp;</option>' : '').
 			( $out ? join('', $out) : '').
 			n.'</select>';
 	}
@@ -153,9 +153,9 @@ include_once(txpath.'/lib/txplib_tree.php');
 					$size='',
 					$tab='',
 					$id='',
-					$disabled = false) 
+					$disabled = false)
 	{
-		$o  = '<input type="'.$type.'" name="'.$name.'"'; 
+		$o  = '<input type="'.$type.'" name="'.$name.'"';
 		$o .= ' value="'.cleanfInput($value).'"';
 		$o .= ($size)     ? ' size="'.$size.'"' : '';
 		$o .= ($class)    ? ' class="'.$class.'"' : '';
@@ -169,7 +169,7 @@ include_once(txpath.'/lib/txplib_tree.php');
 	}
 
 // -------------------------------------------------------------
-	function cleanfInput($text) 
+	function cleanfInput($text)
 	{
 		return str_replace(
 			array('"',"'","<",">"),
@@ -189,13 +189,13 @@ include_once(txpath.'/lib/txplib_tree.php');
 	{
 		return hInput('step',$step);
 	}
-	
+
 //-------------------------------------------------------------
 	function eInput($event)				// hidden event input
 	{
 		return hInput('event',$event);
 	}
-	
+
 //-------------------------------------------------------------
 
 	function checkbox($name, $value, $checked = '1', $tabindex = '', $id = '')
@@ -236,28 +236,28 @@ include_once(txpath.'/lib/txplib_tree.php');
 	}
 
 //-------------------------------------------------------------
-	function form($contents, $style = '', $onsubmit = '', $method = 'post', $class = '') 
+	function form($contents, $style = '', $onsubmit = '', $method = 'post', $class = '', $fragment = '')
 	{
-		return start_form($style, $onsubmit, $method, $class).$contents.end_form();
+		return start_form($style, $onsubmit, $method, $class, $fragment).$contents.end_form();
 	}
 
 //-------------------------------------------------------------
-	function start_form($style = '', $onsubmit = '', $method = 'post', $class = '') 
+	function start_form($style = '', $onsubmit = '', $method = 'post', $class = '', $fragment = '')
 	{
-		return n.'<form method="'.$method.'" action="index.php"'.
+		return n.'<form method="'.$method.'" action="index.php'.($fragment ? '#'.$fragment.'"' : '"').
 			($class ? ' class="'.$class.'"' : '').
 			($onsubmit ? ' onsubmit="return '.$onsubmit.'"' : '').'>';
 	}
 
 //-------------------------------------------------------------
-	function end_form() 
+	function end_form()
 	{
 		return n.'</form>';
 	}
 
 // -------------------------------------------------------------
 	function fetch_editable($name,$event,$identifier,$id)
-	{	
+	{
 		$q = fetch($name,'txp_'.$event,$identifier,$id);
 		return htmlspecialchars($q);
 	}
