@@ -12,20 +12,16 @@ $LastChangedRevision$
 	define("a","&#38;");
 
 // -------------------------------------------------------------
+
 	function end_page()
 	{
-		global $txp_user,$event;
-		if($event!='tag') {
+		global $txp_user, $event;
 
-			echo '<div id="end_page">',
-			navPop().n,
-			'<a href="http://www.textpattern.com"><img src="txp_img/carver.gif" width="60" height="48" border="0" alt="" /></a>'.n;
-			echo graf('Textpattern &#183; '.txp_version).n;
-			echo($txp_user)
-			?	graf(gTxt('logged_in_as').' '.span(htmlspecialchars($txp_user)).br.
-					'<a href="index.php?logout=1">'.gTxt('logout').'</a>', ' id="moniker"').n.'</div>'
-			:	'</div>';
-			echo n.'</body>'.n.'</html>';
+		$theme = 'default';
+
+		if ($event != 'tag')
+		{
+			include(txpath.DS.'theme'.DS.$theme.DS.'footer.php');
 		}
 	}
 
