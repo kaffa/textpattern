@@ -92,7 +92,7 @@ $LastChangedRevision$
 		}
 
 		if ( $preview ) {
-			$name  = ps( 'name' );
+			$name  = ps('name');
 			$email = clean_url(ps('email'));
 			$web   = clean_url(ps('web'));
 			$nonce = getNextNonce();
@@ -154,7 +154,7 @@ $LastChangedRevision$
 
 		$textarea = '<textarea id="message" name="'.$n_message.'"'.$msgcols.$msgrows.$msgstyle.
 			' class="txpCommentInputMessage'.(($commentwarn) ? ' comments_error"' : '"').
-			'>'.htmlspecialchars($message).'</textarea>';
+			'>'.htmlspecialchars(substr(trim($message), 0, 65535)).'</textarea>';
 
 		// by default, the submit button is visible but disabled
 		$comment_submit_button = fInput('submit', 'submit', gTxt('submit'), 'button disabled', '', '', '', '', 'txpCommentSubmit', true);
@@ -333,7 +333,7 @@ $LastChangedRevision$
 		$web = doSlash(strip_tags(deEntBrackets($web)));
 		$email = doSlash(strip_tags(deEntBrackets($email)));
 
-		$message = trim($message);
+		$message = substr(trim($message), 0, 65535);
 		$message2db = doSlash(markup_comment($message));
 
 		$isdup = safe_row("message,name", "txp_discuss", 
@@ -485,7 +485,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-function checkNonce($nonce) 
+	function checkNonce($nonce)
 	{
 		if (!$nonce && !preg_match('#^[a-zA-Z0-9]*$#',$nonce)) 
 			return false;
@@ -541,7 +541,7 @@ function checkNonce($nonce)
 // -------------------------------------------------------------
 		function comments_help()
 	{
-		return ('<a id="txpCommentHelpLink" href="http://textile.thresholdstate.com/help-lite/?lang='.LANG.'" onclick="window.open(this.href, \'popupwindow\', \'width=300,height=400,scrollbars,resizable\'); return false;">'.gTxt('textile_help').'</a>');
+		return ('<a id="txpCommentHelpLink" href="http://rpc.textpattern.com/help/index.php?item=textile_comments&language='.LANG.'" onclick="window.open(this.href, \'popupwindow\', \'width=300,height=400,scrollbars,resizable\'); return false;">'.gTxt('textile_help').'</a>');
 	}
 
 // -------------------------------------------------------------

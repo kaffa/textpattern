@@ -70,8 +70,8 @@ $LastChangedRevision$
 		}
 	}
 
-	if ( $dbversion !== '4.0.5' )
-	{
+	if (version_compare($dbversion, '4.0.5', '<'))
+	{  
 		if ((include txpath.DS.'update'.DS.'_to_4.0.5.php') !== false)
 			$dbversion = '4.0.5';
 	}

@@ -174,20 +174,17 @@ $LastChangedRevision$
 
 				if ($log_refer)
 				{
-					$log_refer = htmlspecialchars('http://'.$log_refer);
+					$log_refer = 'http://'.$log_refer;
 
-					$log_refer = '<a href="'.$log_refer.'" target="_blank">'.soft_wrap($log_refer, 30).'</a>';
+					$log_refer = '<a href="'.htmlspecialchars($log_refer).'" target="_blank">'.htmlspecialchars(soft_wrap($log_refer, 30)).'</a>';
 				}
 
 				if ($log_page)
 				{
-					$log_page = htmlspecialchars($log_page);
-
-					$log_page = '<a href="'.$log_page.'" target="_blank">'.
-						soft_wrap(
-							preg_replace('/\/$/','', substr($log_page, 1))
-						, 30).
-						'</a>';
+					$log_anchor = preg_replace('/\/$/','',$log_page);
+					$log_anchor = soft_wrap(substr($log_anchor,1), 30);
+					
+					$log_page = '<a href="'.htmlspecialchars($log_page).'" target="_blank">'.htmlspecialchars($log_anchor).'</a>';
 
 					if ($log_method == 'POST')
 					{
@@ -201,14 +198,14 @@ $LastChangedRevision$
 						gTime($log_uTime)
 					, 85).
 
-					td($log_ip, '', 'log_detail').
+					td($log_ip, 20, 'log_detail').
 
 					td(soft_wrap($log_host, 30)).
 
 					td($log_page).
 					td($log_refer).
-					td($log_method, '', 'log_detail').
-					td($log_status, '', 'log_detail').
+					td(htmlspecialchars($log_method), 60, 'log_detail').
+					td($log_status, 60, 'log_detail').
 
 					td(
 						fInput('checkbox', 'selected[]', $log_id)
@@ -278,7 +275,7 @@ $LastChangedRevision$
 	{
 		$deleted = event_multi_edit('txp_log', 'id');
 
-		if (!empty($deleted))
+		if ($deleted)
 		{
 			$message = gTxt('logs_deleted', array('{list}' => $deleted));
 

@@ -508,7 +508,7 @@ if (!$client->query('tups.getLanguage',$prefs['blog_uid'],$lang))
 		{
 			foreach ($item as $name => $value) 
 				$item[$name] = addslashes($value);
-			$DB->query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
+				$DB->query("INSERT /* DELAYED */ INTO `".PFX."txp_lang` SET lang='".LANG."', name='".$item['name']."', event='".$item['event']."', data='".$item['data']."', lastmod='".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."'");
 		}
 	}		
 }

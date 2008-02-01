@@ -70,11 +70,11 @@
 				hed(gTxt('site_path'),3).
 				graf(gTxt('confirm_site_path')),4)
 		),
-		tr(
+		/* tr(
 			fLabelCell(gTxt('full_path_to_txp')).
 				tdcs(fInput('text','txpath',$temp_txpath,'edit','','',40).
 				popHelp('full_path'),3)
-		),
+		),*/
 		tr(tdcs('&nbsp;',4)),
 		tr(
 			tdcs(
@@ -105,7 +105,7 @@
 // -------------------------------------------------------------
 	function printConfig()
 	{
-		$carry = enumPostItems('ddb','duser','dpass','dhost','dprefix','dbtype','txprefix','txpath',
+		$carry = enumPostItems('ddb','duser','dpass','dhost','dprefix','dbtype','txprefix',
 			'siteurl','ftphost','ftplogin','ftpass','ftpath','lang');
 
 		@include txpath.'/config.php';
@@ -119,7 +119,6 @@
 			));
 		}
 
-		$carry['txpath']   = preg_replace("/^(.*)\/$/","$1",$carry['txpath']);
 		$carry['ftpath']   = preg_replace("/^(.*)\/$/","$1",$carry['ftpath']);
 		
 		extract($carry);
@@ -332,7 +331,6 @@
 		.o.'pass'		  .m.$dpass.nl
 		.o.'host'		  .m.$dhost.nl
 		.o.'table_prefix' .m.$dprefix.nl
-		.o.'txpath'		  .m.$txpath.nl
 		.o.'dbcharset'	  .m.$dbcharset.nl
 		.o.'dbtype'	  .m.$dbtype.nl
 		.$close;

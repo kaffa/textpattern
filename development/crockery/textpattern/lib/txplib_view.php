@@ -85,7 +85,7 @@ class TxpTableView {
 		$out = array();
 		$out[] = '<table class="txptableview '.$this->class." $this->type\">";
 		if ($this->caption)
-			$out[] = '<caption>'.escape_output($this->caption).'</caption>';
+			$out[] = '<caption>'.htmlspecialchars($this->caption).'</caption>';
 		$out[] = $this->table();
 		$out[] = '</table>';
 

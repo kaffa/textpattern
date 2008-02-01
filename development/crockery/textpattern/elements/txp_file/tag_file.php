@@ -385,7 +385,7 @@ $LastChangedRevision$
 		if ($thisfile['description'])
 		{
 			$description = ($escape == 'html') ?
-				escape_output($thisfile['description']) : $thisfile['description'];
+				htmlspecialchars($thisfile['description']) : $thisfile['description'];
 
 			return ($wraptag) ? doTag($description, $wraptag, $class) : $description;
 		}

@@ -20,6 +20,7 @@ $LastChangedRevision$
 		$GLOBALS['privs'] = $privs;
 
 		$areas = areas();
+		$area = false;
 
 		foreach ($areas as $k => $v)
 		{
@@ -28,6 +29,21 @@ $LastChangedRevision$
 				$area = $k;
 				break;
 			}
+		}
+
+		if (gps('logout'))
+		{
+			$body_id = 'page-logout';
+		}
+
+		elseif (!$txp_user)
+		{
+			$body_id = 'page-login';
+		}
+
+		else
+		{
+			$body_id = 'page-'.$event;
 		}
 
 		$theme = 'default';
@@ -58,13 +74,20 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function tabsort($area,$event)
 	{
-		$areas = areas();
-		foreach($areas[$area] as $a=>$b) {
-			if (has_privs($b)) {
-				$out[] = tabber($a,$b,$event,2);
+		if ($area)
+		{
+			$areas = areas();
+			foreach($areas[$area] as $a=>$b) {
+				if (has_privs($b)) {
+					$out[] = tabber($a,$b,$event,2);
+				}
+	
+	
 			}
+			return (empty($out) ? '' : join('',$out));
 		}
-		return (empty($out) ? '' : join('',$out));
+
+		return '';
 	}
 
 // -------------------------------------------------------------
@@ -171,7 +194,7 @@ $LastChangedRevision$
 		if (is_array($_user_messages)) {
 			foreach ($_user_messages as $m) {
 				list($msg, $type) = $m;
-				$out[] = '<div class="'.$type.'">'.escape_output($msg).'</div>';
+				$out[] = '<div class="'.$type.'">'.htmlspecialchars($msg).'</div>';
 			}
 		}
 

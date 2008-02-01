@@ -84,21 +84,6 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function escape_output($str)
-	{
-		# should be safe for xhtml and xml
-		return strtr($str,
-			array(
-				'&' => '&#38;',
-				'<' => '&#60;',
-				'>' => '&#62;',
-				"'" => '&#39;',
-				'"' => '&#34;',
-			)
-		);
-	}
-
-// -------------------------------------------------------------
 	function escape_tags($str)
 	{
 		return strtr($str,
@@ -138,11 +123,36 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function dmp()
 	{
+		static $f = FALSE;
+
+		if(defined('txpdmpfile'))
+		{
+			global $prefs;
+
+			if(!$f) $f = fopen($prefs['tempdir'].'/'.txpdmpfile, 'a');
+
+			fwrite($f, "\n[".safe_strftime('iso8601')."]\n");
+		}
+
 		$a = func_get_args();
-		echo "<pre>".n;
+
+		if(!$f) echo "<pre>".n;
+
 		foreach ($a as $thing)
-			echo htmlspecialchars(is_scalar($thing) ? strval($thing) : var_export($thing, true)), n;
-		echo "</pre>".n;
+		{
+			$out = is_scalar($thing) ? strval($thing) : var_export($thing, true);
+
+			if ($f)
+			{
+				fwrite($f, $out."\n");
+			}
+			else
+			{
+				echo htmlspecialchars($out), n;
+			}
+		}
+
+		if(!$f) echo "</pre>".n;
 	}
 
 // -------------------------------------------------------------
@@ -272,11 +282,15 @@ $LastChangedRevision$
 			$privs[$user] = safe_field("privs", "txp_users", "name='".doSlash($user)."'");
 		}
 
-		if (@$txp_permissions[$res])
-			$req = explode(',', $txp_permissions[$res]);
+		if (isset($txp_permissions[$res]))
+		{
+			return in_array($privs[$user], explode(',', $txp_permissions[$res]));
+		}
+
 		else
-			$req = array('1'); // The Publisher gets prived for anything
-		return in_array($privs[$user], $req);
+		{
+			return false;
+		}
 	}
 
 // -------------------------------------------------------------
@@ -481,7 +495,7 @@ $LastChangedRevision$
 		printf ("<pre>".gTxt('plugin_load_error').' <b>%s</b> -> <b>%s: %s on line %s</b></pre>',
 				$txp_current_plugin, $error[$errno], $errstr, $errline);
 		if ($production_status == 'debug')
-			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".escape_output(join("\n", get_caller(10)))."</code></pre>";
+			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".htmlspecialchars(join("\n", get_caller(10)))."</code></pre>";
 	}
 
 // -------------------------------------------------------------
@@ -501,12 +515,22 @@ $LastChangedRevision$
 				htmlspecialchars($txp_current_tag), $error[$errno], $errstr, $errline );
 
 		if ($production_status == 'debug')
-		{
-			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".escape_output(join("\n", get_caller(10)))."</code></pre>";
+			{
+			print "\n<pre style=\"padding-left: 2em;\" class=\"backtrace\"><code>".htmlspecialchars(join("\n", get_caller(10)))."</code></pre>";
 
 			$trace_msg = gTxt('tag_error').' '.$txp_current_tag.' -> '.$error[$errno].': '.$errstr.' '.$errline;
 			trace_add( $trace_msg );
-		}
+			}
+	}
+
+// -------------------------------------------------------------
+	function feedErrorHandler($errno, $errstr, $errfile, $errline)
+	{
+		global $production_status;
+
+		if ($production_status != 'debug') return;
+
+		return tagErrorHandler($errno, $errstr, $errfile, $errline);
 	}
 
 // -------------------------------------------------------------
@@ -788,6 +812,29 @@ $LastChangedRevision$
 			}
 		}
 		return (!empty($listed)) ? join(', ',$listed) : false;
+	}
+
+// -------------------------------------------------------------
+	function is_logged_in($user = '')
+	{
+		$name = substr(cs('txp_login_public'), 10);
+
+		if (!strlen($name) or strlen($user) and $user !== $name)
+		{
+			return FALSE;
+		}
+
+		$rs = safe_row('nonce, name, RealName, email, privs', 'txp_users', "name = '".doSlash($name)."'");
+
+		if ($rs and substr(md5($rs['nonce']), -10) === substr(cs('txp_login_public'), 0, 10))
+		{
+			unset($rs['nonce']);
+			return $rs;
+		}
+		else
+		{
+			return FALSE;
+		}
 	}
 
 // -------------------------------------------------------------
@@ -1908,25 +1955,30 @@ eod;
 			'es-es' => array('es_ES.UTF-8', 'es_ES', 'esp', 'spanish', 'es_ES.ISO_8859-1'),
 			'et-ee' => array('et_EE.UTF-8', 'et_EE'),
 			'el-gr' => array('el_GR.UTF-8', 'el_GR', 'el', 'gre', 'greek', 'el_GR.ISO_8859-7'),
-			'fr-fr' => array('fr_FR.UTF-8', 'fr_FR', 'fra', 'fre', 'fr', 'french', 'fr_FR.ISO_8859-1'),
 			'fi-fi' => array('fi_FI.UTF-8', 'fi_FI', 'fin', 'fi', 'finnish', 'fi_FI.ISO_8859-1'),
+			'fr-fr' => array('fr_FR.UTF-8', 'fr_FR', 'fra', 'fre', 'fr', 'french', 'fr_FR.ISO_8859-1'),
+			'gl-gz' => array('gl_GZ.UTF-8', 'gl_GZ', 'glg', 'gl', '', ''),
 			'he_il' => array('he_IL.UTF-8', 'he_IL', 'heb', 'he', 'hebrew', 'he_IL.ISO_8859-8'),
-			'hu_hu' => array('hu_HU.UTF-8', 'hu_HU', 'hun', 'hu', 'hungarian', 'hu_HU.ISO8859-2'),
+			'hr-hr' => array('hr_HR.UTF-8', 'hr_HR', 'hr'),
+			'hu-hu' => array('hu_HU.UTF-8', 'hu_HU', 'hun', 'hu', 'hungarian', 'hu_HU.ISO8859-2'),
 			'id-id' => array('id_ID.UTF-8', 'id_ID', 'id', 'ind', 'indonesian','id_ID.ISO_8859-1'),
 			'is-is' => array('is_IS.UTF-8', 'is_IS'),
 			'it-it' => array('it_IT.UTF-8', 'it_IT', 'it', 'ita', 'italian', 'it_IT.ISO_8859-1'),
 			'ja-jp' => array('ja_JP.UTF-8', 'ja_JP', 'ja', 'jpn', 'japanese', 'ja_JP.ISO_8859-1'),
-			'lv-lv' => array('lv_LV.UTF-8', 'lv_LV'),
-			'no-no' => array('no_NO.UTF-8', 'no_NO', 'no', 'nor', 'norwegian', 'no_NO.ISO_8859-1'),
+			'ko-kr' => array('ko_KR.UTF-8', 'ko_KR', 'ko', 'kor', 'korean'),
+			'lv-lv' => array('lv_LV.UTF-8', 'lv_LV', 'lv', 'lav'),
 			'nl-nl' => array('nl_NL.UTF-8', 'nl_NL', 'dut', 'nla', 'nl', 'nld', 'dutch', 'nl_NL.ISO_8859-1'),
-			'pl-pl' => array('pl_PL.UTF-8', 'pl_PL'),
+			'no-no' => array('no_NO.UTF-8', 'no_NO', 'no', 'nor', 'norwegian', 'no_NO.ISO_8859-1'),
+			'pl-pl' => array('pl_PL.UTF-8', 'pl_PL', 'pl', 'pol', 'polish', ''),
+			'pt-br' => array('pt_BR.UTF-8', 'pt_BR', 'pt', 'ptb', 'portuguese-brazil', ''),
 			'pt-pt' => array('pt_PT.UTF-8', 'pt_PT', 'por', 'portuguese', 'pt_PT.ISO_8859-1'),
 			'ro-ro' => array('ro_RO.UTF-8', 'ro_RO', 'ron', 'rum', 'ro', 'romanian', 'ro_RO.ISO8859-2'),
 			'ru-ru' => array('ru_RU.UTF-8', 'ru_RU', 'ru', 'rus', 'russian', 'ru_RU.ISO8859-5'),
 			'sk-sk' => array('sk_SK.UTF-8', 'sk_SK', 'sk', 'slo', 'slk', 'sky', 'slovak', 'sk_SK.ISO_8859-1'),
 			'sv-se' => array('sv_SE.UTF-8', 'sv_SE', 'sv', 'swe', 'sve', 'swedish', 'sv_SE.ISO_8859-1'),
 			'th-th' => array('th_TH.UTF-8', 'th_TH', 'th', 'tha', 'thai', 'th_TH.ISO_8859-11'),
-			'uk-ua' => array('uk_UA.UTF-8', 'uk_UA'),
+			'uk-ua' => array('uk_UA.UTF-8', 'uk_UA', 'uk', 'ukr'),
+			'vi-vn' => array('vi_VN.UTF-8', 'vi_VN', 'vi', 'vie'),
 			'zh-cn' => array('zh_CN.UTF-8', 'zh_CN'),
 			'zh-tw' => array('zh_TW.UTF-8', 'zh_TW'),
 		);
@@ -1994,7 +2046,7 @@ eod;
 		if (($production_status == 'debug') || (txpinterface == 'admin')) {
 			trigger_error("<pre>Error: '".htmlspecialchars($myvar)."' is not an integer</pre>".
 						  "\n".'<pre style="padding-left: 2em;" class="backtrace"><code>'.
-						  escape_output(join("\n", get_caller(5,1))).'</code></pre>', E_USER_WARNING);
+						  htmlspecialchars(join("\n", get_caller(5,1))).'</code></pre>', E_USER_WARNING);
 		} else trigger_error("'".htmlspecialchars($myvar)."' is not an integer.", E_USER_WARNING);
 		return false;
 	}

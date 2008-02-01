@@ -32,7 +32,7 @@ include_once 'setup.php';
 
 header("Content-type: text/html; charset=utf-8");
 
-$rel_siteurl = preg_replace('#^(.*)/textpattern[/setuphindx.]*?$#i','\\1',$_SERVER['PHP_SELF']);
+$rel_siteurl = preg_replace('#^(.*)/textpattern.*$#i','\\1',$_SERVER['PHP_SELF']);
 print <<<eod
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 			"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -40,7 +40,7 @@ print <<<eod
 	<head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title>Textpattern &#8250; setup</title>
-	<link rel="Stylesheet" href="$rel_siteurl/textpattern/textpattern.css" type="text/css" />
+	<link rel="stylesheet" href="$rel_siteurl/textpattern/textpattern.css" type="text/css" />
 	</head>
 	<body style="border-top:15px solid #FC3">
 	<div align="center">

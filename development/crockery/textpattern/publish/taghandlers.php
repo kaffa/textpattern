@@ -136,8 +136,8 @@ $LastChangedRevision$
 
 			if ($escape == 'html')
 			{
-				$alt = escape_output($alt);
-				$caption = escape_output($caption);
+				$alt = htmlspecialchars($alt);
+				$caption = htmlspecialchars($caption);
 			}
 
 			$out = '<img src="'.hu.$img_dir.'/'.$id.$ext.'" width="'.$w.'" height="'.$h.'" alt="'.$alt.'"'.
@@ -164,6 +164,7 @@ $LastChangedRevision$
 			'html_id' => '',
 			'id'      => '',
 			'link'    => 0,
+			'link_rel'  => '',
 			'name'    => '',
 			'wraptag' => ''
 		), $atts));
@@ -196,8 +197,8 @@ $LastChangedRevision$
 			{
 				if ($escape == 'html')
 				{
-					$alt = escape_output($alt);
-					$caption = escape_output($caption);
+					$alt = htmlspecialchars($alt);
+					$caption = htmlspecialchars($caption);
 				}
 
 				$out = '<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="'.$alt.'"'.
@@ -262,12 +263,12 @@ $LastChangedRevision$
 			$title = ($title == gTxt('rss_feed_title')) ? gTxt('atom_feed_title') : $title;
 		}
 
-		$title = escape_output($title);
-
-		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+		$title = htmlspecialchars($title);
 
 		if ($format == 'link')
 		{
+		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+
 			return '<link rel="alternate" type="'.$type.'" title="'.$title.'" href="'.$url.'" />';
 		}
 
@@ -304,12 +305,12 @@ $LastChangedRevision$
 			$title = ($title == gTxt('rss_feed_title')) ? gTxt('atom_feed_title') : $title;
 		}
 
-		$title = escape_output($title);
-
-		$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+		$title = htmlspecialchars($title);
 
 		if ($format == 'link')
 		{
+			$type = ($flavor == 'atom') ? 'application/atom+xml' : 'application/rss+xml';
+
 			return '<link rel="alternate" type="'.$type.'" title="'.$title.'" href="'.$url.'" />';
 		}
 
@@ -333,7 +334,8 @@ $LastChangedRevision$
 			'form'     => 'plainlinks',
 			'label'    => '',
 			'labeltag' => '',
-			'limit'    => '',
+			'limit'    => 0,
+			'offset'   => 0,
 			'sort'     => 'linksort asc',
 			'wraptag'  => '',
 		), $atts));
@@ -341,7 +343,7 @@ $LastChangedRevision$
 		$qparts = array(
 			($category) ? "category IN ('".join("','", doSlash(do_list($category)))."')" : '1=1',
 			'order by '.doSlash($sort),
-			($limit) ? 'limit '.intval($limit) : ''
+			($limit) ? 'limit '.intval($offset).', '.intval($limit) : ''
 		);
 
 		$rs = safe_rows_start('*, unix_timestamp(date) as uDate', 'txp_link', join(' ', $qparts));
@@ -389,7 +391,7 @@ $LastChangedRevision$
 		), $atts));
 
 		return tag(
-			escape_output($thislink['linkname']), 'a',
+			htmlspecialchars($thislink['linkname']), 'a',
 			($rel ? ' rel="'.$rel.'"' : '').
 			' href="'.doSpecial($thislink['url']).'"'
 		);
@@ -407,11 +409,11 @@ $LastChangedRevision$
 		), $atts));
 
 		$description = ($thislink['description']) ?
-			' title="'.escape_output($thislink['description']).'"' :
+			' title="'.htmlspecialchars($thislink['description']).'"' :
 			'';
 
 		return tag(
-			escape_output($thislink['linkname']), 'a',
+			htmlspecialchars($thislink['linkname']), 'a',
 			($rel ? ' rel="'.$rel.'"' : '').
 			' href="'.doSpecial($thislink['url']).'"'.$description
 		);
@@ -429,7 +431,7 @@ $LastChangedRevision$
 		), $atts));
 
 		return ($escape == 'html') ?
-			escape_output($thislink['linkname']) :
+			htmlspecialchars($thislink['linkname']) :
 			$thislink['linkname'];
 	}
 
@@ -461,7 +463,7 @@ $LastChangedRevision$
 		if ($thislink['description'])
 		{
 			$description = ($escape == 'html') ?
-				escape_output($thislink['description']) :
+				htmlspecialchars($thislink['description']) :
 				$thislink['description'];
 
 			return doLabel($label, $labeltag).doTag($description, $wraptag, $class);
@@ -495,7 +497,7 @@ $LastChangedRevision$
 			'class'    => '',
 			'label'    => '',
 			'labeltag' => '',
-			'title'    => 1,
+			'title'    => 0,
 			'wraptag'  => '',
 		), $atts));
 
@@ -565,7 +567,7 @@ $LastChangedRevision$
 			'break'    => br,
 			'category' => '',
 			'class'    => __FUNCTION__,
-			'label'    => '',
+			'label'    => gTxt('recent_articles'),
 			'labeltag' => '',
 			'limit'    => 10,
 			'section'  => '',
@@ -914,7 +916,7 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'escape'	=> ''
 		), $atts));
-		return ($escape == 'html') ? escape_output($thiscategory['name']) : $thiscategory['name'];
+		return ($escape == 'html') ? htmlspecialchars($thiscategory['name']) : $thiscategory['name'];
 	}
 
 // -------------------------------------------------------------
@@ -926,7 +928,7 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'escape'	=> ''
 		), $atts));
-		return ($escape == 'html') ? escape_output($thiscategory['title']) : $thiscategory['title'];
+		return ($escape == 'html') ? htmlspecialchars($thiscategory['title']) : $thiscategory['title'];
 	}
 
 // -------------------------------------------------------------
@@ -1057,7 +1059,7 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'escape'	=> ''
 		), $atts));
-		return ($escape == 'html') ? escape_output($thissection['name']) : $thissection['name'];
+		return ($escape == 'html') ? htmlspecialchars($thissection['name']) : $thissection['name'];
 	}
 
 // -------------------------------------------------------------
@@ -1069,7 +1071,7 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'escape'	=> ''
 		), $atts));
-		return ($escape == 'html') ? escape_output($thissection['title']) : $thissection['title'];
+		return ($escape == 'html') ? htmlspecialchars($thissection['title']) : $thissection['title'];
 	}
 
 // -------------------------------------------------------------
@@ -1165,7 +1167,7 @@ $LastChangedRevision$
 			'escape'	=> 'html'
 		),$atts));
 
-		return ($escape == 'html' ? escape_output($q) : $q);
+		return ($escape == 'html' ? htmlspecialchars($q) : $q);
 	}
 
 
@@ -1445,25 +1447,37 @@ $LastChangedRevision$
 
 	function posted($atts)
 	{
-		global $thisarticle, $pretext, $prefs;
+		global $thisarticle, $id, $c, $pg, $dateformat, $archive_dateformat;
 
 		assert_article();
 
 		extract(lAtts(array(
+			'class'   => '',
 			'format'  => '',
 			'gmt'     => '',
 			'lang'    => '',
+			'wraptag' => '',
 		), $atts));
 
-		if ($format) {
-			return safe_strftime($format, $thisarticle['posted'], $gmt, $lang);
-		} else {
-			if ($pretext['id'] or $pretext['c'] or $pretext['pg']) {
-				return safe_strftime($prefs['archive_dateformat'], $thisarticle['posted']);
-			} else {
-				return safe_strftime($prefs['dateformat'], $thisarticle['posted']);
+		if ($format)
+		{
+			$out = safe_strftime($format, $thisarticle['posted'], $gmt, $lang);
+		}
+
+		else
+		{
+			if ($id or $c or $pg)
+			{
+				$out = safe_strftime($archive_dateformat, $thisarticle['posted']);
+			}
+
+			else
+			{
+				$out = safe_strftime($dateformat, $thisarticle['posted']);
 			}
 		}
+
+		return ($wraptag) ? doTag($out, $wraptag, $class) : $out;
 	}
 
 
@@ -1595,7 +1609,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function comments_form($atts)
 	{
-		global $thisarticle, $comment_preview;
+		global $thisarticle, $has_comments_preview;
 
 		extract(lAtts(array(
 			'class'        => __FUNCTION__,
@@ -1604,21 +1618,16 @@ $LastChangedRevision$
 			'msgcols'      => '25',
 			'msgrows'      => '5',
 			'msgstyle'     => '',
-			'preview'      => false,
+			'show_preview' => empty($has_comments_preview),
 			'wraptag'      => '',
 		), $atts));
-
-		# don't display the comment form at the bottom, since it's
-		# already shown at the top
-		if (ps('preview') and empty($comment_preview) and !$preview)
-			return '';
 
 		assert_article();
 
 		extract($thisarticle);
 
+		$out = '';
 		$ip = serverset('REMOTE_ADDR');
-
 		$blacklisted = is_blacklisted($ip);
 
 		if (!checkCommentsAllowed($thisid)) {
@@ -1633,7 +1642,10 @@ $LastChangedRevision$
 				$out .= " ". gTxt("comment_moderated");
 			$out = graf($out, ' id="txpCommentInputForm"');
 		} else {
-			$out = commentForm($thisid,$atts);
+			# display a comment preview if required
+			if (ps('preview') and $show_preview)
+				$out = comments_preview(array());
+			$out .= commentForm($thisid,$atts);
 		}
 
 		return (!$wraptag ? $out : doTag($out,$wraptag,$class) );
@@ -1677,7 +1689,9 @@ $LastChangedRevision$
 			'wraptag'	=> ($comments_are_ol ? 'ol' : ''),
 			'break'		=> ($comments_are_ol ? 'li' : 'div'),
 			'class'		=> __FUNCTION__,
-			'breakclass'=> '',
+			'breakclass' => '',
+			'limit'      => 0,
+			'offset'     => 0,
 			'sort'		=> 'posted ASC',
 		),$atts));
 
@@ -1687,8 +1701,13 @@ $LastChangedRevision$
 
 		if (!$comments_count) return '';
 
-		$rs = safe_rows_start("*, unix_timestamp(posted) as time", "txp_discuss",
-			'parentid='.intval($thisid).' and visible='.VISIBLE.' order by '.doSlash($sort));
+		$qparts = array(
+			'parentid='.intval($thisid).' and visible='.VISIBLE,
+			'order by '.doSlash($sort),
+			($limit) ? 'limit '.intval($offset).', '.intval($limit) : ''
+		);
+
+		$rs = safe_rows_start('*, unix_timestamp(posted) as time', 'txp_discuss', join(' ', $qparts));
 
 		$out = '';
 
@@ -1726,13 +1745,15 @@ $LastChangedRevision$
 		$preview = psa(array('name','email','web','message','parentid','remember'));
 		$preview['time'] = time();
 		$preview['discussid'] = 0;
+		$preview['name'] = strip_tags($preview['name']);
+		$preview['email'] = clean_url($preview['email']);
 		if ($preview['message'] == '')
 		{
 			$in = getComment();
 			$preview['message'] = $in['message'];
 
 		}
-		$preview['message'] = markup_comment($preview['message']);
+		$preview['message'] = markup_comment(substr(trim($preview['message']), 0, 65535)); // it is called 'message', not 'novel'
 		$preview['web'] = clean_url($preview['web']);
 
 		$GLOBALS['thiscomment'] = $preview;
@@ -1806,12 +1827,12 @@ $LastChangedRevision$
 
 			if ($web)
 			{
-				return '<a href="http://'.$web.'"'.$nofollow.'>'.$name.'</a>';
+				return '<a href="http://'.htmlspecialchars($web).'"'.$nofollow.'>'.htmlspecialchars($name).'</a>';
 			}
 
 			if ($email && !$never_display_email)
 			{
-				return '<a href="'.eE('mailto:'.$email).'"'.$nofollow.'>'.$name.'</a>';
+				return '<a href="'.eE('mailto:'.$email).'"'.$nofollow.'>'.htmlspecialchars($name).'</a>';
 			}
 		}
 
@@ -1825,16 +1846,17 @@ $LastChangedRevision$
 
 		assert_comment();
 
-		return $thiscomment['email'];
+		return htmlspecialchars($thiscomment['email']);
 	}
 
 // -------------------------------------------------------------
 	function comment_web($atts)
 	{
 		global $thiscomment;
+
 		assert_comment();
 
-		return $thiscomment['web'];
+		return htmlspecialchars($thiscomment['web']);
 	}
 
 // -------------------------------------------------------------
@@ -1858,6 +1880,7 @@ $LastChangedRevision$
 	function comment_message($atts)
 	{
 		global $thiscomment;
+
 		assert_comment();
 
 		return $thiscomment['message'];
@@ -2256,8 +2279,8 @@ $LastChangedRevision$
 
 						if ($escape == 'html')
 						{
-							$alt = escape_output($alt);
-							$caption = escape_output($caption);
+							$alt = htmlspecialchars($alt);
+							$caption = htmlspecialchars($caption);
 						}
 
 						$out = '<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="'.$alt.'"'.
@@ -2279,8 +2302,8 @@ $LastChangedRevision$
 
 					if ($escape == 'html')
 					{
-						$alt = escape_output($alt);
-						$caption = escape_output($caption);
+						$alt = htmlspecialchars($alt);
+						$caption = htmlspecialchars($caption);
 					}
 
 					$out = '<img src="'.hu.$img_dir.'/'.$id.$ext.'" width="'.$w.'" height="'.$h.'" alt="'.$alt.'"'.
@@ -2317,7 +2340,6 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-
 	function search_result_excerpt($atts)
 	{
 		global $thisarticle, $pretext;
@@ -2335,22 +2357,16 @@ $LastChangedRevision$
 		$result = preg_replace('/\s+/', ' ', strip_tags(str_replace('><', '> <', $thisarticle['body'])));
 		preg_match_all("/\b.{1,50}".preg_quote($q).".{1,50}\b/iu", $result, $concat);
 
-		if ($concat)
+		for ($i = 0, $r = array(); $i < min($limit, count($concat[0])); $i++)
 		{
-			for ($i = 0, $r = array(); $i < min($limit, count($concat[0])); $i++)
-			{
-				$r[] = trim($concat[0][$i]);
-			}
-
-			if ($r)
-			{
-				$concat = join($break.n, $r);
-				$concat = preg_replace('/^[^>]+>/U', '', $concat);
-				$concat = preg_replace('/('.preg_quote($q).')/i', "<$hilight>$1</$hilight>", $concat);
-
-				return trim($break.$concat.$break);
-			}
+			$r[] = trim($concat[0][$i]);
 		}
+
+		$concat = join($break.n, $r);
+		$concat = preg_replace('/^[^>]+>/U', '', $concat);
+		$concat = preg_replace('/('.preg_quote($q).')/i', "<$hilight>$1</$hilight>", $concat);
+
+		return ($concat) ? trim($break.$concat.$break) : '';
 	}
 
 // -------------------------------------------------------------
@@ -2390,11 +2406,18 @@ $LastChangedRevision$
 			'class'    => __FUNCTION__,
 			'labeltag' => '',
 			'c' => $c, // Keep the option to override categories due to backward compatiblity
+			'limit'    => 0,
+			'offset'   => 0,
 			'sort'     => 'name ASC',
 		),$atts));
-		$c = doSlash($c);
 
-		$rs = safe_rows_start("*", "txp_image","category='$c' and thumbnail=1 order by ".doSlash($sort));
+		$qparts = array(
+			"category = '".doSlash($c)."' and thumbnail = 1",
+			'order by '.doSlash($sort),
+			($limit) ? 'limit '.intval($offset).', '.intval($limit) : ''
+		);
+
+		$rs = safe_rows_start('*', 'txp_image',  join(' ', $qparts));
 
 		if ($rs) {
 			$out = array();
@@ -2499,7 +2522,8 @@ $LastChangedRevision$
 		extract(lAtts(array(
 			'class' => '',
 			'id'		=> '',
-			'title' => ''
+			'style' => '',
+			'title' => '',
 		), $atts));
 
 		if (!$id)
@@ -2518,6 +2542,7 @@ $LastChangedRevision$
 
 			return tag(parse($thing), 'a', ' rel="bookmark" href="'.$url.'"'.
 				($title ? ' title="'.$title.'"' : '').
+				($style ? ' style="'.$style.'"' : '').
 				($class ? ' class="'.$class.'"' : '')
 			);
 		}
@@ -2616,7 +2641,7 @@ $LastChangedRevision$
 		),$atts));
 
 		$results = (int)$thispage['grand_total'];
-		return parse(EvalElse($thing, $results >= $min and (!$max || $results <= $max)));
+		return parse(EvalElse($thing, $results >= $min && (!$max || $results <= $max)));
 	}
 
 //--------------------------------------------------------------------------
@@ -2750,7 +2775,7 @@ $LastChangedRevision$
 		else
 			$out = $default;
 
-		return ($escape == 'html' ? escape_output($out) : $out);
+		return ($escape == 'html' ? htmlspecialchars($out) : $out);
 	}
 
 //--------------------------------------------------------------------------

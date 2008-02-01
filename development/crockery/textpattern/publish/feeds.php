@@ -16,6 +16,7 @@ $LastChangedRevision$
 
 	function feed($type) {
 		global $prefs;
+		set_error_handler('feedErrorHandler');
 		ob_clean();
 		extract($prefs);
 		extract(doSlash(gpsa(array('category','section','limit','area'))));
@@ -102,8 +103,8 @@ $LastChangedRevision$
 
 		if ($atom) {
 			$out[] = tag('Textpattern','generator', ' uri="http://textpattern.com/" version="'.$version.'"');
-			$out[] = tag(escape_output($feedtitle),'title',t_text);
-			$out[] = tag(escape_output($site_slogan),'subtitle',t_text);
+			$out[] = tag(htmlspecialchars($feedtitle),'title',t_text);
+			$out[] = tag(htmlspecialchars($site_slogan),'subtitle',t_text);
 			$out[] = tag(safe_strftime("w3cdtf",$last),'updated');
 			$out[] = '<link'.r_relself.' href="'.$atom_self_ref.'" />';
 			$out[] = '<link'.r_relalt.t_texthtml.' href="'.hu.'" />';
@@ -121,6 +122,7 @@ $LastChangedRevision$
 			$out[] = tag(doSpecial($site_slogan),'description');
 			$out[] = tag(safe_strftime('rfc822',$last),'pubDate');
 			$out[] = tag(hu,'link');
+			$out[] = '<atom:link href="'.pagelinkurl(array('rss'=>1,'area'=>$area,'section'=>$section,'category'=>$category,'limit'=>$limit)).'" rel="self" type="application/rss+xml" />';			
 		}
 
 		$out[] = callback_event($atom ? 'atom_head' : 'rss_head');
@@ -158,7 +160,7 @@ $LastChangedRevision$
 					$count = '';
 					if ($show_comment_count_in_feed && $comments_count > 0)
 						$count = ' ['.$comments_count.']';
-					$escaped_title = ($atom ? escape_output($Title) : escape_output(strip_tags($Title)));
+					$escaped_title = ($atom ? htmlspecialchars($Title) : htmlspecialchars(strip_tags($Title)));
 					$e['title'] = tag($escaped_title.$count, 'title', t_html);
 
 					$a['posted'] = $uPosted;
@@ -337,7 +339,7 @@ $LastChangedRevision$
 				'<feed xml:lang="'.$language.'" xmlns="http://www.w3.org/2005/Atom">'.n.join(n,$out).'</feed>';
 		} else {
 			return '<?xml version="1.0" encoding="utf-8"?>'.n.
-				'<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">'.n.
+				'<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">'.n.
 				tag(join(n,$out),'channel').n.
 				'</rss>';
 		}
