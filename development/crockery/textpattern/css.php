@@ -15,6 +15,7 @@ include './config.php';
 ob_end_clean();
 
 $nolog = 1;
+define("txpath", dirname(__FILE__));
 define("txpinterface", "css");
 include txpath.'/publish.php';
 $s = gps('s');
