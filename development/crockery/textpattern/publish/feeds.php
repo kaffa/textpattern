@@ -122,7 +122,7 @@ $LastChangedRevision$
 			$out[] = tag(doSpecial($site_slogan),'description');
 			$out[] = tag(safe_strftime('rfc822',$last),'pubDate');
 			$out[] = tag(hu,'link');
-			$out[] = '<atom:link href="'.pagelinkurl(array('rss'=>1,'area'=>$area,'section'=>$section,'category'=>$category,'limit'=>$limit)).'" rel="self" type="application/rss+xml" />';
+			$out[] = '<atom:link href="'.$atom_self_ref.'" rel="self" type="application/rss+xml" />';
 		}
 
 		$out[] = callback_event($atom ? 'atom_head' : 'rss_head');
