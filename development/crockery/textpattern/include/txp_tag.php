@@ -366,20 +366,20 @@ begin generic functions
 
 //--------------------------------------------------------------
 
-	function list_sort_pop($val) 
-	{ 
-		$asc = ' ('.gTxt('ascending').')'; 
-		$desc = ' ('.gTxt('descending').')'; 
+	function list_sort_pop($val)
+	{
+		$asc = ' ('.gTxt('ascending').')';
+		$desc = ' ('.gTxt('descending').')';
 
-		$vals = array( 
-			'title asc'  => gTxt('tag_title').$asc, 
-			'title desc' => gTxt('tag_title').$desc, 
-			'name asc'   => gTxt('name').$asc, 
-			'name desc'  => gTxt('name').$desc, 
-		); 
+		$vals = array(
+			'title asc'  => gTxt('tag_title').$asc,
+			'title desc' => gTxt('tag_title').$desc,
+			'name asc'   => gTxt('name').$asc,
+			'name desc'  => gTxt('name').$desc,
+		);
 
-		return ' '.selectInput('sort', $vals, $val, true); 
-	} 
+		return ' '.selectInput('sort', $vals, $val, true);
+	}
 
 //--------------------------------------------------------------
 
@@ -3328,9 +3328,9 @@ begin tag builder functions
 				default:
 
 					$atts = array(
-						'class'   => $class, 
-						'html_id' => $html_id, 
-						'id'      => $id, 
+						'class'   => $class,
+						'html_id' => $html_id,
+						'id'      => $id,
 						'style'   => $style,
 						'wraptag' => $wraptag
 					);

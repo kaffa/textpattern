@@ -7,7 +7,7 @@ Copyright 2005 by Dean Allen
 www.textpattern.com
 All rights reserved
 
-Use of this software indicates acceptance of the Textpattern license agreement 
+Use of this software indicates acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -19,11 +19,11 @@ if (!defined('txpinterface')) die('txpinterface is undefined.');
 function doAuth()
 {
 	global $txp_user;
-			
+
 	$txp_user = NULL;
-	
+
 	$message = doTxpValidate();
-	
+
 	if(!$txp_user)
 	{
 		doLoginForm($message);
@@ -56,11 +56,11 @@ function doAuth()
 			safe_update("txp_users", "last_access = now()", "name = '$safe_user'");
 			return true;
 
-		} 
-		
+		}
+
 		return false;
 	}
-	
+
 // -------------------------------------------------------------
 
 	function doLoginForm($message)
@@ -118,14 +118,14 @@ function doAuth()
 	}
 
 // -------------------------------------------------------------
-	function doTxpValidate() 
+	function doTxpValidate()
 	{
 		global $logout,$txpcfg, $txp_user;
 		$p_userid   = ps('p_userid');
 		$p_password = ps('p_password');
 		$logout     = gps('logout');
 		$stay       = ps('stay');
-		
+
 		if ($logout)
 		{
 			setcookie('txp_login','',time()-3600);
@@ -150,12 +150,12 @@ function doAuth()
 				setcookie('txp_login','',time()-3600);
 				return gTxt('bad_cookie');
 			}
-			
+
 		}
 		elseif ($p_userid and $p_password) // no cookie, but incoming login vars
 		{
 			sleep(3); // should grind dictionary attacks to a halt
-	
+
 			if (txp_validate($p_userid,$p_password))
 			{
 				$cookie_hash = md5(uniqid(rand()));
@@ -174,14 +174,14 @@ function doAuth()
 					{
 						setcookie('txp_nostay','',time()-3600);
 					}
-				} 
+				}
 				else // session-only cookie required
 				{
-					setcookie('txp_login',$p_userid.','.$cookie_hash);    			
+					setcookie('txp_login',$p_userid.','.$cookie_hash);
 					setcookie('txp_nostay','1',
 						time()+3600*24*365); // remember nostay for 1 year
 				}
-				
+
 				$txp_user = $p_userid; // login is good, create $txp_user
 				return '';
 			}
@@ -195,6 +195,6 @@ function doAuth()
 		{
 			$txp_user = '';
 			return gTxt('login_to_textpattern');
-		}	
+		}
 	}
 ?>

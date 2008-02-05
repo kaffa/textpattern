@@ -139,7 +139,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_insert_rec($table,$rec,$debug='') 
+	function safe_insert_rec($table,$rec,$debug='')
 	{
 		global $DB;
 		return $DB->insert_rec(PFX.$table, $rec, $debug);
@@ -148,7 +148,7 @@ if (empty($GLOBALS['DB']))
 // -------------------------------------------------------------
 // insert or update
 // NOTE: avoid using this fugly, inefficient function if at all possible
-	function safe_upsert($table,$set,$where,$debug='') 
+	function safe_upsert($table,$set,$where,$debug='')
 	{
 		global $DB;
 		// FIXME: lock the table so this is atomic?
@@ -179,7 +179,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_alter($table, $alter, $debug='') 
+	function safe_alter($table, $alter, $debug='')
 	{
 		$q = "alter table ".safe_pfx($table)." $alter";
 		if ($r = safe_query($q,$debug)) {
@@ -189,7 +189,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_upgrade_table($table, $cols, $primary_key='', $debug='') 
+	function safe_upgrade_table($table, $cols, $primary_key='', $debug='')
 	{
 		global $DB;
 		if ($DB->table_exists(PFX.$table)) {
@@ -210,7 +210,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_column_exists($table, $colname, $debug='') 
+	function safe_column_exists($table, $colname, $debug='')
 	{
 		global $DB;
 		$cols = $DB->column_list(PFX.$table);
@@ -225,7 +225,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_upgrade_index($table, $idxname, $type, $def, $debug='') 
+	function safe_upgrade_index($table, $idxname, $type, $def, $debug='')
 	{
 		// $type would typically be '' or 'unique'
 		if (!safe_index_exists($table, $idxname))
@@ -233,7 +233,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_optimize($table, $debug='') 
+	function safe_optimize($table, $debug='')
 	{
 		$q = "optimize table ".safe_pfx($table)."";
 		if ($r = safe_query($q,$debug)) {
@@ -243,7 +243,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_repair($table, $debug='') 
+	function safe_repair($table, $debug='')
 	{
 		$q = "repair table ".safe_pfx($table)."";
 		if ($r = safe_query($q,$debug)) {
@@ -253,7 +253,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_field($thing, $table, $where = '', $debug='') 
+	function safe_field($thing, $table, $where = '', $debug='')
 	{
 		global $DB;
 		$q = "select $thing from ".safe_pfx_j($table);
@@ -272,7 +272,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_column($thing, $table, $where = '', $debug='') 
+	function safe_column($thing, $table, $where = '', $debug='')
 	{
 		$q = "select $thing from ".safe_pfx_j($table);
 
@@ -292,7 +292,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_row($things, $table, $where = '', $debug='') 
+	function safe_row($things, $table, $where = '', $debug='')
 	{
 		$q = "select $things from ".safe_pfx_j($table);
 
@@ -309,7 +309,7 @@ if (empty($GLOBALS['DB']))
 
 
 // -------------------------------------------------------------
-	function safe_rows($things, $table, $where = '', $debug='') 
+	function safe_rows($things, $table, $where = '', $debug='')
 	{
 		$q = "select $things from ".safe_pfx_j($table);
 
@@ -325,7 +325,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_rows_start($things, $table, $where = '', $debug='') 
+	function safe_rows_start($things, $table, $where = '', $debug='')
 	{
 		$q = "select $things from ".safe_pfx_j($table);
 
@@ -338,7 +338,7 @@ if (empty($GLOBALS['DB']))
 
 //-------------------------------------------------------------
 
-	function safe_count($table, $where = '', $debug='') 
+	function safe_count($table, $where = '', $debug='')
 	{
 		$q = "select count(*) from ".safe_pfx_j($table);
 
@@ -350,7 +350,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 // -------------------------------------------------------------
-	function safe_show($thing, $table, $debug='') 
+	function safe_show($thing, $table, $debug='')
 	{
 		$q = "show $thing from ".safe_pfx($table)."";
 		$rs = getRows($q,$debug);
@@ -362,7 +362,7 @@ if (empty($GLOBALS['DB']))
 
 
 //-------------------------------------------------------------
-	function fetch($col,$table,$key,$val,$debug='') 
+	function fetch($col,$table,$key,$val,$debug='')
 	{
 		global $DB;
 		$key = doSlash($key);
@@ -377,7 +377,7 @@ if (empty($GLOBALS['DB']))
 	}
 
 //-------------------------------------------------------------
-	function getRow($query,$debug='') 
+	function getRow($query,$debug='')
 	{
 		global $DB;
 		if ($r = safe_query($query,$debug)) {

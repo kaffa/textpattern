@@ -7,7 +7,7 @@
 	www.textpattern.com
 	All rights reserved
 
-	Use of this software indicates acceptance ofthe Textpattern license agreement 
+	Use of this software indicates acceptance ofthe Textpattern license agreement
 
 $HeadURL: http://svn.textpattern.com/development/crockery/textpattern/include/txp_category.php $
 $LastChangedRevision: 2139 $
@@ -184,7 +184,7 @@ class CategoryController extends ZemAdminController {
 					{
 						$name = $a['category'];
 						$num = $a['num'];
-	
+
 						$total_count[$name] = $num;
 					}
 				}
@@ -195,7 +195,7 @@ class CategoryController extends ZemAdminController {
 			foreach ($rs as $a)
 			{
 				extract($a);
-				
+
 				if ($type == 'article')
 					$url = 'index.php?event=list'.a.'search_method=categories'.a.'crit='.$name;
 				elseif ($type == 'link')

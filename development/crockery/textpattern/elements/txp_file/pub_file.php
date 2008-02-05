@@ -73,7 +73,7 @@ function file_download_send($event, $step) {
 				break;
 			}
 		}
-		
+
 		// download done
 		exit(0);
 	}

@@ -11,14 +11,14 @@ require_once dirname(dirname(__FILE__)).'/lib/txplib_table.php';
 # Are we going to prefix the indexes or to modify the functions?
 
 // -------------------------------------------------------------
-	function unsafe_index_exists($table, $idxname, $debug='') 
+	function unsafe_index_exists($table, $idxname, $debug='')
 	{
 		global $DB;
 		return $DB->index_exists(PFX.$table, $idxname);
 	}
 
 // -------------------------------------------------------------
-	function unsafe_upgrade_index($table, $idxname, $type, $def, $debug='') 
+	function unsafe_upgrade_index($table, $idxname, $type, $def, $debug='')
 	{
 		global $DB;
 		// $type would typically be '' or 'unique'
@@ -74,7 +74,7 @@ class txp_article_table extends zem_table {
 		'uid' => "varchar(32) not null default ''",
 		'feed_time' => 'date not null',
 	);
-	
+
 	function create_table(){
 		parent::create_table();
 		# to prefix or not prefix new/existing indexes?
@@ -115,15 +115,15 @@ class txp_article_table extends zem_table {
 		// ..etc..
 
 	}
-	
+
 
 
 }
 
-class txp_category_table extends zem_table 
+class txp_category_table extends zem_table
 {
 	var $_table_name = 'txp_category'; # this could be inferable through introspection
-	
+
 	var $_cols = array(
 		'id' => ZEM_PRIMARY_KEY,
 		'name' => "varchar(64) NOT NULL default ''",
@@ -133,13 +133,13 @@ class txp_category_table extends zem_table
 		'rgt' => "int(11) NOT NULL default '0'",
 		'title' => "varchar(255) NOT NULL default ''"
 	);
-	
+
 }
 
-class txp_section_table extends zem_table 
+class txp_section_table extends zem_table
 {
 	var $_table_name = 'txp_section';
-	
+
 	var $_cols = array(
 	  'name' => "varchar(128) NOT NULL default ''",
 	  'page' => "varchar(128) NOT NULL default ''",
@@ -156,17 +156,17 @@ class txp_section_table extends zem_table
 	  'rgt' => "int(11) NOT NULL default '0'",
 	  'inherit' => "smallint(6) NOT NULL default '0'",
 	);
-	
+
 	function create_table(){
 		parent::create_table();
 	}
-	
+
 	function upgrade_table() {
 		parent::upgrade_table();
 		safe_update($this->_table_name, 'path=name', "path=''");
 
 		# shortname has to be unique within a parent
-		if (!safe_index_exists($this->_table_name, 'parent_idx')) 
+		if (!safe_index_exists($this->_table_name, 'parent_idx'))
 		safe_upgrade_index($this->_table_name, 'parent_idx', 'unique', 'parent,name');
 
 		safe_update('txp_section', 'parent=0', "name='default'");
@@ -179,41 +179,41 @@ class txp_section_table extends zem_table
 	}
 }
 
-class txp_css_table extends zem_table 
+class txp_css_table extends zem_table
 {
 	var $_table_name = 'txp_css';
-	
+
 	var $_cols = array(
 	  'name' => "varchar(255) default NULL",
 	  'css' => "text",
 	);
-	
+
 	var $_primary_key = null;
-	
+
 	function create_table(){
 		parent::create_table();
 		safe_upgrade_index($this->_table_name,'name','','name');
 	}
 }
 
-class txp_page_table extends zem_table 
+class txp_page_table extends zem_table
 {
 	var $_table_name = 'txp_page';
-	
+
 	var $_cols = array(
 	  'name' => "varchar(128) NOT NULL default ''",
 	  'user_html' => "text NOT NULL",
 	);
-	
+
 	var $_primary_key = 'name';
 
 }
 
-class txp_users_table extends zem_table 
+class txp_users_table extends zem_table
 {
-	
+
 	var $_table_name = 'txp_users';
-	
+
 	var $_cols = array(
 		'user_id' => ZEM_PRIMARY_KEY,
 		'name' => "varchar(64) NOT NULL default ''",
@@ -224,9 +224,9 @@ class txp_users_table extends zem_table
 		'last_access' => ZEM_DATETIME,
 		'nonce' => "varchar(64) NOT NULL default ''",
 	);
-	
+
 	var $_primary_key = 'user_id';
-	
+
 	function create_table(){
 		parent::create_table();
 		safe_upgrade_index($this->_table_name,'user_name','UNIQUE','name');
@@ -234,12 +234,12 @@ class txp_users_table extends zem_table
 }
 
 
-class txp_discuss_table extends zem_table 
+class txp_discuss_table extends zem_table
 {
 	var $_table_name = 'txp_discuss';
-	
+
 	var $_primary_key = 'discussid';
-	
+
 	var $_cols = array(
   		'discussid' => ZEM_PRIMARY_KEY,
   		'parentid' => "int NOT NULL default '0'",
@@ -251,46 +251,46 @@ class txp_discuss_table extends zem_table
   		'message' => "text NOT NULL",
   		'visible' => "smallint NOT NULL default '1'",
 	);
-	
+
 	function create_table(){
 		parent::create_table();
 		safe_upgrade_index($this->_table_name,'parentid','','parentid');
 	}
-	
+
 }
 
-class txp_discuss_ipban_table extends zem_table 
+class txp_discuss_ipban_table extends zem_table
 {
 	var $_table_name = 'txp_discuss_ipban';
-	
+
 	var $_cols = array(
 		'ip' => "varchar(255) NOT NULL default ''",
   		'name_used' => "varchar(255) NOT NULL default ''",
   		'date_banned' => ZEM_DATETIME,
   		'banned_on_message' => "smallint NOT NULL default '0'",
 	);
-	
+
 	var $_primary_key = 'ip';
 }
 
-class txp_discuss_nonce_table extends zem_table 
+class txp_discuss_nonce_table extends zem_table
 {
 	var $_table_name = 'txp_discuss_nonce';
-	
+
 	var $_cols = array(
 		'issue_time' => ZEM_DATETIME,
 		'nonce' => "varchar(255) NOT NULL default ''",
 		'used' => "smallint NOT NULL default '0'",
 		'secret' => "varchar(255) NOT NULL default ''",
 	);
-	
+
 	var $_primary_key = 'nonce';
 }
 
-class txp_file_table extends zem_table 
+class txp_file_table extends zem_table
 {
 	var $_table_name = 'txp_file';
-	
+
 	var $_cols = array(
 		'id' => ZEM_PRIMARY_KEY,
   		'filename' => "varchar(255) NOT NULL default ''",
@@ -299,39 +299,39 @@ class txp_file_table extends zem_table
   		'description' => "text NOT NULL",
   		'downloads' => "int NOT NULL default '0'",
 	);
-	
+
 	function create_table(){
 		parent::create_table();
 		safe_upgrade_index($this->_table_name,'filename','UNIQUE','filename');
 	}
 }
 
-class txp_form_table extends zem_table 
+class txp_form_table extends zem_table
 {
 	var $_table_name = 'txp_form';
-	
+
 	var $_cols = array(
 		'name' => "varchar(64) NOT NULL default ''",
 		'type' => "varchar(28) NOT NULL default ''",
 		'Form' => "text NOT NULL",
 	);
-	
+
 	var $_primary_key = 'name';
-	
+
 	function upgrade_table(){
 		parent::upgrade_table();
 		safe_update('txp_form', "Form = REPLACE(Form, '<txp:message', '<txp:comment_message')", "1 = 1");
 	}
-	
+
 	function create_table(){
 		parent::create_table();
 	}
 }
 
-class txp_image_table extends zem_table 
+class txp_image_table extends zem_table
 {
 	var $_table_name = 'txp_image';
-	
+
 	var $_cols = array(
 		'id' => ZEM_PRIMARY_KEY,
 		'name' => "varchar(255) NOT NULL default ''",
@@ -347,10 +347,10 @@ class txp_image_table extends zem_table
 	);
 }
 
-class txp_lang_table extends zem_table 
+class txp_lang_table extends zem_table
 {
 	var $_table_name = 'txp_lang';
-	
+
 	var $_cols = array(
 		'id' => ZEM_PRIMARY_KEY,
 		'lang' => "varchar(16) default NULL",
@@ -359,7 +359,7 @@ class txp_lang_table extends zem_table
 		'data' => ZEM_TINYTEXT,
 		'lastmod' => "timestamp",
 	);
-	
+
 	function create_table(){
 		parent::create_table();
 		safe_upgrade_index($this->_table_name,'lang','UNIQUE','lang,name');
@@ -367,10 +367,10 @@ class txp_lang_table extends zem_table
 	}
 }
 
-class txp_link_table extends zem_table 
+class txp_link_table extends zem_table
 {
 	var $_table_name = 'txp_link';
-	
+
 	var $_cols = array(
   		'id' => ZEM_PRIMARY_KEY,
   		'date' => ZEM_DATETIME,
@@ -383,10 +383,10 @@ class txp_link_table extends zem_table
 
 }
 
-class txp_log_table extends zem_table 
+class txp_log_table extends zem_table
 {
 	var $_table_name = 'txp_log';
-	
+
 	var $_cols = array(
 		'id' => ZEM_PRIMARY_KEY,
 		'time' => ZEM_DATETIME,
@@ -397,17 +397,17 @@ class txp_log_table extends zem_table
 		'method' => "varchar(16) NOT NULL default 'GET'",
 		'ip' => "varchar(16) NOT NULL default ''",
 	);
-	
+
 	function create_table(){
 		parent::create_table();
 		safe_upgrade_index($this->_table_name,'time','','time');
 	}
 }
 
-class txp_plugin_table extends zem_table 
+class txp_plugin_table extends zem_table
 {
 	var $_table_name = 'txp_plugin';
-	
+
 	var $_cols = array(
   		'name' => "varchar(64) NOT NULL default ''",
   		'status' => "smallint NOT NULL default '1'",
@@ -425,10 +425,10 @@ class txp_plugin_table extends zem_table
 	var $_primary_key = 'name';
 }
 
-class txp_prefs_table extends zem_table 
+class txp_prefs_table extends zem_table
 {
 	var $_table_name = 'txp_prefs';
-	
+
 	var $_cols = array(
   		'prefs_id' => "INT NOT NULL default '1'",
   		'name' => "varchar(255) default NULL",
@@ -438,9 +438,9 @@ class txp_prefs_table extends zem_table
   		'html' => "varchar(64) NOT NULL default 'text_input'",
   		'position' => "smallint NOT NULL default '0'",
 	);
-	
+
 	var $_primary_key = 'prefs_id, name';
-	
+
 	function create_table(){
 		parent::create_table();
 		safe_upgrade_index($this->_table_name,'prefs_idx','UNIQUE','prefs_id,name');

@@ -7,7 +7,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
  	function tree_get($table, $root=NULL, $where='1=1')
- 	{ 
+ 	{
 		// this is a generalization of the old getTree() function
 
 		// don't apply $whwere here, since we assume the supplied root
@@ -15,8 +15,8 @@ $LastChangedRevision$
 
 		if ($root !== NULL) {
 			 extract(safe_row(
-				"lft as l, rgt as r", 
-				$table, 
+				"lft as l, rgt as r",
+				$table,
 				"id='".doSlash($root)."'"
 			));
 
@@ -39,7 +39,7 @@ $LastChangedRevision$
 	    while ($rs and $row = nextRow($rs)) {
 
 	   		extract($row);
-			while (count($right) > 0 && $right[count($right)-1] < $rgt) { 
+			while (count($right) > 0 && $right[count($right)-1] < $rgt) {
 				array_pop($right);
 			}
 
@@ -47,11 +47,11 @@ $LastChangedRevision$
 			$row['children'] = ($rgt - $lft - 1) / 2;
 			$out[] = $row;
 
-			$right[] = $rgt; 
+			$right[] = $rgt;
 	    }
     	return($out);
  	}
- 	
+
 // -------------------------------------------------------------
  	function tree_root_id($table, $where='1=1')
  	{
@@ -63,8 +63,8 @@ $LastChangedRevision$
  	{
 
 	    extract(safe_row(
-	    	"lft as l, rgt as r", 
-	    	$table, 
+	    	"lft as l, rgt as r",
+	    	$table,
 			"id='".doSlash($target)."' and $where"
 		));
 
@@ -72,17 +72,17 @@ $LastChangedRevision$
 			return array();
 
 	    $rs = safe_rows_start(
-	    	"*", 
+	    	"*",
 	    	$table,
 				"lft <= $l and rgt >= $r and $where order by lft asc"
-		); 
+		);
 
 		$out = array();
-		$right = array(); 
+		$right = array();
 
 	    while ($rs and $row = nextRow($rs)) {
 	   		extract($row);
-			while (count($right) > 0 && $right[count($right)-1] < $rgt) { 
+			while (count($right) > 0 && $right[count($right)-1] < $rgt) {
 				array_pop($right);
 			}
 
@@ -90,19 +90,19 @@ $LastChangedRevision$
 			$row['children'] = ($rgt - $lft - 1) / 2;
 			$out[] = $row;
 
-			$right[] = $rgt; 
+			$right[] = $rgt;
 	    }
 		return $out;
 	}
 
 // -------------------------------------------------------------
 // make room for a new node, and return the lft and rgt values it should use
-	function tree_insert_space($table, $parent, $where='1=1') 
-	{ 
+	function tree_insert_space($table, $parent, $where='1=1')
+	{
 		$root = doSlash($parent);
 
 	    $row = safe_row(
-	    	"lft as l, rgt as r", 
+	    	"lft as l, rgt as r",
 	    	$table,
 			"id='$root' and $where"
 		);

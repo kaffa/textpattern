@@ -259,7 +259,7 @@ $LastChangedRevision$
 		global $txp_user, $sitename;
 
 		if ( empty( $name)) $name = $txp_user;
-			
+
 		$message = gTxt('greeting').' '.$name.','.
 
 			n.n.gTxt('your_password_is').': '.$password.

@@ -38,7 +38,7 @@ $LastChangedRevision$
 		$r = safe_rows_start('name, val', 'txp_prefs', 'prefs_id=1');
 		if ($r) {
 			while ($a = nextRow($r)) {
-				$out[$a['name']] = $a['val']; 
+				$out[$a['name']] = $a['val'];
 			}
 			$user_prefs = get_user_prefs();
 			if ($user_prefs)
@@ -58,7 +58,7 @@ $LastChangedRevision$
 		if ($r) {
 			$out = array();
 			while ($a = nextRow($r)) {
-				$out[$a['name']] = $a['val']; 
+				$out[$a['name']] = $a['val'];
 			}
 			return $out;
 		}

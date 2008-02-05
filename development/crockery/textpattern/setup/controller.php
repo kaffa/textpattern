@@ -9,44 +9,44 @@ include_once txpath.'/setup/setup-langs.php';
 # cannot use on test cases with just the include, need to explicitly set $GLOBALS val?
 $GLOBALS['langs'] = $langs;
 
-class textpattern_setup_controller 
+class textpattern_setup_controller
 {
-	
+
 	var $_step;
-	
+
 	var $_default_step = 'chooseLang';
-	
+
 	var $_step_view;
-	
+
 	var $vars = array();
-	
+
 	var $rel_siteurl;
-	
+
 	var $langs;
-	
+
 	function textpattern_setup_controller()
 	{
 		$this->__construct();
 	}
-	
+
 	function __construct()
 	{
-		
+
 		#$this->rel_siteurl = preg_replace('#^(.*)/textpattern[/setuphindx.]*?$#i','\\1',$_SERVER['PHP_SELF']);
 		$this->rel_siteurl = preg_replace('#^(.*)/textpattern[/setuphindxlra.]*?$#i','\\1',$_SERVER['PHP_SELF']);
-		
+
 		$this->_step = ps('step');
-		
+
 		if(empty($this->_step)) $this->_step = $this->_default_step;
-		
+
 		$this->langs =& $GLOBALS['langs'];
-		
+
 		# delegate control into step method
 		if(method_exists($this,$this->_step) && is_callable(array(&$this,$this->_step))){
 			call_user_method($this->_step,$this);
 		}
 	}
-	
+
 	function render()
 	{
 
@@ -71,18 +71,18 @@ eod;
 		header("Cache-Control: no-cache, must-revalidate");
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Content-type: text/html; charset=utf-8");
-		
+
 		echo $content;
 
 	}
-	
+
 // -------------------------------------------------------------
 	# Step 1: Choose your language
-	function chooseLang() 
+	function chooseLang()
 	{
 		require txpath.'/setup/en-gb.php';
 		$GLOBALS['en_gb_lang'] = $en_gb_lang;
-		
+
 		#$this->_step_view =  '<form action="'.$this->rel_siteurl.'/textpattern/setup/index.php" method="post">'.
 		$this->_step_view = '<form action="'.$this->rel_siteurl.'/textpattern/setup/install.php" method="post">'.
 		 	'<table id="setup" cellpadding="0" cellspacing="0" border="0">'.
@@ -98,7 +98,7 @@ eod;
 		'</table></form>';
 
 	}
-	
+
 // -------------------------------------------------------------
 	# Step 2: provide the required DB information
 	function getDbInfo()
@@ -125,7 +125,7 @@ eod;
 	  	'<table id="setup" cellpadding="0" cellspacing="0" border="0">'.
 		tr(
 			tda(
-			  hed(gTxt('welcome_to_textpattern'),3). 
+			  hed(gTxt('welcome_to_textpattern'),3).
 			  graf(gTxt('need_details'),' style="margin-bottom:3em"').
 			  hed(gTxt('database'),3).
 			  graf(gTxt('db_must_exist'))
@@ -181,17 +181,17 @@ eod;
 		sInput('printConfig').
 		'</form>';
 	}
-	
+
 	// -------------------------------------------------------------
 	# Step 3: Print the contents of the config file
 	function printConfig()
 	{
-		
+
 		# Is anybody using the ftp values for something?
 		$this->vars = psa(array('ddb','duser','dpass','dhost','dprefix','dbtype','txprefix','txpath',
 			'siteurl','ftphost','ftplogin','ftpass','ftpath','lang'));
 		$GLOBALS['textarray'] =  $this->_load_lang();
-		
+
 		@include txpath.'/config.php';
 
 		if (!empty($txpcfg['db']))
@@ -201,8 +201,8 @@ eod;
 					'{txpath}' => txpath
 			)));
 		}
-		
-		
+
+
 		$this->vars['txpath']   = preg_replace("/^(.*)\/$/","$1",$this->vars['txpath']);
 		$this->vars['ftpath']   = preg_replace("/^(.*)\/$/","$1",$this->vars['ftpath']);
 
@@ -211,9 +211,9 @@ eod;
 
 		// FIXME, remove when all languages are updated with this string
 		if (!isset($GLOBALS['textarray']['prefix_bad_characters']))
-			$GLOBALS['textarray']['prefix_bad_characters'] = 
+			$GLOBALS['textarray']['prefix_bad_characters'] =
 				'The Table prefix {dbprefix} contains characters that are not allowed.<br />'.
-				'The first character must match one of <b>a-zA-Z_</b> and all following 
+				'The first character must match one of <b>a-zA-Z_</b> and all following
 				 characters must match one of <b>a-zA-Z0-9_</b>';
 
 		$this->_step_view = graf(gTxt("checking_database"));
@@ -221,7 +221,7 @@ eod;
 		$GLOBALS['txpcfg']['dbtype'] = $dbtype;
 		# include here in order to load only the required driver
 		include_once txpath.'/lib/mdb.php';
-		
+
 		if ($dbtype == 'pdo_sqlite') {
 			$ddb = $txpath.DS.$ddb;
 			$carry['ddb'] = $ddb;
@@ -258,7 +258,7 @@ eod;
 			$this->vars['dbcharset'] = "utf8";
 			$this->vars['dbcollate'] = "utf8_general_ci";
 		}elseif ($dbtype == 'pdo_sqlite' && db_query('PRAGMA encoding="UTF-8"')){
-			$this->vars['dbcharset'] = "utf8";			
+			$this->vars['dbcharset'] = "utf8";
 		}
 		else {
 			$this->vars['dbcharset'] = "latin1";
@@ -282,11 +282,11 @@ eod;
 		sInput('getTxpLogin').hInput('carry',$this->postEncode($this->vars)).
 		'</form>';
 	}
-	
+
 // -------------------------------------------------------------
 
 	# Step 4: Check if config file is ok and ask for login data
-	function getTxpLogin() 
+	function getTxpLogin()
 	{
 		$carry = $this->postDecode(ps('carry'));
 		$this->vars =&$carry;
@@ -305,7 +305,7 @@ eod;
 					'{txpath}' => txpath
 				))
 			).
-	
+
 			'<textarea name="config" cols="40" rows="5" style="width: 400px; height: 200px;">'.
 			$this->makeConfig($carry).
 			'</textarea>'.
@@ -351,7 +351,7 @@ eod;
 
 	# Step 5:Setup Textpattern
 	# This method is going to suffer a big refactoring
-	function createTxp() 
+	function createTxp()
 	{
 		$email = ps('email');
 
@@ -359,9 +359,9 @@ eod;
 		{
 			exit(graf(gTxt('email_required')));
 		}
-	
+
 		$carry = $this->postDecode(ps('carry'));
-		
+
 		$this->vars =& $carry;
 
 		extract($carry);
@@ -380,7 +380,7 @@ eod;
 
 		$siteurl = str_replace("http://",'',$siteurl);
 		$siteurl = rtrim($siteurl,"/");
-		
+
 		define("PFX",trim($dprefix));
 		define('TXP_INSTALL', 1);
 
@@ -390,14 +390,14 @@ eod;
 		#include_once txpath.'/setup/txpsql.php';
 
  		include txpath.'/setup/tables.php';
- 		
+
 		// This has to come after txpsql.php, because otherwise we can't call mysql_real_escape_string
 		if (MDB_TYPE=='pdo_sqlite') {
 			extract(gpsa(array('name','pass','RealName','email')));
 		}else{
 			extract($this->sDoSlash(gpsa(array('name','pass','RealName','email'))));
 		}
-		
+
 
  		$nonce = md5( uniqid( rand(), true ) );
 
@@ -410,9 +410,9 @@ eod;
 
  		$this->_step_view = $this->fbCreate();
 	}
-	
+
 // -------------------------------------------------------------
-	function fbCreate() 
+	function fbCreate()
 	{
 		if ($GLOBALS['txp_install_successful'] === false)
 		{
@@ -445,9 +445,9 @@ eod;
 			'</div>';
 		}
 	}
-	
+
 // -------------------------------------------------------------
-	function makeConfig($ar) 
+	function makeConfig($ar)
 	{
 		if(!defined('nl')) define("nl","';\n");
 		if(!defined('o')) define("o",'$txpcfg[\'');
@@ -467,10 +467,10 @@ eod;
 		.o.'dbtype'	  .m.$dbtype.nl
 		.$close;
 	}
-	
+
 //-------------------------------------------------------------
-	
-	function _get_langs_popup($en_gb_lang) 
+
+	function _get_langs_popup($en_gb_lang)
 	{
 		$lang_codes = array_keys($this->langs);
 
@@ -486,20 +486,20 @@ eod;
 
 		foreach ($things as $a=>$b) {
 			$out .= '<option value="'.$a.'">'.$b.'</option>'.n;
-		}		
+		}
 
 		$out .= '</select>';
 		return $out;
 	}
-	
+
 // -------------------------------------------------------------
-	function _load_lang() 
+	function _load_lang()
 	{
 		$lang = (isset($this->langs[$this->vars['lang']]) && !empty($this->langs[$this->vars['lang']]))? $this->vars['lang'] : 'en-gb';
 		if(!defined('LANG')) define('LANG', $this->vars['lang']);
 		return $this->langs[LANG];
 	}
-	
+
 // -------------------------------------------------------------
 	function _availableDBDrivers()
 	{
@@ -514,7 +514,7 @@ eod;
 
 		foreach ($drivers_popup as $k=>$v) {
 			$out .= '<option value="'.$k.'">'.$v.'</option>'.n;
-		}		
+		}
 
 		$out .= '</select>';
 		return $out;
@@ -557,7 +557,7 @@ eod;
 
 		return $drivers_popup;
 	}
-	
+
 // -------------------------------------------------------------
 	function postEncode($thing)
 	{
@@ -569,14 +569,14 @@ eod;
 	{
 		return unserialize(base64_decode($thing));
 	}
-	
+
 // -------------------------------------------------------------
 	function sDoSlash($in)
-	{ 
+	{
 		global $DB;
 		return doArray($in,array($DB,'escape'));
 	}
-	
+
 // -------------------------------------------------------------
 	function setup_error($error_msg){
 		$this->_step_view = hed(gTxt('textpattern_error'),1,' style="margin: 3em;" class="not-ok"').graf($error_msg,' id="warning" class="error"');
@@ -592,7 +592,7 @@ function setup_error_handler($errno, $errstr, $errfile, $errline){
 			$GLOBALS['txp_error_messages'][] = $errstr;
 		break;
 	}
-	
+
 }
 
 ?>

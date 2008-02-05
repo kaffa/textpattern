@@ -1,6 +1,6 @@
 <?php
 
-class textpattern_setup_rows 
+class textpattern_setup_rows
 {
 	function txp_article_table()
 	{
@@ -32,11 +32,11 @@ class textpattern_setup_rows
 			));
 		}
 	}
-	
+
 	function txp_category_table()
 	{
 		$table = new txp_category_table();
-		
+
 		if (!$table->row(array('name' => 'root','type' => 'article'))) {
 			$table->insert(
 				array('id' => ZEM_INCVAL,'name' => 'root','type' => 'article','ltf' => 1,'rgt' => 2,'title' => 'root')
@@ -55,18 +55,18 @@ class textpattern_setup_rows
 		if (!$table->row(array('name' => 'root','type' => 'file'))) {
 			$table->insert(
 				array('id' => ZEM_INCVAL,'name' => 'root','type' => 'file','ltf' => 1,'rgt' => 2,'title' => 'root')
-			);			
+			);
 		}
 
 		# are we going to use values to populate the DB?
 		# are those values going to stay on this file?
 	}
-	
-	
+
+
 	function txp_section_table()
 	{
 		$table = new txp_section_table();
-		
+
 		if (!$table->row(array('name' => 'default'))) {
 			$table->insert(
 				array(
@@ -81,7 +81,7 @@ class textpattern_setup_rows
 	  			)
 			);
 		}
-		
+
 		if (!$table->row(array('name' => 'article'))) {
 			$table->insert(
 				array(
@@ -111,7 +111,7 @@ class textpattern_setup_rows
 			);
 		}
 	}
-	
+
 	function txp_css_table()
 	{
 		$table = new txp_css_table();
@@ -119,7 +119,7 @@ class textpattern_setup_rows
 			$table->insert(array('name' =>'default','css' => 'LyogYmFzZQ0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gKi8NCg0KYm9keSB7DQptYXJnaW46IDA7DQpwYWRkaW5nOiAwOw0KZm9udC1mYW1pbHk6IFZlcmRhbmEsICJMdWNpZGEgR3JhbmRlIiwgVGFob21hLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWY7DQpjb2xvcjogIzAwMDsNCmJhY2tncm91bmQtY29sb3I6ICNmZmY7DQp9DQoNCmJsb2NrcXVvdGUsIGgzLCBwLCBsaSB7DQpwYWRkaW5nLXJpZ2h0OiAxMHB4Ow0KcGFkZGluZy1sZWZ0OiAxMHB4Ow0KZm9udC1zaXplOiAwLjllbTsNCmxpbmUtaGVpZ2h0OiAxLjZlbTsNCn0NCg0KYmxvY2txdW90ZSB7DQptYXJnaW4tcmlnaHQ6IDA7DQptYXJnaW4tbGVmdDogMjBweDsNCn0NCg0KaDEsIGgyLCBoMyB7DQpmb250LXdlaWdodDogbm9ybWFsOw0KfQ0KDQpoMSwgaDIgew0KZm9udC1mYW1pbHk6IEdlb3JnaWEsIFRpbWVzLCBzZXJpZjsNCn0NCg0KaDEgew0KZm9udC1zaXplOiAzZW07DQp9DQoNCmgyIHsNCmZvbnQtc2l6ZTogMWVtOw0KZm9udC1zdHlsZTogaXRhbGljOw0KfQ0KDQpociB7DQptYXJnaW46IDJlbSBhdXRvOw0Kd2lkdGg6IDM3MHB4Ow0KaGVpZ2h0OiAxcHg7DQpjb2xvcjogIzdhN2U3ZDsNCmJhY2tncm91bmQtY29sb3I6ICM3YTdlN2Q7DQpib3JkZXI6IG5vbmU7DQp9DQoNCnNtYWxsLCAuc21hbGwgew0KZm9udC1zaXplOiAwLjllbTsNCn0NCg0KLyogbGlua3MNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICovDQoNCmEgew0KdGV4dC1kZWNvcmF0aW9uOiBub25lOw0KY29sb3I6ICMwMDA7DQpib3JkZXItYm90dG9tOiAxcHggIzAwMCBzb2xpZDsNCn0NCg0KaDEgYSwgaDIgYSwgaDMgYSB7DQpib3JkZXI6IG5vbmU7DQp9DQoNCmgzIGEgew0KZm9udDogMS41ZW0gR2VvcmdpYSwgVGltZXMsIHNlcmlmOw0KfQ0KDQojc2lkZWJhci0yIGEsICNzaWRlYmFyLTEgYSB7DQpjb2xvcjogI2MwMDsNCmJvcmRlcjogbm9uZTsNCn0NCg0KLyogb3ZlcnJpZGVzDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAqLw0KDQojc2lkZWJhci0yIHAsICNzaWRlYmFyLTEgcCB7DQpmb250LXNpemU6IDAuOGVtOw0KbGluZS1oZWlnaHQ6IDEuNWVtOw0KfQ0KDQouY2FwcyB7DQpmb250LXNpemU6IDAuOWVtOw0KbGV0dGVyLXNwYWNpbmc6IDAuMWVtOw0KfQ0KDQpkaXYuZGl2aWRlciB7DQptYXJnaW46IDJlbSAwOw0KdGV4dC1hbGlnbjogY2VudGVyOw0KfQ0KDQovKiBsYXlvdXQNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICovDQoNCiNhY2Nlc3NpYmlsaXR5IHsNCnBvc2l0aW9uOiBhYnNvbHV0ZTsNCnRvcDogLTEwMDAwcHg7DQp9DQoNCiNjb250YWluZXIgew0KbWFyZ2luOiAxMHB4IGF1dG87DQpwYWRkaW5nOiAxMHB4Ow0Kd2lkdGg6IDc2MHB4Ow0KfQ0KDQojaGVhZCB7DQpoZWlnaHQ6IDEwMHB4Ow0KdGV4dC1hbGlnbjogY2VudGVyOw0KfQ0KDQojc2lkZWJhci0xLCAjc2lkZWJhci0yIHsNCnBhZGRpbmctdG9wOiAxMDBweDsNCndpZHRoOiAxNTBweDsNCn0NCg0KI3NpZGViYXItMSB7DQptYXJnaW4tcmlnaHQ6IDVweDsNCmZsb2F0OiBsZWZ0Ow0KdGV4dC1hbGlnbjogcmlnaHQ7DQp9DQoNCiNzaWRlYmFyLTIgew0KbWFyZ2luLWxlZnQ6IDVweDsNCmZsb2F0OiByaWdodDsNCn0NCg0KI2NvbnRlbnQgew0KbWFyZ2luOiAwIDE1NXB4Ow0KcGFkZGluZy10b3A6IDMwcHg7DQp9DQoNCiNmb290IHsNCm1hcmdpbi10b3A6IDVweDsNCmNsZWFyOiBib3RoOw0KdGV4dC1hbGlnbjogY2VudGVyOw0KfQ0KDQovKiBib3ggbW9kZWwgaGFja3MNCmh0dHA6Ly9hcmNoaXZpc3QuaW5jdXRpby5jb20vdmlld2xpc3QvY3NzLWRpc2N1c3MvNDgzODYNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tICovDQoNCiNjb250YWluZXIgew0KXHdpZHRoOiA3NzBweDsNCndcaWR0aDogNzYwcHg7DQp9DQoNCiNzaWRlYmFyLTEsICNzaWRlYmFyLTIgew0KXHdpZHRoOiAxNTBweDsNCndcaWR0aDogMTUwcHg7DQp9DQoNCi8qIGNvbW1lbnRzDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSAqLw0KDQouY29tbWVudHNfZXJyb3Igew0KY29sb3I6ICMwMDA7DQpiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmNGY0IA0KfQ0KDQp1bC5jb21tZW50c19lcnJvciB7DQpwYWRkaW5nIDogMC4zZW07DQpsaXN0LXN0eWxlLXR5cGU6IGNpcmNsZTsNCmxpc3Qtc3R5bGUtcG9zaXRpb246IGluc2lkZTsNCmJvcmRlcjogMnB4IHNvbGlkICNmZGQ7DQp9DQoNCmRpdiNjcHJldmlldyB7DQpjb2xvcjogIzAwMDsNCmJhY2tncm91bmQtY29sb3I6ICNmMWYxZjE7DQpib3JkZXI6IDJweCBzb2xpZCAjZGRkOw0KfQ0KDQpmb3JtI3R4cENvbW1lbnRJbnB1dEZvcm0gdGQgew0KdmVydGljYWwtYWxpZ246IHRvcDsNCn0='));
 		}
 	}
-	
+
 	function txp_page_table()
 	{
 		$table = new txp_page_table();
@@ -130,11 +130,11 @@ class textpattern_setup_rows
 			$table->insert(array('name' => 'archive', 'user_html' => "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n<head>\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\n\t<title><txp:page_title /></title>\n\n\t<txp:feed_link flavor=\"atom\" format=\"link\" label=\"Atom\" />\n\t<txp:feed_link flavor=\"rss\" format=\"link\" label=\"RSS\" />\n\n\t<txp:css format=\"link\" />\n</head>\n<body>\n\n<!-- accessibility -->\n<div id=\"accessibility\">\n\t<ul>\n\t\t<li><a href=\"#content\">Go to content</a></li>\n\t\t<li><a href=\"#sidebar-1\">Go to navigation</a></li>\n\t\t<li><a href=\"#sidebar-2\">Go to search</a></li>\n\t</ul>\n</div>\n\n<div id=\"container\">\n\n<!-- head -->\n\t<div id=\"head\">\n\t\t<h1><txp:link_to_home><txp:site_name /></txp:link_to_home></h1>\n\t\t<h2><txp:site_slogan /></h2>\n\t</div>\n\n<!-- left -->\n\t<div id=\"sidebar-1\">\n\t<txp:linklist wraptag=\"p\" />\n\t</div>\n\n<!-- right -->\n\t<div id=\"sidebar-2\">\n\t\t<txp:search_input label=\"Search\" wraptag=\"p\" />\n\n\t\t<txp:popup type=\"c\" label=\"Browse\" wraptag=\"p\" />\n\n\t\t<p><txp:feed_link label=\"RSS\" /> / <txp:feed_link flavor=\"atom\" label=\"Atom\" /></p>\n\n\t\t<p><img src=\"<txp:site_url />textpattern/txp_img/txp_slug105x45.gif\" width=\"105\" height=\"45\" alt=\"Textpattern\" title=\"\" /></p>\n\t</div>\n\n<!-- center -->\n\t<div id=\"content\">\n\t<txp:article limit=\"5\" />\n\t\n<txp:if_individual_article>\n\t\t<p><txp:link_to_prev><txp:prev_title /></txp:link_to_prev> \n\t\t\t<txp:link_to_next><txp:next_title /></txp:link_to_next></p>\n<txp:else />\n\t\t<p><txp:older><txp:text item=\"older\" /></txp:older> \n\t\t\t<txp:newer><txp:text item=\"newer\" /></txp:newer></p>\n</txp:if_individual_article>\n\t</div>\n\n<!-- footer -->\n\t<div id=\"foot\">&nbsp;</div>\n\n</div>\n\n</body>\n</html>"));
 		}
 	}
-	
+
 	function txp_discuss_table()
 	{
 		$table = new txp_discuss_table();
-		
+
 		if (!$table->row(array('discussid' => 000001))) {
 			$table->insert(array(
 				'discussid' => 000001,
@@ -149,75 +149,75 @@ class textpattern_setup_rows
 			));
 		}
 	}
-	
+
 	function txp_form_table()
 	{
 		$table = new txp_form_table();
 		if (!$table->row(array('name' => 'Links'))) {
 			$table->insert(array('name' => 'Links', 'type' => 'link', 'Form' => "<p><txp:link /><br />\n<txp:link_description /></p>"));
 		}
-		
+
 		if (!$table->row(array('name' => 'lofi'))) {
 			$table->insert(array('name' => 'lofi', 'type' => 'article', 'Form' => "<h3><txp:title /></h3>\n\n<p class=\"small\"><txp:permlink>#</txp:permlink> <txp:posted /></p>\n\n<txp:body />\n\n<hr />"));
 		}
-		
+
 		if (!$table->row(array('name' => 'single'))) {
 			$table->insert(array('name' => 'single', 'type' => 'article', 'Form' => "<h3><txp:title /> <span class=\"permlink\"><txp:permlink>::</txp:permlink></span> <span class=\"date\"><txp:posted /></span></h3>\n\n<txp:body />"));
 		}
-		
+
 		if (!$table->row(array('name' => 'plainlinks'))) {
 			$table->insert(array('name' => 'plainlinks', 'type' => 'link', 'Form' => "<txp:linkdesctitle /><br />"));
 		}
-		
+
 		if (!$table->row(array('name' => 'comments'))) {
 			$table->insert(array('name' => 'comments', 'type' => 'comment', 'Form' => "<txp:comment_message />\n\n<p class=\"small\">&#8212; <txp:comment_name /> &#183; <txp:comment_time /> &#183; <txp:comment_permlink>#</txp:comment_permlink></p>"));
 		}
-		
+
 		if (!$table->row(array('name' => 'default'))) {
 			$table->insert(array('name' => 'default', 'type' => 'article', 'Form' => "<h3><txp:permlink><txp:title /></txp:permlink> &#183; <txp:posted /> by <txp:author /></h3>\n\n<txp:body />\n\n<txp:comments_invite wraptag=\"p\" />\n\n<div class=\"divider\"><img src=\"<txp:site_url />images/1.gif\" width=\"400\" height=\"1\" alt=\"---\" title=\"\" /></div>"));
 		}
-		
+
 		if (!$table->row(array('name' => 'comment_form'))) {
 			$table->insert(array('name' => 'comment_form', 'type' => 'comment', 'Form' => "<table cellpadding=\"4\" cellspacing=\"0\" border=\"0\">\n\n<tr>\n\t<td align=\"right\">\n\t\t<label for=\"name\"><txp:text item=\"name\" /></label>\n\t</td>\n\n\t<td>\n\t\t<txp:comment_name_input />\n\t</td>\n\n\t<td>\n\t\t<txp:comment_remember />\n\t</td> \n</tr>\n\n<tr>\n\t<td align=\"right\">\n\t\t<label for=\"email\"><txp:text item=\"email\" /></label>\n\t</td>\n\n\t<td colspan=\"2\">\n\t\t<txp:comment_email_input />\n\t</td>\n</tr>\n\n<tr> \n\t<td align=\"right\">\n\t\t<label for=\"web\">http://</label>\n\t</td>\n\n\t<td colspan=\"2\">\n\t\t<txp:comment_web_input />\n\t</td>\n</tr>\n\n<tr>\n\t<td align=\"right\">\n\t\t<label for=\"message\"><txp:text item=\"message\" /></label>\n\t</td>\n\n\t<td colspan=\"2\">\n\t\t<txp:comment_message_input />\n\t</td>\n</tr>\n\n<tr>\n\t<td align=\"right\">&nbsp;</td>\n\n\t<td>\n\t\t<txp:comments_help />\n\t</td>\n\n\t<td align=\"right\">\n\t\t<txp:comment_preview />\n\t\t<txp:comment_submit />\n\t</td>\n</tr>\n\n</table>"));
 		}
-		
+
 		if (!$table->row(array('name' => 'noted'))) {
 			$table->insert(array('name' => 'noted', 'type' => 'link', 'Form' => "<p><txp:link />. <txp:link_description /></p>"));
 		}
-		
+
 		if (!$table->row(array('name' => 'popup_comments'))) {
 			$table->insert(array('name' => 'popup_comments', 'type' => 'comment', 'Form' => "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n<head>\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\t<title><txp:page_title /></title>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"<txp:css />\" />\n</head>\n<body>\n\n<div style=\"padding: 1em; width:300px;\">\n<txp:popup_comments />\n</div>\n\n</body>\n</html>"));
 		}
-		
+
 		if (!$table->row(array('name' => 'files'))) {
 			$table->insert(array('name' => 'files', 'type' => 'file', 'Form' => "<txp:text item=\"file\" />: \n<txp:file_download_link>\n<txp:file_download_name /> [<txp:file_download_size format=\"auto\" decimals=\"2\" />]\n</txp:file_download_link>\n<br />\n<txp:text item=\"category\" />: <txp:file_download_category /><br />\n<txp:text item=\"download\" />: <txp:file_download_downloads />"));
 		}
-		
+
 		if (!$table->row(array('name' => 'search_results'))) {
 			$table->insert(array('name' => 'search_results', 'type' => 'article', 'Form' => "<h3><txp:search_result_permlink><txp:search_result_title /></txp:search_result_permlink></h3>\n\n<p><txp:search_result_excerpt /></p>\n\n<p class=\"small\"><txp:search_result_permlink><txp:search_result_permlink /></txp:search_result_permlink> &#183; \n\t<txp:search_result_date /></p>"));
 		}
-		
+
 		if (!$table->row(array('name' => 'comments_display'))) {
 			$table->insert(array('name' => 'comments_display', 'type' => 'article', 'Form' => "<h3 id=\"<txp:text item=\"comment\" />\"><txp:comments_invite textonly=\"1\" showalways=\"1\" showcount=\"0\" /></h3>\n\n<txp:comments />\n\n<txp:if_comments_preview>\n<div id=\"cpreview\">\n<txp:comments_preview />\n</div>\n</txp:if_comments_preview>\n\n<txp:if_comments_allowed>\n<txp:comments_form preview=\"1\" />\n<txp:else />\n<p><txp:text item=\"comments_closed\" /></p>\n</txp:if_comments_allowed>"));
 		}
 	}
-	
+
 	function txp_link_table()
 	{
 		$table = new txp_link_table();
 		if(!$table->row(array('id' => 1))){
 			$table->insert(array('id' => 1, 'date' => '2005-07-20 12:54:26', 'category' => 'textpattern', 'url' => 'http://textpattern.com/', 'linkname' => 'Textpattern', 'linksort' => 'Textpattern', 'description' => ''));
 		}
-		
+
 		if(!$table->row(array('id' => 2))){
 			$table->insert(array('id' => 2, 'date' => '2005-07-20 12:54:41', 'category' => 'textpattern', 'url' => 'http://textpattern.net/', 'linkname' => 'TextBook', 'linksort' => 'TextBook', 'description' => ''));
 		}
-				
+
 		if(!$table->row(array('id' => 3))){
 			$table->insert(array('id' => 3, 'date' => '2005-07-20 12:55:04', 'category' => 'textpattern', 'url' => 'http://textpattern.org/', 'linkname' => 'Txp Resources', 'linksort' => 'Txp Resources', 'description' => ''));
 		}
 	}
-	
+
 	function txp_prefs_table()
 	{
 		$table = new txp_prefs_table();
@@ -235,9 +235,9 @@ class textpattern_setup_rows
 			if (!stristr($server_software, 'Apache'))
 			$permlink_mode = 'messy';
 		}
-		
+
 		$setup_comment_invite = addslashes( ( gTxt('setup_comment_invite')=='setup_comment_invite') ? 'Comment' : gTxt('setup_comment_invite') );
-		
+
 		require_once txpath.'/lib/txplib_prefs.php';
 		$prefs = get_default_prefs();
 		$prefs['blog_uid'] = md5(uniqid(rand(),true));
@@ -267,7 +267,7 @@ class textpattern_setup_rows
 		$preferences[] = array('name' => 'comments_dateformat', 'val' => '%b %d, %I:%M %p', 'type' => 0, 'event' => 'comments', 'html' => 'dateformats', 'position' => 190);
 		$preferences[] = array('name' => 'comments_mode', 'val' => '0', 'type' => 0, 'event' => 'comments', 'html' => 'commentmode', 'position' => 200);
 		$preferences[] = array('name' => 'comments_disabled_after', 'val' => '42', 'type' => 0, 'event' => 'comments', 'html' => 'weeks', 'position' => 210);
-		$preferences[] = array('name' => 'comments_auto_append', 'val' => '1', 'type' => 0, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 211);		
+		$preferences[] = array('name' => 'comments_auto_append', 'val' => '1', 'type' => 0, 'event' => 'comments', 'html' => 'yesnoradio', 'position' => 211);
 		# admin prefs:
 		$preferences[] = array('name' => 'ping_weblogsdotcom', 'val' => '0', 'type' => 1, 'event' => 'publish', 'html' => 'yesnoradio', 'position' => 0);
 		$preferences[] = array('name' => 'rss_how_many', 'val' => '5', 'type' => 1, 'event' => 'admin', 'html' => 'text_input', 'position' => 0);
@@ -334,7 +334,7 @@ class textpattern_setup_rows
 		$preferences[] = array('name' => 'show_article_category_count', 'val' => '1', 'type' => 2, 'event' => 'category', 'html' => 'yesnoradio', 'position' => 0);
 		$preferences[] = array('name' => 'dbupdatetime', 'val' => '1122194504', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
 		$preferences[] = array('name' => 'version', 'val' => '1.0rc4', 'type' => 2, 'event' => 'publish', 'html' => 'text_input', 'position' => 0);
-		
+
 		foreach ($preferences as $preference){
 			if(!$table->row(array('name' => $preference['name']))){
 				$table->insert($preference);

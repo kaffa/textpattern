@@ -4,7 +4,7 @@
 $HeadURL$
 $LastChangedRevision$
 */
-	
+
 	define("t","\t");
 	define("n","\n");
 	define("br","<br />");
@@ -52,7 +52,7 @@ $LastChangedRevision$
 				'dir'		=> '',
 				'crit'		=> '',
 				'method'	=> '',
-			),$item));	
+			),$item));
 
 			$o .= ($first_item) ? '' : ', '; $first_item = false;
 
@@ -87,7 +87,7 @@ $LastChangedRevision$
 		$text = (!$text) ? sp : $text;
 		return tag($text,'th');
 	}
-	
+
 // -------------------------------------------------------------
 	function sLink($event,$step,$linktext,$class='')
 	{
@@ -196,14 +196,14 @@ $LastChangedRevision$
 		if ($numPages > 1)
 		{
 			$option_list = array();
-	
+
 			for ($i = 1; $i <= $numPages; $i++)
 			{
 				if ($i == $page)
 				{
 					$option_list[] = '<option value="'.$i.'" selected="selected">'."$i/$numPages".'</option>';
 				}
-	
+
 				else
 				{
 					$option_list[] = '<option value="'.$i.'">'."$i/$numPages".'</option>';
@@ -212,8 +212,8 @@ $LastChangedRevision$
 
 			$nav = array();
 
-			$nav[] = ($page > 1) ? 
-				PrevNextLink($event, $page - 1, gTxt('prev'), 'prev', $sort, $dir, $crit, $search_method).sp : 
+			$nav[] = ($page > 1) ?
+				PrevNextLink($event, $page - 1, gTxt('prev'), 'prev', $sort, $dir, $crit, $search_method).sp :
 				tag('&#8249; '.gTxt('prev'), 'span', ' class="navlink-disabled"').sp;
 
 			$nav[] = '<select name="page" class="list" onchange="submit(this.form);">';
@@ -221,8 +221,8 @@ $LastChangedRevision$
 			$nav[] = n.'</select>';
 			$nav[] = '<noscript> <input type="submit" value="'.gTxt('go').'" class="smallerbox" /></noscript>';
 
-			$nav[] = ($page != $numPages) ? 
-				sp.PrevNextLink($event, $page + 1, gTxt('next'), 'next', $sort, $dir, $crit, $search_method) : 
+			$nav[] = ($page != $numPages) ?
+				sp.PrevNextLink($event, $page + 1, gTxt('next'), 'next', $sort, $dir, $crit, $search_method) :
 				sp.tag(gTxt('next').' &#8250;', 'span', ' class="navlink-disabled"');
 
 			return '<form class="prev-next" method="get" action="index.php">'.
@@ -242,7 +242,7 @@ $LastChangedRevision$
 // -------------------------------------------------------------
 	function startSkelTable()
 	{
-		return 
+		return
 		'<table width="300" cellpadding="0" cellspacing="0" style="border:1px #ccc solid">';
 	}
 
@@ -256,13 +256,13 @@ $LastChangedRevision$
 		return '<table cellpadding="'.$p.'" cellspacing="0" border="0" id="'.
 			$type.'" align="'.$align.'"'.$class.$width.'>'.n;
 	}
-	
+
 // -------------------------------------------------------------
 	function endTable ()
 	{
 		return n.'</table>'.n;
 	}
-	
+
 // -------------------------------------------------------------
 	function stackRows()
 	{
@@ -323,7 +323,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function fLabelCell($text, $help = '', $label_id = '') 
+	function fLabelCell($text, $help = '', $label_id = '')
 	{
 		$help = ($help) ? popHelp($help) : '';
 
@@ -339,7 +339,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function fInputCell($name, $var = '', $tabindex = '', $size = '', $help = '', $id = '') 
+	function fInputCell($name, $var = '', $tabindex = '', $size = '', $help = '', $id = '')
 	{
 		$pop = ($help) ? sp.popHelp($name) : '';
 
@@ -358,19 +358,19 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function graf ($item,$atts='') 
+	function graf ($item,$atts='')
 	{
 		return tag($item,'p',$atts);
 	}
 
 // -------------------------------------------------------------
-	function hed($item,$level,$atts='') 
+	function hed($item,$level,$atts='')
 	{
 		return tag($item,'h'.$level,$atts);
 	}
 
 // -------------------------------------------------------------
-	function href($item,$href) 
+	function href($item,$href)
 	{
 		return tag($item,'a',' href="'.$href.'"');
 	}
@@ -379,31 +379,31 @@ $LastChangedRevision$
 	function span($item)
 	{
 		return tag($item,'span');
-	}	
+	}
 
 // -------------------------------------------------------------
 	function strong($item)
 	{
 		return tag($item,'strong');
-	}	
+	}
 
 // -------------------------------------------------------------
 	function htmlPre($item)
 	{
 		return '<pre>'.tag($item,'code').'</pre>';
-	}	
+	}
 
 // -------------------------------------------------------------
 	function comment($item)
 	{
 		return '<!-- '.$item.' -->';
-	}	
+	}
 
 // -------------------------------------------------------------
 	function small($item)
 	{
 		return tag($item,'small');
-	}	
+	}
 
 // -------------------------------------------------------------
 	function assRow($array, $atts ='')
@@ -411,7 +411,7 @@ $LastChangedRevision$
 		foreach($array as $a => $b) $o[] = tda($a,' width="'.$b.'"');
 		return tr(join(n.t,$o), $atts);
 	}
-	
+
 // -------------------------------------------------------------
 	function assHead()
 	{
@@ -422,7 +422,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function popHelp($help_var, $width = '', $height = '') 
+	function popHelp($help_var, $width = '', $height = '')
 	{
 		return '<a target="_blank"'.
 			' href="http://rpc.textpattern.com/help/?item='.$help_var.a.'language='.LANG.'"'.
@@ -434,7 +434,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function popHelpSubtle($help_var, $width = '', $height = '') 
+	function popHelpSubtle($help_var, $width = '', $height = '')
 	{
 		return '<a target="_blank"'.
 			' href="http://rpc.textpattern.com/help/?item='.$help_var.a.'language='.LANG.'"'.
@@ -446,7 +446,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function popTag($var, $text, $width = '', $height = '') 
+	function popTag($var, $text, $width = '', $height = '')
 	{
 		return '<a target="_blank"'.
 			' href="?event=tag'.a.'tag_name='.$var.'"'.
@@ -455,10 +455,10 @@ $LastChangedRevision$
 			($height ? ', '.$height : '').
 			'); return false;">'.$text.'</a>';
 	}
-	
+
 // -------------------------------------------------------------
 
-	function popTagLinks($type) 
+	function popTagLinks($type)
 	{
 		global $txpcfg;
 		include txpath.'/lib/taglib.php';
@@ -561,7 +561,7 @@ $LastChangedRevision$
 
 //-------------------------------------------------------------
 
-	function pref_markup($name, $markup, $id) 
+	function pref_markup($name, $markup, $id)
 	{
 		include_once(txpath.'/lib/classMarkup.php');
 
@@ -606,7 +606,7 @@ EOF;
 	function toggle_box($classname, $form=0)
 	{
 		$name = 'cb_toggle_'.$classname;
-		$i = 
+		$i =
 			'<input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.
 			(cs('toggle_'.$classname) ? 'checked="checked" ' : '').
 			'class="checkbox" onclick="toggleClassRemember(\''.$classname.'\');" />'.
@@ -617,7 +617,7 @@ EOF;
 		else
 			return n.$i;
 	}
-	
+
 //-------------------------------------------------------------
 	function cookie_box($classname, $form=1)
 	{
@@ -662,8 +662,8 @@ EOF;
 		{
 			$atts .= ' class="'.$class.'"';
 		}
-		
-		if ($breakclass) 
+
+		if ($breakclass)
 		{
 			$breakatts.= ' class="'.$breakclass.'"';
 		}
@@ -719,14 +719,14 @@ EOF;
 		}
 		return '';
 	}
-	
+
 // -------------------------------------------------------------
 	function eE($txt) // convert email address into unicode entities
 	{
-		 for ($i=0;$i<strlen($txt);$i++) { 
-			  $ent[] = "&#".ord(substr($txt,$i,1)).";"; 
-		 } 
-		 if (!empty($ent)) return join('',$ent); 
+		 for ($i=0;$i<strlen($txt);$i++) {
+			  $ent[] = "&#".ord(substr($txt,$i,1)).";";
+		 }
+		 if (!empty($ent)) return join('',$ent);
 	}
 
 ?>

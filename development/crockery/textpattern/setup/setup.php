@@ -1,7 +1,7 @@
 <?php
 
 // -------------------------------------------------------------
-	function chooseLang() 
+	function chooseLang()
 	{
 	  echo '<form action="'.$GLOBALS['rel_siteurl'].'/textpattern/setup/index.php" method="post">',
 	  	'<table id="setup" cellpadding="0" cellspacing="0" border="0">',
@@ -25,9 +25,9 @@
 		$lang = ps('lang');
 
 		$GLOBALS['textarray'] = setup_load_lang($lang);
-	
+
 		@include txpath.'/config.php';
-		
+
 		if (!empty($txpcfg['db']))
 		{
 			exit(graf(
@@ -45,7 +45,7 @@
 	  	'<table id="setup" cellpadding="0" cellspacing="0" border="0">',
 		tr(
 			tda(
-			  hed(gTxt('welcome_to_textpattern'),3). 
+			  hed(gTxt('welcome_to_textpattern'),3).
 			  graf(gTxt('need_details'),' style="margin-bottom:3em"').
 			  hed('MySQL',3).
 			  graf(gTxt('db_must_exist'))
@@ -109,7 +109,7 @@
 			'siteurl','ftphost','ftplogin','ftpass','ftpath','lang');
 
 		@include txpath.'/config.php';
-		
+
 		if (!empty($txpcfg['db']))
 		{
 			exit(graf(
@@ -120,28 +120,28 @@
 		}
 
 		$carry['ftpath']   = preg_replace("/^(.*)\/$/","$1",$carry['ftpath']);
-		
+
 		extract($carry);
 
 		$GLOBALS['textarray'] = setup_load_lang($lang);
 		// FIXME, remove when all languages are updated with this string
 		if (!isset($GLOBALS['textarray']['prefix_bad_characters']))
-			$GLOBALS['textarray']['prefix_bad_characters'] = 
+			$GLOBALS['textarray']['prefix_bad_characters'] =
 				'The Table prefix {dbprefix} contains characters that are not allowed.<br />'.
-				'The first character must match one of <b>a-zA-Z_</b> and all following 
+				'The first character must match one of <b>a-zA-Z_</b> and all following
 				 characters must match one of <b>a-zA-Z0-9_</b>';
 
 		echo graf(gTxt("checking_database"));
-		
+
 		$GLOBALS['txpcfg']['dbtype'] = $dbtype;
 		# include here in order to load only the required driver
 		include_once txpath.'/lib/mdb.php';
-		
+
 		if ($dbtype == 'pdo_sqlite') {
 			$ddb = $txpath.DS.$ddb;
 			$carry['ddb'] = $ddb;
 		}
-		
+
 		global $DB;
 		$DB =& mdb_factory($dhost, $ddb, $duser, $dpass, 'utf8');
 
@@ -204,7 +204,7 @@
 	}
 
 // -------------------------------------------------------------
-	function getTxpLogin() 
+	function getTxpLogin()
 	{
 		$carry = postDecode(ps('carry'));
 		extract($carry);
@@ -221,7 +221,7 @@
 					'{txpath}' => txpath
 				))
 			),
-	
+
 			'<textarea name="config" cols="40" rows="5" style="width: 400px; height: 200px;">',
 			makeConfig($carry),
 			'</textarea>',
@@ -263,7 +263,7 @@
 
 // -------------------------------------------------------------
 
-	function createTxp() 
+	function createTxp()
 	{
 		$email = ps('email');
 
@@ -271,7 +271,7 @@
 		{
 			exit(graf(gTxt('email_required')));
 		}
-	
+
 		$carry = ps('carry');
 
 		extract(postDecode($carry));
@@ -290,7 +290,7 @@
 
 		$siteurl = str_replace("http://",'',$siteurl);
 		$siteurl = rtrim($siteurl,"/");
-		
+
 		define("PFX",trim($dprefix));
 		define('TXP_INSTALL', 1);
 
@@ -316,7 +316,7 @@
 	}
 
 // -------------------------------------------------------------
-	function makeConfig($ar) 
+	function makeConfig($ar)
 	{
 		define("nl","';\n");
 		define("o",'$txpcfg[\'');
@@ -337,7 +337,7 @@
 	}
 
 // -------------------------------------------------------------
-	function fbCreate() 
+	function fbCreate()
 	{
 		if ($GLOBALS['txp_install_successful'] === false)
 		{
@@ -383,21 +383,21 @@
 	}
 
 // -------------------------------------------------------------
-	function enumPostItems() 
+	function enumPostItems()
 	{
 		foreach(func_get_args() as $item) { $out[$item] = ps($item); }
-		return $out; 
+		return $out;
 	}
 
 //-------------------------------------------------------------
-	function langs() 
+	function langs()
 	{
 		require_once txpath.'/setup/setup-langs.php';
 		require_once txpath.'/setup/en-gb.php';
 		$lang_codes = array_keys($langs);
-		
+
 		$things = array('en-gb' => 'English (GB)');
-		
+
 		foreach($lang_codes as $code){
 			if(array_key_exists($code, $en_gb_lang['public']) && $code != 'en-gb'){
 				$things[$code] = $en_gb_lang['public'][$code];
@@ -414,16 +414,16 @@
 			$out .= n.t.'<option value="'.$a.'"'.
 				( ($a == $default) ? ' selected="selected"' : '').
 				'>'.$b.'</option>';
-		}		
+		}
 
 		$out .= n.'</select>';
 
 		return $out;
 	}
-	
+
 
 // -------------------------------------------------------------
-	function setup_load_lang($lang) 
+	function setup_load_lang($lang)
 	{
 		require_once txpath.'/setup/setup-langs.php';
 		$lang = (isset($langs[$lang]) && !empty($langs[$lang]))? $lang : 'en-gb';
@@ -440,21 +440,21 @@
 		if (empty($drivers_popup)) {
 			exit(graf('no_supported_db_drivers_installed'));
 		}
-		
+
 		$out = '<select name="dbtype">';
 
 		foreach ($drivers_popup as $k=>$v) {
 			$out .= '<option value="'.$k.'">'.$v.'</option>'.n;
-		}		
+		}
 
 		$out .= '</select>';
 		return $out;
-		
+
 	}
-	
+
 	# This one just return the associative array key=>names for existing drivers
 	function getAvailableDrivers(){
-		
+
 		# get available mdb files first reading /lib/mdb dir
 		$d = dir(txpath.'/lib/mdb');
 		$drivers = array();
@@ -466,9 +466,9 @@
 				}
 			}
 		}
-		
+
 		$drivers_popup = array();
-		
+
 		# do not show the list of drivers without support on this php install
 		foreach ($drivers as $driver){
 			if ($driver == 'my') {
@@ -485,7 +485,7 @@
 				}
 			}
 		}
-		
+
 		return $drivers_popup;
 	}
 

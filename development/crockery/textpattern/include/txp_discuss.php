@@ -7,7 +7,7 @@
 	www.textpattern.com
 	All rights reserved
 
-	Use of this software indicates acceptance of the Textpattern license agreement 
+	Use of this software indicates acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -19,7 +19,7 @@ $LastChangedRevision$
 	if ($event == 'discuss') {
 		require_privs('discuss');
 
-		if(!$step or !in_array($step, array('discuss_delete','discuss_save','discuss_list','discuss_edit','ipban_add','discuss_multi_edit','ipban_list','ipban_unban','discuss_change_pageby'))){  
+		if(!$step or !in_array($step, array('discuss_delete','discuss_save','discuss_list','discuss_edit','ipban_add','discuss_multi_edit','ipban_list','ipban_unban','discuss_change_pageby'))){
 			discuss_list();
 		} else $step();
 	}
@@ -421,7 +421,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function ipban_add() 
+	function ipban_add()
 	{
 		extract(gpsa(array('ip', 'name', 'discussid')));
 		$discussid = assert_int($discussid);
@@ -441,9 +441,9 @@ $LastChangedRevision$
 		}
 
 		$rs = safe_insert('txp_discuss_ipban', "
-			ip = '".doSlash($ip)."', 
-			name_used = '".doSlash($name)."', 
-			banned_on_message = $discussid, 
+			ip = '".doSlash($ip)."',
+			name_used = '".doSlash($name)."',
+			banned_on_message = $discussid,
 			date_banned = now()
 		");
 
@@ -461,7 +461,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function ipban_unban() 
+	function ipban_unban()
 	{
 		$ip = doSlash(gps('ip'));
 
@@ -481,7 +481,7 @@ $LastChangedRevision$
 	{
 		pageTop(gTxt('list_banned_ips'), $message);
 
-		$rs = safe_rows_start('*, unix_timestamp(date_banned) as uBanned', 'txp_discuss_ipban', 
+		$rs = safe_rows_start('*, unix_timestamp(date_banned) as uBanned', 'txp_discuss_ipban',
 			"1 = 1 order by date_banned desc");
 
 		if ($rs and numRows($rs) > 0)
@@ -533,7 +533,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function discuss_change_pageby() 
+	function discuss_change_pageby()
 	{
 		event_change_pageby('comment');
 		discuss_list();
@@ -541,7 +541,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function discuss_multiedit_form($page, $sort, $dir, $crit, $search_method) 
+	function discuss_multiedit_form($page, $sort, $dir, $crit, $search_method)
 	{
 		$methods = array(
 			'visible'     => gTxt('show'),
@@ -556,10 +556,10 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function discuss_multi_edit() 
+	function discuss_multi_edit()
 	{
 		//FIXME, this method needs some refactoring
-		
+
 		$selected = ps('selected');
 		$method = ps('edit_method');
 		$done = array();
@@ -576,7 +576,7 @@ $LastChangedRevision$
 				$parentids[] = $parentid;
 
 				if ($method == 'delete') {
-					// Delete and if succesful update commnet count 
+					// Delete and if succesful update commnet count
 					if (safe_delete('txp_discuss', "discussid = $id"))
 						$done[] = $id;
 				}
@@ -616,7 +616,7 @@ $LastChangedRevision$
 							"discussid = $id"
 						))
 							$done[] = $id;
-				}				
+				}
 		}
 
 			$done = join(', ', $done);

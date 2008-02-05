@@ -38,10 +38,10 @@ safe_upgrade_table('txp_section', array(
 safe_update('txp_section', 'path=name', "path=''");
 
 // shortname has to be unique within a parent
-if (!safe_index_exists('txp_section', 'parent_idx')) 
+if (!safe_index_exists('txp_section', 'parent_idx'))
 	safe_upgrade_index('txp_section', 'parent_idx', 'unique', 'parent,name');
 
-#if (!safe_index_exists('txp_section', 'path_idx')) 
+#if (!safe_index_exists('txp_section', 'path_idx'))
 #	safe_upgrade_index('txp_section', 'path_idx', 'unique', 'path');
 
 safe_update('txp_section', 'parent=0', "name='default'");
@@ -62,8 +62,8 @@ if (!safe_field('name', 'txp_prefs', "name = 'publish_expired_articles'"))
 	safe_insert('txp_prefs', "prefs_id = 1, name = 'publish_expired_articles', val = '0', type = '1', event='publish', html='yesnoradio', position='130'");
 
 /*
- * @todo determine section:article relation key 
- */ 
+ * @todo determine section:article relation key
+ */
 // populate section_id values
 // foreach (safe_rows('id, name', 'txp_section', '1=1') as $row) {
 //	safe_update('textpattern', "section_id='".doSlash($row['id'])."'", "Section='".doSlash($row['name'])."'");

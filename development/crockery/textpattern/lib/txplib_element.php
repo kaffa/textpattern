@@ -24,7 +24,7 @@ define('elements_dir', 'elements');
 
 		$dir = abspath(elements_dir);
 		$file = secpath($name.'.php', $dir);
-		
+
 		if ($file == false)
 			trigger_error("path for element '$name' is invalid ($dir)", E_USER_ERROR);
 
@@ -162,7 +162,7 @@ define('elements_dir', 'elements');
 					return '<link href="'.$e['stylesheet'].'" rel="stylesheet" type="text/css" />';
 				}
 			}
-		}	
+		}
 		return '';
 	}
 ?>

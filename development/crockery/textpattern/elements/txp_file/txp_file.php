@@ -31,7 +31,7 @@ class FileController extends ZemAdminController {
 	var $event = 'file';
 	var $caption = 'file';
 	var $default_step = 'list';
-	
+
 	var $statuses = array(
 			2 => 'hidden',
 			3 => 'pending',
@@ -300,7 +300,7 @@ class FileController extends ZemAdminController {
 			$condition .= '</span>';
 
 			$downloadlink = ($file_exists) ? $this->make_download_link($id, htmlspecialchars($filename),$filename) : htmlspecialchars($filename);
-			
+
 			$created =
 					n.graf(checkbox('publish_now', '1', $publish_now, '', 'publish_now').'<label for="publish_now">'.gTxt('set_to_now').'</label>').
 
@@ -353,7 +353,7 @@ class FileController extends ZemAdminController {
 				td(
 					graf(gTxt('file_status').br.$condition) .
 					graf(gTxt('file_name').br.$downloadlink) .
-					graf(gTxt('file_download_count').br.$downloads)					
+					graf(gTxt('file_download_count').br.$downloads)
 				)
 			),
 			$form,
@@ -378,7 +378,7 @@ class FileController extends ZemAdminController {
 			 created = now(),
 			 modified = now()
 		");
-		
+
 		if ($rs) {
 			$GLOBALS['ID'] = mysql_insert_id( );
 			return $GLOBALS['ID'];
@@ -716,7 +716,7 @@ class FileController extends ZemAdminController {
 	{
 		return @chmod($file,0755);
 	}
-	
+
 	function file_path($filename) {
 		global $prefs;
 		return build_file_path($prefs['file_base_path'], $filename);
@@ -743,7 +743,7 @@ class FileController extends ZemAdminController {
 		$url = filedownloadurl($id, $filename);
 		return '<a href="'.$url.'">'.$label.'</a>';
 	}
-	
+
 // -------------------------------------------------------------
 	function get_filenames()
 	{

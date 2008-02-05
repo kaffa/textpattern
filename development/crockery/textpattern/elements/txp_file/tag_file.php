@@ -26,7 +26,7 @@ $LastChangedRevision$
 			'wraptag'  => '',
 			'status'   => '4',
 		), $atts));
-		
+
 		if (!is_numeric($status))
 			$status = getStatusNum($status);
 
@@ -390,5 +390,5 @@ $LastChangedRevision$
 			return ($wraptag) ? doTag($description, $wraptag, $class) : $description;
 		}
 	}
-	
+
 ?>

@@ -7,7 +7,7 @@
 	www.textpattern.com
 	All rights reserved
 
-	Use of this software indicates acceptance of the Textpattern license agreement 
+	Use of this software indicates acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -39,8 +39,8 @@ class ImageController extends ZemAdminController
 	{
 		parent::ZemAdminController();
 		$this->context = gpsa(array('page', 'sort', 'dir', 'crit', 'search_method'));
-		if(empty($this->context['sort'])) $this->context['sort'] = 'id';	
-		if($this->context['dir'] != 'asc') $this->context['dir'] = 'desc';	
+		if(empty($this->context['sort'])) $this->context['sort'] = 'id';
+		if($this->context['dir'] != 'asc') $this->context['dir'] = 'desc';
 	}
 
 // -------------------------------------------------------------
@@ -57,49 +57,49 @@ class ImageController extends ZemAdminController
 		} else {
 			$out[] = upload_form(gTxt('upload_image'), 'upload', 'insert', $this->event, '', $file_max_upload_size);
 		}
-	
-		extract($this->context);	
+
+		extract($this->context);
 		switch ($sort) {
 			case 'name':
 				$sort_sql = 'name '.$dir;
 			break;
-	
+
 			case 'thumbnail':
 				$sort_sql = 'thumbnail '.$dir.', id asc';
 			break;
-	
+
 			case 'category':
 				$sort_sql = 'category '.$dir.', id asc';
 			break;
-	
+
 			case 'date':
 				$sort_sql = 'date '.$dir.', id asc';
 			break;
-	
+
 			case 'author':
 				$sort_sql = 'author '.$dir.', id asc';
 			break;
-	
+
 			default:
 				$sort = 'id';
 				$sort_sql = 'id '.$dir;
 			break;
 		}
-	
+
 		$switch_dir = ($dir == 'desc') ? 'asc' : 'desc';
-	
+
 		$criteria = 1;
-	
+
 		if ($search_method and $crit) {
 			$crit_escaped = doSlash($crit);
-	
+
 			$critsql = array(
 				'id'			 => "id = '$crit_escaped'",
 				'name'		 => "name like '%$crit_escaped%'",
 				'category' => "category like '%$crit_escaped%'",
 				'author'	 => "author like '%$crit_escaped%'"
 			);
-	
+
 			if (array_key_exists($search_method, $critsql)) {
 				$criteria = $critsql[$search_method];
 				$limit = 500;
@@ -112,22 +112,22 @@ class ImageController extends ZemAdminController
 			$crit = '';
 		}
 		$total = safe_count('txp_image', "$criteria");
-	
+
 		if ($total < 1) {
 			if ($criteria != 1) {
 				$out[] = n.$this->search_form($crit, $search_method);
 				$this->_message(gTxt('no_results_found'));
 			} else {
 				$this->_message(gTxt('no_images_recorded'));
-			}	
+			}
 		} else {
-	
+
 			$limit = max(@$image_list_pageby, 15);
-		
+
 			list($page, $offset, $numPages) = pager($total, $limit, $page);
-		
+
 			$out[] = $this->search_form($crit, $search_method);
-		
+
 			$rs = safe_rows('*, unix_timestamp(date) as uDate', 'txp_image',
 			"$criteria order by $sort_sql limit $offset, $limit");
 			if ($rs) {
@@ -139,22 +139,22 @@ class ImageController extends ZemAdminController
 		}
 		return join('', $out);
 	}
-	
-	
+
+
 // -------------------------------------------------------------
 
-	function edit_view($id='') 
+	function edit_view($id='')
 	{
 		global $txpcfg,$img_dir,$file_max_upload_size;
 		$out = array();
-		
+
 		if (!$id) $id = assert_int(gps('id'));
 		extract($this->context);
-	
+
 		$categories = tree_get('txp_category', NULL, "type='image'");
-		
+
 		$rs = safe_row("*", "txp_image", "id = $id");
-		
+
 		if ($rs) {
 			extract($rs);
 
@@ -235,14 +235,14 @@ class ImageController extends ZemAdminController
 		}
 		return join('', $out);
 	}
-	
+
 // -------------------------------------------------------------
 
-	function save_post() 
+	function save_post()
 	{
 		extract(doSlash(gpsa(array('name','category','caption','alt'))));
 		$id = $this->psi('id');
-		
+
 		safe_update(
 			"txp_image",
 			"name    = '$name',
@@ -257,7 +257,7 @@ class ImageController extends ZemAdminController
 		$this->_message(gTxt('image_updated', array('{name}' => $name)));
 		$this->_set_view('list');
 	}
-  
+
 // -------------------------------------------------------------
 
 	function insert_post()
@@ -274,10 +274,10 @@ class ImageController extends ZemAdminController
 			$this->_set_view('list');
 		}
 	}
-	
+
 // -------------------------------------------------------------
 
-	function delete_post() 
+	function delete_post()
 	{
 		$id = assert_int(ps('id'));
 
@@ -312,19 +312,19 @@ class ImageController extends ZemAdminController
 
 // -------------------------------------------------------------
 
-	function replace_post() 
-	{	
+	function replace_post()
+	{
 		$id = assert_int(gps('id'));
 		$rs = safe_row("*", "txp_image", "id = $id");
-		
+
 		if ($rs) {
 			$meta = array('category' => $rs['category'], 'caption' => $rs['caption'], 'alt' => $rs['alt']);
 		} else {
 			$meta = '';
-		} 
+		}
 
 		$img_result = image_data($_FILES['thefile'], $meta, $id);
-		
+
 		if(is_array($img_result)) {
 			list($message, $id) = $img_result;
 			$this->_message($message);
@@ -336,18 +336,18 @@ class ImageController extends ZemAdminController
 
 // -------------------------------------------------------------
 
-	function thumbnail_insert_post() 
+	function thumbnail_insert_post()
 	{
 		global $img_dir;
 		$id = $this->psi('id');
-		
+
 		$file = $_FILES['thefile']['tmp_name'];
 		$name = $_FILES['thefile']['name'];
 
 		$file = get_uploaded_file($file);
-		
+
 		list(,,$extension) = @getimagesize($file);
-	
+
 		if (($file !== false) && $this->extensions[$extension]) {
 			$ext = $this->extensions[$extension];
 			$newpath = IMPATH.$id.'t'.$ext;
@@ -382,29 +382,29 @@ class ImageController extends ZemAdminController
 		extract(doSlash(gpsa(array('thumbnail_clear_settings', 'thumbnail_delete', 'width', 'height', 'crop'))));
 
 		if($thumbnail_clear_settings) {
-			$message = $this->thumbnail_clear_settings($id);			
+			$message = $this->thumbnail_clear_settings($id);
 		} elseif($thumbnail_delete) {
 			$message = $this->thumbnail_delete($id);
 		} else {
 			$width = (int) $width;
-			$height = (int) $height;	
+			$height = (int) $height;
 			if ($width != 0 || $height != 0) {
 				if (img_makethumb($id, $width, $height, $crop)) {
 					global $prefs;
-		
+
 					if ($width == 0) $width = '';
 					if ($height == 0) $height = '';
 					$prefs['thumb_w'] = $width;
 					$prefs['thumb_h'] = $height;
 					$prefs['thumb_crop'] = $crop;
-		
+
 					// hidden prefs
 					set_pref('thumb_w', $width, 'image',	2);
 					set_pref('thumb_h', $height, 'image',	 2);
 					set_pref('thumb_crop', $crop, 'image',	2);
 
 					update_lastmod();
-		
+
 					$message = gTxt('thumbnail_saved', array('{id}' => $id));
 				} else {
 					$message = gTxt('thumbnail_not_saved', array('{id}' => $id));
@@ -449,7 +449,7 @@ class ImageController extends ZemAdminController
 // -------------------------------------------------------------
 
 	function thumb_ui($id,$thumbnail)
-	{		
+	{
 		global $prefs, $sort, $dir, $page, $search_method, $crit;
 		extract($prefs);
 		return
@@ -513,7 +513,7 @@ class ImageController extends ZemAdminController
 		event_change_pageby($this->event);
 		$this->_set_view('list');
 	}
-	
+
 }
 
 // -------------------------------------------------------------
@@ -526,15 +526,15 @@ class ImageListView extends TxpTableView
 		parent::TxpTableView($rows, $caption, $edit_actions);
 		$this->controller = $controller;
 	}
-	
+
 	function head($cols)
 	{
 		if (!$this->controller) return;
 		extract($this->controller->context);
-		
+
 		$switch_dir = ($dir == 'asc') ? 'desc' : 'asc';
 		$e = $this->controller->event;
-		return 
+		return
 			'<col class="col-id" />'.n.
 			'<col class="col-actions" />'.n.
 			'<col class="col-date" />'.n.
@@ -557,7 +557,7 @@ class ImageListView extends TxpTableView
 		).'</thead>';
 	}
 
-	function row($row) {		
+	function row($row) {
 		global $prefs;
 		extract($prefs);
 
@@ -566,7 +566,7 @@ class ImageListView extends TxpTableView
 
 		extract($row);
 		$event = $this->controller->event;
-		
+
 		$edit_url = "?event=$event".a.'step=edit'.a.'id='.$id.a.'sort='.$sort.
 			a.'dir='.$dir.a.'page='.$page.a.'search_method='.$search_method.a.'crit='.$crit;
 
@@ -578,7 +578,7 @@ class ImageListView extends TxpTableView
 			{
 				$thumbnail = '<img src="'.hu.$img_dir.'/'.$id.'t'.$ext.'" alt="" />';
 			}
-			
+
 			else
 			{
 				$thumbnail = '';

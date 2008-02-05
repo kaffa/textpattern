@@ -19,13 +19,13 @@ if (MDB_TYPE == 'pg') {
 }else {
 	define('ZEM_DATETIME','datetime');
 	define('ZEM_INCVAL','NULL');
-	
+
 	if (MDB_TYPE == 'pdo_sqlite') {
 		define('ZEM_TINYTEXT','text');
 	}else{
 		define('ZEM_TINYTEXT','tinytext');
 	}
-	
+
 }
 
 
@@ -117,7 +117,7 @@ class zem_table {
 	}
 
 // -------------------------------------------------------------
-	function getRow($query,$debug='') 
+	function getRow($query,$debug='')
 	{
 		if ($r = $this->query($query,$debug)) {
 			$row = ($this->DB->num_rows($r) > 0) ? db_fetch_assoc($r) : false;
@@ -128,11 +128,11 @@ class zem_table {
 	}
 
 // -------------------------------------------------------------
-	function getRows($query,$debug='') 
+	function getRows($query,$debug='')
 	{
 		if ($r = $this->query($query,$debug)) {
 			if ($this->DB->num_rows($r) > 0) {
-				while ($a = $this->DB->fetch_assoc($r)) $out[] = $a; 
+				while ($a = $this->DB->fetch_assoc($r)) $out[] = $a;
 				$this->DB->free($r);
 				return $out;
 			}

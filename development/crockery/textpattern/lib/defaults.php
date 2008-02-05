@@ -19,7 +19,7 @@ function txp_default_prefs() {
 	$guess_file_base_path = $guess_path_to_site.DS.'files';
 
 	return array(
-		
+
 		'sitename'                    => 'My Site',
 		'site_slogan'                 => 'My pithy slogan',
 		'siteurl'                     => $guess_siteurl,
@@ -109,7 +109,7 @@ function txp_default_prefs() {
 		'textile_updated'             => '1',
 		'thumb_h'                     => '100',
 		'thumb_crop'                  => '1',
-		
+
 	);
 }
 

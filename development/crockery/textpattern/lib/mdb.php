@@ -40,7 +40,7 @@ class MDB {
 	var $user;
 	var $pass;
 	var $charset;
-	
+
 	var $connected = false;
 	var $selected = false;
 	var $debug = false;
@@ -70,7 +70,7 @@ class MDB {
 
 		if (!$this->selectdb($this->db))
 			return;
-			
+
 		$this->selected = true;
 
 		$this->set_charset();
@@ -85,7 +85,7 @@ class MDB {
 	function selectdb($dbname) {
 		trigger_error(__FUNCTION__.' not implemented', E_USER_ERROR);
 	}
-	
+
 	function do_query($q) {
 		trigger_error(__FUNCTION__.' not implemented', E_USER_ERROR);
 	}
@@ -155,7 +155,7 @@ class MDB {
 	}
 
 	// these needn't be overridden except in special cases
-	
+
 	function set_charset() {
 		$this->query("SET NAMES '".$this->charset."'");
 	}

@@ -3,7 +3,7 @@
 		<table cellpadding="0" cellspacing="0" align="center">
 		<tr>
 			<td id="messagepane" valign="middle"<?php if (!empty($msgclass)) echo ' class="'.$msgclass.'"'; ?>>&nbsp;<?php echo $message; ?></td>
-<?php 
+<?php
 	if ($txp_user)
 	{
 		foreach (areas() as $a => $tabs)

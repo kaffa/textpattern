@@ -48,7 +48,7 @@ eod;
 
 
 	$step = ps('step');
-	switch ($step) {	
+	switch ($step) {
 		case "": chooseLang(); break;
 		case "getDbInfo": getDbInfo(); break;
 		case "getTxpLogin": getTxpLogin(); break;
@@ -63,7 +63,7 @@ eod;
 
 // dmp($_POST);
 
-// Move all the non global stuff to its own file so you can test it without deal with headers 
+// Move all the non global stuff to its own file so you can test it without deal with headers
 // and browser related output.
 
 ?>

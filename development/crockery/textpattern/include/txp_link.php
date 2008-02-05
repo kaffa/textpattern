@@ -7,7 +7,7 @@
 	www.textpattern.com
 	All rights reserved
 
-	Use of this software indicates acceptance of the Textpattern license agreement 
+	Use of this software indicates acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -22,18 +22,18 @@ $LastChangedRevision$
 	global $vars;
 
 	if ($event == 'link')
-	{	
-		require_privs('link');		
+	{
+		require_privs('link');
 
 		$vars = array('category', 'url', 'linkname', 'linksort', 'description', 'id');
 
 		$available_steps = array(
-			'link_list', 
-			'link_edit', 
-			'link_post', 
-			'link_save', 
-			'link_delete', 
-			'link_change_pageby', 
+			'link_list',
+			'link_edit',
+			'link_post',
+			'link_save',
+			'link_delete',
+			'link_change_pageby',
 			'link_multi_edit'
 		);
 
@@ -50,7 +50,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function link_list($message = '') 
+	function link_list($message = '')
 	{
 		global $step, $link_list_pageby, $prefs;
 
@@ -118,7 +118,7 @@ $LastChangedRevision$
 			$crit = '';
 		}
 
-		$total = getCount('txp_link', $criteria);  
+		$total = getCount('txp_link', $criteria);
 
 		if ($total < 1)
 		{
@@ -162,7 +162,7 @@ $LastChangedRevision$
 
 				while ($a = nextRow($rs))
 				{
-					extract($a);				
+					extract($a);
 
 					$edit_url = '?event=link'.a.'step=link_edit'.a.'id='.$id.a.'sort='.$sort.
 						a.'dir='.$dir.a.'page='.$page.a.'search_method='.$search_method.a.'crit='.$crit;
@@ -170,7 +170,7 @@ $LastChangedRevision$
 					echo tr(
 
 						n.td($id, 20).
-				
+
 						td(
 							n.'<ul>'.
 							n.t.'<li>'.href(gTxt('edit'), $edit_url).'</li>'.
@@ -245,7 +245,7 @@ $LastChangedRevision$
 			$id = assert_int($id);
 			extract(safe_row('*', 'txp_link', "id = $id"));
 		}
-		
+
 		if ($step == 'link_save' or $step == 'link_post')
 		{
 			foreach ($vars as $var)
@@ -313,9 +313,9 @@ $LastChangedRevision$
 
 //--------------------------------------------------------------
 
-	function linkcategory_popup($cat = '') 
+	function linkcategory_popup($cat = '')
 	{
-		return event_category_popup('link', $cat, 'link-category');		
+		return event_category_popup('link', $cat, 'link-category');
 	}
 
 // -------------------------------------------------------------
@@ -338,25 +338,25 @@ $LastChangedRevision$
 		);
 
 		$GLOBALS['ID'] = mysql_insert_id( );
-		
+
 		if ($q) {
 			//update lastmod due to link feeds
 			update_lastmod();
 
 			$message = gTxt('link_created', array('{name}' => $linkname));
 
-			link_edit($message);			
+			link_edit($message);
 		}
 	}
 
 // -------------------------------------------------------------
-	function link_save() 
+	function link_save()
 	{
 		global $txpcfg,$vars;
 		$varray = gpsa($vars);
 
 		extract(doSlash($varray));
-		
+
 		if (!$linksort) $linksort = $linkname;
 		$id = assert_int($id);
 
@@ -372,7 +372,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function link_delete() 
+	function link_delete()
 	{
 		$id = ps('id');
 		$rs = safe_delete("txp_link", "id=$id");
@@ -388,7 +388,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function link_multiedit_form($page, $sort, $dir, $crit, $search_method) 
+	function link_multiedit_form($page, $sort, $dir, $crit, $search_method)
 	{
 		$methods = array(
 			'delete' => gTxt('delete')
@@ -398,7 +398,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function link_multi_edit() 
+	function link_multi_edit()
 	{
 		$deleted = event_multi_edit('txp_link', 'id');
 

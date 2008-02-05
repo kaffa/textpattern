@@ -4,7 +4,7 @@
 	This is Textpattern
 	Copyright 2005 by Dean Allen - all rights reserved.
 
-	Use of this software denotes acceptance of the Textpattern license agreement 
+	Use of this software denotes acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -15,7 +15,7 @@ $LastChangedRevision$
 	function fetchComments($id)
 	{
 		$rs = safe_rows(
-			"*, unix_timestamp(posted) as time", 
+			"*, unix_timestamp(posted) as time",
 			"txp_discuss", 'parentid='.intval($id).' and visible='.VISIBLE.' order by posted asc'
 		);
 
@@ -53,7 +53,7 @@ $LastChangedRevision$
 		return $secret;
 	}
 
-	function commentForm($id, $atts=NULL) 
+	function commentForm($id, $atts=NULL)
 	{
 		global $prefs;
 		extract($prefs);
@@ -134,9 +134,9 @@ $LastChangedRevision$
 
 		$url = $GLOBALS['pretext']['request_uri'];
 
-		// Experimental clean urls with only 404-error-document on apache 
+		// Experimental clean urls with only 404-error-document on apache
 		// possibly requires messy urls for POST requests.
-		if (defined('PARTLY_MESSY') and (PARTLY_MESSY)) 
+		if (defined('PARTLY_MESSY') and (PARTLY_MESSY))
 		{
 			$url = hu.'?id='.intval($parentid);
 		}
@@ -216,7 +216,7 @@ $LastChangedRevision$
 			n.hInput('backpage', htmlspecialchars($url)) :
 			n.hInput('backpage', htmlspecialchars($backpage));
 
-		$out = str_replace( '<!-- plugin-place-holder -->', callback_event('comment.form'), $out); 
+		$out = str_replace( '<!-- plugin-place-holder -->', callback_event('comment.form'), $out);
 
 		$out .= n.n.'</div>'.n.'</form>';
 
@@ -233,7 +233,7 @@ $LastChangedRevision$
 		ob_start('parse');
 		$out = fetch_form('popup_comments');
 		$out = str_replace("<txp:popup_comments />",$discuss,$out);
-		
+
 		return $out;
 
 	}
@@ -251,7 +251,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function destroyCookies() 
+	function destroyCookies()
 	{
 		$cookietime = time()-3600;
 		ob_start();
@@ -266,7 +266,7 @@ $LastChangedRevision$
 	function getComment()
 	{
 		// comment spam filter plugins: call this function to fetch comment contents
-		
+
 		$c = psa( array(
 			'parentid',
 			'name',
@@ -315,7 +315,7 @@ $LastChangedRevision$
 
 		$ip = serverset('REMOTE_ADDR');
 
-		if (!checkBan($ip)) 
+		if (!checkBan($ip))
 			txp_die(gTxt('you_have_been_banned'), '403');
 
 		$blacklisted = is_blacklisted($ip);
@@ -336,17 +336,17 @@ $LastChangedRevision$
 		$message = substr(trim($message), 0, 65535);
 		$message2db = doSlash(markup_comment($message));
 
-		$isdup = safe_row("message,name", "txp_discuss", 
+		$isdup = safe_row("message,name", "txp_discuss",
 			"name='$name' and message='$message2db' and ip='".doSlash($ip)."'");
 
 		if (   ($prefs['comments_require_name'] && !trim($name))
 			|| ($prefs['comments_require_email'] && !trim($email))
 			|| (!trim($message)))
-		{ 
+		{
 			$evaluator -> add_estimate(RELOAD,1); // The error-messages are added in the preview-code
 		}
 
-		if ($isdup) 
+		if ($isdup)
 			$evaluator -> add_estimate(RELOAD,1); // FIXME? Tell the user about dupe?
 
 		if ( ($evaluator->get_result() != RELOAD) && checkNonce($nonce) ) {
@@ -417,9 +417,9 @@ $LastChangedRevision$
 								   VISIBLE  => array(),
 								   RELOAD  => array()
 								);
-			$this->status_text = array(	SPAM => gTxt('spam'), 
-									MODERATE => gTxt('unmoderated'), 
-									VISIBLE  => gTxt('visible'), 
+			$this->status_text = array(	SPAM => gTxt('spam'),
+									MODERATE => gTxt('unmoderated'),
+									VISIBLE  => gTxt('visible'),
 									RELOAD  => gTxt('reload')
 								);
 			$this->message = $this->status;
@@ -459,7 +459,7 @@ $LastChangedRevision$
 			$file = $prefs['tempdir'].DS.'evaluator_trace.php';
 			if (!file_exists($file)) {
 				$fp = fopen($file,'wb');
-				if ($fp) 
+				if ($fp)
 					fwrite($fp,"<?php return; ?>\n".
 					"This trace-file tracks saved comments. (created ".safe_strftime($prefs['archive_dateformat'],time()).")\n".
 					"Format is: Type; Probability; Message (Type can be -1 => spam, 0 => moderate, 1 => visible)\n\n");
@@ -475,19 +475,19 @@ $LastChangedRevision$
 	}
 
 	function &get_comment_evaluator() {
-	    static $instance; 
-	 
+	    static $instance;
+
 	    // If the instance is not there, create one
-	    if(!isset($instance)) { 
-	        $instance = new comment_evaluation(); 
-	    } 
-	    return $instance; 
+	    if(!isset($instance)) {
+	        $instance = new comment_evaluation();
+	    }
+	    return $instance;
 	}
 
 // -------------------------------------------------------------
 	function checkNonce($nonce)
 	{
-		if (!$nonce && !preg_match('#^[a-zA-Z0-9]*$#',$nonce)) 
+		if (!$nonce && !preg_match('#^[a-zA-Z0-9]*$#',$nonce))
 			return false;
 			// delete expired nonces
 		safe_delete("txp_discuss_nonce", "issue_time < date_sub(now(),interval 10 minute)");
@@ -515,10 +515,10 @@ $LastChangedRevision$
 		{
 			$Annotate = $thisarticle['annotate'];
 			$uPosted  = $thisarticle['posted'];
-		} 
+		}
 		else
 		{
-			extract(	
+			extract(
 				safe_row(
 					"Annotate,unix_timestamp(Posted) as uPosted",
 						"textpattern", "ID = $id"
@@ -529,7 +529,7 @@ $LastChangedRevision$
 		if ($Annotate != 1)
 			return false;
 
-		if($comments_disabled_after) {		
+		if($comments_disabled_after) {
 			$lifespan = ( $comments_disabled_after * 86400 );
 			$timesince = ( time() - $uPosted );
 			return ( $lifespan > $timesince );
@@ -545,7 +545,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function mail_comment($message, $cname, $cemail, $cweb, $parentid, $discussid) 
+	function mail_comment($message, $cname, $cemail, $cweb, $parentid, $discussid)
 	{
 		global $sitename;
 		$parentid = assert_int($parentid);
@@ -555,7 +555,7 @@ $LastChangedRevision$
 		extract(safe_row("RealName, email", "txp_users", "name = '".doSlash($AuthorID)."'"));
 
 		$evaluator =& get_comment_evaluator();
-	
+
 		$out = gTxt('greeting')." $RealName,".n.n;
 		$out .= str_replace('{title}',$Title,gTxt('comment_recorded')).n;
 		$out .= permlinkurl_id($parentid).n;

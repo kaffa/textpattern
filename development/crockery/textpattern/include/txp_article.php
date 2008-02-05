@@ -45,7 +45,7 @@ function article_event($event, $step) {
 	$publish = gps('publish');
 	if ($publish) $step = 'publish';
 
-		
+
 	switch(strtolower($step)) {
 		case "":         article_edit();    break;
 		case "create":   article_edit();    break;
@@ -88,17 +88,17 @@ register_callback('article_event', 'article', '', 1);
 			$expires =  NULLDATETIME;
 			$whenexpires = NULLDATETIME;
 		}
-		else {			
+		else {
 			if(empty($exp_month)) $exp_month=1;
 			if(empty($exp_day)) $exp_day=1;
 			if(empty($exp_hour)) $exp_hour=0;
 			if(empty($exp_minute)) $exp_minute=0;
 			if(empty($exp_second)) $exp_second=0;
-			
+
 			$expires = strtotime($exp_year.'-'.$exp_month.'-'.$exp_day.' '.
 				$exp_hour.':'.$exp_minute.':'.$exp_second)-tz_offset();
 			$whenexpires = "from_unixtime($expires)";
-		}		
+		}
 
 		if ($expires != NULLDATETIME) {
 			if ($expires <= $when_ts) {
@@ -150,11 +150,11 @@ register_callback('article_event', 'article', '', 1);
 				uid             = '".md5(uniqid(rand(),true))."',
 				feed_time       = now()"
 			);
-			
+
 			if ($Status>=4) {
-				
+
 				do_pings();
-				
+
 				update_lastmod();
 			}
 			article_edit(
@@ -212,9 +212,9 @@ register_callback('article_event', 'article', '', 1);
 			if(empty($exp_hour)) $exp_hour=0;
 			if(empty($exp_minute)) $exp_minute=0;
 			if(empty($exp_second)) $exp_second=0;
-			
+
 			$expires = strtotime($exp_year.'-'.$exp_month.'-'.$exp_day.' '.$exp_hour.':'.$exp_minute.':'.$exp_second)-tz_offset();
-			$whenexpires = "Expires=from_unixtime($expires)";	
+			$whenexpires = "Expires=from_unixtime($expires)";
 		}
 
 		if ($expires != NULLDATETIME) {
@@ -343,7 +343,7 @@ register_callback('article_event', 'article', '', 1);
 
 				unset ($store);
 			}
-			
+
 			elseif ($step != 'create')
 			{
 				$article = gpsa($article_vars);
@@ -430,14 +430,14 @@ register_callback('article_event', 'article', '', 1);
 			// url title
 				n.graf('<label for="url-title">'.gTxt('url_title').'</label>'.sp.popHelp('url_title').br.
 					fInput('text', 'url_title', $url_title, 'edit', '', '', 22, '', 'url-title')).
-		
+
 			'</div>
-			
+
 			<h3 class="plain"><a href="#recent" onclick="toggleDisplay(\'recent\'); return false;">'.gTxt('recent_articles').'</a>'.'</h3>'.
 			'<div id="recent" style="display:none;">';
-			
+
 			$recents = safe_rows_start("Title, ID",'textpattern',"1=1 order by LastMod desc limit 10");
-			
+
 			if ($recents)
 			{
 				echo '<ul class="plain-list">';
@@ -523,7 +523,7 @@ register_callback('article_event', 'article', '', 1);
 			else
 			{
 				echo n.'<hr width="50%" />';
-			
+
 				echo ($view=='preview')
 					?	graf(do_markup($markup_excerpt, $Excerpt))
 					:	tag(str_replace(array(n,t),
@@ -553,7 +553,7 @@ register_callback('article_event', 'article', '', 1);
 		}
 
 	//-- author --------------
-	
+
 		if ($view=="text" && $step != "create")
 		{
 			echo '<p class="small">'.gTxt('posted_by').': '.htmlspecialchars($AuthorID).' &#183; '.safe_strftime('%d %b %Y &#183; %X',$sPosted);
@@ -739,9 +739,9 @@ register_callback('article_event', 'article', '', 1);
 			//-- timestamp -------------------
 
 				if (!empty($year)) {
-					$sPosted = safe_strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second);					
+					$sPosted = safe_strtotime($year.'-'.$month.'-'.$day.' '.$hour.':'.$minute.':'.$second);
 				}
-				
+
 				echo n.n.fieldset(
 
 					n.graf(checkbox('reset_time', '1', $reset_time, '', 'reset_time').'<label for="reset_time">'.gTxt('reset_time').'</label>').
@@ -770,7 +770,7 @@ register_callback('article_event', 'article', '', 1);
 			//-- expires -------------------
 
 				if (!empty($exp_year))
-				{	
+				{
 					if(empty($exp_month)) $exp_month=1;
 					if(empty($exp_day)) $exp_day=1;
 					if(empty($exp_hour)) $exp_hour=0;
@@ -778,7 +778,7 @@ register_callback('article_event', 'article', '', 1);
 					if(empty($exp_second)) $exp_second=0;
 					$sExpires = safe_strtotime($exp_year.'-'.$exp_month.'-'.$exp_day.' '.$exp_hour.':'.$exp_minute.':'.$exp_second);
 				}
-					
+
 				echo n.n.fieldset(
 
 					n.graf(gtxt('date').sp.
@@ -810,7 +810,7 @@ register_callback('article_event', 'article', '', 1);
 		}
 
 		echo '</td></tr></table></form>';
-	
+
 	}
 
 // -------------------------------------------------------------
@@ -978,11 +978,11 @@ register_callback('article_event', 'article', '', 1);
 	function markup_main_fields($incoming)
 	{
 		global $txpcfg;
-		
+
 		$incoming['Title_plain'] = $incoming['Title'];
 		$incoming['Body_html'] = do_markup($incoming['markup_body'], $incoming['Body']);
 		$incoming['Excerpt_html'] = do_markup($incoming['markup_excerpt'], $incoming['Excerpt']);
-		
+
 		return $incoming;
 	}
 // -------------------------------------------------------------
@@ -998,7 +998,7 @@ register_callback('article_event', 'article', '', 1);
 		include_once txpath.'/lib/IXRClass.php';
 
 		callback_event('ping');
-		
+
 		if ($prefs['ping_textpattern_com']) {
 			$tx_client = new IXR_Client('http://textpattern.com/xmlrpc/');
 			$tx_client->query('ping.Textpattern', $prefs['sitename'], hu);

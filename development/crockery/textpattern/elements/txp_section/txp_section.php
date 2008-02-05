@@ -27,8 +27,8 @@ class SectionController extends ZemAdminController
 		parent::ZemAdminController();
 		$this->context = gpsa(array('page', 'sort', 'dir', 'crit', 'search_method'));
 		// @todo: sensible standard list view
-		if(empty($this->context['sort'])) $this->context['sort'] = 'name';	
-		if($this->context['dir'] != 'desc') $this->context['dir'] = 'asc';	
+		if(empty($this->context['sort'])) $this->context['sort'] = 'name';
+		if($this->context['dir'] != 'desc') $this->context['dir'] = 'asc';
 	}
 
 // -------------------------------------------------------------
@@ -57,7 +57,7 @@ class SectionController extends ZemAdminController
 				, ' colspan="3"')
 			).
 		endTable();
-			
+
 
 		/*
 		 *  edit 'default' section
@@ -207,18 +207,18 @@ return;
 	}
 
 //-------------------------------------------------------------
-	function insert_post() 
+	function insert_post()
 	{
 		global $txpcfg;
 		$name = doSlash(ps('name'));
-		
+
 		// prevent non url chars on section names
 		include_once txpath.'/lib/classTextile.php';
 		$textile = new Textile();
 		$title = $textile->TextileThis($name,1);
 		$name = dumbDown($textile->TextileThis(trim(doSlash($name)),1));
 		$name = preg_replace("/[^[:alnum:]\-_]/", "", str_replace(" ","-",$name));
-		
+
 		// prevent duplicate section names
 		// @todo: lose this for nested sections when parents differ
 		$chk = fetch('name','txp_section','name',$name);
@@ -228,7 +228,7 @@ return;
 				$rs = safe_insert(
 				   "txp_section",
 				   "name         = '$name',
-					title        = '$title', 
+					title        = '$title',
 					page         = 'default',
 					css          = 'default',
 					is_default   = 0,
@@ -293,7 +293,7 @@ return;
 			if ($is_default) {
 				safe_update("txp_section", "is_default = 0", "name != '$old_name'");
 			}
-	
+
 			safe_update('txp_section', "
 				name         = '$name',
 				title        = '$title',
@@ -318,7 +318,7 @@ return;
 
 // -------------------------------------------------------------
 
-	function delete_post() 
+	function delete_post()
 	{
 		$name = ps('name');
 
@@ -332,24 +332,24 @@ return;
 
 // -------------------------------------------------------------
 
-	function adopters($child_id) 
+	function adopters($child_id)
 	{
 		static $adopters;
 		if(empty($adopters)) {
 			$adopters = safe_rows('name, id', 'txp_section','1=1');
 		}
-		
+
 		// do not attempt to adopt yourself, child!
 		foreach($adopters as $a) {
 			if($a['id'] != $child_id) {
 				$out[$a['id']] = $a['name'];
 			}
 		}
-		
+
 		// @todo: prevent circular section graphs
 		return($out);
 	}
-	
+
 // -------------------------------------------------------------
 
 	function adopters_dropdown($child_id, $parent_id=0)
@@ -369,15 +369,15 @@ class SectionListView extends TxpTableView
 		$this->pages = safe_column('name', 'txp_page', "1 = 1");
 		$this->styles = safe_column('name', 'txp_css', "1 = 1");
 	}
-	
+
 	function head($cols)
 	{
 		if (!$this->controller) return;
 		extract($this->controller->context);
-		
+
 		$switch_dir = ($dir == 'asc') ? 'desc' : 'asc';
 		$e = $this->controller->event;
-		return 
+		return
 			'<col class="col-id" />'.n.
 			'<col class="col-name" />'.n.
 			'<col class="col-title" />'.n.
@@ -402,7 +402,7 @@ class SectionListView extends TxpTableView
 		).'</thead>';
 	}
 
-	function row($row) {		
+	function row($row) {
 		if (!$this->controller) return;
 		extract($this->controller->context);
 
@@ -430,7 +430,7 @@ class SectionListView extends TxpTableView
 		$tr = preg_replace('/<tr.*>/', '\\0'.start_form(), $tr);
 		$tr = preg_replace('/<\/tr>/', end_form().'</tr>', $tr);
 		return $tr;
-		
+
 	}
 } // SectionListView
 

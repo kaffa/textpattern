@@ -7,7 +7,7 @@
 	www.textpattern.com
 	All rights reserved
 
-	Use of this software indicates acceptance of the Textpattern license agreement 
+	Use of this software indicates acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -28,7 +28,7 @@ $LastChangedRevision$
 			form_edit();
 		} else $step();
 	}
-	
+
 // -------------------------------------------------------------
 	function form_list($curname)
 	{
@@ -37,7 +37,7 @@ $LastChangedRevision$
 		$out[] = tr(tda(sLink('form','form_create',gTxt('create_new_form')),' colspan="3" style="height:30px"'));
 
 		$out[] = assHead('form','type','');
-		
+
 		$methods = array('delete'=>gTxt('delete'));
 
 
@@ -46,7 +46,7 @@ $LastChangedRevision$
 		if ($rs) {
 			while ($a = nextRow($rs)){
 				extract($a);
-					$editlink = ($curname!=$name) 
+					$editlink = ($curname!=$name)
 					?	eLink('form','form_edit','name',$name,$name)
 					:	htmlspecialchars($name);
 					$modbox = (!in_array($name, $essential_forms))
@@ -99,7 +99,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function form_create() 
+	function form_create()
 	{
 		form_edit();
 	}
@@ -132,7 +132,7 @@ $LastChangedRevision$
 		else
 			$changename = graf(gTxt('form_name').br.tag($name, 'em').hInput('name',$name));
 
-		$out = 
+		$out =
 			startTable('edit').
 			tr(
 				tdtl(
@@ -184,7 +184,7 @@ $LastChangedRevision$
 					form_list($name)
 				)
 			).endTable();
-			
+
 		echo $out;
 	}
 
@@ -254,20 +254,20 @@ $LastChangedRevision$
 		}
 		return false;
 	}
-	
+
 // -------------------------------------------------------------
-	function formTypes($type) 
+	function formTypes($type)
 	{
 	 	$valid = valid_form_types();
 	 	foreach($valid as $v) {
 	 		$types[$v] = htmlspecialchars(gTxt($v));
 	 	}
-	 	asort($types, SORT_LOCALE_STRING);	 	
+	 	asort($types, SORT_LOCALE_STRING);
 		return selectInput('type',$types,$type);
 	}
 
 // -------------------------------------------------------------
-	function valid_form_types() 
+	function valid_form_types()
 	{
 	 	global $essential_form_types;
 	 	// pull in third-party form types

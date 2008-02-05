@@ -40,13 +40,13 @@ include_once txpath.'/setup/data.php';
 $default_rows = new textpattern_setup_rows();
 
 foreach ($textpattern_tables as $table_name) {
-	
+
 	$table = new $table_name($DB);
 	/* @var $table zem_table */
 	$result = $table->create_table();
 
 	$db_error = $DB->lasterror();
-	if (!$result && !empty($db_error)) 
+	if (!$result && !empty($db_error))
 	{
 		$GLOBALS['txp_error_messages'][] = $db_error;
 		$GLOBALS['txp_install_successful'] = false;
@@ -55,7 +55,7 @@ foreach ($textpattern_tables as $table_name) {
 			$default_rows->{$table_name}();
 			$table->upgrade_table();
 		}
-		
+
 	}
 }
 
@@ -98,7 +98,7 @@ if (!$client->query('tups.getLanguage',$blog_uid,$lang))
 	$response = $client->getResponse();
 	$lang_struct = unserialize($response);
 	if (MDB_TYPE == 'pdo_sqlite') {
-		
+
 		$stmt = $DB->prepare("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang', ?, ?, ?, ?)");
 		foreach ($lang_struct as $item){
 			$stmt->execute(array_values($item));
@@ -106,11 +106,11 @@ if (!$client->query('tups.getLanguage',$blog_uid,$lang))
 	}else{
 		foreach ($lang_struct as $item)
 		{
-			foreach ($item as $name => $value) 
+			foreach ($item as $name => $value)
 				$item[$name] = addslashes($value);
 			$DB->query("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang','$item[name]','$item[event]','$item[data]','".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."')");
 		}
-	}		
+	}
 }
 
 ?>

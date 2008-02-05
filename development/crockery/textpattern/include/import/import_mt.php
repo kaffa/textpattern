@@ -15,9 +15,9 @@ function doImportMT($file, $section, $status, $invite) {
 	$fp = fopen($file, 'r');
 	if (!$fp)
 		return false;
-		
+
 	//Keep some response on some part
-	$results = array();	
+	$results = array();
 
 	$state = 'metadata';
 	$item = array();

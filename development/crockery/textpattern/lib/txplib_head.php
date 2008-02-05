@@ -81,8 +81,8 @@ $LastChangedRevision$
 				if (has_privs($b)) {
 					$out[] = tabber($a,$b,$event,2);
 				}
-	
-	
+
+
 			}
 			return (empty($out) ? '' : join('',$out));
 		}

@@ -66,8 +66,8 @@ class PrefsController extends ZemAdminController {
 	{
 		$this->prefs_post();
 	}
-	
-	function prefs_post() 
+
+	function prefs_post()
 	{
 
 		// special considerations
@@ -95,7 +95,7 @@ class PrefsController extends ZemAdminController {
 
 //-------------------------------------------------------------
 
-	function list_languages_post() 
+	function list_languages_post()
 	{
 		global $locale, $textarray;
 		// Select and save active language
@@ -109,11 +109,11 @@ class PrefsController extends ZemAdminController {
 	}
 
 //-------------------------------------------------------------
-	function real_max_upload_size($user_max) 
+	function real_max_upload_size($user_max)
 	{
 		// The minimum of the candidates, is the real max. possible size
 		$candidates = array($user_max,
-							ini_get('post_max_size'), 
+							ini_get('post_max_size'),
 							ini_get('upload_max_filesize'));
 		$real_max = null;
 		foreach ($candidates as $item)
@@ -127,7 +127,7 @@ class PrefsController extends ZemAdminController {
 				case 'k': $val *= 1024;
 			}
 			if ($val > 1) {
-				if (is_null($real_max)) 
+				if (is_null($real_max))
 					$real_max = $val;
 				elseif ($val < $real_max)
 					$real_max = $val;
@@ -146,23 +146,23 @@ class PrefsView extends TxpDetailView {
 	function PrefsView($data, $event, $step, $caption='') {
 		parent::TxpDetailView($data, $event, $step, $caption);
 		$this->listtag = '';
-		$this->rowtag = 'tr';		
+		$this->rowtag = 'tr';
 	 	$this->ltag = 'td';
 		$this->itag = 'td';
 	}
-	
+
 	function head()
 	{
 		return TxpDetailView::head().
 			tag(
 					tag(sLink('prefs', 'prefs_list', gTxt('site_prefs'), ('prefs_list' == $this->step) ? 'navlink-active' : 'navlink'), 'li').n.
 					tag(sLink('prefs', 'advanced_prefs', gTxt('advanced_preferences'), ('advanced_prefs' == $this->step) ? 'navlink-active' : 'navlink'),'li').n.
-					tag(sLink('prefs', 'list_languages', gTxt('manage_languages'), ('list_languages' == $this->step) ? 'navlink-active' : 'navlink'),'li'), 
+					tag(sLink('prefs', 'list_languages', gTxt('manage_languages'), ('list_languages' == $this->step) ? 'navlink-active' : 'navlink'),'li'),
 			'ul', ' id="nav-prefs"');
 	}
-	
+
 	function body() {
-		
+
 		extract(get_prefs());
 
 		$locale = setlocale(LC_ALL, $locale);
@@ -175,25 +175,25 @@ class PrefsView extends TxpDetailView {
 		foreach ($evt_list as $event) {
 			$rs = safe_rows_start('*', 'txp_prefs', "type = $this->type and prefs_id = 1 and event = '".doSlash($event)."' order by position");
 			$out = array();
-			while ($a = nextRow($rs)) {	
+			while ($a = nextRow($rs)) {
 				$name = $a['name'];
 				$widget = $this->widget($a['html']);
 				if(empty($a['choices'])) {
-					// Assuming this widget function signature: 
+					// Assuming this widget function signature:
 					// $thing = $this->i_foo( [string] $name, [string] $data);
 					$thing = $this->$widget($name, $this->data[$name]);
 				} else {
 					$choices = $this->$a['choices']();
 					$widget = $this->widget($a['html']);
-					// Assuming this widget function signature: 
+					// Assuming this widget function signature:
 					// $thing = $this->i_foo( [string] $name, [array of strings] $choices, [string] $data);
 					$thing = $this->$widget($name, $choices, $this->data[$name]);
-				}			
+				}
 				#$out[] = tag($thing, 'tr');
 				$out[] = $thing;
 			}
 			$set[] = fieldset(
-						tag(join(n, $out), 'table', " id='pref-panel-$event'"), 
+						tag(join(n, $out), 'table', " id='pref-panel-$event'"),
 						gTxt($event)
 					 );
 		}
@@ -221,9 +221,9 @@ class PrefsView extends TxpDetailView {
 			return $map[$widget];
 		} else {
 			return 'i_awol';
-		}		
+		}
 	}
-	
+
 	function i_awol($name, $value='', $opts = array())
 	{
 		// the "something's wrong with your prefs table" fallback widget
@@ -232,7 +232,7 @@ class PrefsView extends TxpDetailView {
 				tag(gTxt('no_widget_for_pref', array('pref' => $name)), $this->itag),
 			$this->rowtag
 		);
-		
+
 	}
 
 //-------------------------------------------------------------
@@ -399,8 +399,8 @@ class PrefsView extends TxpDetailView {
 }
 
 class LanguagesView extends PrefsView {
-	
-	function body() 
+
+	function body()
 	{
 		global $prefs, $locale, $txpcfg;
 		require_once txpath.'/lib/IXRClass.php';
@@ -409,7 +409,7 @@ class LanguagesView extends PrefsView {
 		$this->data['active_language'] = safe_field('val','txp_prefs',"name='language'");
 		$lang_form = $this->form($this->i_select('active_language', $this->languages(), $this->data['active_language']).
 								$this->i_button('save'));
-		
+
 
 		// rpc language installer
 		$client = new IXR_Client(RPC_SERVER);
@@ -432,7 +432,7 @@ class LanguagesView extends PrefsView {
 		// Get items from file system
 		$files = $this->get_lang_files();
 
-		if (gps('force')=='file' || !$rpc_connect) 
+		if (gps('force')=='file' || !$rpc_connect)
 			$show_files = true;
 
 		if ( $show_files && is_array($files) && !empty($files) ) {
@@ -441,16 +441,16 @@ class LanguagesView extends PrefsView {
 					$name = str_replace('.txt','',$file);
 					$firstline = fgets($fp, 4096);
 					fclose($fp);
-					if (strpos($firstline,'#@version') !== false) 
+					if (strpos($firstline,'#@version') !== false)
 						@list($fversion,$ftime) = explode(';',trim(substr($firstline,strpos($firstline,' ',1))));
-					else 
+					else
 						$fversion = $ftime = NULL;
 					$available_lang[$name]['file_note'] = (isset($fversion)) ? $fversion : 0;
 					$available_lang[$name]['file_lastmod'] = (isset($ftime)) ? $ftime : 0;
 				}
 			}
 		}
-		
+
 		// Get installed items from the database
 		// I'm afraid we need a value here for the language itself, not for each one of the rows
 		$rows = safe_rows('lang, UNIX_TIMESTAMP(MAX(lastmod)) as lastmod','txp_lang',"1 GROUP BY lang ORDER BY lastmod DESC");
@@ -459,36 +459,36 @@ class LanguagesView extends PrefsView {
 		}
 
 		$list = '';
-		// Show the language table 
+		// Show the language table
 		foreach ($available_lang as $langname => $langdat)
 		{
 			$file_updated = ( isset($langdat['db_lastmod']) && @$langdat['file_lastmod'] > $langdat['db_lastmod']);
 			$rpc_updated = ( @$langdat['rpc_lastmod'] > @$langdat['db_lastmod']);
-			$rpc_install = tda( strong(eLink('prefs','get_language','lang_code',$langname,(isset($langdat['db_lastmod'])) 
+			$rpc_install = tda( strong(eLink('prefs','get_language','lang_code',$langname,(isset($langdat['db_lastmod']))
 										? gTxt('update') : gTxt('install'),'updating',isset($langdat['db_lastmod']) )).
 								br.safe_strftime('%d %b %Y %X',@$langdat['rpc_lastmod'])
-							,(isset($langdat['db_lastmod'])) 
+							,(isset($langdat['db_lastmod']))
 								? ' style="color:red;text-align:center;background-color:#FFFFCC;"'
 								: ' style="color:#667;vertical-align:middle;text-align:center"');
 			$list.= tr (
 				// lang name and date
 				tda(gTxt($langname).
-					 tag( ( isset($langdat['db_lastmod']) ) 
+					 tag( ( isset($langdat['db_lastmod']) )
 							? br.'&nbsp;'.safe_strftime('%d %b %Y %X',$langdat['db_lastmod'])
 							: ''
 						, 'span',' style="color:#aaa;font-style:italic"')
 					, (isset($langdat['db_lastmod']) && $rpc_updated) #tda attribute
-							? ' nowrap="nowrap" style="color:red;background-color:#FFFFCC;"' 
+							? ' nowrap="nowrap" style="color:red;background-color:#FFFFCC;"'
 							: ' nowrap="nowrap" style="vertical-align:middle"' ).n.
 				// RPC info
-				(  ($rpc_updated) 
-					? $rpc_install 
+				(  ($rpc_updated)
+					? $rpc_install
 					: tda( (isset($langdat['rpc_lastmod'])) ? gTxt('updated') : '-'
 						,' style="vertical-align:middle;text-align:center"')
 				).n.
 				// file info
 				( ($show_files)
-					?	tda( tag( ( isset($langdat['file_lastmod']) ) 
+					?	tda( tag( ( isset($langdat['file_lastmod']) )
 									? eLink('prefs','get_language','lang_code',$langname,($file_updated) ? gTxt('update') : gTxt('install'),'force','file').
 											br.'&nbsp;'.safe_strftime($prefs['archive_dateformat'],$langdat['file_lastmod'])
 									: ' &nbsp; '  # No File available
@@ -528,11 +528,11 @@ class LanguagesView extends PrefsView {
 
 //-------------------------------------------------------------
 
-	function languages() 
+	function languages()
 	{
 		$installed_langs = safe_column('distinct lang', 'txp_lang', "1=1");
-		
-		$vals = array();		
+
+		$vals = array();
 		foreach ($installed_langs as $lang)	{
 			// human readable translated language names
 			$vals[$lang] = safe_field('data', 'txp_lang', "name = '".doSlash($lang)."' AND lang = '".doSlash($lang)."'");
@@ -553,17 +553,17 @@ class LanguagesView extends PrefsView {
 	{
 		global $prefs, $txpcfg, $textarray;
 		require_once txpath.'/lib/IXRClass.php';
-		$lang_code = gps('lang_code');		
+		$lang_code = gps('lang_code');
 
 		$client = new IXR_Client(RPC_SERVER);
 //		$client->debug = true;
-		
+
 		@set_time_limit(90);
 		if (gps('force')=='file' || !$client->query('tups.getLanguage',$prefs['blog_uid'],$lang_code))
 		{
 			if ( (gps('force')=='file' || gps('updating')!=='1') && install_language_from_file($lang_code) )
 			{
-				if (defined('LANG')) 
+				if (defined('LANG'))
 					$textarray = load_lang(LANG);
 				return list_languages(gTxt($lang_code).sp.gTxt('updated'));
 			}else{
@@ -575,17 +575,17 @@ class LanguagesView extends PrefsView {
 				if ( $install_langfile == 'install_langfile')
 					$install_langfile = 'To install new languages from file you can download them from <b><a href="'.RPC_SERVER.'/lang/">'.RPC_SERVER.'/lang/</a></b> and place them inside your ./textpattern/lang/ directory.';
 				pagetop(gTxt('installing_language'));
-				echo tag( gTxt('rpc_connect_error')."<!--".$client->getErrorCode().' '.$client->getErrorMessage()."-->" 
+				echo tag( gTxt('rpc_connect_error')."<!--".$client->getErrorCode().' '.$client->getErrorMessage()."-->"
 						 ,'p',' style="text-align:center;color:red;width:50%;margin: 2em auto"' );
 				echo tag( $install_langfile ,'p',' style="text-align:center;width:50%;margin: 2em auto"' );
-			}			
+			}
 		}else {
 			$response = $client->getResponse();
 			$lang_struct = unserialize($response);
 			function install_lang_key(&$value, $key)
 			{
 				extract(gpsa(array('lang_code','updating')));
-				$exists = safe_field('name','txp_lang',"name='".doSlash($value['name'])."' AND lang='".doSlash($lang_code)."'");				
+				$exists = safe_field('name','txp_lang',"name='".doSlash($value['name'])."' AND lang='".doSlash($lang_code)."'");
 				$q = "name='".doSlash($value['name'])."', event='".doSlash($value['event'])."', data='".doSlash($value['data'])."', lastmod='".doSlash(strftime('%Y%m%d%H%M%S',$value['uLastmod']))."'";
 
 				if ($exists)
@@ -594,7 +594,7 @@ class LanguagesView extends PrefsView {
 				}else{
 					$value['ok'] = safe_insert('txp_lang',$q.", lang='".doSlash($lang_code)."'");
 				}
-			}			
+			}
 			array_walk($lang_struct,'install_lang_key');
 			$size = count($lang_struct);
 			$errors = 0;
@@ -602,13 +602,13 @@ class LanguagesView extends PrefsView {
 			{
 				$errors += ( !$lang_struct[$i]['ok'] );
 			}
-			if (defined('LANG')) 
+			if (defined('LANG'))
 				$textarray = load_lang(LANG);
 			$msg = gTxt($lang_code).sp.gTxt('updated');
-			if ($errors > 0) 
+			if ($errors > 0)
 				$msg .= sprintf(" (%s errors, %s ok)",$errors, ($size-$errors));
 			return list_languages($msg);
-		}		
+		}
 	}
 
 // ----------------------------------------------------------------------
@@ -616,9 +616,9 @@ class LanguagesView extends PrefsView {
 function get_lang_files()
 {
 	global $txpcfg;
-	
+
 	$dirlist = array();
-	
+
 	$lang_dir = txpath.DS.'lang'.DS;
 
 	if (!is_dir($lang_dir))
@@ -626,7 +626,7 @@ function get_lang_files()
 		trigger_error('Lang directory is not a directory: '.$lang_dir, E_USER_WARNING);
 		return $dirlist;
 	}
-	
+
 	if (chdir($lang_dir)) {
 		if (function_exists('glob')){
 			$g_array = glob("*.txt");
@@ -639,7 +639,7 @@ function get_lang_files()
 					$g_array[] = $filename;
 			}
 			closedir($dh);
-			
+
 		}
 		# build an array of lang-codes => filemtimes
 		if ($g_array) {
@@ -652,6 +652,6 @@ function get_lang_files()
 	}
 	return $g_array;
 }
-	
+
 }
 ?>

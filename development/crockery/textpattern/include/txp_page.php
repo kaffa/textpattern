@@ -6,7 +6,7 @@
 	www.textpattern.com
 	All rights reserved
 
-	Use of this software indicates acceptance of the Textpattern license agreement 
+	Use of this software indicates acceptance of the Textpattern license agreement
 
 $HeadURL$
 $LastChangedRevision$
@@ -15,13 +15,13 @@ $LastChangedRevision$
 	if (!defined('txpinterface')) die('txpinterface is undefined.');
 
 	if ($event == 'page') {
-		require_privs('page');		
+		require_privs('page');
 
 		if(!$step or !in_array($step, array('page_edit','page_save','page_delete','div_edit','div_save','page_list'))){
 			page_edit();
 		} else $step();
 	}
-	
+
 //-------------------------------------------------------------
 
 	function page_edit($message = '') {
@@ -38,7 +38,7 @@ $LastChangedRevision$
 
 		$name = ( $copy && trim(preg_replace('/[<>&"\']/', '', $newname)) ) ? $newname : $name;
 
-		echo 
+		echo
 			startTable('edit').
 			tr(
 				tda(
@@ -89,13 +89,13 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 	#deprecated
-	function div_edit() 
+	function div_edit()
 	{
 		return page_edit();
 	}
 
 //-------------------------------------------------------------
-	function page_edit_form($name) 
+	function page_edit_form($name)
 	{
 		global $step;
 		if ($step=='div_edit') {
@@ -115,18 +115,18 @@ $LastChangedRevision$
 					n.eInput('page').
 					n.sInput($outstep).
 					n.hInput('name',$name);
-				
+
 			if($step=='div_edit') {
-				$out[] = 
+				$out[] =
 					n.hInput('html_array',$html_array).
 				  	n.hInput('start_pos',$start_pos).
 				  	n.hInput('stop_pos',$stop_pos).
 				  	n.hInput('name',$name);
 			} else {
-				$out[] = 
+				$out[] =
 						n.'<label for="copy-page">'.gTxt('copy_page_as').'</label>'.sp.
 						n.fInput('text', 'newname', '', 'edit', '', '', '', '', 'copy-page').
-						n.fInput('submit','copy',gTxt('copy'),'smallerbox').'</p>'; 
+						n.fInput('submit','copy',gTxt('copy'),'smallerbox').'</p>';
 			}
 		return form(join('',$out));
 	}
@@ -176,14 +176,14 @@ $LastChangedRevision$
 			{
 				$message = gTxt('page_already_exists', array('{name}' => $newname));
 			}
-			elseif ($newname) 
+			elseif ($newname)
 			{
 				safe_insert('txp_page', "name = '$newname', user_html = '$html'");
 				update_lastmod();
- 
+
 				$message = gTxt('page_created', array('{name}' => $newname));
 			}
-			else 
+			else
 			{
 				$message = gTxt('page_name_invalid');
 			}
@@ -202,27 +202,27 @@ $LastChangedRevision$
 			page_edit($message);
 		}
 	}
-	
+
 //-------------------------------------------------------------
-	function taglinks($type) 
+	function taglinks($type)
 	{
 		return popTagLinks($type);
 	}
 
 // -------------------------------------------------------------
 	#deprecated
-	function extract_div() 
+	function extract_div()
 	{
 		extract(doSlash(gpsa(array('name','div'))));
 		$name = (!$name) ? 'default' : $name;
 		$html = safe_field('user_html','txp_page',"name='$name'");
-		
+
 		$goodlevel = (preg_match("/<div id=\"container\"/i",$html)) ? 2 : 1;
-		
+
 		if ($div) {
-		
+
 			$html_array = preg_split("/(<.*>)/U",$html,-1,PREG_SPLIT_DELIM_CAPTURE);
-						
+
 			$level = 0;
 			$count = -1;
 			$indiv = false;
@@ -247,13 +247,13 @@ $LastChangedRevision$
 			return array($html_array,join('',$thediv),$start_pos,$stop_pos);
 		}
 	}
-	
+
 // -------------------------------------------------------------
 	#deprecated
 	function div_save()
 	{
 		extract(gpsa(array('html_array','html','start_pos','stop_pos','name')));
-		
+
 		$html_array = unserialize($html_array);
 
 		$repl_array = preg_split("/(<.*>)/U", $html, -1, PREG_SPLIT_DELIM_CAPTURE);

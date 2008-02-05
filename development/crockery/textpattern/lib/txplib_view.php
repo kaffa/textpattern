@@ -192,7 +192,7 @@ class TxpDetailView {
 	function i_hidden($name, $value='') {
 		return hInput($name, $value);
 	}
-	
+
 	function label($name, $opts=array()) {
 		return '<label for="'.$name.'" class="'.$this->_class($opts).'">'.gTxt($name).'</label>';
 	}

@@ -12,29 +12,29 @@ class txpXmlParser {
 
 	var $xml;
 	var $result;
-  
+
 	function txpXmlParser() {
 
 		$this->xml = xml_parser_create('UTF-8');
 		xml_parser_set_option($this->xml,XML_OPTION_CASE_FOLDING, 0);
 		xml_set_object($this->xml,$this);
-		xml_set_character_data_handler($this->xml, 'dataHandler');   
+		xml_set_character_data_handler($this->xml, 'dataHandler');
 		xml_set_element_handler($this->xml, "startHandler", "endHandler");
 		xml_set_default_handler($this->xml, 'defaultHandler');
 	}
-  
-  
+
+
 	function parse($data, $is_final=true) {
 		// this works with partial data - use $is_final=false
-		
+
 		if (!xml_parse($this->xml, $data, $is_final)) {
 			trigger_error(sprintf("XML error: %s at line %d",
 				xml_error_string(xml_get_error_code($this->xml)),
 				xml_get_current_line_number($this->xml)));
 				xml_parser_free($this->xml);
 		}
-	
-		if ($is_final)	
+
+		if ($is_final)
 			return $this->result;
 
 		// return partial data and reset
@@ -154,7 +154,7 @@ class txpBackupParser extends txpXmlParser {
 	function xml_restore_backup($xml, $tables=array())
 	{
 		$data = xml_restore_decode($xml);
-	
+
 		// Assume all tables if none are specified
 		if (empty($tables))
 			$tables = safe_table_list();

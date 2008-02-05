@@ -8,7 +8,7 @@ $LastChangedRevision$
 */
 
 // -------------------------------------------------------------
-	function section_add($parent, $name, $atts) 
+	function section_add($parent, $name, $atts)
 	{
 		$rec = lAtts(array(
 			'path' => '',
@@ -25,7 +25,7 @@ $LastChangedRevision$
 
 		$default = section_default();
 
-		if (empty($rec['parent'])) 
+		if (empty($rec['parent']))
 			$rec['parent'] = $default['id'];
 		if (empty($rec['name']))
 			$rec['name'] = dumbDown($rec['title']);
@@ -34,7 +34,7 @@ $LastChangedRevision$
 			// find the closest ancestor
 			// we do this at insert to save time when fetching pages
 			$ancestor = section_inherit($parent);
-	
+
 			$rec['page']         = $ancestor['page'];
 			$rec['css']          = $ancestor['css'];
 			$rec['in_rss']       = $ancestor['in_rss'];
@@ -57,7 +57,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 // delete a single section (keeping children intact)
-	function section_del($id) 
+	function section_del($id)
 	{
 		$s = safe_row('*', 'txp_section', "id='".doSlash($id)."'");
 		// can't delete the default section
@@ -83,7 +83,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 // delete an entire branch, children and all
-	function section_prune($id) 
+	function section_prune($id)
 	{
 		$s = safe_row('*', 'txp_section', "id='".doSlash($id)."'");
 		// can't delete the default section
@@ -97,7 +97,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function section_update($id, $atts) 
+	function section_update($id, $atts)
 	{
 		$old = safe_row('*', 'txp_section', "id='".doSlash($id)."'");
 		if (!$old)
@@ -107,7 +107,7 @@ $LastChangedRevision$
 
 		$default = section_default();
 
-		if (empty($rec['parent'])) 
+		if (empty($rec['parent']))
 			$rec['parent'] = $default['id'];
 		if (empty($rec['name']))
 			$rec['name'] = dumbDown($rec['title']);
@@ -121,7 +121,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function section_default() 
+	function section_default()
 	{
 		static $def;
 		if ($def)
@@ -131,7 +131,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function section_resolve_inheritance($root) 
+	function section_resolve_inheritance($root)
 	{
 		// trickle settings down to the specified node and any children
 		// that have inherit set to 1
@@ -151,7 +151,7 @@ $LastChangedRevision$
 	}
 
 // -------------------------------------------------------------
-	function section_inherit($id) 
+	function section_inherit($id)
 	{
 		// find the closest ancestor of $id that has inheret == 0
 		$from = safe_row('*', 'txp_section', "id='".doSlash($id)."'");

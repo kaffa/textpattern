@@ -461,7 +461,7 @@ $GLOBALS['txp_err_count'] = 0;
 foreach ($create_sql as $query)
 {
 	$result = $DB->query($query);
-	if (!$result) 
+	if (!$result)
 	{
 		$GLOBALS['txp_err_count']++;
 		echo "<b>".$GLOBALS['txp_err_count'].".</b> ".$DB->lasterror()."<br />\n";
@@ -498,7 +498,7 @@ if (!$client->query('tups.getLanguage',$prefs['blog_uid'],$lang))
 	$response = $client->getResponse();
 	$lang_struct = unserialize($response);
 	if (MDB_TYPE == 'pdo_sqlite') {
-		
+
 		$stmt = $DB->prepare("INSERT INTO ".PFX."txp_lang (lang,name,event,data,lastmod) VALUES ('$lang', ?, ?, ?, ?)");
 		foreach ($lang_struct as $item){
 			$stmt->execute(array_values($item));
@@ -506,11 +506,11 @@ if (!$client->query('tups.getLanguage',$prefs['blog_uid'],$lang))
 	}else{
 		foreach ($lang_struct as $item)
 		{
-			foreach ($item as $name => $value) 
+			foreach ($item as $name => $value)
 				$item[$name] = addslashes($value);
 				$DB->query("INSERT /* DELAYED */ INTO `".PFX."txp_lang` SET lang='".LANG."', name='".$item['name']."', event='".$item['event']."', data='".$item['data']."', lastmod='".strftime('%Y-%m-%d %H:%M:%S',$item['uLastmod'])."'");
 		}
-	}		
+	}
 }
 
 ?>

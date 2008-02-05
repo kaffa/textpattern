@@ -102,11 +102,11 @@ class ZemAdminController {
 	{
 		pagetop(gTxt($this->caption));
 	}
-	
+
 	function _pagebottom()
 	{
 	}
-	
+
 	function _render($out) {
 		$this->_pagetop();
 
@@ -215,7 +215,7 @@ class ZemAdminController {
 		, '', '', 'post', 'pageby-form');
 	}
 
-	
+
 // -------------------------------------------------------------
 // default post handler for pageby form
 	function change_pageby_post()
@@ -247,7 +247,7 @@ function register_controller($classname, $event) {
 
 function controller_name($event) {
 	global $txp_controllers;
-	
+
 	return @$txp_controllers[$event];
 }
 

@@ -139,7 +139,7 @@ $LastChangedRevision$
 					$pop = @array_pop($stack);
 					if (!$pop or $pop[2] != $m[2])
 						trigger_error(gTxt('parse_tag_mismatch', array('code', $chunk)));
-					
+
 					if (empty($stack)) {
 						$out .= processTags(array($m[0], $tag[2], $tag[3], '', $inside));
 						$inside = '';
