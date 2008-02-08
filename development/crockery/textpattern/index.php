@@ -128,14 +128,14 @@ $LastChangedRevision$
 		else 
 			require_privs($event);
 
+		callback_event($event, $step, 1);
+
 		// let elements override older /include/txp_foo.php admin pages
 		if (!controller_name($event)) {
 			$inc = txpath . '/include/txp_'.$event.'.php';
 			if (is_readable($inc))
 				include($inc);
 		}
-
-		callback_event($event, $step, 1);
 
 		callback_event($event, $step, 0);
 
