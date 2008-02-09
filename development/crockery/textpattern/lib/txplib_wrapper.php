@@ -399,6 +399,18 @@ class TXP_Wrapper
 
 		extract($prefs);
 
+		if (!empty($incoming['Section']) && !$this->getSection($incoming['Section'])) {
+			return false;
+		}
+
+		if (!empty($incoming['Category1']) && !$this->getCategory($incoming['Category1'])) {
+			return false;
+		}
+
+		if (!empty($incoming['Category2']) && !$this->getCategory($incoming['Category2'])) {
+			return false;
+		}
+
 		if ($article_id!==null) {
 			$article_id = assert_int($article_id);
 		}
