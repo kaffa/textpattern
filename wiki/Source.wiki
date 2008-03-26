@@ -1,0 +1,14 @@
+[http://code.google.com/p/textpattern-cms/source/browse Browse]
+[http://code.google.com/p/textpattern-cms/source/list Changes]
+
+== Checkout ===
+
+Non-members may check out a read-only working copy anonymously over HTTP.
+
+Dev branch:
+
+{{{svn checkout http://textpattern-cms.googlecode.com/svn/development/4.0 dev}}}
+
+Crockery branch:
+
+{{{svn checkout http://textpattern-cms.googlecode.com/svn/development/crockery crockery}}}
