@@ -1,0 +1,4 @@
+*Please report all security issues by email to security at textpattern dot com; do not post them here*.
+
+  * [http://code.google.com/p/textpattern-cms/issues/entry New Issue]
+  * [http://code.google.com/p/textpattern-cms/issues/list View Issues]
