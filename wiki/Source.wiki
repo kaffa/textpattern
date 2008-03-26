@@ -1,14 +1,16 @@
-[http://code.google.com/p/textpattern-cms/source/browse Browse]
-[http://code.google.com/p/textpattern-cms/source/list Changes]
+  * [http://code.google.com/p/textpattern-cms/source/browse Browse the Subversion repository]
+  * [http://code.google.com/p/textpattern-cms/source/list View changesets]
 
 == Checkout ===
 
-Non-members may check out a read-only working copy anonymously over HTTP.
-
 Dev branch:
 
-{{{svn checkout http://textpattern-cms.googlecode.com/svn/development/4.0 dev}}}
+{{{
+svn checkout http://textpattern-cms.googlecode.com/svn/development/4.0 dev
+}}}
 
 Crockery branch:
 
-{{{svn checkout http://textpattern-cms.googlecode.com/svn/development/crockery crockery}}}
+{{{
+svn checkout http://textpattern-cms.googlecode.com/svn/development/crockery crockery
+}}}
