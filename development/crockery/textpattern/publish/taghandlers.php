@@ -887,12 +887,7 @@ $LastChangedRevision$
 							'title'  => $title,
 							'url'    => pagelinkurl(array('s' => $section, 'c' => $name)),
 						);
-
-						if (empty($form)) {
-							$out[] = parse($thing);
-						} else {
-							$out[] = parse_form($form);
-						}
+						$out[] = (empty($thing)) ? parse_form($form) : parse($thing);
 					}
 				}
 			}
@@ -1031,12 +1026,7 @@ $LastChangedRevision$
 						'url'    => pagelinkurl(array('s' => $name)),
 						'parent' => $parent
 					);
-
-					if (empty($form)) {
-						$out[] = parse($thing);
-					} else {
-						$out[] = parse_form($form);
-					}
+					$out[] = (empty($thing)) ? parse_form($form) : parse($thing);
 				}
 			}
 			$thissection = $old_section;
