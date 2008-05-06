@@ -18,12 +18,17 @@ $plugin['version'] = '0.1';
 $plugin['author'] = 'Alex Shiels';
 $plugin['author_uri'] = 'http://thresholdstate.com/';
 $plugin['description'] = 'Short description';
+// Plugin load order:
+// The default value of 5 would fit most plugins, while for instance comment spam evaluators or URL redirectors
+// would probably want to run earlier (1...4) to prepare the environment for everything else that follows.
+// Orders 6...9 should be considered for plugins which would work late. This order is user-overrideable.
+$plugin['order'] = 5;
 
 // Plugin types:
 // 0 = regular plugin; loaded on the public web side only
 // 1 = admin plugin; loaded on both the public and admin side
 // 2 = library; loaded only when include_plugin() or require_plugin() is called
-$plugin['type'] = 0; 
+$plugin['type'] = 0;
 
 if (!defined('txpinterface'))
 	@include_once('zem_tpl.php');
