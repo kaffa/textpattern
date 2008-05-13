@@ -1,16 +1,16 @@
-  * [http://code.google.com/p/textpattern-cms/source/browse Browse the Subversion repository]
-  * [http://code.google.com/p/textpattern-cms/source/list View changesets]
+  * [http://code.google.com/p/textpattern/source/browse Browse the Subversion repository]
+  * [http://code.google.com/p/textpattern/source/list View changesets]
 
 == Checkout ===
 
 Dev branch:
 
 {{{
-svn checkout http://textpattern-cms.googlecode.com/svn/development/4.0 dev
+svn checkout http://textpattern.googlecode.com/svn/development/4.0 dev
 }}}
 
 Crockery branch:
 
 {{{
-svn checkout http://textpattern-cms.googlecode.com/svn/development/crockery crockery
+svn checkout http://textpattern.googlecode.com/svn/development/crockery crockery
 }}}
