@@ -24,10 +24,11 @@ $plugin['description'] = 'Short description';
 // Orders 6...9 should be considered for plugins which would work late. This order is user-overrideable.
 $plugin['order'] = 5;
 
-// Plugin types:
-// 0 = regular plugin; loaded on the public web side only
-// 1 = admin plugin; loaded on both the public and admin side
-// 2 = library; loaded only when include_plugin() or require_plugin() is called
+// Plugin 'type' defines where the plugin is loaded
+// 0 = public       : only on the public side of the website (default)
+// 1 = public+admin : on both the public and admin side      
+// 2 = library      : only when include_plugin() or require_plugin() is called
+// 3 = admin        : only on the admin side
 $plugin['type'] = 0;
 
 if (!defined('txpinterface'))
