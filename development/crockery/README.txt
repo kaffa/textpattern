@@ -1,5 +1,5 @@
 Textpattern Crockery
-Released under the BSD License
+Released under the GNU General Public License
 
 == WARNING ==
 
