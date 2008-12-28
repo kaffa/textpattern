@@ -7,29 +7,35 @@
 // $ php abc_myplugin.php > abc_myplugin-0.1.txt
 
 // Plugin name is optional.  If unset, it will be extracted from the current
-// file name. Uncomment and edit this line to override:
+// file name. Plugin names should start with a three letter prefix which is
+// unique and reserved for each plugin author ('abc' is just an example).
+// Uncomment and edit this line to override:
 # $plugin['name'] = 'abc_plugin';
 
+// Allow raw HTML help, as opposed to Textile.
 // 0 = Plugin help is in Textile format, no raw HTML allowed (default).
 // 1 = Plugin help is in raw HTML.  Not recommended.
-# $plugin['allow_html_help'] = 1;
+# $plugin['allow_html_help'] = 0;
 
 $plugin['version'] = '0.1';
 $plugin['author'] = 'Alex Shiels';
 $plugin['author_uri'] = 'http://thresholdstate.com/';
-$plugin['description'] = 'Short description';
+$plugin['description'] = 'Short description (max 255 chars)';
+
 // Plugin load order:
-// The default value of 5 would fit most plugins, while for instance comment spam evaluators or URL redirectors
-// would probably want to run earlier (1...4) to prepare the environment for everything else that follows.
-// Orders 6...9 should be considered for plugins which would work late. This order is user-overrideable.
-$plugin['order'] = 5;
+// The default value of 5 would fit most plugins, while for instance comment
+// spam evaluators or URL redirectors would probably want to run earlier
+// (1...4) to prepare the environment for everything else that follows.
+// Values 6...9 should be considered for plugins which would work late.
+// This order is user-overrideable.
+# $plugin['order'] = 5;
 
 // Plugin 'type' defines where the plugin is loaded
 // 0 = public       : only on the public side of the website (default)
-// 1 = public+admin : on both the public and admin side      
+// 1 = public+admin : on both the public and admin side
 // 2 = library      : only when include_plugin() or require_plugin() is called
 // 3 = admin        : only on the admin side
-$plugin['type'] = 0;
+# $plugin['type'] = 0;
 
 if (!defined('txpinterface'))
 	@include_once('zem_tpl.php');
@@ -37,6 +43,7 @@ if (!defined('txpinterface'))
 if (0) {
 ?>
 # --- BEGIN PLUGIN HELP ---
+
 h1. Textile-formatted help goes here
 
 # --- END PLUGIN HELP ---
