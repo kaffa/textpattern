@@ -15,6 +15,12 @@ $plugin['version'] = '0.1';
 $plugin['author'] = 'Threshold State';
 $plugin['author_uri'] = 'http://thresholdstate.com/';
 $plugin['description'] = 'Simple plugin examples';
+// Plugin load order:
+// The default value of 5 would fit most plugins, while for instance comment spam evaluators or URL redirectors
+// would probably want to run earlier (1...4) to prepare the environment for everything else that follows.
+// Orders 6...9 should be considered for plugins which would work late. This order is user-overrideable.
+$plugin['order'] = 5;
+
 // Plugin 'type' defines where the plugin is loaded
 // 0 = public       : only on the public side of the website (default)
 // 1 = public+admin : on both the public and admin side
