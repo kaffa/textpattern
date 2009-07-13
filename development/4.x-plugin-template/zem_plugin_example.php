@@ -37,6 +37,14 @@ $plugin['description'] = 'Simple plugin examples';
 // 3 = admin        : only on the admin side
 $plugin['type'] = 1;
 
+// Plugin 'flags' signal the presence of optional capabilities to the core plugin loader.
+// Use an appropriately OR-ed combination of these flags.
+// The four high-order bits 0xf000 are available for this plugin's private use. 
+define('PLUGIN_HAS_PREFS', 0x0001);			// This plugin wants to receive "plugin_prefs.{$plugin['name']}" events
+define('PLUGIN_LIFECYCLE_NOTIFY', 0x0002); 	// This plugin wants to receive "plugin_lifecycle.{$plugin['name']}" events
+
+$plugin['flags'] = PLUGIN_HAS_PREFS | PLUGIN_LIFECYCLE_NOTIFY;
+
 if (!defined('txpinterface'))
 	@include_once('zem_tpl.php');
 
@@ -106,6 +114,8 @@ h1. Textile-formatted help goes here
 
 		// 'zem_admin_test' will be called to handle the new event
 		register_callback("zem_admin_test", $myevent);
+		// 'zem_admin_test_lifecycle' will be called on plugin installation, activation, disactivation, and deletion
+		register_callback("zem_admin_test_lifecycle", "plugin_lifecycle.zem_plugin_example");
 	}
 
 	function zem_admin_test($event, $step) {
@@ -126,6 +136,14 @@ h1. Textile-formatted help goes here
 			," style=\"text-align:center\"")
 		);
 		echo "</div>";
+	}
+
+	// Act upon activation/deactivation, installtion/deletion.
+	// $event will be "plugin_lifecycle.zem_plugin_example"
+	// $step will be one of "installed", "enabled", disabled", and "deleted"
+	function zem_admin_test_lifecycle($event, $step) {
+		// View source to see the output
+		echo comment("$event $step").n;
 	}
 
 # --- END PLUGIN CODE ---
