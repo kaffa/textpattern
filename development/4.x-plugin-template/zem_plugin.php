@@ -37,6 +37,14 @@ $plugin['description'] = 'Short description (max 255 chars)';
 // 3 = admin        : only on the admin side
 # $plugin['type'] = 0;
 
+// Plugin 'flags' signal the presence of optional capabilities to the core plugin loader.
+// Use an appropriately OR-ed combination of these flags.
+// The four high-order bits 0xf000 are available for this plugin's private use. 
+define('PLUGIN_HAS_PREFS', 0x0001);			// This plugin wants to receive "plugin_prefs.{$plugin['name']}" events
+define('PLUGIN_LIFECYCLE_NOTIFY', 0x0002); 	// This plugin wants to receive "plugin_lifecycle.{$plugin['name']}" events
+
+# $plugin['flags'] = PLUGIN_HAS_PREFS | PLUGIN_LIFECYCLE_NOTIFY;
+
 if (!defined('txpinterface'))
 	@include_once('zem_tpl.php');
 
