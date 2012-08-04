@@ -32,9 +32,11 @@ $plugin['description'] = 'Simple plugin examples';
 
 // Plugin 'type' defines where the plugin is loaded
 // 0 = public       : only on the public side of the website (default)
-// 1 = public+admin : on both the public and admin side
+// 1 = public+admin : on both the public and non-AJAX admin side
 // 2 = library      : only when include_plugin() or require_plugin() is called
-// 3 = admin        : only on the admin side
+// 3 = admin        : only on the non-AJAX admin side
+// 4 = admin+ajax   : only on admin side
+// 5 = public+admin+ajax   : on both the public and admin side
 $plugin['type'] = 1;
 
 // Plugin 'flags' signal the presence of optional capabilities to the core plugin loader.
