@@ -1,4 +1,4 @@
-#@version 4.5.1;1345723006
+#@version 4.5.2;1349532963
 #@admin
 add_new_author => Add new author
 and_mailed_to => and mailed to
@@ -163,6 +163,7 @@ changecomments => Change comments
 changeparent => Change parent
 changesection => Change section
 changestatus => Change status
+close => Close
 comment => Comment
 comments_expired => Commenting has expired for this article.
 confirm_delete_popup => Really delete?
@@ -176,7 +177,7 @@ deleteforce => Force delete
 delete_selected => Delete selected
 descending => Descending
 description => Description
-detail_toggle => Show detail
+detail_toggle => Show more detail
 draft => Draft
 el-gr => Ελληνικά
 en-gb => English (Great Britain)
@@ -252,6 +253,7 @@ tab_file => Files
 tab_forms => Forms
 tab_image => Images
 tab_import => Import
+tab_languages => Languages
 tab_link => Links
 tab_list => Articles
 tab_logs => Visitor logs
@@ -874,6 +876,7 @@ list_links => list links
 live => Live
 lowercase => lowercase
 lt-lt => Lietuvių
+main_content => Main content
 manual => Manual
 matching_search_request => matching your search request
 message => Message
@@ -934,6 +937,7 @@ selected => Selected
 site => Site
 sitename => Site name
 siteurl => Site URL
+skip_to_main_content => Skip to main content
 sp-rs => Srpski
 sr-rs => Српски
 status => Status
