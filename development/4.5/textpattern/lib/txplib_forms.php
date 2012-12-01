@@ -145,7 +145,7 @@ $LastChangedRevision$
 					$required = false)
 	{
 		$o  = '<input type="'.$type.'"';
-		$o .= ' value="'.txpspecialchars($value).'"';
+		$o .= ($type == 'file' || $type == 'image') ? '' : ' value="'.txpspecialchars($value).'"';
 		$o .= strlen($name)? ' name="'.$name.'"' : '';
 		$o .= ($size)     ? ' size="'.$size.'"' : '';
 		$o .= ($class)    ? ' class="'.$class.'"' : '';
