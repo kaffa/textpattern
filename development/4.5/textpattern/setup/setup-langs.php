@@ -1,6 +1,6 @@
 <?php
 
-// Generated: 04 Dec 2012, 05:12:38 GMT
+// Generated: 05 Dec 2012, 08:47:54 GMT
 
 $langs = array(
 	'ar-dz' => array(
