@@ -310,7 +310,7 @@ $LastChangedRevision$
 
 // -------------------------------------------------------------
 
-	function yield()
+	function tpt_yield()
 	{
 		global $yield;
 

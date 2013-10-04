@@ -416,7 +416,7 @@ function processTags($tag, $atts, $thing = NULL)
 		}
 	}
 
-	if ($tag === 'link')
+	if ($tag === 'link' || $tag === 'yield')
 	{
 		$tag = 'tpt_'.$tag;
 	}
