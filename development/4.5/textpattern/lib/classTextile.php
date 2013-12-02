@@ -9,18 +9,13 @@
  */
 
 /*
-$HeadURL$
-$LastChangedRevision$
-*/
-
-/*
 
 _____________
 T E X T I L E
 
 A Humane Web Text Generator
 
-Version 2.4.1
+Version 2.4.2
 
 Copyright (c) 2003-2004, Dean Allen <dean@textism.com>
 All rights reserved.
@@ -383,7 +378,7 @@ class Textile
 	var $hu = '';
 	var $max_span_depth = 5;
 
-	var $ver = '2.4.1';
+	var $ver = '2.4.2';
 	var $rev = '$Rev$';
 
 	var $doc_root;
@@ -848,7 +843,7 @@ class Textile
 				$atts = $this->pba($atts);
 
 				preg_match( "/^(.*?)[\s]*:=(.*?)[\s]*(=:|:=)?[\s]*$/s", $content, $xm );
-				list( , $term, $def, ) = $xm;
+				list( , $term, $def, ) = array_pad($xm, 3, '');
 				$term = trim( $term );
 				$def  = trim( $def, ' ' );
 
@@ -1315,7 +1310,7 @@ class Textile
 		if( !empty($this->notes) ) {
 			$o = array();
 			foreach( $this->notes as $label=>$info ) {
-				$i = @$info['seq'];
+				$i = isset($info['seq']) ? $info['seq'] : '';
 				if( !empty($i) ) {
 					$info['seq'] = $label;
 					$o[$i] = $info;
@@ -1411,7 +1406,7 @@ class Textile
 	{
 		list(, $label, $link, $att, $content) = $m;
 		# Assign an id if the note reference parse hasn't found the label yet.
-		$id = @$this->notes[$label]['id'];
+		$id = isset($this->notes[$label]['id']) ? $this->notes[$label]['id'] : '';
 		if( !$id )
 			$this->notes[$label]['id'] = uniqid(rand());
 
@@ -1452,7 +1447,7 @@ class Textile
 		$nolink = ($nolink === '!');
 
 		# Assign a sequence number to this reference if there isn't one already...
-		$num = @$this->notes[$label]['seq'];
+		$num = isset($this->notes[$label]['seq']) ? $this->notes[$label]['seq'] : '';
 		if( !$num )
 			$num = $this->notes[$label]['seq'] = ($this->note_index++);
 
@@ -1461,7 +1456,7 @@ class Textile
 		$this->notes[$label]['refids'][] = $refid = uniqid(rand());
 
 		# If we are referencing a note that hasn't had the definition parsed yet, then assign it an ID...
-		$id = @$this->notes[$label]['id'];
+		$id = isset($this->notes[$label]['id']) ? $this->notes[$label]['id'] : '';
 		if( !$id )
 			$id = $this->notes[$label]['id'] = uniqid(rand());
 
@@ -1484,8 +1479,8 @@ class Textile
 	 **/
 	function parseURI( $uri, &$m )
 	{
-		$r = "@^((?P<scheme>[^:/?#]+):)?(//(?P<authority>[^/?#]*))?(?P<path>[^?#]*)(\?(?P<query>[^#]*))?(#(?P<fragment>.*))?@";
-		#       12                      3  4                       5               6  7                 8 9
+		$r = "@^((?<scheme>[^:/?#]+):)?(//(?<authority>[^/?#]*))?(?<path>[^?#]*)(\?(?<query>[^#]*))?(#(?<fragment>.*))?@";
+		#       12                     3  4                      5              6  7                8 9
 		#
 		#	scheme    = $2
 		#	authority = $4
@@ -1755,14 +1750,14 @@ class Textile
 // -------------------------------------------------------------
 	function fCode($m)
 	{
-		@list(, $before, $text, $after) = $m;
+		list(, $before, $text, $after) = array_pad($m, 4, '');
 		return $before.$this->shelve('<code>'.$this->r_encode_html($text).'</code>').$after;
 	}
 
 // -------------------------------------------------------------
 	function fPre($m)
 	{
-		@list(, $before, $text, $after) = $m;
+		list(, $before, $text, $after) = array_pad($m, 4, '');
 		return $before.'<pre>'.$this->shelve($this->r_encode_html($text)).'</pre>'.$after;
 	}
 
@@ -1833,7 +1828,7 @@ class Textile
 	function fSpecial($m)
 	{
 		// A special block like notextile or code
-		@list(, $before, $text, $after) = $m;
+		list(, $before, $text, $after) = array_pad($m, 4, '');
 		return $before.$this->shelve($this->encode_html($text)).$after;
 	}
 
@@ -1848,7 +1843,7 @@ class Textile
 // -------------------------------------------------------------
 	function fTextile($m)
 	{
-		@list(, $before, $notextile, $after) = $m;
+		list(, $before, $notextile, $after) = array_pad($m, 4, '');
 		#$notextile = str_replace(array_keys($modifiers), array_values($modifiers), $notextile);
 		return $before.$this->shelve($notextile).$after;
 	}
@@ -1856,13 +1851,14 @@ class Textile
 // -------------------------------------------------------------
 	function footnoteRef($text)
 	{
-		return preg_replace('/(?<=\S)\[([0-9]+)([\!]?)\](\s)?/Ue',
-			'$this->footnoteID(\'\1\',\'\2\',\'\3\')', $text);
+		return preg_replace_callback('/(?<=\S)\[([0-9]+)([\!]?)\](\s)?/U', array(&$this, 'footnoteID'), $text);
 	}
 
 // -------------------------------------------------------------
-	function footnoteID($id, $nolink, $t)
+	function footnoteID($m)
 	{
+		list(, $id, $nolink, $t) = array_pad($m, 4, '');
+
 		$backref = ' ';
 		if (empty($this->fn[$id])) {
 			$this->fn[$id] = $a = uniqid(rand());
