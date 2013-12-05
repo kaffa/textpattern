@@ -2141,9 +2141,10 @@ function escape_js($js)
 			$user_name = 'user_name = \''.doSlash($txp_user).'\'';
 		}
 
+		$name = doSlash($name);
 		$val = doSlash($val);
 		$event = doSlash($event);
-		$type = doSlash($type);
+		$type = (int) $type;
 		$html = doSlash($html);
 		$position = (int) $position;
 
