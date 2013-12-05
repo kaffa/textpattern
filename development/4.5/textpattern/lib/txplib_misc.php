@@ -2160,7 +2160,7 @@ function escape_js($js)
 				prefs_id = 1"
 			);
     	} else {
-        	return safe_update('txp_prefs', "val = '$val'","name like '$name'" . ($user_name ? " AND $user_name" : ''));
+        	return safe_update('txp_prefs', "val = '$val'","name = '$name'" . ($user_name ? " AND $user_name" : ''));
     	}
 	}
 
