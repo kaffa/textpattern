@@ -2132,7 +2132,6 @@ function escape_js($js)
 	function set_pref($name, $val, $event='publish',  $type=0, $html='text_input', $position=0, $is_private=PREF_GLOBAL)
 	{
 		global $txp_user;
-		extract(doSlash(func_get_args()));
 
 		$user_name = '';
 		if ($is_private == PREF_PRIVATE) {
@@ -2141,6 +2140,12 @@ function escape_js($js)
 
 			$user_name = 'user_name = \''.doSlash($txp_user).'\'';
 		}
+
+		$val = doSlash($val);
+		$event = doSlash($event);
+		$type = doSlash($type);
+		$html = doSlash($html);
+		$position = (int) $position;
 
 		if (!safe_row('name', 'txp_prefs', "name = '$name'" . ($user_name ? " AND $user_name" : ''))) {
 			$user_name = ($user_name ? "$user_name," : '');
