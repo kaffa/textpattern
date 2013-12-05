@@ -755,7 +755,7 @@ $en_gb_lang = array(
 		'show_comment_count_in_feed' => 'Show comment count in feeds?',
 		'site_prefs' => 'Basic',
 		'smtp_from' => 'SMTP envelope sender address',
-		'spam_blacklists' => 'Spam blacklists (comma-separated)',
+		'spam_blacklists' => 'Spam blocklists (comma-separated)',
 		'syndicate_body_or_excerpt' => 'Syndicate article excerpt <strong>only</strong>?',
 		'tempdir' => 'Temporary directory path',
 		'textile_links' => 'Textile link descriptions by default?',
@@ -988,7 +988,7 @@ $en_gb_lang = array(
 		'while_parsing_page_form' => 'while parsing form <strong>{form}</strong> on page <strong>{page}</strong>',
 		'yes' => 'Yes',
 		'your_branch_is_updated' => 'You have the most up-to-date version of this Textpattern branch.',
-		'your_ip_is_blacklisted_by' => 'Your IP address has been blacklisted by',
+		'your_ip_is_blacklisted_by' => 'Your IP address has been blocklisted by',
 		'you_have_been_banned' => 'You have been banned from commenting.',
 		'yyyy-mm' => 'yyyy-mm',
 	),
@@ -1256,5 +1256,5 @@ $en_gb_lang = array(
 		'wraptag' => 'Wrap tag',
 	)
 );
-$lastmod = gmdate('Y-m-d H:m:s',1380023390);
+$lastmod = gmdate('Y-m-d H:m:s',1382613505);
 ?>
