@@ -10,3 +10,6 @@
 
 	// Store IPv6 properly in logs.
 	safe_alter('txp_log', "MODIFY ip VARCHAR(45) NOT NULL default ''");
+
+	// Save sections correctly in articles.
+	safe_alter('textpattern', "MODIFY Section VARCHAR(128) NOT NULL default ''");
