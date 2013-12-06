@@ -5,6 +5,8 @@ Changes in 4.5.6
 * Fixed: <txp:link_to_prev>, <txp:link_to_next>, <txp:prev_title>, and <txp:next_title> tags for certain combinations with <txp:article_custom>.
 * Fixed: SQL statement escaping in set_pref().
 * Fixed: Situations where set_pref() could corrupt the preference table if the string name contained '%' or '_' characters.
+* Fixed: Save comment emails of any valid length properly.
+* Fixed: Visitor logs support IPv6.
 
 Changes in 4.5.5
 
