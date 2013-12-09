@@ -1,4 +1,4 @@
-Changes in 4.5.6
+Changes in 4.5.7
 
 * Maintenance release with bug fixes, no security implications.
 * Textile v2.4.3 resolves PHP 5.5 compatibility issues.
@@ -8,6 +8,10 @@ Changes in 4.5.6
 * Fixed: Save comment emails of any valid length properly.
 * Fixed: Visitor logs support IPv6.
 * Fixed: Articles can be assigned to sections with names longer than 64 characters.
+
+Changes in 4.5.6
+
+* Skipped due to broken update path for SVN users.
 
 Changes in 4.5.5
 
