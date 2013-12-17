@@ -2,6 +2,7 @@ Changes in 4.5.7
 
 * Maintenance release with bug fixes, no security implications.
 * Textile v2.4.3 resolves PHP 5.5 compatibility issues.
+* Updated default site theme.
 * Fixed: <txp:link_to_prev>, <txp:link_to_next>, <txp:prev_title>, and <txp:next_title> tags for certain combinations with <txp:article_custom>.
 * Fixed: SQL statement escaping in set_pref().
 * Fixed: Situations where set_pref() could corrupt the preference table if the string name contained '%' or '_' characters.
