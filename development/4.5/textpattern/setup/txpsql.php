@@ -177,7 +177,7 @@ $create_sql[] = "CREATE TABLE `".PFX."txp_file` (
 ) $tabletype PACK_KEYS=0 AUTO_INCREMENT=1 ";
 
 $create_sql[] = "CREATE TABLE `".PFX."txp_form` (
-  `name` varchar(64) NOT NULL,
+  `name` varchar(64) NOT NULL default '',
   `type` varchar(28) NOT NULL default '',
   `Form` text NOT NULL,
   PRIMARY KEY (`name`)
@@ -256,7 +256,7 @@ $create_sql[] = "CREATE TABLE `".PFX."txp_log` (
 ) $tabletype AUTO_INCREMENT=77 ";
 
 $create_sql[] = "CREATE TABLE `".PFX."txp_page` (
-  `name` varchar(128) NOT NULL,
+  `name` varchar(128) NOT NULL default '',
   `user_html` text NOT NULL,
   PRIMARY KEY (`name`)
 ) $tabletype PACK_KEYS=1";
@@ -283,8 +283,8 @@ $create_sql[] = "CREATE TABLE `".PFX."txp_plugin` (
 ) $tabletype ";
 
 $create_sql[] = "CREATE TABLE `".PFX."txp_prefs` (
-  `prefs_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `prefs_id` int(11) NOT NULL default '1',
+  `name` varchar(255) NOT NULL default '',
   `val` varchar(255) NOT NULL default '',
   `type` smallint(5) unsigned NOT NULL default '2',
   `event` varchar(12) NOT NULL default 'publish',
@@ -386,7 +386,7 @@ $create_sql[] = "INSERT INTO `".PFX."txp_prefs` VALUES (1, 'version', '1.0rc4', 
 $create_sql[] = "INSERT INTO `".PFX."txp_prefs` VALUES (1, 'doctype', 'html5', 0, 'publish', 'doctypes', 190, '')";
 
 $create_sql[] = "CREATE TABLE `".PFX."txp_section` (
-  `name` varchar(128) NOT NULL,
+  `name` varchar(128) NOT NULL default '',
   `page` varchar(128) NOT NULL default '',
   `css` varchar(128) NOT NULL default '',
   `is_default` int(2) NOT NULL default '0',
