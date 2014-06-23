@@ -867,8 +867,7 @@ $LastChangedRevision$
 			description = '$description',
 			status = '$status',
 			size = '$size',
-			modified = now(),
-			author = '".doSlash($txp_user)."'"
+			modified = now()"
 			.($created ? ", created = $created" : '')
 		, "id = $id");
 
