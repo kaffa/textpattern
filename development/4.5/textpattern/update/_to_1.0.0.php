@@ -132,7 +132,7 @@ $LastChangedRevision$
 			extract($a);
 			if (!$nonce){
 				$nonce = md5( uniqid( rand(), true ) );
-				safe_update('txp_users',"nonce='$nonce'", "name = '$name'");
+				safe_update('txp_users',"nonce='$nonce'", "name = '".doSlash($name)."'");
 			}
 		}
 	}
@@ -228,6 +228,7 @@ eod;
 		while ($a = mysql_fetch_array($rs)){
 			extract($a);
 			$url_title = addslashes(stripSpace($Title,1));
+			assert_int($ID);
 			safe_update("textpattern","url_title = '$url_title'","ID=$ID");
 		}
 
@@ -297,7 +298,7 @@ eod;
 		$old_offset = safe_field('val', 'txp_prefs', "name='timeoffset'");
 		$serveroffset = gmmktime(0,0,0) - mktime(0,0,0);
 		$gmtoffset = sprintf("%+d", $serveroffset + $old_offset);
-		safe_insert('txp_prefs',"prefs_id=1,name='gmtoffset',val='$gmtoffset'");
+		safe_insert('txp_prefs',"prefs_id=1,name='gmtoffset',val='".doSlash($gmtoffset)."'");
 	}
 
 	$tempdir = doSlash(find_temp_dir());
@@ -382,9 +383,10 @@ eod;
 	$textile = new Textile();
 	while ($a = @mysql_fetch_assoc($rs)){
 		extract($a);
+		assert_int($ID);
 		$lite = ($textile_excerpt)? '' : 1;
 		$Excerpt_html = $textile->TextileThis($Excerpt,$lite);
-		safe_update("textpattern","Excerpt_html = '$Excerpt_html'","ID=$ID");
+		safe_update("textpattern","Excerpt_html = '".doSlash($Excerpt_html)."'","ID=$ID");
 	}
 
 	//1.0 feed unique ids
@@ -397,7 +399,7 @@ eod;
 	if (safe_field('name','txp_prefs',"name='blog_mail_uid'") === false)
 	{
 		$mail = safe_field('email', 'txp_users', "privs='1' LIMIT 1");
-		safe_insert('txp_prefs',"name='blog_mail_uid', val='$mail', prefs_id='1'");
+		safe_insert('txp_prefs',"name='blog_mail_uid', val='".doSlash($mail)."', prefs_id='1'");
 	}
 	if (safe_field('val','txp_prefs',"name='blog_time_uid'") === false)
 	{
@@ -414,8 +416,9 @@ eod;
 		{
 			while ($a = nextRow($rs))
 			{
+				assert_int($a['ID']);
 				$feed_time = substr($a['Posted'],0,10);
-				safe_update('textpattern',"uid='".md5(uniqid(rand(),true))."', feed_time='$feed_time'","ID={$a['ID']}");
+				safe_update('textpattern',"uid='".md5(uniqid(rand(),true))."', feed_time='".doSlash($feed_time)."'","ID={$a['ID']}");
 			}
 		}
 	}
@@ -425,6 +428,7 @@ eod;
 		$rs = safe_rows_start('parentid, count(*) as thecount','txp_discuss','visible=1 group by parentid');
 		if ($rs) {
 			while ($a = nextRow($rs)) {
+				assert_int($a['parentid']);
 				safe_update('textpattern',"comments_count=".$a['thecount'],"ID=".$a['parentid']);
 			}
 		}
@@ -576,7 +580,7 @@ eod;
 <small><txp:permlink><txp:permlink /></txp:permlink> &middot;
 <txp:posted /></small></p>
 EOF;
-		safe_insert('txp_form', "name='search_results', type='article', Form='$form'");
+		safe_insert('txp_form', "name='search_results', type='article', Form='".doSlash($form)."'");
 	}
 
 	if (!safe_query("SELECT 1 FROM `".PFX."txp_lang` LIMIT 0")) {
@@ -599,7 +603,7 @@ EOF;
 
 			if (!$client->query('tups.getLanguage',$prefs['blog_uid'],LANG))
 			{
-				echo '<p style="color:red">Error trying to install language. Please, try it again again.<br />
+				echo '<p style="color:red">Error trying to install language. Please, try it again.<br />
 				If problem connecting to the RPC server persists, you can go to <a href="http://rpc.textpattern.com/lang/">http://rpc.textpattern.com/lang/</a>, download the
 				desired language file and place it in the /lang/ directory of your textpattern install. You can then install the language from file.</p>';
 			}else {
@@ -607,7 +611,7 @@ EOF;
 				$lang_struct = unserialize($response);
 				function install_lang_key($value, $key)
 				{
-					$q = "name='$value[name]', event='$value[event]', data='$value[data]', lastmod='".strftime('%Y%m%d%H%M%S',$value['uLastmod'])."'";
+					$q = "name='".doSlash($value[name])."', event='".doSlash($value[event])."', data='".doSlash($value[data])."', lastmod='".doSlash(strftime('%Y%m%d%H%M%S',$value['uLastmod']))."'";
 					safe_insert('txp_lang',$q.", lang='".LANG."'");
 				}
 				array_walk($lang_struct,'install_lang_key');
@@ -650,7 +654,7 @@ EOF;
 <txp:comments_form />
 </txp:if_comments_allowed>
 EOF;
-		safe_insert('txp_form', "name='comments_display', type='article', Form='$form'");
+		safe_insert('txp_form', "name='comments_display', type='article', Form='".doSlash($form)."'");
 	}
 
 	// /tmp is bad for permanent storage of files,

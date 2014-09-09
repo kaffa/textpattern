@@ -59,6 +59,9 @@ else
 $step = ps('step');
 $rel_siteurl = preg_replace("#^(.*?)($txpdir)?/setup.*$#i",'$1',$_SERVER['PHP_SELF']);
 $rel_txpurl = rtrim(dirname(dirname($_SERVER['PHP_SELF'])), '/\\');
+$safe_siteurl = txpspecialchars($rel_siteurl);
+$safe_txpurl = txpspecialchars($rel_txpurl);
+
 $bodyclass = ($step=='') ? ' class="welcome"' : '';
 
 print <<<eod
@@ -68,14 +71,14 @@ print <<<eod
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="noindex, nofollow" />
 	<title>Setup &#124; Textpattern CMS</title>
-	<script type="text/javascript" src="$rel_txpurl/jquery.js"></script>
+	<script type="text/javascript" src="$safe_txpurl/jquery.js"></script>
 	<script type="text/javascript">var textpattern = { do_spellcheck: "", textarray: {} };</script>
-	<script type="text/javascript" src="$rel_txpurl/textpattern.js"></script>
-	<link rel="stylesheet" href="$rel_txpurl/theme/hive/css/textpattern.css" type="text/css" />
+	<script type="text/javascript" src="$safe_txpurl/textpattern.js"></script>
+	<link rel="stylesheet" href="$safe_txpurl/theme/hive/css/textpattern.css" type="text/css" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-	<script type="text/javascript" src="$rel_txpurl/theme/hive/js/modernizr.js"></script>
-	<script type="text/javascript" src="$rel_txpurl/theme/hive/js/jquery.formalize.min.js"></script>
-	<!--[if lt IE 9]><script type="text/javascript" src="$rel_txpurl/theme/hive/js/selectivizr.min.js"></script><![endif]-->
+	<script type="text/javascript" src="$safe_txpurl/theme/hive/js/modernizr.js"></script>
+	<script type="text/javascript" src="$safe_txpurl/theme/hive/js/jquery.formalize.min.js"></script>
+	<!--[if lt IE 9]><script type="text/javascript" src="$safe_txpurl/theme/hive/js/selectivizr.min.js"></script><![endif]-->
 </head>
 <body id="page-setup"{$bodyclass}>
 	<div class="txp-body">
@@ -100,7 +103,7 @@ eod;
 		echo n.'<div id="setup_container" class="txp-container">',
 			n.'<div class="txp-setup">',
 			n.hed('Welcome to Textpattern',1),
-			n.'<form action="'.$_SERVER['PHP_SELF'].'" method="post">',
+			n.'<form action="'.txpspecialchars($_SERVER['PHP_SELF']).'" method="post">',
 			n.langs(),
 			n.graf(fInput('submit','Submit','Submit','publish')),
 			n.sInput('getDbInfo'),
@@ -174,7 +177,7 @@ eod;
 			$guess_siteurl = 'mysite.com';
 		}
 
-		echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post">'.
+		echo '<form action="'.txpspecialchars($_SERVER['PHP_SELF']).'" method="post">'.
 			n.hed(setup_gTxt('need_details'),1).
 			n.hed('MySQL',2).
 			n.graf(setup_gTxt('db_must_exist')).
@@ -208,7 +211,7 @@ eod;
 			n.graf(setup_gTxt('please_enter_url')).
 			n.graf(
 				'<span class="edit-label"><label for="setup_site_url">http://</label>'.sp.popHelp('siteurl').'</span>'.
-				n.'<span class="edit-value">'.fInput('text', 'siteurl', $guess_siteurl, '', '', '', INPUT_REGULAR, '', 'setup_site_url').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'siteurl', txpspecialchars($guess_siteurl), '', '', '', INPUT_REGULAR, '', 'setup_site_url').'</span>'
 			);
 
 		if (is_disabled('mail'))
@@ -425,7 +428,7 @@ eod;
 		echo txp_setup_progress_meter(3).
 			n.'<div class="txp-setup">';
 
-		echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post">'.
+		echo '<form action="'.txpspecialchars($_SERVER['PHP_SELF']).'" method="post">'.
 			n.hed(setup_gTxt('creating_db_tables'),2).
 			n.graf(setup_gTxt('about_to_create')).
 
@@ -647,7 +650,7 @@ eod;
 		'<textarea class="code" readonly="readonly" name="config" cols="'.INPUT_LARGE.'" rows="'.INPUT_MEDIUM.'">'.
 		makeConfig($carry).
 		'</textarea>'.
-		'<form action="'.$_SERVER['PHP_SELF'].'" method="post">'.
+		'<form action="'.txpspecialchars($_SERVER['PHP_SELF']).'" method="post">'.
 		graf(fInput('submit','submit',setup_gTxt('did_it'),'publish')).
 		sInput('getTxpLogin').
 		hInput('carry',postEncode($carry)).
