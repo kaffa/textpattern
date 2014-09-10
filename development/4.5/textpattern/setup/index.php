@@ -26,6 +26,14 @@ if (defined('E_DEPRECATED')) {
 	error_reporting(E_ALL);
 }
 
+if (!isset($_SESSION)) {
+	if (headers_sent()) {
+		$_SESSION = array();
+	} else {
+		session_start();
+	}
+}
+
 @ini_set("display_errors","1");
 
 include_once txpath.'/lib/constants.php';
@@ -143,7 +151,13 @@ eod;
 // -------------------------------------------------------------
 	function getDbInfo()
 	{
-		$GLOBALS['textarray'] = setup_load_lang(ps('lang'));
+		$lang = ps('lang');
+
+		if ($lang) {
+			$_SESSION['lang'] = $lang;
+		}
+
+		$GLOBALS['textarray'] = setup_load_lang($_SESSION['lang']);
 
 		global $txpcfg;
 
@@ -161,13 +175,17 @@ eod;
 			echo graf(
 					'<span class="warning">'.setup_gTxt('already_installed', array('{txpath}' => txpath)).'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
 		}
 
-		if (@$_SERVER['SCRIPT_NAME'] && (@$_SERVER['SERVER_NAME'] || @$_SERVER['HTTP_HOST']))
+		if (isset($_SESSION['siteurl']))
+		{
+			$guess_siteurl = $_SESSION['siteurl'];
+		}
+		elseif (@$_SERVER['SCRIPT_NAME'] && (@$_SERVER['SERVER_NAME'] || @$_SERVER['HTTP_HOST']))
 		{
 			$guess_siteurl = (@$_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
 			$guess_siteurl .= $GLOBALS['rel_siteurl'];
@@ -184,27 +202,27 @@ eod;
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_mysql_login">'.setup_gTxt('mysql_login').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'duser', '', '', '', '', INPUT_REGULAR, '', 'setup_mysql_login').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'duser', (isset($_SESSION['duser']) ? $_SESSION['duser'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_login').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_mysql_pass">'.setup_gTxt('mysql_password').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'dpass', '', '', '', '', INPUT_REGULAR, '', 'setup_mysql_pass').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'dpass', (isset($_SESSION['dpass']) ? $_SESSION['dpass'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_pass').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_mysql_server">'.setup_gTxt('mysql_server').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'dhost', 'localhost', '', '', '', INPUT_REGULAR, '', 'setup_mysql_server').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'dhost', (isset($_SESSION['dhost']) ? $_SESSION['dhost'] : 'localhost'), '', '', '', INPUT_REGULAR, '', 'setup_mysql_server').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_mysql_db">'.setup_gTxt('mysql_database').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'ddb', '', '', '', '', INPUT_REGULAR, '', 'setup_mysql_db').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'ddb', (isset($_SESSION['ddb']) ? $_SESSION['ddb'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_db').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_table_prefix">'.setup_gTxt('table_prefix').'</label>'.sp.popHelp('table_prefix').'</span>'.
-				n.'<span class="edit-value">'.fInput('text', 'dprefix', '', '', '', '', INPUT_REGULAR, '', 'setup_table_prefix').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'dprefix', (isset($_SESSION['dprefix']) ? $_SESSION['dprefix'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_table_prefix').'</span>'
 			).
 
 			n.hed(setup_gTxt('site_url'),2).
@@ -225,8 +243,7 @@ eod;
 			fInput('submit','Submit',setup_gTxt('next_step', '', 'raw'),'publish')
 		);
 
-		echo n.hInput('lang', LANG),
-			n.sInput('printConfig'),
+		echo n.sInput('printConfig').
 			n.'</form>'.
 			n.'</div>'.
 			n.'</div>';
@@ -235,10 +252,14 @@ eod;
 // -------------------------------------------------------------
 	function printConfig()
 	{
-		$carry = psa(array('ddb','duser','dpass','dhost','dprefix','siteurl','lang'));
-		extract($carry);
+		$_SESSION['ddb'] = ps('ddb');
+		$_SESSION['duser'] = ps('duser');
+		$_SESSION['dpass'] = ps('dpass');
+		$_SESSION['dhost'] = ps('dhost');
+		$_SESSION['dprefix'] = ps('dprefix');
+		$_SESSION['siteurl'] = ps('siteurl');
 
-		$GLOBALS['textarray'] = setup_load_lang($lang);
+		$GLOBALS['textarray'] = setup_load_lang($_SESSION['lang']);
 
 		global $txpcfg;
 
@@ -256,14 +277,14 @@ eod;
 			echo graf(
 					'<span class="warning">'.setup_gTxt('already_installed', array('{txpath}' => txpath)).'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
 		}
 
 // TODO, @see http://forum.textpattern.com/viewtopic.php?pid=263205#p263205
-//		if ('' === $dhost || '' === $duser || '' === $ddb)
+//		if ('' === $_SESSION['dhost'] || '' === $_SESSION['duser'] || '' === $_SESSION['ddb'])
 //		{
 //			echo graf(
 //				'<span class="war">'.setup_gTxt('missing_db_details').'</span>'
@@ -276,20 +297,20 @@ eod;
 
 		echo hed(setup_gTxt("checking_database"), 2);
 
-		if (($mylink = mysql_connect($dhost, $duser, $dpass)))
+		if (($mylink = mysql_connect($_SESSION['dhost'], $_SESSION['duser'], $_SESSION['dpass'])))
 		{
-			$carry['dclient_flags'] = 0;
+			$_SESSION['dclient_flags'] = 0;
 		}
-		elseif (($mylink = mysql_connect($dhost, $duser, $dpass, false, MYSQL_CLIENT_SSL)))
+		elseif (($mylink = mysql_connect($_SESSION['dhost'], $_SESSION['duser'], $_SESSION['dpass'], false, MYSQL_CLIENT_SSL)))
 		{
-			$carry['dclient_flags'] = 'MYSQL_CLIENT_SSL';
+			$_SESSION['dclient_flags'] = 'MYSQL_CLIENT_SSL';
 		}
 		else
 		{
 			echo graf(
 					'<span class="error">'.setup_gTxt('db_cant_connect').'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
@@ -299,41 +320,41 @@ eod;
 			'<span class="success">'.setup_gTxt('db_connected').'</span>'
 			);
 
-		if (! ($dprefix == '' || preg_match('#^[a-zA-Z_][a-zA-Z0-9_]*$#', $dprefix)) )
+		if (! ($_SESSION['dprefix'] == '' || preg_match('#^[a-zA-Z_][a-zA-Z0-9_]*$#', $_SESSION['dprefix'])) )
 		{
 			echo graf(
 					'<span class="error">'.setup_gTxt('prefix_bad_characters', array(
-						'{dbprefix}' => strong(txpspecialchars($dprefix))
+						'{dbprefix}' => strong(txpspecialchars($_SESSION['dprefix']))
 					), 'raw').'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
 		}
 
-		if (!$mydb = mysql_select_db($ddb))
+		if (!$mydb = mysql_select_db($_SESSION['ddb']))
 		{
 			echo graf(
 					'<span class="error">'.setup_gTxt('db_doesnt_exist', array(
-						'{dbname}' => strong(txpspecialchars($ddb))
+						'{dbname}' => strong(txpspecialchars($_SESSION['ddb']))
 					), 'raw').'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
 		}
 
-		$tables_exist = mysql_query("describe `".$dprefix."textpattern`");
+		$tables_exist = mysql_query("describe `".$_SESSION['dprefix']."textpattern`");
 		if ($tables_exist)
 		{
 			echo graf(
 					'<span class="error">'.setup_gTxt('tables_exist', array(
-						'{dbname}' => strong(txpspecialchars($ddb))
+						'{dbname}' => strong(txpspecialchars($_SESSION['ddb']))
 					), 'raw').'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
@@ -346,24 +367,24 @@ eod;
 		{
 			if (mysql_query("SET NAMES utf8"))
 			{
-				$carry['dbcharset'] = "utf8";
+				$_SESSION['dbcharset'] = "utf8";
 			}
 			else
 			{
-				$carry['dbcharset'] = "latin1";
+				$_SESSION['dbcharset'] = "latin1";
 			}
 		}
 		else
 		{
-			$carry['dbcharset'] = "latin1";
+			$_SESSION['dbcharset'] = "latin1";
 		}
 
 		echo graf(
-			'<span class="success">'.setup_gTxt('using_db', array('{dbname}' => strong(txpspecialchars($ddb))), 'raw')
-			.' ('. $carry['dbcharset'] .')</span>'
+			'<span class="success">'.setup_gTxt('using_db', array('{dbname}' => strong(txpspecialchars($_SESSION['ddb']))), 'raw')
+			.' ('. $_SESSION['dbcharset'] .')</span>'
 		);
 
-		echo setup_config_contents($carry).
+		echo setup_config_contents().
 			n.'</div>'.
 			n.'</div>';
 	}
@@ -371,11 +392,7 @@ eod;
 // -------------------------------------------------------------
 	function getTxpLogin()
 	{
-		$carry = postDecode(ps('carry'));
-
-		extract($carry);
-
-		$GLOBALS['textarray'] = setup_load_lang($lang);
+		$GLOBALS['textarray'] = setup_load_lang($_SESSION['lang']);
 
 		global $txpcfg;
 
@@ -395,13 +412,13 @@ eod;
 			}
 		}
 
-		if (!isset($txpcfg) || ($txpcfg['db'] != $ddb) || ($txpcfg['table_prefix'] != $dprefix))
+		if (!isset($txpcfg) || ($txpcfg['db'] != $_SESSION['ddb']) || ($txpcfg['table_prefix'] != $_SESSION['dprefix']))
 		{
 			$problems[] = graf('<span class="error">'.setup_gTxt('config_php_does_not_match_input', 'raw').'</span>');
 			echo txp_setup_progress_meter(2).
 				n.'<div class="txp-setup">'.
 				n.join(n, $problems).
-				n.setup_config_contents($carry).
+				n.setup_config_contents().
 				n.'</div>'.
 				n.'</div>';
 			exit;
@@ -423,7 +440,7 @@ eod;
 		}
 		asort($vals, SORT_STRING);
 
-		$theme_chooser = selectInput('theme', $vals, 'classic', '', '', '', 'setup_admin_theme');
+		$theme_chooser = selectInput('theme', $vals, (isset($_SESSION['theme']) ? $_SESSION['theme'] : 'classic'), '', '', '', 'setup_admin_theme');
 
 		echo txp_setup_progress_meter(3).
 			n.'<div class="txp-setup">';
@@ -434,22 +451,22 @@ eod;
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_user_realname">'.setup_gTxt('your_full_name').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'RealName', '', '', '', '', INPUT_REGULAR, '', 'setup_user_realname').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'RealName', (isset($_SESSION['realname']) ? $_SESSION['realname'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_realname').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_user_login">'.setup_gTxt('setup_login').'</label>'.sp.popHelp('setup_user_login').'</span>'.
-				n.'<span class="edit-value">'.fInput('text', 'name', '', '', '', '', INPUT_REGULAR, '', 'setup_user_login').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'name', (isset($_SESSION['name']) ? $_SESSION['name'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_login').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_user_pass">'.setup_gTxt('choose_password').'</label>'.sp.popHelp('setup_user_pass').'</span>'.
-				n.'<span class="edit-value">'.fInput('text', 'pass', '', '', '', '', INPUT_REGULAR, '', 'setup_user_pass').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'pass', (isset($_SESSION['pass']) ? $_SESSION['pass'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_pass').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_user_email">'.setup_gTxt('your_email').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'email', '', '', '', '', INPUT_REGULAR, '', 'setup_user_email').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'email', (isset($_SESSION['email']) ? $_SESSION['email'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_email').'</span>'
 			).
 
 			n.hed(setup_gTxt('site_config'),2).
@@ -463,9 +480,7 @@ eod;
 				fInput('submit','Submit',setup_gTxt('next_step'),'publish')
 			).
 
-			n.sInput('createTxp'),
-			n.hInput('lang', txpspecialchars($lang)),
-			n.hInput('siteurl', txpspecialchars($siteurl)),
+			n.sInput('createTxp').
 			n.'</form>'.
 			n.'</div>'.
 			n.'</div>';
@@ -474,9 +489,15 @@ eod;
 // -------------------------------------------------------------
 	function createTxp()
 	{
-		$GLOBALS['textarray'] = setup_load_lang(ps('lang'));
+		$GLOBALS['textarray'] = setup_load_lang($_SESSION['lang']);
 
-		if (ps('name') == '')
+		$_SESSION['name'] = ps('name');
+		$_SESSION['realname'] = ps('RealName');
+		$_SESSION['pass'] = ps('pass');
+		$_SESSION['email'] = ps('email');
+		$_SESSION['theme'] = ps('theme');
+
+		if ($_SESSION['name'] == '')
 		{
 			echo n.'<div id="setup_container" class="txp-container">'.
 				txp_setup_progress_meter(3).
@@ -484,13 +505,13 @@ eod;
 				n.graf(
 					'<span class="error">'.setup_gTxt('name_required').'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
 		}
 
-		if (!ps('pass'))
+		if (!$_SESSION['pass'])
 		{
 			echo n.'<div id="setup_container" class="txp-container">'.
 				txp_setup_progress_meter(3).
@@ -498,13 +519,13 @@ eod;
 				n.graf(
 					'<span class="error">'.setup_gTxt('pass_required').'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
 		}
 
-		if (!is_valid_email(ps('email')))
+		if (!is_valid_email($_SESSION['email']))
 		{
 			echo n.'<div id="setup_container" class="txp-container">'.
 				txp_setup_progress_meter(3).
@@ -512,7 +533,7 @@ eod;
 				n.graf(
 					'<span class="error">'.setup_gTxt('email_required').'</span>'
 				).
-				n.setup_back_button().
+				n.setup_back_button(__FUNCTION__).
 				n.'</div>'.
 				n.'</div>';
 			exit;
@@ -522,7 +543,26 @@ eod;
 
 		if (!isset($txpcfg['db']))
 		{
-			require txpath.'/config.php';
+			if (!is_readable(txpath.'/config.php'))
+			{
+				$problems[] = graf('<span class="error">'.setup_gTxt('config_php_not_found', array('{file}' => txpspecialchars(txpath.'/config.php')), 'raw').'</span>');
+			}
+			else
+			{
+				@include txpath.'/config.php';
+			}
+		}
+
+		if (!isset($txpcfg) || ($txpcfg['db'] != $_SESSION['ddb']) || ($txpcfg['table_prefix'] != $_SESSION['dprefix']))
+		{
+			$problems[] = graf('<span class="error">'.setup_gTxt('config_php_does_not_match_input', 'raw').'</span>');
+			echo txp_setup_progress_meter(3).
+				n.'<div class="txp-setup">'.
+				n.join(n, $problems).
+				n.setup_config_contents().
+				n.'</div>'.
+				n.'</div>';
+			exit;
 		}
 
 		$ddb = $txpcfg['db'];
@@ -533,7 +573,7 @@ eod;
 		$dprefix = $txpcfg['table_prefix'];
 		$dbcharset = $txpcfg['dbcharset'];
 
-		$siteurl = str_replace("http://",'', ps('siteurl'));
+		$siteurl = str_replace("http://",'', $_SESSION['siteurl']);
 		$siteurl = rtrim($siteurl,"/");
 		$urlpath = preg_replace('#^[^/]+#', '', $siteurl);
 
@@ -543,14 +583,19 @@ eod;
 		include_once txpath.'/lib/txplib_update.php';
 		include txpath.'/setup/txpsql.php';
 
-		// This has to come after txpsql.php, because otherwise we can't call mysql_real_escape_string
-		extract(doSlash(psa(array('name','pass','RealName','email', 'theme'))));
-
 		$nonce = md5( uniqid( rand(), true ) );
-		$hash  = doSlash(txp_hash_password($pass));
+		$hash  = doSlash(txp_hash_password($_SESSION['pass']));
 
 		mysql_query("INSERT INTO `".PFX."txp_users` VALUES
-			(1,'$name','$hash','$RealName','$email',1,now(),'$nonce')");
+			(1,
+			'".doSlash($_SESSION['name'])."',
+			'$hash',
+			'".doSlash($_SESSION['realname'])."',
+			'".doSlash($_SESSION['email'])."',
+			1,
+			now(),
+			'$nonce')"
+		);
 
 		mysql_query("update `".PFX."txp_prefs` set val = '".doSlash($siteurl)."' where `name`='siteurl'");
 		mysql_query("update `".PFX."txp_prefs` set val = '".LANG."' where `name`='language'");
@@ -559,14 +604,14 @@ eod;
 
 		// cf. update/_to_4.2.0.php.
 		// TODO: Position might need altering when prefs panel layout is altered
-		$theme = $theme ? $theme : 'classic';
+		$theme = $_SESSION['theme'] ? $_SESSION['theme'] : 'classic';
 		mysql_query("insert `".PFX."txp_prefs` set prefs_id = 1, name = 'theme_name', val = '".doSlash($theme)."', type = '1', event = 'admin', html = 'themename', position = '160'");
 
 		echo fbCreate();
 	}
 
 // -------------------------------------------------------------
-	function makeConfig($ar)
+	function makeConfig()
 	{
 		define("nl","';\n");
 		define("o",'$txpcfg[\'');
@@ -575,22 +620,21 @@ eod;
 		$close = '?'.chr(62);
 
 		// Escape single quotes and backslashes in literal PHP strings
-		foreach ($ar as $k => $v) {
-			$ar[$k] = addcslashes($ar[$k], "'\\");
+		foreach ($_SESSION as $k => $v) {
+			$_SESSION[$k] = addcslashes($_SESSION[$k], "'\\");
 		}
-		$ar = doSpecial($ar);
-		extract($ar);
+		$_SESSION = doSpecial($_SESSION);
 
 		return
 		$open."\n"
-		.o.'db'           .m.$ddb.nl
-		.o.'user'         .m.$duser.nl
-		.o.'pass'         .m.$dpass.nl
-		.o.'host'         .m.$dhost.nl
-		.($dclient_flags ? o.'client_flags'."'] = ".$dclient_flags.";\n" : '')
-		.o.'table_prefix' .m.$dprefix.nl
+		.o.'db'           .m.$_SESSION['ddb'].nl
+		.o.'user'         .m.$_SESSION['duser'].nl
+		.o.'pass'         .m.$_SESSION['dpass'].nl
+		.o.'host'         .m.$_SESSION['dhost'].nl
+		.($_SESSION['dclient_flags'] ? o.'client_flags'."'] = ".$_SESSION['dclient_flags'].";\n" : '')
+		.o.'table_prefix' .m.$_SESSION['dprefix'].nl
 		.o.'txpath'       .m.txpath.nl
-		.o.'dbcharset'    .m.$dbcharset.nl
+		.o.'dbcharset'    .m.$_SESSION['dbcharset'].nl
 		.$close;
 	}
 
@@ -613,6 +657,9 @@ eod;
 		}
 		else
 		{
+			// Clear the session so no data is leaked.
+			$_SESSION = array();
+
 			$warnings = @find_temp_dir() ? '' : n.graf('<span class="warning">'.setup_gTxt('set_temp_dir_prefs').'</span>');
 			$login_url = $GLOBALS['rel_txpurl'].'/index.php';
 
@@ -640,7 +687,7 @@ eod;
 	}
 
 // -------------------------------------------------------------
-	function setup_config_contents($carry)
+	function setup_config_contents()
 	{
 		return hed(setup_gTxt('creating_config'), 2).
 			graf(
@@ -648,35 +695,35 @@ eod;
 			).
 
 		'<textarea class="code" readonly="readonly" name="config" cols="'.INPUT_LARGE.'" rows="'.INPUT_MEDIUM.'">'.
-		makeConfig($carry).
+		makeConfig().
 		'</textarea>'.
 		'<form action="'.txpspecialchars($_SERVER['PHP_SELF']).'" method="post">'.
 		graf(fInput('submit','submit',setup_gTxt('did_it'),'publish')).
 		sInput('getTxpLogin').
-		hInput('carry',postEncode($carry)).
 		'</form>';
 	}
 
 // -------------------------------------------------------------
-	function postEncode($thing)
+	function setup_back_button($current = null)
 	{
-		return base64_encode(serialize($thing));
-	}
+		$prevSteps = array(
+			'getDbInfo'   => '',
+			'getTxpLogin' => 'getDbInfo',
+			'printConfig' => 'getDbInfo',
+			'createTxp'   => 'getTxpLogin',
+			'fbCreate'    => 'createTxp',
+		);
 
-// -------------------------------------------------------------
-	function postDecode($thing)
-	{
-		return unserialize(base64_decode($thing));
-	}
+		$prev = isset($prevSteps[$current]) ? $prevSteps[$current] : '';
 
-// -------------------------------------------------------------
-	function setup_back_button()
-	{
 		return graf(
 			setup_gTxt('please_go_back')
 		).
 		n.graf(
-			'<a class="navlink" href="javascript:history.back()">'.setup_gTxt('back').'</a>'
+			'<form action="'.txpspecialchars($_SERVER['PHP_SELF']).'" method="post">'.
+			sInput($prev).
+			fInput('submit', 'submit', setup_gTxt('back'), 'navlink').
+			'</form>'
 		);
 	}
 
@@ -730,7 +777,7 @@ eod;
 			'zh-tw' => '中文(繁體)',
 		);
 
-		$default = 'en-gb';
+		$default = (!empty($_SESSION['lang']) ? $_SESSION['lang'] : 'en-gb');
 
 		$out = n.'<p><label for="setup_language">Please choose a language</label>'.
 			br.'<select name="lang" id="setup_language">';
