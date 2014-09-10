@@ -202,27 +202,27 @@ eod;
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_mysql_login">'.setup_gTxt('mysql_login').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'duser', (isset($_SESSION['duser']) ? $_SESSION['duser'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_login').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'duser', (isset($_SESSION['duser']) ? txpspecialchars($_SESSION['duser']) : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_login').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_mysql_pass">'.setup_gTxt('mysql_password').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'dpass', (isset($_SESSION['dpass']) ? $_SESSION['dpass'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_pass').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'dpass', (isset($_SESSION['dpass']) ? txpspecialchars($_SESSION['dpass']) : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_pass').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_mysql_server">'.setup_gTxt('mysql_server').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'dhost', (isset($_SESSION['dhost']) ? $_SESSION['dhost'] : 'localhost'), '', '', '', INPUT_REGULAR, '', 'setup_mysql_server').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'dhost', (isset($_SESSION['dhost']) ? txpspecialchars($_SESSION['dhost']) : 'localhost'), '', '', '', INPUT_REGULAR, '', 'setup_mysql_server').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_mysql_db">'.setup_gTxt('mysql_database').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'ddb', (isset($_SESSION['ddb']) ? $_SESSION['ddb'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_db').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'ddb', (isset($_SESSION['ddb']) ? txpspecialchars($_SESSION['ddb']) : ''), '', '', '', INPUT_REGULAR, '', 'setup_mysql_db').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_table_prefix">'.setup_gTxt('table_prefix').'</label>'.sp.popHelp('table_prefix').'</span>'.
-				n.'<span class="edit-value">'.fInput('text', 'dprefix', (isset($_SESSION['dprefix']) ? $_SESSION['dprefix'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_table_prefix').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'dprefix', (isset($_SESSION['dprefix']) ? txpspecialchars($_SESSION['dprefix']) : ''), '', '', '', INPUT_REGULAR, '', 'setup_table_prefix').'</span>'
 			).
 
 			n.hed(setup_gTxt('site_url'),2).
@@ -381,7 +381,7 @@ eod;
 
 		echo graf(
 			'<span class="success">'.setup_gTxt('using_db', array('{dbname}' => strong(txpspecialchars($_SESSION['ddb']))), 'raw')
-			.' ('. $_SESSION['dbcharset'] .')</span>'
+			.' ('. txpspecialchars($_SESSION['dbcharset']) .')</span>'
 		);
 
 		echo setup_config_contents().
@@ -440,7 +440,7 @@ eod;
 		}
 		asort($vals, SORT_STRING);
 
-		$theme_chooser = selectInput('theme', $vals, (isset($_SESSION['theme']) ? $_SESSION['theme'] : 'classic'), '', '', '', 'setup_admin_theme');
+		$theme_chooser = selectInput('theme', $vals, (isset($_SESSION['theme']) ? txpspecialchars($_SESSION['theme']) : 'classic'), '', '', '', 'setup_admin_theme');
 
 		echo txp_setup_progress_meter(3).
 			n.'<div class="txp-setup">';
@@ -451,22 +451,22 @@ eod;
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_user_realname">'.setup_gTxt('your_full_name').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'RealName', (isset($_SESSION['realname']) ? $_SESSION['realname'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_realname').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'RealName', (isset($_SESSION['realname']) ? txpspecialchars($_SESSION['realname']) : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_realname').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_user_login">'.setup_gTxt('setup_login').'</label>'.sp.popHelp('setup_user_login').'</span>'.
-				n.'<span class="edit-value">'.fInput('text', 'name', (isset($_SESSION['name']) ? $_SESSION['name'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_login').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'name', (isset($_SESSION['name']) ? txpspecialchars($_SESSION['name']) : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_login').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_user_pass">'.setup_gTxt('choose_password').'</label>'.sp.popHelp('setup_user_pass').'</span>'.
-				n.'<span class="edit-value">'.fInput('text', 'pass', (isset($_SESSION['pass']) ? $_SESSION['pass'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_pass').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'pass', (isset($_SESSION['pass']) ? txpspecialchars($_SESSION['pass']) : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_pass').'</span>'
 			).
 
 			n.graf(
 				'<span class="edit-label"><label for="setup_user_email">'.setup_gTxt('your_email').'</label></span>'.
-				n.'<span class="edit-value">'.fInput('text', 'email', (isset($_SESSION['email']) ? $_SESSION['email'] : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_email').'</span>'
+				n.'<span class="edit-value">'.fInput('text', 'email', (isset($_SESSION['email']) ? txpspecialchars($_SESSION['email']) : ''), '', '', '', INPUT_REGULAR, '', 'setup_user_email').'</span>'
 			).
 
 			n.hed(setup_gTxt('site_config'),2).
