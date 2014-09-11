@@ -574,7 +574,7 @@ eod;
 		$dbcharset = $txpcfg['dbcharset'];
 
 		$siteurl = str_replace("http://",'', $_SESSION['siteurl']);
-		$siteurl = rtrim($siteurl,"/");
+		$siteurl = str_replace(' ', '%20', rtrim($siteurl,"/"));
 		$urlpath = preg_replace('#^[^/]+#', '', $siteurl);
 
 		define("PFX",trim($dprefix));
