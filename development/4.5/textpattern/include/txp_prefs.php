@@ -754,7 +754,7 @@ EOS
 									n.'<span class="date modified">'.safe_strftime('%d %b %Y %X',@$langdat['rpc_lastmod']).'</span>'
 								: (
 										(isset($langdat['rpc_lastmod'])
-											? gTxt('updated')
+											? gTxt('up_to_date')
 											: '-'
 										).
 										(isset($langdat['db_lastmod'])
