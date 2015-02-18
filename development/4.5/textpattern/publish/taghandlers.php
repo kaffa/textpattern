@@ -782,6 +782,7 @@ $LastChangedRevision$
 			'label'    => gTxt('recent_articles'),
 			'labeltag' => '',
 			'limit'    => 10,
+        	'offset'   => 0,
 			'section'  => '',
 			'sort'     => 'Posted desc',
 			'sortby'   => '', // deprecated
@@ -820,7 +821,7 @@ $LastChangedRevision$
 		$expired = ($prefs['publish_expired_articles']) ? '' : ' and (now() <= Expires or Expires = '.NULLDATETIME.') ';
 
 		$rs = safe_rows_start('*, id as thisid, unix_timestamp(Posted) as posted', 'textpattern',
-			"Status = 4 $section $categories and Posted <= now()$expired order by ".doSlash($sort).' limit 0,'.intval($limit));
+			"Status = 4 $section $categories and Posted <= now()$expired order by ".doSlash($sort).' limit '.intval($offset).','.intval($limit));
 
 		if ($rs)
 		{
