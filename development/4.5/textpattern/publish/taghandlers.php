@@ -782,7 +782,7 @@ $LastChangedRevision$
 			'label'    => gTxt('recent_articles'),
 			'labeltag' => '',
 			'limit'    => 10,
-        	'offset'   => 0,
+			'offset'   => 0,
 			'section'  => '',
 			'sort'     => 'Posted desc',
 			'sortby'   => '', // deprecated
