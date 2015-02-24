@@ -522,6 +522,7 @@ EOS
 	function section_delete()
 	{
 		$selected  = ps('selected');
+		$message = '';
 		$with_articles = safe_rows('Section, Count(*) AS count', 'textpattern', "Section in ('".join("','", doSlash($selected))."') GROUP BY Section");
 		$protected[] = 'default';
 		$del['success'] = $del['error'] = array();
@@ -558,7 +559,14 @@ EOS
 			callback_event('sections_deleted', '', 0, $del['success']);
 		}
 
-		$message = ($del['success']) ? gTxt('section_deleted', array('{name}' => join(', ', $del['success']))) : '';
+		if ($del['success']) {
+			$message = gTxt('section_deleted', array('{name}' => join(', ', $del['success'])));
+		}
+
+		if ($del['error']) {
+			$severity = ($message) ? E_WARNING : E_ERROR;
+			$message = array(($message ? $message . n : '') . gTxt('section_delete_failure', array('{name}' => join(', ', $del['error']))), $severity);
+		}
 
 		sec_section_list($message);
 	}
