@@ -557,13 +557,11 @@ EOS
 		if ($del['success'])
 		{
 			callback_event('sections_deleted', '', 0, $del['success']);
-		}
-
-		if ($del['success']) {
 			$message = gTxt('section_deleted', array('{name}' => join(', ', $del['success'])));
 		}
 
-		if ($del['error']) {
+		if ($del['error'])
+		{
 			$severity = ($message) ? E_WARNING : E_ERROR;
 			$message = array(($message ? $message . n : '') . gTxt('section_delete_failure', array('{name}' => join(', ', $del['error']))), $severity);
 		}
