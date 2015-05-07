@@ -17,4 +17,4 @@ If requesting an enhancement, please make sure to _first_ try the following:
   * upgrade to the latest stable version, to make sure it has not already been added
   * check to see if the issue has already been reported; do not create duplicate reports
 
-[http://code.google.com/p/textpattern/issues/entry Report New Issue]
+[https://github.com/textpattern/textpattern/issues Report New Issue]

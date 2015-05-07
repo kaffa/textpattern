@@ -1,16 +1,14 @@
-  * [http://code.google.com/p/textpattern/source/browse Browse the Subversion repository]
-  * [http://code.google.com/p/textpattern/source/list View changesets]
+  * [https://github.com/textpattern/textpattern Browse the Git repository]
+  * [https://github.com/textpattern/textpattern/commits/master View commits]
 
-=== Checkout ===
+== Clone / Checkout ==
 
 Dev branch:
-
 {{{
-svn checkout http://textpattern.googlecode.com/svn/development/4.x dev
+git clone https://github.com/textpattern/textpattern.git dev
 }}}
 
-Crockery branch:
-
+Latest stable release:
 {{{
-svn checkout http://textpattern.googlecode.com/svn/development/crockery crockery
+svn checkout http://textpattern.googlecode.com/svn/releases/4.5.7/source stable
 }}}
